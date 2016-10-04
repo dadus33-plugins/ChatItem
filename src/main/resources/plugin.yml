@@ -1,0 +1,17 @@
+name: ChatItem
+main: me.dadus33.chatitem.ChatItem
+version: 1.1.0
+depend: [ProtocolLib]
+author: dadus33
+commands:
+  cireload:
+    description: Reload the ChatItem config.
+    aliases: [chatitemreload, citemreload, cir]
+    permission: chatitem.reload
+permissions:
+  chatitem.reload:
+    description: Allows reloading the config
+    default: op
+  chatitem.use:
+    description: Allows your messages to be parsed by the plugin
+    default: true
