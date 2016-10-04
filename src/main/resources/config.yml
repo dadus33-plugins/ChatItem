@@ -39,7 +39,11 @@ deny-if-no-item: false
 #If so, what message should the user get upon attempting to send such a message? Set to "" to disable.
 deny-message: "&c&lYou have no item in hand!"
 
+#  Should we add a cooldown for users to use the placeholder? Set it to any > 0 integer value which represents
+# the time in seconds.
 cooldown: 0
+
+cooldown-message: "&cYou can't resend a message with placeholder in it as you're still in cooldown!"
 
 #The message you will get after reloading the plugin using /cireload.
 reload-success: "&b&lSuccessful reload!"
