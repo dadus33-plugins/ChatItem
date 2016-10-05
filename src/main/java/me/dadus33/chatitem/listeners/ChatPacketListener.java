@@ -51,6 +51,7 @@ public class ChatPacketListener extends PacketAdapter {
             return;
         }
         if (!e.getPlayer().hasPermission("chatitem.use")) {
+            e.setCancelled(true);
             return;
         }
         String message = json;
@@ -105,8 +106,9 @@ public class ChatPacketListener extends PacketAdapter {
         } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
             e1.printStackTrace();
         }
-        if (message != null)
+        if (message != null) {
             packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
+        }
     }
 
 
