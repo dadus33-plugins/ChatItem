@@ -6,7 +6,7 @@
 
     <groupId>me.dadus33</groupId>
     <artifactId>ChatItem</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,15 +18,10 @@
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
         <repository>
-            <id>stealthyone-repo</id>
-            <url>http://repo.stealthyone.com/content/groups/public</url>
-        </repository>
-        <repository>
             <id>dmulloy2-repo</id>
             <url>http://repo.dmulloy2.net/content/groups/public/</url>
         </repository>
     </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
@@ -44,6 +39,7 @@
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
             <version>3.6.5</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

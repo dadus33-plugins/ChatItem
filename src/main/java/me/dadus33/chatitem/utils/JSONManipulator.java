@@ -27,7 +27,6 @@ public class JSONManipulator {
 
 
     public static String parse(String json, String[] replacements, ItemStack item, String repl) throws InvocationTargetException, IllegalAccessException, InstantiationException {
-        System.out.println(json);
         JsonObject obj = parser.parse(json).getAsJsonObject();
         JsonArray array = obj.getAsJsonArray("extra");
         replaces = replacements;
@@ -127,7 +126,6 @@ public class JSONManipulator {
 
         }
         obj.add("extra", rep);
-        System.out.println(obj.toString());
         return obj.toString();
     }
 
@@ -195,7 +193,6 @@ public class JSONManipulator {
             }
 
         }
-        System.out.println(replacer);
         return replacer;
     }
 

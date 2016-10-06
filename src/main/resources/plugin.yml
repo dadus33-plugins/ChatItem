@@ -1,6 +1,6 @@
 name: ChatItem
 main: me.dadus33.chatitem.ChatItem
-version: 1.1.0
+version: ${project.version}
 depend: [ProtocolLib]
 author: dadus33
 commands:

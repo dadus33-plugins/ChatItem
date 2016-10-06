@@ -7,6 +7,7 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.async.AsyncListenerHandler;
 import com.comphenix.protocol.events.ListenerPriority;
 import me.dadus33.chatitem.commands.CIReload;
+import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatPacketListener;
 import me.dadus33.chatitem.utils.Config;
 import me.dadus33.chatitem.utils.CustomConfig;
@@ -24,6 +25,7 @@ public class ChatItem extends JavaPlugin {
     public final static int CFG_VER = 3;
     private static ChatItem instance;
     private AsyncListenerHandler packetListenerAsyncThread;
+    private ChatEventListener chatEventListener;
     private CustomConfig handler;
     private Config config;
     private Storage storage;
@@ -43,6 +45,7 @@ public class ChatItem extends JavaPlugin {
         General.init(obj.storage);
         General.checkConfigVersion();
         obj.listener.setStorage(obj.storage);
+        obj.chatEventListener.setStorage(obj.storage);
         if (!obj.storage.RELOAD_MESSAGE.isEmpty())
             sender.sendMessage(obj.storage.RELOAD_MESSAGE);
     }
@@ -68,6 +71,8 @@ public class ChatItem extends JavaPlugin {
         packetListenerAsyncThread.start();
         rld = new CIReload();
         Bukkit.getPluginCommand("cireload").setExecutor(rld);
+        chatEventListener = new ChatEventListener(storage);
+        Bukkit.getPluginManager().registerEvents(chatEventListener, this);
     }
 
     public void onDisable() {

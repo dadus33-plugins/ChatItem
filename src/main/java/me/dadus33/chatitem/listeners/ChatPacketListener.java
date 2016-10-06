@@ -9,20 +9,26 @@ import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.utils.JSONManipulator;
 import me.dadus33.chatitem.utils.Storage;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 
 public class ChatPacketListener extends PacketAdapter {
 
-    public final static String NAME = Pattern.quote("{name}");
-    public final static String AMOUNT = Pattern.quote("{amount}");
-    public final static String TIMES = Pattern.quote("{times}");
+    public final static HashMap<Long, String> SENDERS = new HashMap<>();
+    private final static String NAME = Pattern.quote("{name}");
+    private final static String AMOUNT = Pattern.quote("{amount}");
+    private final static String TIMES = Pattern.quote("{times}");
+    private final static HashMap<String, Integer> PLAYER = new HashMap<>();
     ChatItem instance;
     Storage c;
 
@@ -50,18 +56,39 @@ public class ChatPacketListener extends PacketAdapter {
         if (!found) {
             return;
         }
-        if (!e.getPlayer().hasPermission("chatitem.use")) {
+        Player p = null;
+        String pname = "";
+        long diff = 1000;
+        for (Map.Entry<Long, String> entry : SENDERS.entrySet()) {
+            long smallst = System.currentTimeMillis() - entry.getKey();
+            if (smallst < diff) {
+                diff = smallst;
+                pname = entry.getValue();
+            }
+        }
+        p = Bukkit.getPlayer(pname);
+        if (!p.hasPermission("chatitem.use")) {
             e.setCancelled(true);
             return;
         }
         String message = json;
         String[] reps = new String[c.PLACEHOLDERS.size()];
         c.PLACEHOLDERS.toArray(reps);
-        ItemStack inHand = e.getPlayer().getItemInHand();
+        ItemStack inHand = p.getItemInHand();
         if (inHand.getType() == Material.AIR) {
             if (c.DENY_IF_NO_ITEM) {
                 if (!c.DENY_MESSAGE.isEmpty()) {
-                    e.getPlayer().sendMessage(c.DENY_MESSAGE);
+                    if (!PLAYER.containsKey(p.getName()))
+                        p.sendMessage(c.DENY_MESSAGE);
+                    if (PLAYER.containsKey(p.getName())) {
+                        if (PLAYER.get(p.getName()) == 1) {
+                            PLAYER.remove(p.getName());
+                        } else {
+                            PLAYER.put(p.getName(), PLAYER.get(p.getName()) - 1);
+                        }
+                    } else {
+                        PLAYER.put(p.getName(), Bukkit.getOnlinePlayers().size());
+                    }
                 }
                 e.setCancelled(true);
                 return;
@@ -102,7 +129,7 @@ public class ChatPacketListener extends PacketAdapter {
         }
 
         try {
-            message = JSONManipulator.parse(json, reps, e.getPlayer().getItemInHand(), replacer);
+            message = JSONManipulator.parse(json, reps, p.getItemInHand(), replacer);
         } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
             e1.printStackTrace();
         }
