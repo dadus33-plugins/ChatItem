@@ -18,7 +18,6 @@ public class ChatEventListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onChat(AsyncPlayerChatEvent e) {
-        System.out.println(e.toString());
         if (!e.isAsynchronous()) {
             return;
         }

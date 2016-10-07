@@ -38,6 +38,31 @@ public class ChatPacketListener extends PacketAdapter {
         c = s;
     }
 
+    private static String materialToName(Material m) {
+        if (m.equals(Material.TNT)) {
+            return "TNT";
+        }
+        String orig = m.toString().toLowerCase();
+        String[] splits = orig.split("_");
+        StringBuilder sb = new StringBuilder(orig.length());
+        int pos = 0;
+        for (String split : splits) {
+            sb.append(split);
+            int loc = sb.lastIndexOf(split);
+            char charLoc = sb.charAt(loc);
+            if (!(split.equalsIgnoreCase("of") || split.equalsIgnoreCase("and") ||
+                    split.equalsIgnoreCase("with") || split.equalsIgnoreCase("on")))
+                sb.setCharAt(loc, Character.toUpperCase(charLoc));
+            if (pos != splits.length - 1)
+                sb.append(' ');
+            ++pos;
+        }
+
+        return sb.toString();
+
+
+    }
+
     @Override
     public void onPacketSending(PacketEvent e) {
         PacketContainer packet = e.getPacket();
@@ -56,7 +81,7 @@ public class ChatPacketListener extends PacketAdapter {
         if (!found) {
             return;
         }
-        Player p = null;
+        Player p;
         String pname = "";
         long diff = 1000;
         for (Map.Entry<Long, String> entry : SENDERS.entrySet()) {
@@ -103,6 +128,12 @@ public class ChatPacketListener extends PacketAdapter {
                 replacer = ChatColor.stripColor(replacer);
                 dname = true;
             }
+        } else {
+            if (inHand.hasItemMeta()) {
+                if (inHand.getItemMeta().hasDisplayName()) {
+                    dname = true;
+                }
+            }
         }
         if (inHand.getAmount() == 1) {
             if (c.FORCE_ADD_AMOUNT) {
@@ -122,9 +153,7 @@ public class ChatPacketListener extends PacketAdapter {
             if (translated != null) {
                 replacer = replacer.replaceAll(NAME, translated);
             } else {
-                StringBuilder stringBuilder = new StringBuilder(inHand.getType().toString().toLowerCase());
-                stringBuilder.setCharAt(0, Character.toUpperCase(stringBuilder.charAt(0)));
-                replacer = replacer.replaceAll(NAME, stringBuilder.toString().replaceAll("_", " "));
+                replacer = replacer.replaceAll(NAME, materialToName(inHand.getType()));
             }
         }
 
@@ -137,7 +166,6 @@ public class ChatPacketListener extends PacketAdapter {
             packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
         }
     }
-
 
     public void setStorage(Storage st) {
         c = st;
