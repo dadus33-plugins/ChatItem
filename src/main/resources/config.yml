@@ -15,7 +15,7 @@ placeholders:
 # the item, or material name (ex. DIAMOND_SWORD) if it doesn't have a customized
 # display name, and {amount} will be replaced by the amount-format configured bellow.
 # You can use color codes.
-name-format: "&f<&b&l&o{name}{amount}&f>&r"
+name-format: "&f<&b&l&o{name} {amount}&f>&r"
 
 #  The amount format that will replace the {amount} placeholder in the 'name-format'
 # field above. The {times} placeholder represents the number of times the item is
@@ -33,39 +33,37 @@ color-if-already-colored: true
 # Should we add the item amount even if there's only one item in the stack?
 force-add-amount: true
 
-#Should we cancel the user message if the item in his (main) hand is air or null? (No item in hand, that is)
-deny-if-no-item: false
+# Should we cancel the user message if the item in his (main) hand is air or null? (No item in hand, that is)
+deny-if-no-item: true
 
-#If so, what message should the user get upon attempting to send such a message? Set to "" to disable.
+#  If so, what message should the user get upon attempting to send such a message? Set to "" to disable.
 deny-message: "&c&lYou have no item in hand!"
 
-#  Should we add a cooldown for users to use the placeholder? Set it to any > 0 integer value which represents
-# the time in seconds.
-cooldown: 0
-
-cooldown-message: "&cYou can't resend a message with placeholder in it as you're still in cooldown!"
-
-#The message you will get after reloading the plugin using /cireload.
+#  The message you will get after reloading the plugin using /cireload.
 reload-success: "&b&lSuccessful reload!"
 
 
 
-#Translations
+#  Translations
 Translations:
-  GRANITE: "STONE:1"
-#The above field is a little more complicated, but I'll explain you:
-#You may have noticed that (until now) if using the placeholder
-#with an item such as Granite in hand, (unless it's display name
-#is changed) the item will display in chat as (for granite) STONE.
-#That happens because the plugin is set to use the material
-#name of the item if no custom displayname is found on it.
-#The material name for both stone and granite is STONE, the
-#only difference being the data value, stone being STONE:0
-#and granite being STONE:1. In order to make things more user
-#friendly, I implemented this translation feature. Here's how it works:
-#If you want to display STONE:1 as GRANITE in chat, you should
-#add the following line under translations:
-#GRANITE: "STONE:1". The key (the thing before ':') is the name
-#you want to be displayed for the value (the thing after ':')
-#in chat. You can find a list of item materials and data values
-#here: http://www.minecraftinfo.com/idlist.htm
+  STONE:
+    1: "Granite"
+#  The above field is a little more complicated, but I'll explain you:
+# You may have noticed that (until now) if using the placeholder
+# with an item such as Granite in hand, (unless it's display name
+# is changed) the item will display in chat as (for granite) Stone.
+# That happens because the plugin is set to use the material
+# name of the item if no custom displayname is found on it.
+# The material name for both stone and granite is STONE, the
+# only difference being the data value, stone being STONE:0
+# and granite being STONE:1. In order to make things more user
+# friendly, I implemented this translation feature. Here's how it works:
+# If you want to display STONE:1 as GRANITE in chat, you should
+# add the following line under translations:
+# STONE:
+#   1: "Granite"
+# STONE represents the material name of the item, while it's sub-section
+# '1' represents the data value of the item. The thing that comes next is
+# what should actually be displayed in chat.
+# You can find a list of item materials and data values
+# here: http://www.minecraftinfo.com/idlist.html
