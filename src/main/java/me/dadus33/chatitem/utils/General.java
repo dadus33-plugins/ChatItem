@@ -6,18 +6,9 @@ import org.bukkit.ChatColor;
 
 import java.util.logging.Level;
 
-/**
- * Created by Vlad on 03.10.2016.
- */
 public class General {
 
     private static Storage c;
-
-
-    public static String translate(String mat, short data) {
-        String search = mat.concat(":").concat(String.valueOf(data));
-        return c.TRANSLATIONS.get(search);
-    }
 
     public static void checkConfigVersion() {
         int latestVersion = ChatItem.CFG_VER;

@@ -134,7 +134,7 @@ public class ChatPacketListener extends PacketAdapter {
             if (dname) {
                 replacer = replacer.replaceAll(NAME, inHand.getItemMeta().getDisplayName());
             } else {
-                String translated = c.TRANSLATIONS.get(inHand.getType().name().concat(":").concat(String.valueOf(inHand.getDurability())));
+                String translated = c.TRANSLATIONS.get(inHand.getType().name()).get(inHand.getDurability());
                 if (translated != null) {
                     replacer = replacer.replaceAll(NAME, translated);
                 } else {

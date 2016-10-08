@@ -3,11 +3,15 @@ package me.dadus33.chatitem.utils;
 
 import org.bukkit.ChatColor;
 
-public class Translator {
+/*
+Many thanks to @DarkSeraphim for this!
+I only modified his work to make it compatible with what I was building.
+*/
+class Translator {
     private static final StringBuilder BUILDER = new StringBuilder("");
     private static final StringBuilder STYLE = new StringBuilder();
 
-    public static String toJSON(String message) {
+    static String toJSON(String message) {
         if (message == null || message.isEmpty())
             return null;
         String[] parts = message.split(Character.toString(ChatColor.COLOR_CHAR));
@@ -18,8 +22,6 @@ public class Translator {
         BUILDER.append("[");
         boolean ignoreFirst = !parts[0].isEmpty() && ChatColor.getByChar(parts[0].charAt(0)) != null;
         for (String part : parts) {
-            // If it starts with a colour, just ignore the empty String
-            // before it
             if (part.isEmpty()) {
                 continue;
             }

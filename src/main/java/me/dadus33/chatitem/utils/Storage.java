@@ -7,6 +7,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Copyright (C) 2016 Vlad Ardelean - All Rights Reserved
@@ -19,8 +20,7 @@ import java.util.List;
 
 public class Storage {
 
-    public final HashMap<String, String> TRANSLATIONS = new HashMap<>();
-    public final Integer CONFIG_VERSION;
+    public final HashMap<String, HashMap<Short, String>> TRANSLATIONS = new HashMap<>();
     public final ImmutableList<String> PLACEHOLDERS;
     public final String NAME_FORMAT;
     public final String AMOUNT_FORMAT;
@@ -29,6 +29,7 @@ public class Storage {
     public final Boolean DENY_IF_NO_ITEM;
     public final String DENY_MESSAGE;
     public final String RELOAD_MESSAGE;
+    final Integer CONFIG_VERSION;
     private final Config cfg;
     private final CustomConfig handler;
     private final FileConfiguration conf;
@@ -38,9 +39,16 @@ public class Storage {
         this.cfg = cfg;
         this.handler = handler;
         this.conf = handler.getCustomConfig(cfg);
+        Set<String> keys = conf.getConfigurationSection("Translations").getKeys(false);
+        for (String key : keys) {
+            HashMap<Short, String> entry = new HashMap<>();
+            Set<String> subKeys = conf.getConfigurationSection("Translations.".concat(key)).getKeys(false);
+            for (String subKey : subKeys) {
+                entry.put(Short.parseShort(subKey), color(conf.getString("Translations.".concat(key).concat(".")
+                        .concat(subKey))));
+            }
 
-        for (String key : conf.getConfigurationSection("Translations").getKeys(false)) {
-            TRANSLATIONS.put(key, color(conf.getString("Translations.".concat(key))));
+            TRANSLATIONS.put(key, entry);
         }
         CONFIG_VERSION = conf.getInt("config-version");
         List<String> added = conf.getStringList("placeholders");
@@ -60,14 +68,14 @@ public class Storage {
     }
 
     private static List<String> colorList(List<String> ls) {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
         for (String s : ls) {
             ret.add(color(s));
         }
         return ret;
     }
 
-    public void performOverwrite() {
+    void performOverwrite() {
         handler.overwriteWithDefautConfig(cfg);
     }
 
