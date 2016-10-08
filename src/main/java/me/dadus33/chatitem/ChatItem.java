@@ -14,12 +14,14 @@ import me.dadus33.chatitem.utils.CustomConfig;
 import me.dadus33.chatitem.utils.General;
 import me.dadus33.chatitem.utils.Storage;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.mcstats.MetricsLite;
 
-/**
- * Created by Vlad on 30.09.2016.
- */
+import java.io.IOException;
+import java.util.logging.Level;
+
 public class ChatItem extends JavaPlugin {
 
     public final static int CFG_VER = 3;
@@ -50,7 +52,7 @@ public class ChatItem extends JavaPlugin {
             sender.sendMessage(obj.storage.RELOAD_MESSAGE);
     }
 
-    public static ChatItem getInstance() {
+    private static ChatItem getInstance() {
         return instance;
     }
 
@@ -73,6 +75,14 @@ public class ChatItem extends JavaPlugin {
         Bukkit.getPluginCommand("cireload").setExecutor(rld);
         chatEventListener = new ChatEventListener(storage);
         Bukkit.getPluginManager().registerEvents(chatEventListener, this);
+
+        try {
+            MetricsLite metrics = new MetricsLite(this);
+            metrics.start();
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, ChatColor.RED + "Couldn't start metrics!");
+        }
+
     }
 
     public void onDisable() {
