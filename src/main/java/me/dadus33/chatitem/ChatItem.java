@@ -24,16 +24,14 @@ import java.util.logging.Level;
 
 public class ChatItem extends JavaPlugin {
 
-    public final static int CFG_VER = 3;
+    public final static int CFG_VER = 4;
     private static ChatItem instance;
-    private AsyncListenerHandler packetListenerAsyncThread;
     private ChatEventListener chatEventListener;
     private CustomConfig handler;
     private Config config;
     private Storage storage;
     private ProtocolManager pm;
     private ChatPacketListener listener;
-    private CIReload rld;
 
     public static void reload(CommandSender sender) {
         ChatItem obj = getInstance();
@@ -69,9 +67,9 @@ public class ChatItem extends JavaPlugin {
         General.checkConfigVersion();
         listener = new ChatPacketListener(this, ListenerPriority.HIGHEST, storage, PacketType.Play.Server.CHAT);
         AsynchronousManager am = pm.getAsynchronousManager();
-        packetListenerAsyncThread = am.registerAsyncHandler(listener);
+        AsyncListenerHandler packetListenerAsyncThread = am.registerAsyncHandler(listener);
         packetListenerAsyncThread.start();
-        rld = new CIReload();
+        CIReload rld = new CIReload();
         Bukkit.getPluginCommand("cireload").setExecutor(rld);
         chatEventListener = new ChatEventListener(storage);
         Bukkit.getPluginManager().registerEvents(chatEventListener, this);
