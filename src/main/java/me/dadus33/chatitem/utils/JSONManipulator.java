@@ -80,6 +80,7 @@ public class JSONManipulator {
                     jar = parseArray(jar);
                     o.add("extra", jar);
                 }
+                continue;
             } else {
                 if (text.getAsString().isEmpty()) {
                     JsonElement el = o.get("extra");
@@ -94,7 +95,7 @@ public class JSONManipulator {
             String msg = text.getAsString();
             boolean isLast = false;
             boolean done = false;
-            boolean fnd = false;
+            boolean fnd;
             String[] splits;
             for (String repls : replacements) {
                 if (done) {

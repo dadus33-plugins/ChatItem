@@ -1,6 +1,7 @@
 package me.dadus33.chatitem.listeners;
 
 import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
@@ -24,13 +25,12 @@ import java.util.regex.Pattern;
 
 public class ChatPacketListener extends PacketAdapter {
 
-    public final static HashMap<Long, String> SENDERS = new HashMap<>();
+    final static HashMap<Long, String> SENDERS = new HashMap<>();
     private final static String NAME = Pattern.quote("{name}");
     private final static String AMOUNT = Pattern.quote("{amount}");
     private final static String TIMES = Pattern.quote("{times}");
-    private final static HashMap<String, Integer> PLAYER = new HashMap<>();
-    ChatItem instance;
-    Storage c;
+    private ChatItem instance;
+    private Storage c;
 
     public ChatPacketListener(Plugin plugin, ListenerPriority listenerPriority, Storage s, PacketType... types) {
         super(plugin, listenerPriority, types);
@@ -63,108 +63,105 @@ public class ChatPacketListener extends PacketAdapter {
 
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onPacketSending(PacketEvent e) {
-        PacketContainer packet = e.getPacket();
-        if (packet.getBytes().readSafely(0) == (byte) 2) {
-            return;
+        if (e.getPacket().getBytes().readSafely(0) == (byte) 2) {
+            return;  //It means it's an actionbar message, and we ain't intercepting those
         }
-        WrappedChatComponent chatMessage = packet.getChatComponents().readSafely(0);
-        String json = chatMessage.getJson();
+        String json = e.getPacket().getChatComponents().readSafely(0).getJson();
         boolean found = false;
-        for (int i = 0; i < c.PLACEHOLDERS.size(); ++i) {
-            if (json.contains(c.PLACEHOLDERS.get(i))) {
+        for (String rep : c.PLACEHOLDERS)
+            if (json.contains(rep)) {
                 found = true;
                 break;
             }
-        }
         if (!found) {
-            return;
+            return; //then it's just a normal message without placeholders, so we leave it alone
         }
-        Player p;
-        String pname = "";
-        long diff = 1000;
-        for (Map.Entry<Long, String> entry : SENDERS.entrySet()) {
-            long smallst = System.currentTimeMillis() - entry.getKey();
-            if (smallst < diff) {
-                diff = smallst;
-                pname = entry.getValue();
-            }
-        }
-        p = Bukkit.getPlayer(pname);
-        if (!p.hasPermission("chatitem.use")) {
-            e.setCancelled(true);
-            return;
-        }
-        String message = json;
-        String[] reps = new String[c.PLACEHOLDERS.size()];
-        c.PLACEHOLDERS.toArray(reps);
-        ItemStack inHand = p.getItemInHand();
-        if (inHand.getType() == Material.AIR) {
-            if (c.DENY_IF_NO_ITEM) {
-                if (!c.DENY_MESSAGE.isEmpty()) {
-                    if (!PLAYER.containsKey(p.getName()))
-                        p.sendMessage(c.DENY_MESSAGE);
-                    if (PLAYER.containsKey(p.getName())) {
-                        if (PLAYER.get(p.getName()) == 1) {
-                            PLAYER.remove(p.getName());
-                        } else {
-                            PLAYER.put(p.getName(), PLAYER.get(p.getName()) - 1);
-                        }
-                    } else {
-                        PLAYER.put(p.getName(), Bukkit.getOnlinePlayers().size());
-                    }
+        PacketContainer packet = e.getPacket();
+        if (packet.getMetadata("goodPacket") == null) { //if this isn't one of the already-parsed packets
+            String playerName = null;
+            Long currentTime = System.currentTimeMillis();
+            Long minDiff = 10000L;
+            Map.Entry entry = null;
+            for (Map.Entry<Long, String> ent : SENDERS.entrySet()) {
+                long dif = currentTime - ent.getKey();
+                if (dif <= minDiff) {
+                    minDiff = dif;
+                    playerName = ent.getValue();
+                    entry = ent;
                 }
-                e.setCancelled(true);
+            } //we searched for the player who sent the packet
+            e.setCancelled(true); //we cancel this as we're going to manually resend all packets anyways
+            if (playerName == null) {
                 return;
             }
-            return;
-        }
-        String replacer = c.NAME_FORMAT;
-        String amount = c.AMOUNT_FORMAT;
-        boolean dname = false;
-        if (!c.COLOR_IF_ALREADY_COLORED && inHand.hasItemMeta()) {
-            if (inHand.getItemMeta().hasDisplayName()) {
-                replacer = ChatColor.stripColor(replacer);
-                dname = true;
-            }
-        } else {
-            if (inHand.hasItemMeta()) {
+            Player p = Bukkit.getPlayer(playerName);
+            SENDERS.entrySet().remove(entry);
+
+
+            //Styling begin
+
+
+            ItemStack inHand = p.getItemInHand();
+            String replacer = c.NAME_FORMAT;
+            String amount = c.AMOUNT_FORMAT;
+            boolean dname = false;
+            if (!c.COLOR_IF_ALREADY_COLORED && inHand.hasItemMeta()) {
                 if (inHand.getItemMeta().hasDisplayName()) {
+                    replacer = ChatColor.stripColor(replacer);
                     dname = true;
                 }
+            } else {
+                if (inHand.hasItemMeta()) {
+                    if (inHand.getItemMeta().hasDisplayName()) {
+                        dname = true;
+                    }
+                }
             }
-        }
-        if (inHand.getAmount() == 1) {
-            if (c.FORCE_ADD_AMOUNT) {
-                amount = amount.replaceAll(TIMES, "1");
+            if (inHand.getAmount() == 1) {
+                if (c.FORCE_ADD_AMOUNT) {
+                    amount = amount.replaceAll(TIMES, "1");
+                    replacer = replacer.replaceAll(AMOUNT, amount);
+                } else {
+                    replacer = replacer.replaceAll(AMOUNT, "");
+                }
+            } else {
+                amount = amount.replaceAll(TIMES, String.valueOf(inHand.getAmount()));
                 replacer = replacer.replaceAll(AMOUNT, amount);
-            } else {
-                replacer = replacer.replaceAll(AMOUNT, "");
             }
-        } else {
-            amount = amount.replaceAll(TIMES, String.valueOf(inHand.getAmount()));
-            replacer = replacer.replaceAll(AMOUNT, amount);
-        }
-        if (dname) {
-            replacer = replacer.replaceAll(NAME, inHand.getItemMeta().getDisplayName());
-        } else {
-            String translated = c.TRANSLATIONS.get(inHand.getType().name().concat(":").concat(String.valueOf(inHand.getDurability())));
-            if (translated != null) {
-                replacer = replacer.replaceAll(NAME, translated);
+            if (dname) {
+                replacer = replacer.replaceAll(NAME, inHand.getItemMeta().getDisplayName());
             } else {
-                replacer = replacer.replaceAll(NAME, materialToName(inHand.getType()));
+                String translated = c.TRANSLATIONS.get(inHand.getType().name().concat(":").concat(String.valueOf(inHand.getDurability())));
+                if (translated != null) {
+                    replacer = replacer.replaceAll(NAME, translated);
+                } else {
+                    replacer = replacer.replaceAll(NAME, materialToName(inHand.getType()));
+                }
             }
+            //Styling end
+            String[] reps = new String[c.PLACEHOLDERS.size()];
+            c.PLACEHOLDERS.toArray(reps);
+            String message = null;
+            try {
+                message = JSONManipulator.parse(json, reps, p.getItemInHand(), replacer);
+            } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
+                e1.printStackTrace();
+            }
+            packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
+            packet.addMetadata("goodPacket", true); //Adding this metadata will let it pass through our filter
+            for (Player player : Bukkit.getOnlinePlayers()) { //And now we send it to all players on the server
+                try {
+                    ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet, true);
+                } catch (InvocationTargetException e1) {
+                    e1.printStackTrace();
+                }
+            }
+
         }
 
-        try {
-            message = JSONManipulator.parse(json, reps, p.getItemInHand(), replacer);
-        } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
-            e1.printStackTrace();
-        }
-        if (message != null) {
-            packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
-        }
     }
 
     public void setStorage(Storage st) {
