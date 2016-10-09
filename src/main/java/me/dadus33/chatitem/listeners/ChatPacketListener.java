@@ -1,7 +1,6 @@
 package me.dadus33.chatitem.listeners;
 
 import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
@@ -19,13 +18,11 @@ import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 
 public class ChatPacketListener extends PacketAdapter {
 
-    final static HashMap<Long, String> SENDERS = new HashMap<>();
     private final static String NAME = Pattern.quote("{name}");
     private final static String AMOUNT = Pattern.quote("{amount}");
     private final static String TIMES = Pattern.quote("{times}");
@@ -69,7 +66,10 @@ public class ChatPacketListener extends PacketAdapter {
         if (e.getPacket().getBytes().readSafely(0) == (byte) 2) {
             return;  //It means it's an actionbar message, and we ain't intercepting those
         }
-        String json = e.getPacket().getChatComponents().readSafely(0).getJson();
+
+        PacketContainer packet = e.getPacket();
+        String json = packet.getChatComponents().readSafely(0).getJson();
+
         boolean found = false;
         for (String rep : c.PLACEHOLDERS)
             if (json.contains(rep)) {
@@ -79,30 +79,29 @@ public class ChatPacketListener extends PacketAdapter {
         if (!found) {
             return; //then it's just a normal message without placeholders, so we leave it alone
         }
-        PacketContainer packet = e.getPacket();
-        if (packet.getMetadata("goodPacket") == null) { //if this isn't one of the already-parsed packets
-            String playerName = null;
-            Long currentTime = System.currentTimeMillis();
-            Long minDiff = 10000L;
-            Map.Entry entry = null;
-            for (Map.Entry<Long, String> ent : SENDERS.entrySet()) {
-                long dif = currentTime - ent.getKey();
-                if (dif <= minDiff) {
-                    minDiff = dif;
-                    playerName = ent.getValue();
-                    entry = ent;
-                }
-            } //we searched for the player who sent the packet
-            e.setCancelled(true); //we cancel this as we're going to manually resend all packets anyways
-            if (playerName == null) {
-                return;
+        int topIndex = -1;
+        String name = null;
+        for(Player p : Bukkit.getOnlinePlayers()){
+            String pname = p.getName();
+            if(!json.contains(pname)){
+                continue;
             }
-            Player p = Bukkit.getPlayer(playerName);
-            SENDERS.entrySet().remove(entry);
+            int index = json.lastIndexOf(pname)+pname.length();
+            if(index>topIndex){
+                topIndex = index;
+                name = pname;
+            }
+        }
+        if(name==null){ //something went really bad, so we run away and hide
+            return;
+        }
+        Player p = Bukkit.getPlayer(name);
+        StringBuffer buff = new StringBuffer(json);
+        buff.replace(topIndex-name.length(), topIndex, "");
+        json = buff.toString();
 
 
-            //Styling begin
-
+        //STYLE BEGIN
 
             ItemStack inHand = p.getItemInHand();
             String replacer = c.NAME_FORMAT;
@@ -134,34 +133,31 @@ public class ChatPacketListener extends PacketAdapter {
             if (dname) {
                 replacer = replacer.replaceAll(NAME, inHand.getItemMeta().getDisplayName());
             } else {
-                String translated = c.TRANSLATIONS.get(inHand.getType().name()).get(inHand.getDurability());
-                if (translated != null) {
-                    replacer = replacer.replaceAll(NAME, translated);
-                } else {
+                HashMap<Short, String> translationSection = c.TRANSLATIONS.get(inHand.getType().name());
+                if(translationSection==null){
                     replacer = replacer.replaceAll(NAME, materialToName(inHand.getType()));
-                }
-            }
-            //Styling end
-            String[] reps = new String[c.PLACEHOLDERS.size()];
-            c.PLACEHOLDERS.toArray(reps);
-            String message = null;
-            try {
-                message = JSONManipulator.parse(json, reps, p.getItemInHand(), replacer);
-            } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
-                e1.printStackTrace();
-            }
-            packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
-            packet.addMetadata("goodPacket", true); //Adding this metadata will let it pass through our filter
-            for (Player player : Bukkit.getOnlinePlayers()) { //And now we send it to all players on the server
-                try {
-                    ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet, true);
-                } catch (InvocationTargetException e1) {
-                    e1.printStackTrace();
+                }else {
+                    String translated = translationSection.get(inHand.getDurability());
+                    if (translated != null) {
+                        replacer = replacer.replaceAll(NAME, translated);
+                    } else {
+                        replacer = replacer.replaceAll(NAME, materialToName(inHand.getType()));
+                    }
                 }
             }
 
+
+        //STYLE END
+
+        String[] reps = new String[c.PLACEHOLDERS.size()];
+        c.PLACEHOLDERS.toArray(reps);
+        String message = null;
+        try {
+            message = JSONManipulator.parse(json, reps, p.getItemInHand(), replacer);
+        } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
+            e1.printStackTrace();
         }
-
+        packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
     }
 
     public void setStorage(Storage st) {

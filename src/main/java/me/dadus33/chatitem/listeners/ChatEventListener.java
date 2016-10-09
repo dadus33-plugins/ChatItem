@@ -24,6 +24,7 @@ public class ChatEventListener implements Listener {
             return;
         }
         boolean found = false;
+
         for (String rep : c.PLACEHOLDERS)
             if (e.getMessage().contains(rep)) {
                 found = true;
@@ -44,8 +45,7 @@ public class ChatEventListener implements Listener {
             }
             return;
         }
-        Long curr = System.currentTimeMillis();
-        ChatPacketListener.SENDERS.put(curr, e.getPlayer().getName());
+        e.setMessage(e.getMessage().concat(e.getPlayer().getName()));
 
     }
 
