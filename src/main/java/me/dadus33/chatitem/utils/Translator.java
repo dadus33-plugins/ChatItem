@@ -1,13 +1,8 @@
 package me.dadus33.chatitem.utils;
 
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.bukkit.ChatColor;
-
-import java.util.regex.Pattern;
 
 /*
 Many thanks to @DarkSeraphim for this!
@@ -95,62 +90,4 @@ public class Translator {
         return STYLE.append("\"color\":\"").append(cc.name().toLowerCase()).append("\", ").toString();
     }
 
-
-    public static String fromJSON(String json){
-        JsonArray extra = JSON_PARSER.parse(json).getAsJsonObject().get("extra").getAsJsonArray();
-        StringBuilder message = new StringBuilder();
-        for(int i = 0; i < extra.size(); ++i){
-            JsonElement o = extra.get(i);
-            if(!o.toString().contains("text")){
-                continue;
-            }
-            JsonObject ob = o.getAsJsonObject();
-            if(!ob.has("text")){
-                message.append(fromJSON(ob.toString()));
-                continue;
-            }
-            if(ob.get("text").getAsString().isEmpty()){
-                message.append(fromJSON(ob.toString()));
-                continue;
-            }
-            String text = ob.get("text").getAsString();
-            message.append(text);
-        }
-        return message.toString();
-    }
-
-    public static String removeLast(String json, String pname){
-        JsonObject obj = JSON_PARSER.parse(json).getAsJsonObject();
-        JsonArray extra = obj.get("extra").getAsJsonArray();
-        for(int i = extra.size()-1; i >=0; ++i){
-            JsonElement o = extra.get(i);
-            if(!o.toString().contains("text")){
-                continue;
-            }
-            JsonObject ob = o.getAsJsonObject();
-            if(!ob.has("text")){
-                if(removeLast(ob.toString(), pname)!=null){
-                    return removeLast(ob.toString(), pname);
-                }
-                continue;
-            }
-            if(ob.get("text").getAsString().isEmpty()){
-                if(removeLast(ob.toString(), pname)!=null){
-                    return removeLast(ob.toString(), pname);
-                }
-                continue;
-            }
-            String text = ob.get("text").getAsString();
-            if(text.contains(pname)){
-                text = text.replaceFirst(Pattern.quote(pname), "");
-            }
-            ob.addProperty("text", text);
-            extra.set(i, ob);
-            return obj.toString();
-        }
-        obj.add("extra", extra);
-        if(json.equals(obj.toString()))
-            return null;
-        return obj.toString();
-    }
 }
