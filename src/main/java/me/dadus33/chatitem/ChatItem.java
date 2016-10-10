@@ -50,7 +50,7 @@ public class ChatItem extends JavaPlugin {
             sender.sendMessage(obj.storage.RELOAD_MESSAGE);
     }
 
-    private static ChatItem getInstance() {
+    public static ChatItem getInstance() {
         return instance;
     }
 

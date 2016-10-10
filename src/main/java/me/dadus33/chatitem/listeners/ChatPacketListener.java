@@ -153,11 +153,16 @@ public class ChatPacketListener extends PacketAdapter {
         c.PLACEHOLDERS.toArray(reps);
         String message = null;
         try {
+            if(!p.getItemInHand().getType().equals(Material.AIR))
             message = JSONManipulator.parse(json, reps, p.getItemInHand(), replacer);
         } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
             e1.printStackTrace();
         }
-        packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
+        if(message!=null)
+            packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
+        else
+            e.setCancelled(true);
+
     }
 
     public void setStorage(Storage st) {

@@ -42,6 +42,12 @@ deny-message: "&c&lYou have no item in hand!"
 #  The message you will get after reloading the plugin using /cireload.
 reload-success: "&b&lSuccessful reload!"
 
+#  Here you can choose which commands will the plugin attempt to parse. Console commands will all be ignored,
+# however player commands will be taken into consideration. To add a command, simply add an element to the list
+# bellow containing an alias (or name) for that command.
+commands:
+  - "msg"
+
 
 
 #  Translations

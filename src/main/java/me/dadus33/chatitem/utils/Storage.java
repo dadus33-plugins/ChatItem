@@ -1,13 +1,17 @@
 package me.dadus33.chatitem.utils;
 
 import com.google.common.collect.ImmutableList;
+import me.dadus33.chatitem.ChatItem;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 /**
  * Copyright (C) 2016 Vlad Ardelean - All Rights Reserved
@@ -21,7 +25,7 @@ import java.util.Set;
 public class Storage {
 
     public final HashMap<String, HashMap<Short, String>> TRANSLATIONS = new HashMap<>();
-    public final ImmutableList<String> PLACEHOLDERS;
+    public final List<String> PLACEHOLDERS;
     public final String NAME_FORMAT;
     public final String AMOUNT_FORMAT;
     public final Boolean COLOR_IF_ALREADY_COLORED;
@@ -30,6 +34,7 @@ public class Storage {
     public final String DENY_MESSAGE;
     public final String RELOAD_MESSAGE;
     final Integer CONFIG_VERSION;
+    public final List<Command> ALLOWED_COMMANDS = new ArrayList<>();
     private final Config cfg;
     private final CustomConfig handler;
     private final FileConfiguration conf;
@@ -60,6 +65,16 @@ public class Storage {
         DENY_IF_NO_ITEM = conf.getBoolean("deny-if-no-item");
         DENY_MESSAGE = color(conf.getString("deny-message"));
         RELOAD_MESSAGE = color(conf.getString("reload-success"));
+        List<String> cmds = conf.getStringList("commands");
+        for(String s : cmds){
+            Command c = Bukkit.getPluginCommand(s);
+            if(c!=null) {
+                ALLOWED_COMMANDS.add(Bukkit.getPluginCommand(s));
+            }
+            else
+                ChatItem.getInstance().getLogger().log(Level.WARNING, ChatColor.RED.toString().concat("Unknown command ")
+                        .concat(s).concat(" found in config! Ignoring occurrence..."));
+        }
     }
 
 
