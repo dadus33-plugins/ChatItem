@@ -50,7 +50,10 @@ public class ChatEventListener implements Listener {
             }
             return;
         }
+        String oldmsg = e.getMessage();
         e.setMessage(e.getMessage().concat(e.getPlayer().getName()));
+        Bukkit.getConsoleSender().sendMessage(String.format(e.getFormat(), e.getPlayer().getDisplayName(), oldmsg));
+
 
     }
 

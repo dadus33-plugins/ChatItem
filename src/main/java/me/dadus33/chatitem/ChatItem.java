@@ -7,6 +7,7 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.async.AsyncListenerHandler;
 import com.comphenix.protocol.events.ListenerPriority;
 import me.dadus33.chatitem.commands.CIReload;
+import me.dadus33.chatitem.filters.Log4jFilter;
 import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatPacketListener;
 import me.dadus33.chatitem.utils.Config;
@@ -28,6 +29,7 @@ public class ChatItem extends JavaPlugin {
     private static ChatItem instance;
     private ChatEventListener chatEventListener;
     private CustomConfig handler;
+    private Log4jFilter filter;
     private Config config;
     private Storage storage;
     private ProtocolManager pm;
@@ -46,6 +48,7 @@ public class ChatItem extends JavaPlugin {
         General.checkConfigVersion();
         obj.listener.setStorage(obj.storage);
         obj.chatEventListener.setStorage(obj.storage);
+        obj.filter.setStorage(obj.storage);
         if (!obj.storage.RELOAD_MESSAGE.isEmpty())
             sender.sendMessage(obj.storage.RELOAD_MESSAGE);
     }
@@ -80,8 +83,9 @@ public class ChatItem extends JavaPlugin {
         } catch (IOException e) {
             getLogger().log(Level.WARNING, ChatColor.RED + "Couldn't start metrics!");
         }
-
+        filter = new Log4jFilter(storage);
     }
+
 
     public void onDisable() {
         instance = null;

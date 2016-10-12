@@ -13,14 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-/**
- * Copyright (C) 2016 Vlad Ardelean - All Rights Reserved
- * You are not allowed to edit, modify or
- * decompile the contents of this file and/or
- * any other file found in the enclosing jar
- * unless explicitly permitted by me.
- * Written by Vlad Ardelean <LongLiveVladerius@gmail.com>
- */
 
 public class Storage {
 
@@ -65,16 +57,22 @@ public class Storage {
         DENY_IF_NO_ITEM = conf.getBoolean("deny-if-no-item");
         DENY_MESSAGE = color(conf.getString("deny-message"));
         RELOAD_MESSAGE = color(conf.getString("reload-success"));
-        List<String> cmds = conf.getStringList("commands");
-        for(String s : cmds){
-            Command c = Bukkit.getPluginCommand(s);
-            if(c!=null) {
-                ALLOWED_COMMANDS.add(Bukkit.getPluginCommand(s));
+        final List<String> cmds = conf.getStringList("commands");
+        Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                for(String s : cmds){
+                    Command c = Bukkit.getPluginCommand(s);
+                    if(c!=null) {
+                        ALLOWED_COMMANDS.add(Bukkit.getPluginCommand(s));
+                    }
+                    else
+                        ChatItem.getInstance().getLogger().log(Level.WARNING, ChatColor.RED.toString().concat("Unknown command ")
+                                .concat(s).concat(" found in config! Ignoring occurrence..."));
+                }
             }
-            else
-                ChatItem.getInstance().getLogger().log(Level.WARNING, ChatColor.RED.toString().concat("Unknown command ")
-                        .concat(s).concat(" found in config! Ignoring occurrence..."));
-        }
+        }, 100L);
+
     }
 
 
@@ -82,13 +80,6 @@ public class Storage {
         return ChatColor.translateAlternateColorCodes('&', s);
     }
 
-    private static List<String> colorList(List<String> ls) {
-        List<String> ret = new ArrayList<>();
-        for (String s : ls) {
-            ret.add(color(s));
-        }
-        return ret;
-    }
 
     void performOverwrite() {
         handler.overwriteWithDefautConfig(cfg);
