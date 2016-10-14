@@ -1,10 +1,11 @@
-package me.dadus33.chatitem.utils;
+package me.dadus33.chatitem.json;
 
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import me.dadus33.chatitem.utils.Reflect;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.InvocationTargetException;
@@ -12,7 +13,7 @@ import java.lang.reflect.Method;
 import java.util.regex.Pattern;
 
 
-public class JSONManipulator {
+public class JSONManipulatorPost1_7_10 implements JSONManipulator{
 
     private static Class<?> craftItemStackClass = Reflect.getOBCClass("inventory.CraftItemStack");
     private static Class<?> nmsItemStackClass = Reflect.getNMSClass("ItemStack");
@@ -21,16 +22,15 @@ public class JSONManipulator {
     private static Method saveNmsItemStackMethod = Reflect.getMethod(nmsItemStackClass, "save", nbtTagCompoundClass);
 
     private static String[] replaces;
-    private static String replace, rgx;
+    private static String rgx;
     private static JsonArray toUse;
     private static JsonParser parser = new JsonParser();
 
 
-    public static String parse(String json, String[] replacements, ItemStack item, String repl) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+    public String parse(String json, String[] replacements, ItemStack item, String repl) throws InvocationTargetException, IllegalAccessException, InstantiationException {
         JsonObject obj = parser.parse(json).getAsJsonObject();
         JsonArray array = obj.getAsJsonArray("extra");
         replaces = replacements;
-        replace = repl;
         String regex = "";
         for (int i = 0; i < replacements.length; ++i) {
             if (replacements.length == 1) {

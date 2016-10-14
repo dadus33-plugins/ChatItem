@@ -7,7 +7,6 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.utils.JSONManipulator;
 import me.dadus33.chatitem.utils.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -63,6 +62,7 @@ public class ChatPacketListener extends PacketAdapter {
     @SuppressWarnings("deprecation")
     @Override
     public void onPacketSending(PacketEvent e) {
+        if(ChatItem.post17)
         if (e.getPacket().getBytes().readSafely(0) == (byte) 2) {
             return;  //It means it's an actionbar message, and we ain't intercepting those
         }
@@ -96,7 +96,7 @@ public class ChatPacketListener extends PacketAdapter {
             return;
         }
         Player p = Bukkit.getPlayer(name);
-        StringBuffer buff = new StringBuffer(json);
+        StringBuilder buff = new StringBuilder(json);
         buff.replace(topIndex-name.length(), topIndex, "");
         json = buff.toString();
 
@@ -154,7 +154,7 @@ public class ChatPacketListener extends PacketAdapter {
         String message = null;
         try {
             if(!p.getItemInHand().getType().equals(Material.AIR))
-            message = JSONManipulator.parse(json, reps, p.getItemInHand(), replacer);
+            message = ChatItem.getManipulator().parse(json, reps, p.getItemInHand(), replacer);
         } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
             e1.printStackTrace();
         }

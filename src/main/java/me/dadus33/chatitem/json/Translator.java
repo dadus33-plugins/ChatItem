@@ -1,4 +1,4 @@
-package me.dadus33.chatitem.utils;
+package me.dadus33.chatitem.json;
 
 
 import com.google.gson.JsonParser;

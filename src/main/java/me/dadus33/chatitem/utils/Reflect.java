@@ -2,7 +2,6 @@ package me.dadus33.chatitem.utils;
 
 import org.bukkit.Bukkit;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class Reflect {
@@ -11,7 +10,7 @@ public class Reflect {
     private static String versionString;
 
 
-    public static String getVersion() {
+    private static String getVersion() {
         if (versionString == null) {
             String name = Bukkit.getServer().getClass().getPackage().getName();
             versionString = name.substring(name.lastIndexOf('.') + 1) + ".";
@@ -54,22 +53,11 @@ public class Reflect {
 
     public static Method getMethod(Class<?> clazz, String methodName, Class<?>... params) {
         try {
-            Method method = clazz.getMethod(methodName, params);
-            return method;
+            return clazz.getMethod(methodName, params);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-
-    public static Field getField(Class<?> clazz, String fieldName) {
-        try {
-            Field field = clazz.getField(fieldName);
-            return field;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }

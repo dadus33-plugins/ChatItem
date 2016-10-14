@@ -8,6 +8,9 @@ import com.comphenix.protocol.async.AsyncListenerHandler;
 import com.comphenix.protocol.events.ListenerPriority;
 import me.dadus33.chatitem.commands.CIReload;
 import me.dadus33.chatitem.filters.Log4jFilter;
+import me.dadus33.chatitem.json.JSONManipulator;
+import me.dadus33.chatitem.json.JSONManipulatorPost1_7_10;
+import me.dadus33.chatitem.json.JSONManipulatorPre1_7_10;
 import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatPacketListener;
 import me.dadus33.chatitem.utils.Config;
@@ -16,6 +19,7 @@ import me.dadus33.chatitem.utils.General;
 import me.dadus33.chatitem.utils.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mcstats.MetricsLite;
@@ -34,6 +38,8 @@ public class ChatItem extends JavaPlugin {
     private Storage storage;
     private ProtocolManager pm;
     private ChatPacketListener listener;
+    private static JSONManipulator manip;
+    public static boolean post17 = false;
 
     public static void reload(CommandSender sender) {
         ChatItem obj = getInstance();
@@ -76,6 +82,12 @@ public class ChatItem extends JavaPlugin {
         Bukkit.getPluginCommand("cireload").setExecutor(rld);
         chatEventListener = new ChatEventListener(storage);
         Bukkit.getPluginManager().registerEvents(chatEventListener, this);
+        if(isMc18OrLater()) {
+            manip = new JSONManipulatorPost1_7_10();
+            post17 = true;
+        }
+        else
+            manip = new JSONManipulatorPre1_7_10();
 
         try {
             MetricsLite metrics = new MetricsLite(this);
@@ -89,7 +101,35 @@ public class ChatItem extends JavaPlugin {
 
     public void onDisable() {
         instance = null;
+        post17 = false;
     }
+
+    private boolean isMc18OrLater(){
+        switch(getVersion(Bukkit.getServer())){
+            case "v1_8_R1": return true;
+            case "v1_8_R2": return true;
+            case "v1_8_R3": return true;
+            case "v1_9_R1": return true;
+            case "v1_9_R2": return true;
+            case "v1_10_R1": return true;
+            case "v1_10_R2": return true;
+            default: return false;
+        }
+    }
+
+
+    private static String getVersion(Server server) {
+        final String packageName = server.getClass().getPackage().getName();
+
+        return packageName.substring(packageName.lastIndexOf('.') + 1);
+    }
+
+
+    public static JSONManipulator getManipulator(){
+        return manip;
+    }
+
+
 
 
 }
