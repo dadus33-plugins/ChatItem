@@ -11,15 +11,15 @@ import org.apache.logging.log4j.message.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import static org.apache.logging.log4j.core.Filter.Result.NEUTRAL;
 
 
-/**
- * Created by Vlad on 12.10.2016.
- */
 public class Log4jFilter implements Filter {
 
     private boolean stopped;
+    private final static CopyOnWriteArrayList<String> ls = new CopyOnWriteArrayList<>();
     public Storage c;
 
     public Log4jFilter(Storage st){
@@ -81,8 +81,10 @@ public class Log4jFilter implements Filter {
     private Result checkMessage(String msg){
         for(String placeholder : c.PLACEHOLDERS){
             if(msg.contains(placeholder)){
+                ls.add(msg);
                 for(Player p : Bukkit.getOnlinePlayers()){
-                    if(msg.endsWith(p.getName())){
+                    msg = msg.replaceAll("\\p{C}", "");
+                    if(msg.endsWith(p.getName()) || msg.lastIndexOf(p.getName())+2+p.getName().length()>=msg.length()){
                         return Result.DENY;
                     }
                 }

@@ -9,8 +9,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import me.dadus33.chatitem.commands.CIReload;
 import me.dadus33.chatitem.filters.Log4jFilter;
 import me.dadus33.chatitem.json.JSONManipulator;
-import me.dadus33.chatitem.json.JSONManipulatorPost1_7_10;
-import me.dadus33.chatitem.json.JSONManipulatorPre1_7_10;
+import me.dadus33.chatitem.json.JSONManipulatorCurrent;
 import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatPacketListener;
 import me.dadus33.chatitem.utils.Config;
@@ -83,11 +82,9 @@ public class ChatItem extends JavaPlugin {
         chatEventListener = new ChatEventListener(storage);
         Bukkit.getPluginManager().registerEvents(chatEventListener, this);
         if(isMc18OrLater()) {
-            manip = new JSONManipulatorPost1_7_10();
             post17 = true;
         }
-        else
-            manip = new JSONManipulatorPre1_7_10();
+        manip = new JSONManipulatorCurrent();
 
         try {
             MetricsLite metrics = new MetricsLite(this);
