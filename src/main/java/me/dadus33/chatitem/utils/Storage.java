@@ -2,8 +2,8 @@ package me.dadus33.chatitem.utils;
 
 import com.google.common.collect.ImmutableList;
 import me.dadus33.chatitem.ChatItem;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.configuration.file.FileConfiguration;
 
