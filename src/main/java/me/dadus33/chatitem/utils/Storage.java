@@ -27,15 +27,8 @@ public class Storage {
     public final String RELOAD_MESSAGE;
     final Integer CONFIG_VERSION;
     public final List<Command> ALLOWED_COMMANDS = new ArrayList<>();
-    private final Config cfg;
-    private final CustomConfig handler;
-    private final FileConfiguration conf;
 
-
-    public Storage(Config cfg, CustomConfig handler) {
-        this.cfg = cfg;
-        this.handler = handler;
-        this.conf = handler.getCustomConfig(cfg);
+    public Storage(FileConfiguration conf) {
         Set<String> keys = conf.getConfigurationSection("Translations").getKeys(false);
         for (String key : keys) {
             HashMap<Short, String> entry = new HashMap<>();
@@ -82,7 +75,7 @@ public class Storage {
 
 
     void performOverwrite() {
-        handler.overwriteWithDefautConfig(cfg);
+        ChatItem.getInstance().saveResource("config.yml", true);
     }
 
 }

@@ -12,8 +12,6 @@ import me.dadus33.chatitem.json.JSONManipulator;
 import me.dadus33.chatitem.json.JSONManipulatorCurrent;
 import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatPacketListener;
-import me.dadus33.chatitem.utils.Config;
-import me.dadus33.chatitem.utils.CustomConfig;
 import me.dadus33.chatitem.utils.General;
 import me.dadus33.chatitem.utils.Storage;
 import org.bukkit.Bukkit;
@@ -31,9 +29,7 @@ public class ChatItem extends JavaPlugin {
     public final static int CFG_VER = 4;
     private static ChatItem instance;
     private ChatEventListener chatEventListener;
-    private CustomConfig handler;
     private Log4jFilter filter;
-    private Config config;
     private Storage storage;
     private ProtocolManager pm;
     private ChatPacketListener listener;
@@ -42,13 +38,10 @@ public class ChatItem extends JavaPlugin {
 
     public static void reload(CommandSender sender) {
         ChatItem obj = getInstance();
-        obj.handler = new CustomConfig(obj);
-        obj.config = new Config("config");
         obj.pm = ProtocolLibrary.getProtocolManager();
-        if (obj.config.file == null || obj.config.fileConfig == null) {
-            obj.handler.saveDefaultConfig(obj.config);
-        }
-        obj.storage = new Storage(obj.config, obj.handler);
+        obj.saveDefaultConfig();
+        obj.reloadConfig();
+        obj.storage = new Storage(obj.getConfig());
         General.init(obj.storage);
         General.checkConfigVersion();
         obj.listener.setStorage(obj.storage);
@@ -64,13 +57,9 @@ public class ChatItem extends JavaPlugin {
 
     public void onEnable() {
         instance = this;
-        handler = new CustomConfig(this);
-        config = new Config("config");
         pm = ProtocolLibrary.getProtocolManager();
-        if (config.file == null || config.fileConfig == null) {
-            handler.saveDefaultConfig(config);
-        }
-        storage = new Storage(config, handler);
+        saveDefaultConfig();
+        storage = new Storage(getConfig());
         General.init(storage);
         General.checkConfigVersion();
         listener = new ChatPacketListener(this, ListenerPriority.HIGHEST, storage, PacketType.Play.Server.CHAT);
@@ -125,8 +114,4 @@ public class ChatItem extends JavaPlugin {
     public static JSONManipulator getManipulator(){
         return manip;
     }
-
-
-
-
 }
