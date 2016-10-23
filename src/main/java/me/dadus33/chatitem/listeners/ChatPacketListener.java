@@ -17,14 +17,13 @@ import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 
 public class ChatPacketListener extends PacketAdapter {
 
-    private final static String NAME = Pattern.quote("{name}");
-    private final static String AMOUNT = Pattern.quote("{amount}");
-    private final static String TIMES = Pattern.quote("{times}");
+    private final static String NAME = "{name}";
+    private final static String AMOUNT = "{amount}";
+    private final static String TIMES = "{times}";
     private ChatItem instance;
     private Storage c;
 
@@ -121,27 +120,29 @@ public class ChatPacketListener extends PacketAdapter {
             }
             if (inHand.getAmount() == 1) {
                 if (c.FORCE_ADD_AMOUNT) {
-                    amount = amount.replaceAll(TIMES, "1");
-                    replacer = replacer.replaceAll(AMOUNT, amount);
+                    amount = amount.replace(TIMES, "1");
+                    replacer = replacer.replace(AMOUNT, amount);
                 } else {
-                    replacer = replacer.replaceAll(AMOUNT, "");
+                    replacer = replacer.replace(AMOUNT, "");
                 }
             } else {
-                amount = amount.replaceAll(TIMES, String.valueOf(inHand.getAmount()));
-                replacer = replacer.replaceAll(AMOUNT, amount);
+                amount = amount.replace(TIMES, String.valueOf(inHand.getAmount()));
+                replacer = replacer.replace(AMOUNT, amount);
             }
             if (dname) {
-                replacer = replacer.replaceAll(NAME, inHand.getItemMeta().getDisplayName());
+                String trp = inHand.getItemMeta().getDisplayName();
+                replacer = replacer.replace(NAME, trp);
             } else {
                 HashMap<Short, String> translationSection = c.TRANSLATIONS.get(inHand.getType().name());
                 if(translationSection==null){
-                    replacer = replacer.replaceAll(NAME, materialToName(inHand.getType()));
+                    String trp = materialToName(inHand.getType());
+                    replacer = replacer.replace(NAME, trp);
                 }else {
                     String translated = translationSection.get(inHand.getDurability());
                     if (translated != null) {
-                        replacer = replacer.replaceAll(NAME, translated);
+                        replacer = replacer.replace(NAME, translated);
                     } else {
-                        replacer = replacer.replaceAll(NAME, materialToName(inHand.getType()));
+                        replacer = replacer.replace(NAME, materialToName(inHand.getType()));
                     }
                 }
             }

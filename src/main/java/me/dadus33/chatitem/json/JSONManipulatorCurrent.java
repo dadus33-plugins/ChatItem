@@ -46,13 +46,14 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         }
         rgx = regex;
         JsonArray rep = new JsonArray();
+        repl = escapeBackslash(repl);
         JsonArray use = parser.parse(Translator.toJSON(repl)).getAsJsonArray();
 
         JsonObject hover = parser.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
         Object nmsStack = asNMSCopy.invoke(null, item);
         Object tag = nbtTagCompoundClass.newInstance();
         tag = saveNmsItemStackMethod.invoke(nmsStack, tag);
-        String jsonRep = tag.toString();
+        String jsonRep = escapeBackslash(tag.toString());
         hover.addProperty("value", jsonRep);
         for (JsonElement ob : use)
             ob.getAsJsonObject().add("hoverEvent", hover);
@@ -111,7 +112,8 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                     for (int j = 0; j < splits.length; ++j) {
                         boolean endDot = (j == splits.length - 1) && isLast;
                         if (!splits[j].isEmpty() && !endDot) {
-                            JsonObject fix = parser.parse(o.toString()).getAsJsonObject();
+                            String st = o.toString();
+                            JsonObject fix = parser.parse(st).getAsJsonObject();
                             fix.addProperty("text", splits[j]);
                             rep.add(fix);
                         }
@@ -227,7 +229,8 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                     for (int j = 0; j < splits.length; ++j) {
                         boolean endDot = (j == splits.length - 1) && isLast;
                         if (!splits[j].isEmpty() && !endDot) {
-                            JsonObject fix = parser.parse(o.toString()).getAsJsonObject();
+                            String st = o.toString();
+                            JsonObject fix = parser.parse(st).getAsJsonObject();
                             fix.addProperty("text", splits[j]);
                             replacer.add(fix);
                         }
@@ -283,6 +286,12 @@ public class JSONManipulatorCurrent implements JSONManipulator{
 
         }
         return replacer;
+    }
+
+
+    private static String escapeBackslash(String json){
+        json = json.replace("\\", "\\\\");
+        return json;
     }
 
 
