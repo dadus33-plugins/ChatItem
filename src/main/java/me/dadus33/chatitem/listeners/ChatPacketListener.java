@@ -67,6 +67,10 @@ public class ChatPacketListener extends PacketAdapter {
         }
 
         PacketContainer packet = e.getPacket();
+
+        if(packet.getChatComponents().readSafely(0)==null){  // null check for some cases of messages from other plugins
+            return;
+        }
         String json = packet.getChatComponents().readSafely(0).getJson();
 
         boolean found = false;
