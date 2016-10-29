@@ -2,16 +2,12 @@ package me.dadus33.chatitem.utils;
 
 import com.google.common.collect.ImmutableList;
 import me.dadus33.chatitem.ChatItem;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 
 
 public class Storage {
@@ -26,7 +22,7 @@ public class Storage {
     public final String DENY_MESSAGE;
     public final String RELOAD_MESSAGE;
     final Integer CONFIG_VERSION;
-    public final List<Command> ALLOWED_COMMANDS = new ArrayList<>();
+    public final Integer MAX_OCCURRENCES;
 
     public Storage(FileConfiguration conf) {
         Set<String> keys = conf.getConfigurationSection("Translations").getKeys(false);
@@ -50,21 +46,7 @@ public class Storage {
         DENY_IF_NO_ITEM = conf.getBoolean("deny-if-no-item");
         DENY_MESSAGE = color(conf.getString("deny-message"));
         RELOAD_MESSAGE = color(conf.getString("reload-success"));
-        final List<String> cmds = conf.getStringList("commands");
-        Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                for(String s : cmds){
-                    Command c = Bukkit.getPluginCommand(s);
-                    if(c!=null) {
-                        ALLOWED_COMMANDS.add(Bukkit.getPluginCommand(s));
-                    }
-                    else
-                        ChatItem.getInstance().getLogger().log(Level.WARNING, ChatColor.RED.toString().concat("Unknown command ")
-                                .concat(s).concat(" found in config! Ignoring occurrence..."));
-                }
-            }
-        }, 100L);
+        MAX_OCCURRENCES = conf.getInt("max-occurrences");
 
     }
 

@@ -1,7 +1,6 @@
 package me.dadus33.chatitem.json;
 
 
-import com.google.gson.JsonParser;
 import org.bukkit.ChatColor;
 
 /*
@@ -11,7 +10,6 @@ I only modified his work to make it compatible with what I was building.
 public class Translator {
     private static final StringBuilder BUILDER = new StringBuilder("");
     private static final StringBuilder STYLE = new StringBuilder();
-    private static final JsonParser JSON_PARSER = new JsonParser();
 
     static String toJSON(String message) {
         if (message == null || message.isEmpty())

@@ -3,7 +3,7 @@
 #https://www.spigotmc.org/resources/chatitem.19064/
 
 #Version info, DON'T TOUCH
-config-version: 4
+config-version: 5
 
 
 #The placeholders you want to use for the item. You can add as many as you want.
@@ -42,11 +42,11 @@ deny-message: "&c&lYou have no item in hand!"
 #  The message you will get after reloading the plugin using /cireload.
 reload-success: "&b&lSuccessful reload!"
 
-#  Here you can choose which commands will the plugin attempt to parse. Console commands will all be ignored,
-# however player commands will be taken into consideration. To add a command, simply add an element to the list
-# bellow containing an alias (or name) for that command.
-commands:
-  - "msg"
+#  The message a player will get when attempting to write more than 'max-occurrences' of placeholders in chat.
+max-reached-message: "&c&lYou can only add 3 placeholders in chat!"
+
+#  The maximum number of occurences of the item placeholder in chat.
+max-occurrences: 3
 
 
 

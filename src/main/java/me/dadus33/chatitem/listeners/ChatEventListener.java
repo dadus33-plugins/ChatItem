@@ -1,9 +1,7 @@
 package me.dadus33.chatitem.listeners;
 
 import me.dadus33.chatitem.utils.Storage;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.command.Command;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -46,19 +44,23 @@ public class ChatEventListener implements Listener {
             }
             return;
         }
+        String s = e.getMessage();
+        for(String placeholder : c.PLACEHOLDERS){
+            s = s.replace(placeholder, c.PLACEHOLDERS.get(0));
+        }
+        int occurrences = countOccurrences(c.PLACEHOLDERS.get(0), s);
+        if(occurrences>c.MAX_OCCURRENCES){
+            e.setCancelled(true);
+
+        }
         String oldmsg = e.getMessage();
         e.setMessage(e.getMessage().concat(e.getPlayer().getName()));
-        Bukkit.getConsoleSender().sendMessage(String.format(e.getFormat(), e.getPlayer().getDisplayName(), oldmsg));
     }
 
 
     @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.NORMAL)
     public void onCommand(PlayerCommandPreprocessEvent e){
-        Command cmd = Bukkit.getPluginCommand(e.getMessage().split(" ")[0].substring(1));
-        if(!c.ALLOWED_COMMANDS.contains(cmd)){
-            return;
-        }
         boolean found = false;
 
         for (String rep : c.PLACEHOLDERS)
@@ -81,6 +83,15 @@ public class ChatEventListener implements Listener {
             }
             return;
         }
+        String s = e.getMessage();
+        for(String placeholder : c.PLACEHOLDERS){
+            s = s.replace(placeholder, c.PLACEHOLDERS.get(0));
+        }
+        int occurrences = countOccurrences(c.PLACEHOLDERS.get(0), s);
+        if(occurrences>c.MAX_OCCURRENCES){
+            e.setCancelled(true);
+
+        }
 
         e.setMessage(e.getMessage().concat(e.getPlayer().getName()));
 
@@ -90,4 +101,20 @@ public class ChatEventListener implements Listener {
     public void setStorage(Storage st) {
         c = st;
     }
+
+    private int countOccurrences(String findStr, String str){
+        int lastIndex = 0;
+        int count = 0;
+        while(lastIndex != -1){
+
+            lastIndex = str.indexOf(findStr,lastIndex);
+
+            if(lastIndex != -1){
+                count ++;
+                lastIndex += findStr.length();
+            }
+        }
+        return count;
+    }
+
 }
