@@ -45,7 +45,7 @@ reload-success: "&b&lSuccessful reload!"
 #  Here you can choose which commands will the plugin attempt to parse. Console commands will all be ignored,
 # however player commands will be taken into consideration. To add a command, simply add an element to the list
 # bellow containing an alias (or name) for that command.
-#  Care should be taken with vanilla commands as those are not supported (yet)!
+#  Care should be taken with vanilla commands as those are not supported!
 commands:
   - "msg"
 
