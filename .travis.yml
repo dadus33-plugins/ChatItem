@@ -1,1 +1,13 @@
 language: java
+before_deploy:
+  - export NAME=$(ls target/ChatItem-*.jar)
+deploy:
+  provider: releases
+  api_key: "86638617bf48abf5bc080c7e070645d172d81c1e"
+  file: "${NAME}"
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true
+    repo: dadus33/ChatItem
+script: "mvn clean package -DskipTests"

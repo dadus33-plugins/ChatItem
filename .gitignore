@@ -3,3 +3,4 @@ src/test/
 target/
 *.iml
 dependency-reduced-pom.xml
+.travis.yml
