@@ -39,6 +39,10 @@ public class ChatEventListener implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onChat(AsyncPlayerChatEvent e) {
+        if(e.getMessage().indexOf(SEPARATOR)!=-1){  //If the BELL character is found, we have to remove it
+            String msg = e.getMessage().replace(Character.toString(SEPARATOR), "");
+            e.setMessage(msg);
+        }
         boolean found = false;
 
         for (String rep : c.PLACEHOLDERS)
@@ -88,6 +92,10 @@ public class ChatEventListener implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.NORMAL)
     public void onCommand(PlayerCommandPreprocessEvent e){
+        if(e.getMessage().indexOf(SEPARATOR)!=-1){  //If the BELL character is found, we have to remove it
+            String msg = e.getMessage().replace(Character.toString(SEPARATOR), "");
+            e.setMessage(msg);
+        }
         Command cmd = Bukkit.getPluginCommand(e.getMessage().split(" ")[0].substring(1));
         if(cmd==null){ //not a plugin command
             return;
