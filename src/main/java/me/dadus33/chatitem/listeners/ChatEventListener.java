@@ -14,7 +14,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 public class ChatEventListener implements Listener {
 
     private Storage c;
-    private final static char SEPARATOR = ((char)0x0007);
+    public final static char SEPARATOR = ((char)0x0007);
 
     public ChatEventListener(Storage storage) {
         c = storage;
@@ -29,7 +29,7 @@ public class ChatEventListener implements Listener {
             lastIndex = str.indexOf(findStr,lastIndex);
 
             if(lastIndex != -1){
-                count ++;
+                count++;
                 lastIndex += findStr.length();
             }
         }
@@ -37,7 +37,7 @@ public class ChatEventListener implements Listener {
     }
 
     @SuppressWarnings("deprecation")
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)  //We need to have lowest priority in order to get to the event before DeluxeChat or other plugins do
     public void onChat(AsyncPlayerChatEvent e) {
         if(e.getMessage().indexOf(SEPARATOR)!=-1){  //If the BELL character is found, we have to remove it
             String msg = e.getMessage().replace(Character.toString(SEPARATOR), "");

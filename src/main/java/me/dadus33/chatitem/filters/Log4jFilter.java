@@ -1,5 +1,6 @@
 package me.dadus33.chatitem.filters;
 
+import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.utils.Storage;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -11,16 +12,13 @@ import org.apache.logging.log4j.message.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import static org.apache.logging.log4j.core.Filter.Result.NEUTRAL;
 
 
 public class Log4jFilter implements Filter {
 
     private boolean stopped;
-    private final static CopyOnWriteArrayList<String> ls = new CopyOnWriteArrayList<>();
-    public Storage c;
+    private Storage c;
 
     public Log4jFilter(Storage st){
         c = st;
@@ -79,12 +77,13 @@ public class Log4jFilter implements Filter {
     }
 
     private Result checkMessage(String msg){
+        if(msg==null){
+            return Result.NEUTRAL;
+        }
         for(String placeholder : c.PLACEHOLDERS){
             if(msg.contains(placeholder)){
-                ls.add(msg);
                 for(Player p : Bukkit.getOnlinePlayers()){
-                    msg = msg.replaceAll("\\p{C}", "");
-                    if(msg.endsWith(p.getName()) || msg.lastIndexOf(p.getName())+2+p.getName().length()>=msg.length()){
+                    if(msg.contains(Character.toString(ChatEventListener.SEPARATOR)+p.getName())){
                         return Result.DENY;
                     }
                 }
