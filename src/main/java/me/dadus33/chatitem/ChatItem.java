@@ -26,7 +26,7 @@ import java.util.logging.Level;
 
 public class ChatItem extends JavaPlugin {
 
-    public final static int CFG_VER = 6;
+    public final static int CFG_VER = 7;
     private static ChatItem instance;
     private ChatEventListener chatEventListener;
     private Log4jFilter filter;

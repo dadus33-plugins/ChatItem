@@ -26,7 +26,9 @@ public class Storage {
     public final String DENY_MESSAGE;
     public final String LIMIT_MESSAGE;
     public final String RELOAD_MESSAGE;
+    public final String COOLDOWN_MESSAGE;
     final Integer CONFIG_VERSION;
+    public final Long COOLDOWN;
     public final Integer LIMIT;
     public final List<Command> ALLOWED_COMMANDS = new ArrayList<>();
 
@@ -43,6 +45,7 @@ public class Storage {
             TRANSLATIONS.put(key, entry);
         }
         CONFIG_VERSION = conf.getInt("config-version");
+        COOLDOWN = conf.getLong("cooldown");
         LIMIT = conf.getInt("limit");
         List<String> added = conf.getStringList("placeholders");
         PLACEHOLDERS = ImmutableList.copyOf(added);
@@ -54,6 +57,7 @@ public class Storage {
         DENY_MESSAGE = color(conf.getString("deny-message"));
         LIMIT_MESSAGE = color(conf.getString("limit-message"));
         RELOAD_MESSAGE = color(conf.getString("reload-success"));
+        COOLDOWN_MESSAGE = color(conf.getString("cooldown-message"));
         final List<String> cmds = conf.getStringList("commands");
         Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), new Runnable() {
             @Override
