@@ -12,7 +12,6 @@ import me.dadus33.chatitem.json.JSONManipulator;
 import me.dadus33.chatitem.json.JSONManipulatorCurrent;
 import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatPacketListener;
-import me.dadus33.chatitem.utils.General;
 import me.dadus33.chatitem.utils.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -42,8 +41,6 @@ public class ChatItem extends JavaPlugin {
         obj.saveDefaultConfig();
         obj.reloadConfig();
         obj.storage = new Storage(obj.getConfig());
-        General.init(obj.storage);
-        General.checkConfigVersion();
         obj.listener.setStorage(obj.storage);
         obj.chatEventListener.setStorage(obj.storage);
         obj.filter.setStorage(obj.storage);
@@ -60,8 +57,6 @@ public class ChatItem extends JavaPlugin {
         pm = ProtocolLibrary.getProtocolManager();
         saveDefaultConfig();
         storage = new Storage(getConfig());
-        General.init(storage);
-        General.checkConfigVersion();
         listener = new ChatPacketListener(this, ListenerPriority.HIGHEST, storage, PacketType.Play.Server.CHAT);
         AsynchronousManager am = pm.getAsynchronousManager();
         AsyncListenerHandler packetListenerAsyncThread = am.registerAsyncHandler(listener);

@@ -82,30 +82,26 @@ public class ChatPacketListener extends PacketAdapter {
         if (!found) {
             return; //then it's just a normal message without placeholders, so we leave it alone
         }
-        if(json.lastIndexOf("\\u0007")==-1){ //if the message doesn't contain the BEL separator, then it's certainly NOT a message we want to parse
+        if(json.lastIndexOf("\\u0007")==-1){ //if the message doesn't contain the BELL separator, then it's certainly NOT a message we want to parse
             return;
         }
 
-        //here we find the last player name in the string
+        //here we find the last player name in the string that has a BELL character before it
         int topIndex = -1;
         String name = null;
         for(Player p : Bukkit.getOnlinePlayers()){
-            String pname = p.getName();
+            String pname = "\\u0007"+p.getName();
             if(!json.contains(pname)){
                 continue;
             }
             int index = json.lastIndexOf(pname)+pname.length();
             if(index>topIndex){
                 topIndex = index;
-                name = pname;
+                name = pname.replace("\\u0007", "");
             }
         }
         if(name==null){ //something went really bad, so we run away and hide
             return;
-        }
-        //then we make sure the name is after the BEL separator.
-        if(json.lastIndexOf(name)!=json.lastIndexOf("\\u0007")+6){
-            return; //then it means somehow the message just contained a BEL character not inserted by our plugin
         }
 
         Player p = Bukkit.getPlayer(name);

@@ -16,6 +16,7 @@ import java.util.logging.Level;
 
 public class Storage {
 
+    private FileConfiguration conf;
     public final HashMap<String, HashMap<Short, String>> TRANSLATIONS = new HashMap<>();
     public final List<String> PLACEHOLDERS;
     public final String NAME_FORMAT;
@@ -32,7 +33,10 @@ public class Storage {
     public final Integer LIMIT;
     public final List<Command> ALLOWED_COMMANDS = new ArrayList<>();
 
-    public Storage(FileConfiguration conf) {
+    public Storage(FileConfiguration cnf) {
+        this.conf = cnf;
+        CONFIG_VERSION = conf.getInt("config-version");
+        checkConfigVersion();
         Set<String> keys = conf.getConfigurationSection("Translations").getKeys(false);
         for (String key : keys) {
             HashMap<Short, String> entry = new HashMap<>();
@@ -44,7 +48,6 @@ public class Storage {
 
             TRANSLATIONS.put(key, entry);
         }
-        CONFIG_VERSION = conf.getInt("config-version");
         COOLDOWN = conf.getLong("cooldown");
         LIMIT = conf.getInt("limit");
         List<String> added = conf.getStringList("placeholders");
@@ -81,8 +84,18 @@ public class Storage {
         return ChatColor.translateAlternateColorCodes('&', s);
     }
 
+    public void checkConfigVersion() {
+        int latestVersion = ChatItem.CFG_VER;
+        if (latestVersion != CONFIG_VERSION) {
+            Bukkit.getLogger().log(Level.WARNING, ChatColor.RED + "ChatItem detected an older or invalid configuration file. Replacing it with the default config...");
+            performOverwrite();
+            conf = ChatItem.getInstance().getConfig();
+            Bukkit.getLogger().log(Level.WARNING, ChatColor.RED + "Replacement complete!");
+        }
+    }
 
-    void performOverwrite() {
+
+    private void performOverwrite() {
         ChatItem.getInstance().saveResource("config.yml", true);
     }
 

@@ -76,8 +76,12 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                     JsonElement el = o.get("extra");
                     if (el != null) {
                         JsonArray jar = el.getAsJsonArray();
-                        jar = parseArray(jar);
-                        o.add("extra", jar);
+                        if(jar.size()!=0) {
+                            jar = parseArray(jar);
+                            o.add("extra", jar);
+                        }else{
+                            o.remove("extra");
+                        }
                     }
                     continue;
                 } else {
@@ -85,8 +89,12 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                         JsonElement el = o.get("extra");
                         if (el != null) {
                             JsonArray jar = el.getAsJsonArray();
-                            jar = parseArray(jar);
-                            o.add("extra", jar);
+                            if(jar.size()!=0) {
+                                jar = parseArray(jar);
+                                o.add("extra", jar);
+                            }else{
+                                o.remove("extra");
+                            }
                         }
                     }
                 }
@@ -129,8 +137,11 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                     continue;
                 }else{
                     if(array.get(i).isJsonArray()){
-                        JsonArray jar = parseArray(array.get(i).getAsJsonArray());
-                        rep.set(i, jar);
+                        JsonArray jar = array.get(i).getAsJsonArray();
+                        if(jar.size()!=0) {
+                            jar = parseArray(array.get(i).getAsJsonArray());
+                            rep.set(i, jar);
+                        }
                     }else{
 
 
@@ -192,6 +203,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                         inside = true;
                     }
                 if (!inside) { //the placeholder we're looking for is not inside this element, so we continue searching
+                    replacer.add(o);
                     continue;
                 }
                 JsonElement text = o.get("text");
@@ -204,8 +216,12 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                         continue;
                     }
                     JsonArray jar = el.getAsJsonArray();
-                    jar = parseArray(jar);
-                    o.add("extra", jar);
+                    if(jar.size()!=0) {
+                        jar = parseArray(jar);
+                        o.add("extra", jar);
+                    }else{
+                        o.remove("extra");
+                    }
                 }
 
                 String msg = text.getAsString();
@@ -246,8 +262,11 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                     continue;
                 }else{
                     if(arr.get(i).isJsonArray()){
-                        JsonArray jar = parseArray(arr.get(i).getAsJsonArray());
-                        replacer.set(i, jar);
+                        JsonArray jar = arr.get(i).getAsJsonArray();
+                        if(jar.size()!=0) {
+                            jar = parseArray(arr.get(i).getAsJsonArray());
+                            replacer.set(i, jar);
+                        }
                     }else{
                         String msg = arr.get(i).getAsString();
                         boolean isLast = false;
