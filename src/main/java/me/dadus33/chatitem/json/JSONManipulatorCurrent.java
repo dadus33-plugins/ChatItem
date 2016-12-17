@@ -2,6 +2,7 @@ package me.dadus33.chatitem.json;
 
 
 import com.google.gson.*;
+import me.dadus33.chatitem.namecheck.Checker;
 import me.dadus33.chatitem.utils.Reflect;
 import org.bukkit.inventory.ItemStack;
 
@@ -12,11 +13,11 @@ import java.util.regex.Pattern;
 
 public class JSONManipulatorCurrent implements JSONManipulator{
 
-    private static Class<?> craftItemStackClass = Reflect.getOBCClass("inventory.CraftItemStack");
-    private static Class<?> nmsItemStackClass = Reflect.getNMSClass("ItemStack");
-    private static Method asNMSCopy = Reflect.getMethod(craftItemStackClass, "asNMSCopy", ItemStack.class);
-    private static Class<?> nbtTagCompoundClass = Reflect.getNMSClass("NBTTagCompound");
-    private static Method saveNmsItemStackMethod = Reflect.getMethod(nmsItemStackClass, "save", nbtTagCompoundClass);
+    private static final Class<?> craftItemStackClass = Reflect.getOBCClass("inventory.CraftItemStack");
+    private static final Class<?> nmsItemStackClass = Reflect.getNMSClass("ItemStack");
+    private static final Method asNMSCopy = Reflect.getMethod(craftItemStackClass, "asNMSCopy", ItemStack.class);
+    private static final Class<?> nbtTagCompoundClass = Reflect.getNMSClass("NBTTagCompound");
+    private static final Method saveNmsItemStackMethod = Reflect.getMethod(nmsItemStackClass, "save", nbtTagCompoundClass);
 
     private static String[] replaces;
     private static String rgx;
@@ -24,7 +25,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     private static JsonParser parser = new JsonParser();
 
 
-    public String parse(String json, String[] replacements, ItemStack item, String repl) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+    public String parse(String json, String[] replacements, ItemStack item, String replacement) throws InvocationTargetException, IllegalAccessException, InstantiationException {
         JsonObject obj = parser.parse(json).getAsJsonObject();
         JsonArray array = obj.getAsJsonArray("extra");
         replaces = replacements;
@@ -46,14 +47,21 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         }
         rgx = regex;
         JsonArray rep = new JsonArray();
-        repl = escapeBackslash(repl);
-        JsonArray use = parser.parse(Translator.toJSON(repl)).getAsJsonArray();
-
+        JsonArray use;
+        try {
+            use = parser.parse(Translator.toJSON(escapeBackslash(replacement))).getAsJsonArray();
+        }catch(JsonParseException e){ //in case the name of the item was already escaped
+            use = parser.parse(Translator.toJSON(replacement)).getAsJsonArray();
+        }
         JsonObject hover = parser.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
         Object nmsStack = asNMSCopy.invoke(null, item);
         Object tag = nbtTagCompoundClass.newInstance();
         tag = saveNmsItemStackMethod.invoke(nmsStack, tag);
-        String jsonRep = escapeBackslash(tag.toString());
+        String stringed = tag.toString();
+        String jsonRep = escapeBackslash(stringed);
+        if(!Checker.checkItem(jsonRep)){
+            jsonRep = stringed;
+        }
         hover.addProperty("value", jsonRep);
         for (JsonElement ob : use)
             ob.getAsJsonObject().add("hoverEvent", hover);
@@ -64,8 +72,8 @@ public class JSONManipulatorCurrent implements JSONManipulator{
             if (array.get(i).isJsonObject()){
                 JsonObject o = array.get(i).getAsJsonObject();
                 boolean inside = false;
-                for (String replacement : replacements)
-                    if (o.toString().contains(replacement)) {
+                for (String replace : replacements)
+                    if (o.toString().contains(replace)) {
                         if (inside) {
                             break;
                         }
@@ -308,9 +316,8 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     }
 
 
-    private static String escapeBackslash(String json){
-        json = json.replace("\\", "\\\\");
-        return json;
+    private String escapeBackslash(String json){
+        return json.replace("\\",  "\\\\");
     }
 
 
