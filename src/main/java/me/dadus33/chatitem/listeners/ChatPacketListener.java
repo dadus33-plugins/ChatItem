@@ -8,14 +8,18 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.utils.Storage;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashMap;
 
 
@@ -61,17 +65,28 @@ public class ChatPacketListener extends PacketAdapter {
     @SuppressWarnings("deprecation")
     @Override
     public void onPacketSending(PacketEvent e) {
-        if(ChatItem.post17) //actionbar messages are only available after 1.7
+        if(ChatItem.mcSupportsActionBar()) //only if action mar messages are supported in this version of minecraft
         if (e.getPacket().getBytes().readSafely(0) == (byte) 2) {
             return;  //It means it's an actionbar message, and we ain't intercepting those
         }
-
+        boolean usesChatComponent = false;
         PacketContainer packet = e.getPacket();
-
-        if(packet.getChatComponents().readSafely(0)==null){  // null check for some cases of messages from other plugins
-            return;
+        String json;
+        if(packet.getChatComponents().readSafely(0)==null){  //null check for some cases of messages sent using spigot's Chat Component API or other means
+            if(ChatItem.supportsChatComponentApi()){  //only if the API is supported in this server distribution
+                BaseComponent[] components = packet.getSpecificModifier(BaseComponent[].class).readSafely(0);
+                if(components == null){
+                    return;
+                }
+                json = ComponentSerializer.toString(components);
+                usesChatComponent = true;
+            }else{
+                return;
+            }
+        }else{
+            json = packet.getChatComponents().readSafely(0).getJson();
         }
-        String json = packet.getChatComponents().readSafely(0).getJson();
+
 
         boolean found = false;
         for (String rep : c.PLACEHOLDERS)
@@ -164,17 +179,28 @@ public class ChatPacketListener extends PacketAdapter {
         c.PLACEHOLDERS.toArray(reps);
         String message = null;
         try {
-            if(!p.getItemInHand().getType().equals(Material.AIR))
-            message = ChatItem.getManipulator().parse(json, reps, p.getItemInHand(), replacer);
+            if(!p.getItemInHand().getType().equals(Material.AIR)) {
+                ItemStack hand = p.getItemInHand();
+                if(hand.getType().equals(Material.BOOK_AND_QUILL) || hand.getType().equals(Material.WRITTEN_BOOK)){
+                    BookMeta bm = (BookMeta)hand.getItemMeta();
+                    bm.setPages(Collections.<String>emptyList());
+                    hand.setItemMeta(bm);
+                }
+                message = ChatItem.getManipulator().parse(json, reps, hand, replacer);
+            }
         } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
             e1.printStackTrace();
         }
         if(message!=null) {
-            packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
+            if(!usesChatComponent) {
+                packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
+            }else{
+                packet.getSpecificModifier(BaseComponent[].class).writeSafely(0, ComponentSerializer.parse(message));
+            }
         }
-        else
+        else {
             e.setCancelled(true);
-
+        }
     }
 
     public void setStorage(Storage st) {

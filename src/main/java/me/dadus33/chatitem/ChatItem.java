@@ -33,7 +33,8 @@ public class ChatItem extends JavaPlugin {
     private ProtocolManager pm;
     private ChatPacketListener listener;
     private static JSONManipulator manip;
-    public static boolean post17 = false;
+    private static boolean post17 = false;
+    private static boolean baseComponentAvailable = true;
 
     public static void reload(CommandSender sender) {
         ChatItem obj = getInstance();
@@ -57,7 +58,7 @@ public class ChatItem extends JavaPlugin {
         pm = ProtocolLibrary.getProtocolManager();
         saveDefaultConfig();
         storage = new Storage(getConfig());
-        listener = new ChatPacketListener(this, ListenerPriority.HIGHEST, storage, PacketType.Play.Server.CHAT);
+        listener = new ChatPacketListener(this, ListenerPriority.LOWEST, storage, PacketType.Play.Server.CHAT);
         AsynchronousManager am = pm.getAsynchronousManager();
         AsyncListenerHandler packetListenerAsyncThread = am.registerAsyncHandler(listener);
         packetListenerAsyncThread.start();
@@ -67,6 +68,11 @@ public class ChatItem extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(chatEventListener, this);
         if(isMc18OrLater()) {
             post17 = true;
+        }
+        try {
+            Class.forName("net.md_5.bungee.api.chat.BaseComponent");
+        } catch (ClassNotFoundException e) {
+            baseComponentAvailable = false;
         }
         manip = new JSONManipulatorCurrent();
 
@@ -94,6 +100,8 @@ public class ChatItem extends JavaPlugin {
             case "v1_9_R2": return true;
             case "v1_10_R1": return true;
             case "v1_10_R2": return true;
+            case "v1_11_R1": return true;
+            case "v1_11_R2": return true;
             default: return false;
         }
     }
@@ -105,6 +113,13 @@ public class ChatItem extends JavaPlugin {
         return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
 
+    public static boolean mcSupportsActionBar(){
+        return post17;
+    }
+
+    public static boolean supportsChatComponentApi(){
+        return baseComponentAvailable;
+    }
 
     public static JSONManipulator getManipulator(){
         return manip;

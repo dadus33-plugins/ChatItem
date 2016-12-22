@@ -90,9 +90,7 @@ public class Log4jFilter implements Filter {
 
             }
         }
-
         return Result.NEUTRAL;
-
     }
 
     public void setStorage(Storage nst){
