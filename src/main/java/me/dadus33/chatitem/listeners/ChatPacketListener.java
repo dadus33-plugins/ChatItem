@@ -28,12 +28,10 @@ public class ChatPacketListener extends PacketAdapter {
     private final static String NAME = "{name}";
     private final static String AMOUNT = "{amount}";
     private final static String TIMES = "{times}";
-    private ChatItem instance;
     private Storage c;
 
     public ChatPacketListener(Plugin plugin, ListenerPriority listenerPriority, Storage s, PacketType... types) {
         super(plugin, listenerPriority, types);
-        this.instance = (ChatItem) plugin;
         c = s;
     }
 
@@ -69,7 +67,7 @@ public class ChatPacketListener extends PacketAdapter {
         if (e.getPacket().getBytes().readSafely(0) == (byte) 2) {
             return;  //It means it's an actionbar message, and we ain't intercepting those
         }
-        boolean usesChatComponent = false;
+        boolean usesBaseComponents = false;
         PacketContainer packet = e.getPacket();
         String json;
         if(packet.getChatComponents().readSafely(0)==null){  //null check for some cases of messages sent using spigot's Chat Component API or other means
@@ -79,7 +77,7 @@ public class ChatPacketListener extends PacketAdapter {
                     return;
                 }
                 json = ComponentSerializer.toString(components);
-                usesChatComponent = true;
+                usesBaseComponents = true;
             }else{
                 return;
             }
@@ -115,7 +113,8 @@ public class ChatPacketListener extends PacketAdapter {
                 name = pname.replace("\\u0007", "");
             }
         }
-        if(name==null){ //something went really bad, so we run away and hide
+        if(name==null){ //something went really bad, so we run away and hide (AKA the player left or is on another server)
+            e.setCancelled(true);
             return;
         }
 
@@ -192,7 +191,7 @@ public class ChatPacketListener extends PacketAdapter {
             e1.printStackTrace();
         }
         if(message!=null) {
-            if(!usesChatComponent) {
+            if(!usesBaseComponents) {
                 packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
             }else{
                 packet.getSpecificModifier(BaseComponent[].class).writeSafely(0, ComponentSerializer.parse(message));

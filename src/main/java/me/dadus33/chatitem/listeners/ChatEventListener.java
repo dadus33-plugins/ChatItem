@@ -1,30 +1,57 @@
 package me.dadus33.chatitem.listeners;
 
-import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.utils.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 
 public class ChatEventListener implements Listener {
 
     private Storage c;
     public final static char SEPARATOR = ((char)0x0007);
-    private final List<String> COOLDOWNS = new ArrayList<>();
+    private final static String LEFT = "{remaining}";
+    private final HashMap<String, Long> COOLDOWNS = new HashMap<>();
 
     public ChatEventListener(Storage storage) {
         c = storage;
     }
 
+    private String calculateTime(long seconds){
+        if(seconds < 60){
+            return seconds+c.SECONDS;
+        }
+        if(seconds < 3600){
+            StringBuilder builder = new StringBuilder();
+            int minutes = (int) seconds / 60;
+            builder.append(minutes).append(c.MINUTES);
+            int secs = (int) seconds - minutes*60;
+            if(secs != 0){
+                builder.append(" ").append(secs).append(c.SECONDS);
+            }
+            return builder.toString();
+        }
+        StringBuilder builder = new StringBuilder();
+        int hours = (int) seconds / 3600;
+        builder.append(hours).append(c.HOURS);
+        int minutes = (int) (seconds/60) - (hours*60);
+        if(minutes != 0){
+            builder.append(" ").append(minutes).append(c.MINUTES);
+        }
+        int secs = (int) (seconds - ((seconds/60)*60));
+        if(secs != 0){
+            builder.append(" ").append(secs).append(c.SECONDS);
+        }
+        return builder.toString();
+    }
 
     private int countOccurrences(String findStr, String str){
         int lastIndex = 0;
@@ -60,12 +87,15 @@ public class ChatEventListener implements Listener {
             return;
         }
 
-        if (!e.getPlayer().hasPermission("chatitem.use")) {
-            e.setCancelled(true);
+        Player p = e.getPlayer();
+
+        if (!p.hasPermission("chatitem.use")) {
+            if(!c.LET_MESSAGE_THROUGH)
+                e.setCancelled(true);
             return;
         }
 
-        if (e.getPlayer().getItemInHand().getType().equals(Material.AIR)) {
+        if (p.getItemInHand().getType().equals(Material.AIR)) {
             if (c.DENY_IF_NO_ITEM) {
                 e.setCancelled(true);
                 if (!c.DENY_MESSAGE.isEmpty())
@@ -75,21 +105,24 @@ public class ChatEventListener implements Listener {
             return;
         }
 
-        if(c.COOLDOWN > 0){
-            if(COOLDOWNS.contains(e.getPlayer().getName())){
-                e.setCancelled(true);
-                if(!c.COOLDOWN_MESSAGE.isEmpty()){
-                    e.getPlayer().sendMessage(c.COOLDOWN_MESSAGE);
+        if(c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")){
+            if(COOLDOWNS.containsKey(p.getName())){
+                long start = COOLDOWNS.get(p.getName());
+                long current = System.currentTimeMillis()/1000;
+                long elapsed = current - start;
+                if(elapsed >= c.COOLDOWN){
+                    COOLDOWNS.remove(p.getName());
+                }else{
+                    if(!c.LET_MESSAGE_THROUGH) {
+                        e.setCancelled(true);
+                    }
+                    if(!c.COOLDOWN_MESSAGE.isEmpty()){
+                        long left = (start + c.COOLDOWN) - current;
+                        p.sendMessage(c.COOLDOWN_MESSAGE.replace(LEFT, calculateTime(left)));
+                    }
+                    return;
                 }
-                return;
             }
-            COOLDOWNS.add(e.getPlayer().getName());
-            Bukkit.getScheduler().runTaskLater(ChatItem.getInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    COOLDOWNS.remove(e.getPlayer().getName());
-                }
-            }, c.COOLDOWN*20);
         }
 
         String s = e.getMessage();
@@ -112,25 +145,32 @@ public class ChatEventListener implements Listener {
         sb.append(SEPARATOR).append(e.getPlayer().getName());
         e.setMessage(sb.toString());
         Bukkit.getConsoleSender().sendMessage(String.format(e.getFormat(), e.getPlayer().getDisplayName(), oldmsg));
+        if(!p.hasPermission("chatitem.ignore-cooldown")) {
+            COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
+        }
     }
 
 
     @SuppressWarnings("deprecation")
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onCommand(final PlayerCommandPreprocessEvent e){
         if(e.getMessage().indexOf(SEPARATOR)!=-1){  //If the BELL character is found, we have to remove it
             String msg = e.getMessage().replace(Character.toString(SEPARATOR), "");
             e.setMessage(msg);
         }
-        Command cmd = Bukkit.getPluginCommand(e.getMessage().split(" ")[0].substring(1));
+        String commandString = e.getMessage().split(" ")[0].replaceAll("^/+", ""); //First part of the command, without leading slashes and without arguments
+        Command cmd = Bukkit.getPluginCommand(commandString);
         if(cmd==null){ //not a plugin command
-            return;
+            if(!c.ALLOWED_DEFAULT_COMMANDS.contains(commandString)){
+                return;
+            }
+        }else{
+            if(!c.ALLOWED_PLUGIN_COMMANDS.contains(cmd)){
+                return;
+            }
         }
 
-        if(!c.ALLOWED_COMMANDS.contains(cmd)){
-            return;
-        }
-
+        Player p = e.getPlayer();
         boolean found = false;
 
         for (String rep : c.PLACEHOLDERS) {
@@ -144,7 +184,7 @@ public class ChatEventListener implements Listener {
             return;
         }
 
-        if (!e.getPlayer().hasPermission("chatitem.use")) {
+        if (!p.hasPermission("chatitem.use")) {
             e.setCancelled(true);
             return;
         }
@@ -158,21 +198,24 @@ public class ChatEventListener implements Listener {
             return;
         }
 
-        if(c.COOLDOWN > 0){
-            if(COOLDOWNS.contains(e.getPlayer().getName())){
-                e.setCancelled(true);
-                if(!c.COOLDOWN_MESSAGE.isEmpty()){
-                    e.getPlayer().sendMessage(c.COOLDOWN_MESSAGE);
+        if(c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")){
+            if(COOLDOWNS.containsKey(p.getName())){
+                long start = COOLDOWNS.get(p.getName());
+                long current = System.currentTimeMillis()/1000;
+                long elapsed = current - start;
+                if(elapsed >= c.COOLDOWN){
+                    COOLDOWNS.remove(p.getName());
+                }else{
+                    if(!c.LET_MESSAGE_THROUGH) {
+                        e.setCancelled(true);
+                    }
+                    if(!c.COOLDOWN_MESSAGE.isEmpty()){
+                        long left = (start + c.COOLDOWN) - current;
+                        p.sendMessage(c.COOLDOWN_MESSAGE.replace(LEFT, calculateTime(left)));
+                    }
+                    return;
                 }
-                return;
             }
-            COOLDOWNS.add(e.getPlayer().getName());
-            Bukkit.getScheduler().runTaskLater(ChatItem.getInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    COOLDOWNS.remove(e.getPlayer().getName());
-                }
-            }, c.COOLDOWN*20);
         }
 
         String s = e.getMessage();
@@ -193,6 +236,9 @@ public class ChatEventListener implements Listener {
         StringBuilder sb = new StringBuilder(e.getMessage());
         sb.append(SEPARATOR).append(e.getPlayer().getName());
         e.setMessage(sb.toString());
+        if(!p.hasPermission("chatitem.ignore-cooldown")) {
+            COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
+        }
     }
 
 

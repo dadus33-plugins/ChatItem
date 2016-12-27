@@ -3,69 +3,75 @@
 #https://www.spigotmc.org/resources/chatitem.19064/
 
 #Version info, DON'T TOUCH
-config-version: 7
+config-version: 8
 
 
-#The placeholders you want to use for the item. You can add as many as you want.
-placeholders:
- - "[i]"
- - "{item}"
+#General configuration
+General:
+  #The placeholders you want to use for the item. You can add as many as you want.
+  placeholders:
+    - "[i]"
+    - "{item}"
+  #  How will the item be displayed in chat? {name} represents the display name of
+  # the item, or material name (ex. Diamond Sword) if it doesn't have a customized
+  # display name nor any available translation, and {amount} will be replaced by
+  # the amount-format configured bellow.
+  #  You can use color codes.
+  name-format: "&f<&b&l&o{name} {amount}&f>&r"
+  #  The amount format that will replace the {amount} placeholder in the 'name-format'
+  # field above. The {times} placeholder represents the number of times the item is
+  # presented in the itemstack, in other words, the actual item amount in the stack
+  # the player holds. You can use color codes too.
+  amount-format: "x{times}"
+  #  Should we apply the color and formatting defined in the name-format field even if
+  # the item is already colored/formated (ex. From anvils or other plugins that change
+  # the display name of an item). I recommend leaving this to true as not applying color
+  # codes or formatting at all can lead to an unexpected output compared to what you
+  # actually want, but feel free to experiment with it ;)
+  color-if-already-colored: true
+  #  Should we add the item amount even if there's only one item in the stack?
+  force-add-amount: true
+  #  Should we let the message through, as-is (with the placeholder not replaced)
+  # if the user doesn't have permission or if the user is on cooldown?
+  let-message-through: true
+  #  Should we cancel the user message if the item in his (main) hand is air or null?
+  # (No item in hand, that is)
+  deny-if-no-item: true
+  #  Here you can choose which commands will the plugin attempt to parse. Console commands will all be ignored,
+  # however player commands will be taken into consideration. To add a command, simply add an element to the list
+  # bellow containing an alias (or name) for that command.
+  #  It is enough to add only ONE alias for each command, and the others will automatically be supported. However,
+  # this is only available for plugin commands. If you're planning to add bukkit or mojang commands here, you'll have
+  # to manually specify ALL aiases for those.
+  commands:
+    - "msg"
+  #  Here you can set the limit on how many placeholders a user is allowed to use inside a message.
+  # Allowing too many placeholders can result in client crashes.
+  limit: 5
+  #  The cooldown, in seconds, between allowing players to send messages with items. Setting this to 0
+  # will remove the cooldown totally.
+  cooldown: 60
 
-#  How will the item be displayed in chat? {name} represents the display name of
-# the item, or material name (ex. DIAMOND_SWORD) if it doesn't have a customized
-# display name, and {amount} will be replaced by the amount-format configured bellow.
-# You can use color codes.
-name-format: "&f<&b&l&o{name} {amount}&f>&r"
-
-#  The amount format that will replace the {amount} placeholder in the 'name-format'
-# field above. The {times} placeholder represents the number of times the item is
-# presented in the itemstack, in other words, the actual item amount in the stack
-# the player holds. You can use color codes too.
-amount-format: "x{times}"
-
-#  Should we apply the color and formatting defined in the name-format field even if
-# the item is already colored/formated (ex. From anvils or other plugins that change
-# the display name of an item). I recommend leaving this to true as not applying color
-# codes or formatting at all can lead to an unexpected output compared to what you
-# actually want, but feel free to experiment with it ;)
-color-if-already-colored: true
-
-# Should we add the item amount even if there's only one item in the stack?
-force-add-amount: true
-
-# Should we cancel the user message if the item in his (main) hand is air or null? (No item in hand, that is)
-deny-if-no-item: true
-
-#  If so, what message should the user get upon attempting to send such a message? Set to "" to disable.
-deny-message: "&c&lYou have no item in hand!"
-
-#  The message you will get after reloading the plugin using /cireload.
-reload-success: "&b&lSuccessful reload!"
-
-#  Here you can choose which commands will the plugin attempt to parse. Console commands will all be ignored,
-# however player commands will be taken into consideration. To add a command, simply add an element to the list
-# bellow containing an alias (or name) for that command.
-#  Care should be taken with vanilla commands as those are not supported!
-commands:
-  - "msg"
-
-#  Here you can set the limit on how many placeholders a user is allowed to use inside a message.
-# Allowing too many placeholders can result in client crashes.
-limit: 5
-
-#  The message a player will get when attempting to send a message with more placeholders then the allowed limit.
-limit-message: "&c&lYou can only add 5 item placeholders per message!"
-
-#  The cooldown, in seconds, between allowing players to send messages with items. Setting this to 0
-# will remove the cooldown totally.
-cooldown: 60
-
-#  The message to display players when they can't display items in chat due to the cooldown
-cooldown-message: "&c&lYou can only use items in chat once a minute!"
-
-
-
+#  Messages section. You can disable any of them by simply leaving them empty, like this: ""
+Messages:
+  #  The message users will get upon attempting to use the placeholder without any item in hand.
+  # Only works if 'General.deny-if-no-item' is set to true!
+  deny-message: "&c&lYou have no item in hand!"
+  #  The message you will get after reloading the plugin using /cireload.
+  reload-success: "&b&lSuccessful reload!"
+  #  The message a player will get when attempting to send a message with more placeholders then the allowed limit.
+  limit-message: "&c&lYou can only add 5 item placeholders per message!"
+  #  The message to display players when they can't display items in chat due to the cooldown
+  cooldown-message: "&c&lYou can only use items in chat once a minute! You have {remaining} left!"
+  #  The no permission message to be showed to players who don't have the required permission to use the placeholder
+  no-permission: "&c&lI'm sorry, but you are not allowed to use the placeholder in chat!"
+  #  All the fields bellow shold be translated in your own language. Those will be used in the {remaining} format of the cooldown message.
+  # You should leave a space as a PREFIX as we will add a number in front of them
+  seconds: " seconds"
+  minutes: " minutes"
+  hours: " hours"
 #  Translations
+# Below you can find a set of default values for all items in Minecraft 1.8.
 Translations:
 ## Blocks ##
   STONE:

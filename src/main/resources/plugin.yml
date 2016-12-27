@@ -14,4 +14,7 @@ permissions:
     default: op
   chatitem.use:
     description: Allows your messages to be parsed by the plugin
-    default: true
+    default: op
+  chatitem.ignore-cooldown:
+    description: Allows you to ignore cooldowns (if enabled)
+    default: op

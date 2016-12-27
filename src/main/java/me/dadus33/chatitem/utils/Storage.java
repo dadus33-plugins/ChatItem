@@ -23,15 +23,20 @@ public class Storage {
     public final String AMOUNT_FORMAT;
     public final Boolean COLOR_IF_ALREADY_COLORED;
     public final Boolean FORCE_ADD_AMOUNT;
+    public final Boolean LET_MESSAGE_THROUGH;
     public final Boolean DENY_IF_NO_ITEM;
     public final String DENY_MESSAGE;
     public final String LIMIT_MESSAGE;
     public final String RELOAD_MESSAGE;
     public final String COOLDOWN_MESSAGE;
+    public final String SECONDS;
+    public final String MINUTES;
+    public final String HOURS;
     final Integer CONFIG_VERSION;
     public final Long COOLDOWN;
     public final Integer LIMIT;
-    public final List<Command> ALLOWED_COMMANDS = new ArrayList<>();
+    public final List<Command> ALLOWED_PLUGIN_COMMANDS = new ArrayList<>();
+    public final List<String> ALLOWED_DEFAULT_COMMANDS = new ArrayList<>();
 
     public Storage(FileConfiguration cnf) {
         this.conf = cnf;
@@ -48,31 +53,35 @@ public class Storage {
 
             TRANSLATIONS.put(key, entry);
         }
-        COOLDOWN = conf.getLong("cooldown");
-        LIMIT = conf.getInt("limit");
-        List<String> added = conf.getStringList("placeholders");
+        COOLDOWN = conf.getLong("General.cooldown");
+        LIMIT = conf.getInt("General.limit");
+        List<String> added = conf.getStringList("General.placeholders");
         PLACEHOLDERS = ImmutableList.copyOf(added);
-        NAME_FORMAT = color(conf.getString("name-format"));
-        AMOUNT_FORMAT = color(conf.getString("amount-format"));
-        COLOR_IF_ALREADY_COLORED = conf.getBoolean("color-if-already-colored");
-        FORCE_ADD_AMOUNT = conf.getBoolean("force-add-amount");
-        DENY_IF_NO_ITEM = conf.getBoolean("deny-if-no-item");
-        DENY_MESSAGE = color(conf.getString("deny-message"));
-        LIMIT_MESSAGE = color(conf.getString("limit-message"));
-        RELOAD_MESSAGE = color(conf.getString("reload-success"));
-        COOLDOWN_MESSAGE = color(conf.getString("cooldown-message"));
-        final List<String> cmds = conf.getStringList("commands");
+        NAME_FORMAT = color(conf.getString("General.name-format"));
+        AMOUNT_FORMAT = color(conf.getString("General.amount-format"));
+        COLOR_IF_ALREADY_COLORED = conf.getBoolean("General.color-if-already-colored");
+        LET_MESSAGE_THROUGH = conf.getBoolean("General.let-message-through");
+        FORCE_ADD_AMOUNT = conf.getBoolean("General.force-add-amount");
+        DENY_IF_NO_ITEM = conf.getBoolean("General.deny-if-no-item");
+        DENY_MESSAGE = color(conf.getString("Messages.deny-message"));
+        LIMIT_MESSAGE = color(conf.getString("Messages.limit-message"));
+        RELOAD_MESSAGE = color(conf.getString("Messages.reload-success"));
+        COOLDOWN_MESSAGE = color(conf.getString("Messages.cooldown-message"));
+        SECONDS = color(conf.getString("Messages.seconds"));
+        MINUTES = color(conf.getString("Messages.minutes"));
+        HOURS = color(conf.getString("Messages.hours"));
+        final List<String> cmds = conf.getStringList("General.commands");
         Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), new Runnable() {
             @Override
             public void run() {
                 for(String s : cmds){
                     Command c = Bukkit.getPluginCommand(s);
                     if(c!=null) {
-                        ALLOWED_COMMANDS.add(Bukkit.getPluginCommand(s));
+                        ALLOWED_PLUGIN_COMMANDS.add(c);
                     }
-                    else
-                        ChatItem.getInstance().getLogger().log(Level.WARNING, ChatColor.RED.toString().concat("Unknown command ")
-                                .concat(s).concat(" found in config! Ignoring occurrence..."));
+                    else {
+                        ALLOWED_DEFAULT_COMMANDS.add(s);
+                    }
                 }
             }
         }, 100L);
