@@ -1,10 +1,8 @@
 package me.dadus33.chatitem;
 
-import com.comphenix.protocol.AsynchronousManager;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.async.AsyncListenerHandler;
 import com.comphenix.protocol.events.ListenerPriority;
 import me.dadus33.chatitem.commands.CIReload;
 import me.dadus33.chatitem.filters.Log4jFilter;
@@ -12,6 +10,7 @@ import me.dadus33.chatitem.json.JSONManipulator;
 import me.dadus33.chatitem.json.JSONManipulatorCurrent;
 import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatPacketListener;
+import me.dadus33.chatitem.listeners.ChatPacketValidator;
 import me.dadus33.chatitem.utils.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -31,7 +30,8 @@ public class ChatItem extends JavaPlugin {
     private Log4jFilter filter;
     private Storage storage;
     private ProtocolManager pm;
-    private ChatPacketListener listener;
+    private ChatPacketListener packetListener;
+    private ChatPacketValidator packetValidator;
     private static JSONManipulator manip;
     private static boolean post17 = false;
     private static boolean post111 = false;
@@ -43,7 +43,8 @@ public class ChatItem extends JavaPlugin {
         obj.saveDefaultConfig();
         obj.reloadConfig();
         obj.storage = new Storage(obj.getConfig());
-        obj.listener.setStorage(obj.storage);
+        obj.packetListener.setStorage(obj.storage);
+        obj.packetValidator.setStorage(obj.storage);
         obj.chatEventListener.setStorage(obj.storage);
         obj.filter.setStorage(obj.storage);
         if (!obj.storage.RELOAD_MESSAGE.isEmpty())
@@ -65,10 +66,10 @@ public class ChatItem extends JavaPlugin {
         if(isMc111OrLater()){
             post111 = true; //for shulker box filtering
         }
-        listener = new ChatPacketListener(this, ListenerPriority.LOWEST, storage, PacketType.Play.Server.CHAT);
-        AsynchronousManager am = pm.getAsynchronousManager();
-        AsyncListenerHandler packetListenerAsyncThread = am.registerAsyncHandler(listener);
-        packetListenerAsyncThread.start();
+        packetListener = new ChatPacketListener(this, ListenerPriority.LOW, storage, PacketType.Play.Server.CHAT);
+        packetValidator = new ChatPacketValidator(this, ListenerPriority.LOWEST, storage, PacketType.Play.Server.CHAT);
+        pm.addPacketListener(packetValidator);
+        pm.addPacketListener(packetListener);
         CIReload rld = new CIReload();
         Bukkit.getPluginCommand("cireload").setExecutor(rld);
         chatEventListener = new ChatEventListener(storage);
