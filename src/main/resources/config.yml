@@ -3,7 +3,7 @@
 #https://www.spigotmc.org/resources/chatitem.19064/
 
 #Version info, DON'T TOUCH
-config-version: 8
+config-version: 9
 
 
 #General configuration
@@ -36,7 +36,19 @@ General:
   let-message-through: true
   #  Should we cancel the user message if the item in his (main) hand is air or null?
   # (No item in hand, that is)
-  deny-if-no-item: true
+  deny-if-no-item: false
+  #  If the above (deny-if-no-item) is set to false, what should the placeholder be replaced with?
+  # Bellow you can configure that behaviour.
+  hand:
+    #  Should the empty hand formatting be totally disabled? That will just leave the placeholder
+    # untouched in the final message
+    disabled: false
+    #  The string the placeholder shall be replaced with. You can use {name} as a placeholder for
+    # the player's name and {display-name} as a placeholder for the player's display (custom) name.
+    name: "&f<&b&l&o{display-name}&b&l&o's hand&f>"
+    #  The text to be displayed whe users hove their cursor above the name
+    tooltip: "&7Nothing to see here"
+
   #  Here you can choose which commands will the plugin attempt to parse. Console commands will all be ignored,
   # however player commands will be taken into consideration. To add a command, simply add an element to the list
   # bellow containing an alias (or name) for that command.
@@ -47,10 +59,11 @@ General:
     - "msg"
   #  Here you can set the limit on how many placeholders a user is allowed to use inside a message.
   # Allowing too many placeholders can result in client crashes.
-  limit: 5
+  limit: 8
   #  The cooldown, in seconds, between allowing players to send messages with items. Setting this to 0
-  # will remove the cooldown totally.
+  # will remove the cooldown entirely.
   cooldown: 60
+
 
 #  Messages section. You can disable any of them by simply leaving them empty, like this: ""
 Messages:
@@ -60,7 +73,7 @@ Messages:
   #  The message you will get after reloading the plugin using /cireload.
   reload-success: "&b&lSuccessful reload!"
   #  The message a player will get when attempting to send a message with more placeholders then the allowed limit.
-  limit-message: "&c&lYou can only add 5 item placeholders per message!"
+  limit-message: "&c&lYou can only add 8 item placeholders per message!"
   #  The message to display players when they can't display items in chat due to the cooldown
   cooldown-message: "&c&lYou can only use items in chat once a minute! You have {remaining} left!"
   #  The no permission message to be showed to players who don't have the required permission to use the placeholder
@@ -70,6 +83,8 @@ Messages:
   seconds: " seconds"
   minutes: " minutes"
   hours: " hours"
+
+
 #  Translations
 # Below you can find a set of default values for all items in Minecraft 1.8.
 Translations:

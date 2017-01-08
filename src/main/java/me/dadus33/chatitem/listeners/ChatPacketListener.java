@@ -176,8 +176,6 @@ public class ChatPacketListener extends PacketAdapter {
                 //STYLE END
 
 
-                String[] reps = new String[c.PLACEHOLDERS.size()];
-                c.PLACEHOLDERS.toArray(reps);
 
                 String message = null;
                 try {
@@ -204,7 +202,11 @@ public class ChatPacketListener extends PacketAdapter {
                                 }
                             }
                         }
-                        message = ChatItem.getManipulator().parse(json, reps, copy, replacer);
+                        message = ChatItem.getManipulator().parse(json, c.PLACEHOLDERS, copy, replacer);
+                    } else {
+                        if(!c.HAND_DISABLED){
+                            message = ChatItem.getManipulator().parseEmpty(json, c.PLACEHOLDERS, c.HAND_NAME, c.HAND_TOOLTIP, p);
+                        }
                     }
                 } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
                     e1.printStackTrace();
@@ -215,16 +217,20 @@ public class ChatPacketListener extends PacketAdapter {
                     }else{
                         packet.getSpecificModifier(BaseComponent[].class).writeSafely(0, ComponentSerializer.parse(message));
                     }
-                    e.setCancelled(false);
                     try {
-                        ProtocolLibrary.getProtocolManager().sendServerPacket(e.getPlayer(), packet, true);
+                        ProtocolLibrary.getProtocolManager().sendServerPacket(e.getPlayer(), packet, false);
+                    } catch (InvocationTargetException e1) {
+                        e1.printStackTrace();
+                    }
+                } else {
+                    try {
+                        ProtocolLibrary.getProtocolManager().sendServerPacket(e.getPlayer(), packet, false);
                     } catch (InvocationTargetException e1) {
                         e1.printStackTrace();
                     }
                 }
             }
         });
-        //here we find the last player name in the string that has a BELL character before it
     }
 
     public void setStorage(Storage st) {

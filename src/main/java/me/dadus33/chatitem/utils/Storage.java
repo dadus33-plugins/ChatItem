@@ -18,13 +18,15 @@ public class Storage {
 
     private FileConfiguration conf;
     public final HashMap<String, HashMap<Short, String>> TRANSLATIONS = new HashMap<>();
-    public final List<String> PLACEHOLDERS;
-    public final String NAME_FORMAT;
-    public final String AMOUNT_FORMAT;
+
     public final Boolean COLOR_IF_ALREADY_COLORED;
     public final Boolean FORCE_ADD_AMOUNT;
     public final Boolean LET_MESSAGE_THROUGH;
     public final Boolean DENY_IF_NO_ITEM;
+    public final Boolean HAND_DISABLED;
+    public final String HAND_NAME;
+    public final String NAME_FORMAT;
+    public final String AMOUNT_FORMAT;
     public final String DENY_MESSAGE;
     public final String LIMIT_MESSAGE;
     public final String RELOAD_MESSAGE;
@@ -32,11 +34,13 @@ public class Storage {
     public final String SECONDS;
     public final String MINUTES;
     public final String HOURS;
-    final Integer CONFIG_VERSION;
+    public final String HAND_TOOLTIP;
+    private final Integer CONFIG_VERSION;
     public final Long COOLDOWN;
     public final Integer LIMIT;
     public final List<Command> ALLOWED_PLUGIN_COMMANDS = new ArrayList<>();
     public final List<String> ALLOWED_DEFAULT_COMMANDS = new ArrayList<>();
+    public final List<String> PLACEHOLDERS;
 
     public Storage(FileConfiguration cnf) {
         this.conf = cnf;
@@ -63,13 +67,16 @@ public class Storage {
         LET_MESSAGE_THROUGH = conf.getBoolean("General.let-message-through");
         FORCE_ADD_AMOUNT = conf.getBoolean("General.force-add-amount");
         DENY_IF_NO_ITEM = conf.getBoolean("General.deny-if-no-item");
+        HAND_DISABLED = conf.getBoolean("General.hand.disabled");
         DENY_MESSAGE = color(conf.getString("Messages.deny-message"));
+        HAND_NAME = color(conf.getString("General.hand.name"));
         LIMIT_MESSAGE = color(conf.getString("Messages.limit-message"));
         RELOAD_MESSAGE = color(conf.getString("Messages.reload-success"));
         COOLDOWN_MESSAGE = color(conf.getString("Messages.cooldown-message"));
         SECONDS = color(conf.getString("Messages.seconds"));
         MINUTES = color(conf.getString("Messages.minutes"));
         HOURS = color(conf.getString("Messages.hours"));
+        HAND_TOOLTIP = color(conf.getString("General.hand.tooltip"));
         final List<String> cmds = conf.getStringList("General.commands");
         Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), new Runnable() {
             @Override
@@ -88,12 +95,11 @@ public class Storage {
 
     }
 
-
     private static String color(String s) {
         return ChatColor.translateAlternateColorCodes('&', s);
     }
 
-    public void checkConfigVersion() {
+    private void checkConfigVersion() {
         int latestVersion = ChatItem.CFG_VER;
         if (latestVersion != CONFIG_VERSION) {
             Bukkit.getLogger().log(Level.WARNING, ChatColor.RED + "ChatItem detected an older or invalid configuration file. Replacing it with the default config...");

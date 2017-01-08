@@ -102,7 +102,9 @@ public class ChatEventListener implements Listener {
                     e.getPlayer().sendMessage(c.DENY_MESSAGE);
                 return;
             }
-            return;
+            if(c.HAND_DISABLED) {
+                return;
+            }
         }
 
         if(c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")){
@@ -192,10 +194,13 @@ public class ChatEventListener implements Listener {
         if (e.getPlayer().getItemInHand().getType().equals(Material.AIR)) {
             if (c.DENY_IF_NO_ITEM) {
                 e.setCancelled(true);
-                if (!c.DENY_MESSAGE.isEmpty())
+                if (!c.DENY_MESSAGE.isEmpty()) {
                     e.getPlayer().sendMessage(c.DENY_MESSAGE);
+                }
             }
-            return;
+            if(c.HAND_DISABLED) {
+                return;
+            }
         }
 
         if(c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")){
