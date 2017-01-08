@@ -1,6 +1,7 @@
 package me.dadus33.chatitem.listeners;
 
 import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
@@ -31,7 +32,9 @@ public class ChatPacketListener extends PacketAdapter {
     private final static String AMOUNT = "{amount}";
     private final static String TIMES = "{times}";
     private final static List<Material> SHULKER_BOXES = new ArrayList<>();
+
     private Storage c;
+
 
     public ChatPacketListener(Plugin plugin, ListenerPriority listenerPriority, Storage s, PacketType... types) {
         super(plugin, listenerPriority, types);
@@ -88,161 +91,140 @@ public class ChatPacketListener extends PacketAdapter {
 
     @SuppressWarnings("deprecation")
     @Override
-    public void onPacketSending(PacketEvent e) {
-        if(ChatItem.mcSupportsActionBar()) //only if action mar messages are supported in this version of minecraft
-        if (e.getPacket().getBytes().readSafely(0) == (byte) 2) {
-            return;  //It means it's an actionbar message, and we ain't intercepting those
+    public void onPacketSending(final PacketEvent e) {
+        final PacketContainer packet = e.getPacket();
+        if(!packet.hasMetadata("parse")){ //First we check if the packet validator has validated this packet to be parsed by us
+            return;
         }
-        boolean usesBaseComponents = false;
-        PacketContainer packet = e.getPacket();
-        String json;
-        if(packet.getChatComponents().readSafely(0)==null){  //null check for some cases of messages sent using spigot's Chat Component API or other means
-            if(ChatItem.supportsChatComponentApi()){  //only if the API is supported in this server distribution
-                BaseComponent[] components = packet.getSpecificModifier(BaseComponent[].class).readSafely(0);
-                if(components == null){
+        final boolean usesBaseComponents = (boolean)packet.getMetadata("base-component"); //The packet validator should also tell if this packet uses base components
+        e.setCancelled(true); //We cancel the packet as we're going to resend it anyways (ignoring listeners this time)
+        Bukkit.getScheduler().runTaskAsynchronously(ChatItem.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                String json = (String)packet.getMetadata("json"); //The packet validator got the json for us, so no need to get it again
+                int topIndex = -1;
+                String name = null;
+                for(Player p : Bukkit.getOnlinePlayers()){
+                    String pname = "\\u0007"+p.getName();
+                    if(!json.contains(pname)){
+                        continue;
+                    }
+                    int index = json.lastIndexOf(pname)+pname.length();
+                    if(index>topIndex){
+                        topIndex = index;
+                        name = pname.replace("\\u0007", "");
+                    }
+                }
+                if(name==null){ //something went really bad, so we run away and hide (AKA the player left or is on another server)
+                    e.setCancelled(true);
                     return;
                 }
-                json = ComponentSerializer.toString(components);
-                usesBaseComponents = true;
-            }else{
-                return;
-            }
-        }else{
-            json = packet.getChatComponents().readSafely(0).getJson();
-        }
+
+                Player p = Bukkit.getPlayer(name);
+                StringBuilder buff = new StringBuilder(json);
+                buff.replace(topIndex-(name.length()+6), topIndex, ""); //we remove both the name and the separator from the json string
+                json = buff.toString();
 
 
-        boolean found = false;
-        for (String rep : c.PLACEHOLDERS)
-            if (json.contains(rep)) {
-                found = true;
-                break;
-            }
-        if (!found) {
-            return; //then it's just a normal message without placeholders, so we leave it alone
-        }
-        if(json.lastIndexOf("\\u0007")==-1){ //if the message doesn't contain the BELL separator, then it's certainly NOT a message we want to parse
-            return;
-        }
+                //Item Styling
+                //STYLE BEGIN
 
-        //here we find the last player name in the string that has a BELL character before it
-        int topIndex = -1;
-        String name = null;
-        for(Player p : Bukkit.getOnlinePlayers()){
-            String pname = "\\u0007"+p.getName();
-            if(!json.contains(pname)){
-                continue;
-            }
-            int index = json.lastIndexOf(pname)+pname.length();
-            if(index>topIndex){
-                topIndex = index;
-                name = pname.replace("\\u0007", "");
-            }
-        }
-        if(name==null){ //something went really bad, so we run away and hide (AKA the player left or is on another server)
-            e.setCancelled(true);
-            return;
-        }
-
-        Player p = Bukkit.getPlayer(name);
-        StringBuilder buff = new StringBuilder(json);
-        buff.replace(topIndex-(name.length()+6), topIndex, ""); //we remove both the name and the separator from the json string
-        json = buff.toString();
-
-
-        //Item Styling
-        //STYLE BEGIN
-
-            ItemStack inHand = p.getItemInHand();
-            String replacer = c.NAME_FORMAT;
-            String amount = c.AMOUNT_FORMAT;
-            boolean dname = false;
-            if (!c.COLOR_IF_ALREADY_COLORED && inHand.hasItemMeta()) {
-                if (inHand.getItemMeta().hasDisplayName()) {
-                    replacer = ChatColor.stripColor(replacer);
-                    dname = true;
-                }
-            } else {
-                if (inHand.hasItemMeta()) {
+                ItemStack inHand = p.getItemInHand();
+                String replacer = c.NAME_FORMAT;
+                String amount = c.AMOUNT_FORMAT;
+                boolean dname = false;
+                if (!c.COLOR_IF_ALREADY_COLORED && inHand.hasItemMeta()) {
                     if (inHand.getItemMeta().hasDisplayName()) {
+                        replacer = ChatColor.stripColor(replacer);
                         dname = true;
                     }
-                }
-            }
-            if (inHand.getAmount() == 1) {
-                if (c.FORCE_ADD_AMOUNT) {
-                    amount = amount.replace(TIMES, "1");
-                    replacer = replacer.replace(AMOUNT, amount);
                 } else {
-                    replacer = replacer.replace(AMOUNT, "");
-                }
-            } else {
-                amount = amount.replace(TIMES, String.valueOf(inHand.getAmount()));
-                replacer = replacer.replace(AMOUNT, amount);
-            }
-            if (dname) {
-                String trp = inHand.getItemMeta().getDisplayName();
-                replacer = replacer.replace(NAME, trp);
-            } else {
-                HashMap<Short, String> translationSection = c.TRANSLATIONS.get(inHand.getType().name());
-                if(translationSection==null){
-                    String trp = materialToName(inHand.getType());
-                    replacer = replacer.replace(NAME, trp);
-                }else {
-                    String translated = translationSection.get(inHand.getDurability());
-                    if (translated != null) {
-                        replacer = replacer.replace(NAME, translated);
-                    } else {
-                        replacer = replacer.replace(NAME, materialToName(inHand.getType()));
-                    }
-                }
-            }
-        //STYLE END
-
-
-        String[] reps = new String[c.PLACEHOLDERS.size()];
-        c.PLACEHOLDERS.toArray(reps);
-
-        String message = null;
-        try {
-            if(!p.getItemInHand().getType().equals(Material.AIR)) {
-                ItemStack copy = p.getItemInHand().clone();
-                if(copy.getType().equals(Material.BOOK_AND_QUILL) || copy.getType().equals(Material.WRITTEN_BOOK)){ //filtering written books
-                    BookMeta bm = (BookMeta)copy.getItemMeta();
-                    bm.setPages(Collections.<String>emptyList());
-                    copy.setItemMeta(bm);
-                } else {
-                    if (ChatItem.mcSupportsShulkerBoxes()) { //filtering shulker boxes
-                        if (SHULKER_BOXES.contains(copy.getType())) {
-                            if (copy.hasItemMeta()) {
-                                BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
-                                if (bsm.hasBlockState()) {
-                                    ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
-                                    for (ItemStack item : sb.getInventory()) {
-                                        stripData(item);
-                                    }
-                                    bsm.setBlockState(sb);
-                                }
-                                copy.setItemMeta(bsm);
-                            }
+                    if (inHand.hasItemMeta()) {
+                        if (inHand.getItemMeta().hasDisplayName()) {
+                            dname = true;
                         }
                     }
                 }
-                message = ChatItem.getManipulator().parse(json, reps, copy, replacer);
+                if (inHand.getAmount() == 1) {
+                    if (c.FORCE_ADD_AMOUNT) {
+                        amount = amount.replace(TIMES, "1");
+                        replacer = replacer.replace(AMOUNT, amount);
+                    } else {
+                        replacer = replacer.replace(AMOUNT, "");
+                    }
+                } else {
+                    amount = amount.replace(TIMES, String.valueOf(inHand.getAmount()));
+                    replacer = replacer.replace(AMOUNT, amount);
+                }
+                if (dname) {
+                    String trp = inHand.getItemMeta().getDisplayName();
+                    replacer = replacer.replace(NAME, trp);
+                } else {
+                    HashMap<Short, String> translationSection = c.TRANSLATIONS.get(inHand.getType().name());
+                    if(translationSection==null){
+                        String trp = materialToName(inHand.getType());
+                        replacer = replacer.replace(NAME, trp);
+                    }else {
+                        String translated = translationSection.get(inHand.getDurability());
+                        if (translated != null) {
+                            replacer = replacer.replace(NAME, translated);
+                        } else {
+                            replacer = replacer.replace(NAME, materialToName(inHand.getType()));
+                        }
+                    }
+                }
+                //STYLE END
+
+
+                String[] reps = new String[c.PLACEHOLDERS.size()];
+                c.PLACEHOLDERS.toArray(reps);
+
+                String message = null;
+                try {
+                    if(!p.getItemInHand().getType().equals(Material.AIR)) {
+                        ItemStack copy = p.getItemInHand().clone();
+                        if(copy.getType().equals(Material.BOOK_AND_QUILL) || copy.getType().equals(Material.WRITTEN_BOOK)){ //filtering written books
+                            BookMeta bm = (BookMeta)copy.getItemMeta();
+                            bm.setPages(Collections.<String>emptyList());
+                            copy.setItemMeta(bm);
+                        } else {
+                            if (ChatItem.mcSupportsShulkerBoxes()) { //filtering shulker boxes
+                                if (SHULKER_BOXES.contains(copy.getType())) {
+                                    if (copy.hasItemMeta()) {
+                                        BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
+                                        if (bsm.hasBlockState()) {
+                                            ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
+                                            for (ItemStack item : sb.getInventory()) {
+                                                stripData(item);
+                                            }
+                                            bsm.setBlockState(sb);
+                                        }
+                                        copy.setItemMeta(bsm);
+                                    }
+                                }
+                            }
+                        }
+                        message = ChatItem.getManipulator().parse(json, reps, copy, replacer);
+                    }
+                } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
+                    e1.printStackTrace();
+                }
+                if(message!=null) {
+                    if(!usesBaseComponents) {
+                        packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
+                    }else{
+                        packet.getSpecificModifier(BaseComponent[].class).writeSafely(0, ComponentSerializer.parse(message));
+                    }
+                    e.setCancelled(false);
+                    try {
+                        ProtocolLibrary.getProtocolManager().sendServerPacket(e.getPlayer(), packet, true);
+                    } catch (InvocationTargetException e1) {
+                        e1.printStackTrace();
+                    }
+                }
             }
-        } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
-            e1.printStackTrace();
-        }
-        if(message!=null) {
-            if(!usesBaseComponents) {
-                packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
-            }else{
-                packet.getSpecificModifier(BaseComponent[].class).writeSafely(0, ComponentSerializer.parse(message));
-            }
-        }
-        else {
-            e.setCancelled(true);
-        }
+        });
+        //here we find the last player name in the string that has a BELL character before it
     }
 
     public void setStorage(Storage st) {
