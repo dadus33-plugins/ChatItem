@@ -34,6 +34,7 @@ public class ChatItem extends JavaPlugin {
     private ChatPacketListener listener;
     private static JSONManipulator manip;
     private static boolean post17 = false;
+    private static boolean post111 = false;
     private static boolean baseComponentAvailable = true;
 
     public static void reload(CommandSender sender) {
@@ -58,6 +59,12 @@ public class ChatItem extends JavaPlugin {
         pm = ProtocolLibrary.getProtocolManager();
         saveDefaultConfig();
         storage = new Storage(getConfig());
+        if(isMc18OrLater()) {
+            post17 = true; //for actionbar messages ignoring
+        }
+        if(isMc111OrLater()){
+            post111 = true; //for shulker box filtering
+        }
         listener = new ChatPacketListener(this, ListenerPriority.LOWEST, storage, PacketType.Play.Server.CHAT);
         AsynchronousManager am = pm.getAsynchronousManager();
         AsyncListenerHandler packetListenerAsyncThread = am.registerAsyncHandler(listener);
@@ -66,9 +73,6 @@ public class ChatItem extends JavaPlugin {
         Bukkit.getPluginCommand("cireload").setExecutor(rld);
         chatEventListener = new ChatEventListener(storage);
         Bukkit.getPluginManager().registerEvents(chatEventListener, this);
-        if(isMc18OrLater()) {
-            post17 = true;
-        }
         try {
             Class.forName("net.md_5.bungee.api.chat.BaseComponent");
         } catch (ClassNotFoundException e) {
@@ -93,6 +97,9 @@ public class ChatItem extends JavaPlugin {
 
     private boolean isMc18OrLater(){
         switch(getVersion(Bukkit.getServer())){
+            case "v1_7_R1": return false;
+            case "v1_7_R2": return false;
+            case "v1_7_R3": return false;
             case "v1_8_R1": return true;
             case "v1_8_R2": return true;
             case "v1_8_R3": return true;
@@ -102,7 +109,25 @@ public class ChatItem extends JavaPlugin {
             case "v1_10_R2": return true;
             case "v1_11_R1": return true;
             case "v1_11_R2": return true;
-            default: return false;
+            default: return true;
+        }
+    }
+
+    private boolean isMc111OrLater(){
+        switch(getVersion(Bukkit.getServer())){
+            case "v1_7_R1": return false;
+            case "v1_7_R2": return false;
+            case "v1_7_R3": return false;
+            case "v1_8_R1": return false;
+            case "v1_8_R2": return false;
+            case "v1_8_R3": return false;
+            case "v1_9_R1": return false;
+            case "v1_9_R2": return false;
+            case "v1_10_R1": return false;
+            case "v1_10_R2": return false;
+            case "v1_11_R1": return true;
+            case "v1_11_R2": return true;
+            default: return true;
         }
     }
 
@@ -115,6 +140,10 @@ public class ChatItem extends JavaPlugin {
 
     public static boolean mcSupportsActionBar(){
         return post17;
+    }
+
+    public static boolean mcSupportsShulkerBoxes(){
+        return post111;
     }
 
     public static boolean supportsChatComponentApi(){

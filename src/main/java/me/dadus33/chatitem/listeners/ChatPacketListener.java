@@ -13,14 +13,16 @@ import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 
 
 public class ChatPacketListener extends PacketAdapter {
@@ -28,10 +30,18 @@ public class ChatPacketListener extends PacketAdapter {
     private final static String NAME = "{name}";
     private final static String AMOUNT = "{amount}";
     private final static String TIMES = "{times}";
+    private final static List<Material> SHULKER_BOXES = new ArrayList<>();
     private Storage c;
 
     public ChatPacketListener(Plugin plugin, ListenerPriority listenerPriority, Storage s, PacketType... types) {
         super(plugin, listenerPriority, types);
+        if(ChatItem.mcSupportsShulkerBoxes()){
+            SHULKER_BOXES.addAll(Arrays.asList(Material.BLACK_SHULKER_BOX, Material.BLUE_SHULKER_BOX,
+                    Material.BROWN_SHULKER_BOX, Material.CYAN_SHULKER_BOX, Material.GRAY_SHULKER_BOX, Material.GREEN_SHULKER_BOX,
+                    Material.LIGHT_BLUE_SHULKER_BOX, Material.LIME_SHULKER_BOX, Material.MAGENTA_SHULKER_BOX, Material.ORANGE_SHULKER_BOX,
+                    Material.PINK_SHULKER_BOX, Material.PURPLE_SHULKER_BOX, Material.RED_SHULKER_BOX, Material.SILVER_SHULKER_BOX,
+                    Material.WHITE_SHULKER_BOX, Material.YELLOW_SHULKER_BOX));
+        }
         c = s;
     }
 
@@ -56,8 +66,24 @@ public class ChatPacketListener extends PacketAdapter {
         }
 
         return sb.toString();
+    }
 
-
+    private void stripData(ItemStack i){
+        if(i == null){
+            return;
+        }
+        if(i.getType().equals(Material.AIR)){
+            return;
+        }
+        if(!i.hasItemMeta()){
+            return;
+        }
+        ItemMeta im = Bukkit.getItemFactory().getItemMeta(i.getType());
+        ItemMeta original = i.getItemMeta();
+        if(original.hasDisplayName()){
+            im.setDisplayName(original.getDisplayName());
+        }
+        i.setItemMeta(im);
     }
 
     @SuppressWarnings("deprecation")
@@ -176,16 +202,33 @@ public class ChatPacketListener extends PacketAdapter {
 
         String[] reps = new String[c.PLACEHOLDERS.size()];
         c.PLACEHOLDERS.toArray(reps);
+
         String message = null;
         try {
             if(!p.getItemInHand().getType().equals(Material.AIR)) {
-                ItemStack hand = p.getItemInHand();
-                if(hand.getType().equals(Material.BOOK_AND_QUILL) || hand.getType().equals(Material.WRITTEN_BOOK)){
-                    BookMeta bm = (BookMeta)hand.getItemMeta();
+                ItemStack copy = p.getItemInHand().clone();
+                if(copy.getType().equals(Material.BOOK_AND_QUILL) || copy.getType().equals(Material.WRITTEN_BOOK)){ //filtering written books
+                    BookMeta bm = (BookMeta)copy.getItemMeta();
                     bm.setPages(Collections.<String>emptyList());
-                    hand.setItemMeta(bm);
+                    copy.setItemMeta(bm);
+                } else {
+                    if (ChatItem.mcSupportsShulkerBoxes()) { //filtering shulker boxes
+                        if (SHULKER_BOXES.contains(copy.getType())) {
+                            if (copy.hasItemMeta()) {
+                                BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
+                                if (bsm.hasBlockState()) {
+                                    ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
+                                    for (ItemStack item : sb.getInventory()) {
+                                        stripData(item);
+                                    }
+                                    bsm.setBlockState(sb);
+                                }
+                                copy.setItemMeta(bsm);
+                            }
+                        }
+                    }
                 }
-                message = ChatItem.getManipulator().parse(json, reps, hand, replacer);
+                message = ChatItem.getManipulator().parse(json, reps, copy, replacer);
             }
         } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
             e1.printStackTrace();
