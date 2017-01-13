@@ -8,8 +8,8 @@ Many thanks to @DarkSeraphim for this!
 I only modified his work to make it compatible with what I was building.
 */
 public class Translator {
-    private static final StringBuilder BUILDER = new StringBuilder("");
-    private static final StringBuilder STYLE = new StringBuilder();
+    private static final StringBuffer BUFFER = new StringBuffer();
+    private static final StringBuffer STYLE = new StringBuffer();
 
     static String toJSON(String message) {
         if (message == null || message.isEmpty())
@@ -18,8 +18,8 @@ public class Translator {
         boolean first = true;
         String colour = null;
         String format = null;
-        BUILDER.setLength(0);
-        BUILDER.append("[");
+        BUFFER.setLength(0);
+        BUFFER.append("[");
         boolean ignoreFirst = !parts[0].isEmpty() && ChatColor.getByChar(parts[0].charAt(0)) != null;
         for (String part : parts) {
             if (part.isEmpty()) {
@@ -44,23 +44,23 @@ public class Translator {
                 if (first)
                     first = false;
                 else {
-                    BUILDER.append(", ");
+                    BUFFER.append(", ");
                 }
-                BUILDER.append("{");
+                BUFFER.append("{");
                 if (colour != null) {
-                    BUILDER.append(colour);
+                    BUFFER.append(colour);
                     colour = null;
                 }
                 if (format != null) {
-                    BUILDER.append(format);
+                    BUFFER.append(format);
                     format = null;
                 }
-                BUILDER.append(String.format("\"text\":\"%s\"", part));
-                BUILDER.append("}");
+                BUFFER.append(String.format("\"text\":\"%s\"", part));
+                BUFFER.append("}");
             }
         }
-        BUILDER.append("]");
-        return BUILDER.toString();
+        BUFFER.append("]");
+        return BUFFER.toString();
     }
 
     private static String getStyle(char colour) {

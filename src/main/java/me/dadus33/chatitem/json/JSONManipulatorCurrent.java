@@ -2,6 +2,7 @@ package me.dadus33.chatitem.json;
 
 
 import com.google.gson.*;
+import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.namecheck.Checker;
 import me.dadus33.chatitem.utils.Reflect;
 import org.bukkit.entity.Player;
@@ -10,6 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 
@@ -26,10 +29,24 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     private static JsonArray itemTooltip;
     private static JsonArray classicTooltip;
     private static JsonParser parser = new JsonParser();
+    private final Logger debug;
+
+    public JSONManipulatorCurrent(){
+        debug = ChatItem.getInstance().getLogger();
+        debug.setLevel(Level.INFO);
+    }
 
 
-    public String parse(String json, List<String> replacements, ItemStack item, String replacement) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+    public String parse(String json, List<String> replacements, ItemStack item, String replacement, boolean dbg) throws InvocationTargetException, IllegalAccessException, InstantiationException {
         JsonObject obj = parser.parse(json).getAsJsonObject();
+        if(dbg) {
+            debug.info("The current JSON message to be sent (before parsing):");
+            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            debug.info(json);
+            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            debug.info("");
+            debug.info("");
+        }
         JsonArray array = obj.getAsJsonArray("extra");
         replaces = replacements;
         String regex = "";
@@ -51,11 +68,35 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         rgx = regex;
         JsonArray rep = new JsonArray();
         JsonArray use;
+        if(dbg) {
+            debug.info("The current replacement message to be sent (before translating to JSON):");
+            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            debug.info(replacement);
+            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            debug.info("");
+            debug.info("");
+            debug.info("The current replacement message to be sent (after translating to JSON, no backslash-escaping):");
+            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            debug.info(Translator.toJSON(replacement));
+            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            debug.info("");
+            debug.info("");
+            debug.info("The current replacement message to be sent (after translating to JSON, with backslash-escaping):");
+            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            debug.info(escapeBackslash(Translator.toJSON(replacement)));
+            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            debug.info("");
+            debug.info("");
+        }
         try {
             use = parser.parse(Translator.toJSON(escapeBackslash(replacement))).getAsJsonArray();
         }catch(JsonParseException e){ //in case the name of the item was already escaped
+            if(dbg){
+                debug.info("The first way has been chosen (without backslash-escaping). An exception might occur now.");
+            }
             use = parser.parse(Translator.toJSON(replacement)).getAsJsonArray();
         }
+
         JsonObject hover = parser.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
         Object nmsStack = asNMSCopy.invoke(null, item);
         Object tag = nbtTagCompoundClass.newInstance();
@@ -200,7 +241,15 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     }
 
     @Override
-    public String parseEmpty(String json, List<String> replacements, String repl, String tooltip, Player sender) {
+    public String parseEmpty(String json, List<String> replacements, String repl, String tooltip, Player sender, boolean dbg) {
+        if(dbg) {
+            debug.info("The current JSON message to be sent (before parsing, in empty mode):");
+            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            debug.info(json);
+            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
+            debug.info("");
+            debug.info("");
+        }
         JsonObject obj = parser.parse(json).getAsJsonObject();
         JsonArray array = obj.getAsJsonArray("extra");
         replaces = replacements;

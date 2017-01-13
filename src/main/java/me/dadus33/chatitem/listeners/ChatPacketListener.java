@@ -121,7 +121,7 @@ public class ChatPacketListener extends PacketAdapter {
                 }
 
                 Player p = Bukkit.getPlayer(name);
-                StringBuilder buff = new StringBuilder(json);
+                StringBuffer buff = new StringBuffer(json);
                 buff.replace(topIndex-(name.length()+6), topIndex, ""); //we remove both the name and the separator from the json string
                 json = buff.toString();
 
@@ -202,10 +202,10 @@ public class ChatPacketListener extends PacketAdapter {
                                 }
                             }
                         }
-                        message = ChatItem.getManipulator().parse(json, c.PLACEHOLDERS, copy, replacer);
+                        message = ChatItem.getManipulator().parse(json, c.PLACEHOLDERS, copy, replacer, c.DEBUG);
                     } else {
                         if(!c.HAND_DISABLED){
-                            message = ChatItem.getManipulator().parseEmpty(json, c.PLACEHOLDERS, c.HAND_NAME, c.HAND_TOOLTIP, p);
+                            message = ChatItem.getManipulator().parseEmpty(json, c.PLACEHOLDERS, c.HAND_NAME, c.HAND_TOOLTIP, p, c.DEBUG);
                         }
                     }
                 } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {

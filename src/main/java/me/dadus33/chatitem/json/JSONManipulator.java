@@ -8,6 +8,6 @@ import java.util.List;
 
 
 public interface JSONManipulator {
-    String parse(String json, List<String> replacements, ItemStack item, String repl) throws InvocationTargetException, IllegalAccessException, InstantiationException;
-    String parseEmpty(String json, List<String> replacements, String repl, String tooltip, Player sender);
+    String parse(String json, List<String> replacements, ItemStack item, String repl, boolean debug) throws InvocationTargetException, IllegalAccessException, InstantiationException;
+    String parseEmpty(String json, List<String> replacements, String repl, String tooltip, Player sender, boolean debug);
 }

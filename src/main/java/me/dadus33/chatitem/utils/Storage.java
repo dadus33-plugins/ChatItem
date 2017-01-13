@@ -19,6 +19,7 @@ public class Storage {
     private FileConfiguration conf;
     public final HashMap<String, HashMap<Short, String>> TRANSLATIONS = new HashMap<>();
 
+    public final Boolean DEBUG;
     public final Boolean COLOR_IF_ALREADY_COLORED;
     public final Boolean FORCE_ADD_AMOUNT;
     public final Boolean LET_MESSAGE_THROUGH;
@@ -68,6 +69,7 @@ public class Storage {
         FORCE_ADD_AMOUNT = conf.getBoolean("General.force-add-amount");
         DENY_IF_NO_ITEM = conf.getBoolean("General.deny-if-no-item");
         HAND_DISABLED = conf.getBoolean("General.hand.disabled");
+        DEBUG = conf.getBoolean("debug");
         DENY_MESSAGE = color(conf.getString("Messages.deny-message"));
         HAND_NAME = color(conf.getString("General.hand.name"));
         LIMIT_MESSAGE = color(conf.getString("Messages.limit-message"));
