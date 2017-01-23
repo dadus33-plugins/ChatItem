@@ -24,16 +24,19 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     private static final Class<?> nbtTagCompoundClass = Reflect.getNMSClass("NBTTagCompound");
     private static final Method saveNmsItemStackMethod = Reflect.getMethod(nmsItemStackClass, "save", nbtTagCompoundClass);
 
-    private static List<String> replaces;
-    private static String rgx;
-    private static JsonArray itemTooltip;
-    private static JsonArray classicTooltip;
-    private static JsonParser parser = new JsonParser();
-    private final Logger debug;
+    private static Logger debug;
+
+    private List<String> replaces;
+    private String rgx;
+    private JsonArray itemTooltip;
+    private JsonArray classicTooltip;
+    private JsonParser parser = new JsonParser();
 
     public JSONManipulatorCurrent(){
-        debug = ChatItem.getInstance().getLogger();
-        debug.setLevel(Level.INFO);
+        if(debug == null) {
+            debug = ChatItem.getInstance().getLogger();
+            debug.setLevel(Level.INFO);
+        }
     }
 
 
@@ -229,8 +232,6 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                         if (!fnd) {
                             rep.add(array.get(i));
                         }
-
-
                     }
                 }
             }
@@ -241,7 +242,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     }
 
     @Override
-    public String parseEmpty(String json, List<String> replacements, String repl, String tooltip, Player sender, boolean dbg) {
+    public String parseEmpty(String json, List<String> replacements, String repl, List<String> tooltip, Player sender, boolean dbg) {
         if(dbg) {
             debug.info("The current JSON message to be sent (before parsing, in empty mode):");
             debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
@@ -278,8 +279,18 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                                 replace("{display-name}", sender.getDisplayName())))).
                 getAsJsonArray();
         JsonObject hover = parser.parse("{\"action\":\"show_text\", \"value\": \"\"}").getAsJsonObject();
-        tooltip = tooltip.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName());
-        hover.add("value", parser.parse(Translator.toJSON(tooltip)));
+
+        StringBuilder oneLineTooltip = new StringBuilder("");
+        int index = 0;
+        for(String m : tooltip){
+           oneLineTooltip.append(m.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
+           ++index;
+           if(index!=tooltip.size()-1){
+               oneLineTooltip.append('\n');
+           }
+        }
+
+        hover.add("value", parser.parse(Translator.toJSON(oneLineTooltip.toString())));
         for (JsonElement ob : use)
             ob.getAsJsonObject().add("hoverEvent", hover);
 
@@ -413,7 +424,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     }
 
 
-    private static JsonArray parseNoItemArray(JsonArray arr) {
+    private JsonArray parseNoItemArray(JsonArray arr) {
         JsonArray replacer = new JsonArray();
         for (int i = 0; i < arr.size(); ++i) {
             if (arr.get(i).isJsonObject()){
@@ -531,7 +542,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         return replacer;
     }
 
-    private static JsonArray parseArray(JsonArray arr) {
+    private JsonArray parseArray(JsonArray arr) {
         JsonArray replacer = new JsonArray();
         for (int i = 0; i < arr.size(); ++i) {
             if (arr.get(i).isJsonObject()){

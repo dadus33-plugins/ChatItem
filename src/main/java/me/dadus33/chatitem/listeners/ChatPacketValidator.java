@@ -22,7 +22,7 @@ public class ChatPacketValidator extends PacketAdapter {
     }
 
     public void onPacketSending(PacketEvent e){
-        if(ChatItem.mcSupportsActionBar()) { //only if action mar messages are supported in this version of minecraft
+        if(ChatItem.mcSupportsActionBar()) { //only if action bar messages are supported in this version of minecraft
             if (e.getPacket().getBytes().readSafely(0) == (byte) 2) {
                 return;  //It means it's an actionbar message, and we ain't intercepting those
             }

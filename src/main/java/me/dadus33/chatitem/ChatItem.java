@@ -24,7 +24,7 @@ import java.util.logging.Level;
 
 public class ChatItem extends JavaPlugin {
 
-    public final static int CFG_VER = 10;
+    public final static int CFG_VER = 11;
     private static ChatItem instance;
     private ChatEventListener chatEventListener;
     private Log4jFilter filter;
@@ -32,7 +32,6 @@ public class ChatItem extends JavaPlugin {
     private ProtocolManager pm;
     private ChatPacketListener packetListener;
     private ChatPacketValidator packetValidator;
-    private static JSONManipulator manip;
     private static boolean post17 = false;
     private static boolean post111 = false;
     private static boolean baseComponentAvailable = true;
@@ -79,7 +78,6 @@ public class ChatItem extends JavaPlugin {
         } catch (ClassNotFoundException e) {
             baseComponentAvailable = false;
         }
-        manip = new JSONManipulatorCurrent();
 
         try {
             MetricsLite metrics = new MetricsLite(this);
@@ -152,6 +150,6 @@ public class ChatItem extends JavaPlugin {
     }
 
     public static JSONManipulator getManipulator(){
-        return manip;
+        return new JSONManipulatorCurrent();
     }
 }

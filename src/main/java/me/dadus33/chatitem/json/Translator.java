@@ -8,8 +8,8 @@ Many thanks to @DarkSeraphim for this!
 I only modified his work to make it compatible with what I was building.
 */
 public class Translator {
-    private static final StringBuffer BUFFER = new StringBuffer();
-    private static final StringBuffer STYLE = new StringBuffer();
+    private static final StringBuilder BUILDER = new StringBuilder();
+    private static final StringBuilder STYLE = new StringBuilder();
 
     static String toJSON(String message) {
         if (message == null || message.isEmpty())
@@ -18,8 +18,8 @@ public class Translator {
         boolean first = true;
         String colour = null;
         String format = null;
-        BUFFER.setLength(0);
-        BUFFER.append("[");
+        BUILDER.setLength(0);
+        BUILDER.append("[");
         boolean ignoreFirst = !parts[0].isEmpty() && ChatColor.getByChar(parts[0].charAt(0)) != null;
         for (String part : parts) {
             if (part.isEmpty()) {
@@ -44,23 +44,23 @@ public class Translator {
                 if (first)
                     first = false;
                 else {
-                    BUFFER.append(", ");
+                    BUILDER.append(", ");
                 }
-                BUFFER.append("{");
+                BUILDER.append("{");
                 if (colour != null) {
-                    BUFFER.append(colour);
+                    BUILDER.append(colour);
                     colour = null;
                 }
                 if (format != null) {
-                    BUFFER.append(format);
+                    BUILDER.append(format);
                     format = null;
                 }
-                BUFFER.append(String.format("\"text\":\"%s\"", part));
-                BUFFER.append("}");
+                BUILDER.append(String.format("\"text\":\"%s\"", part));
+                BUILDER.append("}");
             }
         }
-        BUFFER.append("]");
-        return BUFFER.toString();
+        BUILDER.append("]");
+        return BUILDER.toString();
     }
 
     private static String getStyle(char colour) {

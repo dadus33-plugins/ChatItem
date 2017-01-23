@@ -35,13 +35,13 @@ public class Storage {
     public final String SECONDS;
     public final String MINUTES;
     public final String HOURS;
-    public final String HAND_TOOLTIP;
     private final Integer CONFIG_VERSION;
     public final Long COOLDOWN;
     public final Integer LIMIT;
     public final List<Command> ALLOWED_PLUGIN_COMMANDS = new ArrayList<>();
     public final List<String> ALLOWED_DEFAULT_COMMANDS = new ArrayList<>();
     public final List<String> PLACEHOLDERS;
+    public final List<String> HAND_TOOLTIP;
 
     public Storage(FileConfiguration cnf) {
         this.conf = cnf;
@@ -78,7 +78,8 @@ public class Storage {
         SECONDS = color(conf.getString("Messages.seconds"));
         MINUTES = color(conf.getString("Messages.minutes"));
         HOURS = color(conf.getString("Messages.hours"));
-        HAND_TOOLTIP = color(conf.getString("General.hand.tooltip"));
+        HAND_TOOLTIP = conf.getStringList("General.hand.tooltip");
+        colorStringList(HAND_TOOLTIP);
         final List<String> cmds = conf.getStringList("General.commands");
         Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), new Runnable() {
             @Override
@@ -114,6 +115,12 @@ public class Storage {
 
     private void performOverwrite() {
         ChatItem.getInstance().saveResource("config.yml", true);
+    }
+
+    private static void colorStringList(List<String> input){
+        for(int i=0; i<input.size(); ++i){
+            input.set(i, color(input.get(i)));
+        }
     }
 
 }
