@@ -8,10 +8,10 @@ Many thanks to @DarkSeraphim for this!
 I only modified his work to make it compatible with what I was building.
 */
 public class Translator {
-    private static final StringBuilder BUILDER = new StringBuilder();
-    private static final StringBuilder STYLE = new StringBuilder();
+    private final StringBuilder BUILDER = new StringBuilder();
+    private final StringBuilder STYLE = new StringBuilder();
 
-    static String toJSON(String message) {
+    String toJSON(String message) {
         if (message == null || message.isEmpty())
             return null;
         String[] parts = message.split(Character.toString(ChatColor.COLOR_CHAR));
@@ -63,7 +63,7 @@ public class Translator {
         return BUILDER.toString();
     }
 
-    private static String getStyle(char colour) {
+    private String getStyle(char colour) {
         if (STYLE.length() > 0)
             STYLE.delete(0, STYLE.length());
         switch (colour) {

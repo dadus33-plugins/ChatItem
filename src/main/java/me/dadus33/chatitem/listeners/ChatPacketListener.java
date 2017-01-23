@@ -228,6 +228,7 @@ public class ChatPacketListener extends PacketAdapter {
                     } catch (InvocationTargetException e1) {
                         e1.printStackTrace();
                     }
+
                 }
             }
         });

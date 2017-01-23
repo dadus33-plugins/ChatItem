@@ -31,6 +31,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     private JsonArray itemTooltip;
     private JsonArray classicTooltip;
     private JsonParser parser = new JsonParser();
+    private Translator translator = new Translator();
 
     public JSONManipulatorCurrent(){
         if(debug == null) {
@@ -80,24 +81,24 @@ public class JSONManipulatorCurrent implements JSONManipulator{
             debug.info("");
             debug.info("The current replacement message to be sent (after translating to JSON, no backslash-escaping):");
             debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
-            debug.info(Translator.toJSON(replacement));
+            debug.info(translator.toJSON(replacement));
             debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
             debug.info("");
             debug.info("");
             debug.info("The current replacement message to be sent (after translating to JSON, with backslash-escaping):");
             debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
-            debug.info(escapeBackslash(Translator.toJSON(replacement)));
+            debug.info(escapeBackslash(translator.toJSON(replacement)));
             debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
             debug.info("");
             debug.info("");
         }
         try {
-            use = parser.parse(Translator.toJSON(escapeBackslash(replacement))).getAsJsonArray();
+            use = parser.parse(translator.toJSON(escapeBackslash(replacement))).getAsJsonArray();
         }catch(JsonParseException e){ //in case the name of the item was already escaped
             if(dbg){
                 debug.info("The first way has been chosen (without backslash-escaping). An exception might occur now.");
             }
-            use = parser.parse(Translator.toJSON(replacement)).getAsJsonArray();
+            use = parser.parse(translator.toJSON(replacement)).getAsJsonArray();
         }
 
         JsonObject hover = parser.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
@@ -273,7 +274,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         rgx = regex;
         JsonArray rep = new JsonArray();
         JsonArray use;
-        use = parser.parse(Translator.toJSON(
+        use = parser.parse(translator.toJSON(
                 escapeBackslash(
                         repl.replace("{name}", sender.getName()).
                                 replace("{display-name}", sender.getDisplayName())))).
@@ -290,7 +291,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
            }
         }
 
-        hover.add("value", parser.parse(Translator.toJSON(oneLineTooltip.toString())));
+        hover.add("value", parser.parse(translator.toJSON(oneLineTooltip.toString())));
         for (JsonElement ob : use)
             ob.getAsJsonObject().add("hoverEvent", hover);
 
