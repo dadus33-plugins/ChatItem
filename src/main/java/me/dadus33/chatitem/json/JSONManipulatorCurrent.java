@@ -41,16 +41,8 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     }
 
 
-    public String parse(String json, List<String> replacements, ItemStack item, String replacement, boolean dbg) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+    public String parse(String json, List<String> replacements, ItemStack item, String replacement) throws InvocationTargetException, IllegalAccessException, InstantiationException {
         JsonObject obj = parser.parse(json).getAsJsonObject();
-        if(dbg) {
-            debug.info("The current JSON message to be sent (before parsing):");
-            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
-            debug.info(json);
-            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
-            debug.info("");
-            debug.info("");
-        }
         JsonArray array = obj.getAsJsonArray("extra");
         replaces = replacements;
         String regex = "";
@@ -72,32 +64,9 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         rgx = regex;
         JsonArray rep = new JsonArray();
         JsonArray use;
-        if(dbg) {
-            debug.info("The current replacement message to be sent (before translating to JSON):");
-            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
-            debug.info(replacement);
-            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
-            debug.info("");
-            debug.info("");
-            debug.info("The current replacement message to be sent (after translating to JSON, no backslash-escaping):");
-            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
-            debug.info(translator.toJSON(replacement));
-            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
-            debug.info("");
-            debug.info("");
-            debug.info("The current replacement message to be sent (after translating to JSON, with backslash-escaping):");
-            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
-            debug.info(escapeBackslash(translator.toJSON(replacement)));
-            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
-            debug.info("");
-            debug.info("");
-        }
         try {
             use = parser.parse(translator.toJSON(escapeBackslash(replacement))).getAsJsonArray();
         }catch(JsonParseException e){ //in case the name of the item was already escaped
-            if(dbg){
-                debug.info("The first way has been chosen (without backslash-escaping). An exception might occur now.");
-            }
             use = parser.parse(translator.toJSON(replacement)).getAsJsonArray();
         }
 
@@ -243,15 +212,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     }
 
     @Override
-    public String parseEmpty(String json, List<String> replacements, String repl, List<String> tooltip, Player sender, boolean dbg) {
-        if(dbg) {
-            debug.info("The current JSON message to be sent (before parsing, in empty mode):");
-            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
-            debug.info(json);
-            debug.info(":::::::::::::::::::::::::::::::::::::::::::::::::::::");
-            debug.info("");
-            debug.info("");
-        }
+    public String parseEmpty(String json, List<String> replacements, String repl, List<String> tooltip, Player sender) {
         JsonObject obj = parser.parse(json).getAsJsonObject();
         JsonArray array = obj.getAsJsonArray("extra");
         replaces = replacements;
