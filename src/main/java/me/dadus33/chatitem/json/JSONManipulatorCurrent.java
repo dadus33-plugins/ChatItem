@@ -8,9 +8,12 @@ import me.dadus33.chatitem.utils.Reflect;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -18,11 +21,13 @@ import java.util.regex.Pattern;
 
 public class JSONManipulatorCurrent implements JSONManipulator{
 
-    private static final Class<?> craftItemStackClass = Reflect.getOBCClass("inventory.CraftItemStack");
-    private static final Class<?> nmsItemStackClass = Reflect.getNMSClass("ItemStack");
-    private static final Method asNMSCopy = Reflect.getMethod(craftItemStackClass, "asNMSCopy", ItemStack.class);
-    private static final Class<?> nbtTagCompoundClass = Reflect.getNMSClass("NBTTagCompound");
-    private static final Method saveNmsItemStackMethod = Reflect.getMethod(nmsItemStackClass, "save", nbtTagCompoundClass);
+    private static final Class<?> CRAFT_ITEM_STACK_CLASS = Reflect.getOBCClass("inventory.CraftItemStack");
+    private static final Class<?> NMS_ITEM_STACK_CLASS = Reflect.getNMSClass("ItemStack");
+    private static final Method AS_NMS_COPY = Reflect.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
+    private static final Class<?> NBT_TAG_COMPOUND = Reflect.getNMSClass("NBTTagCompound");
+    private static final Method SAVE_NMS_ITEM_STACK_METHOD = Reflect.getMethod(NMS_ITEM_STACK_CLASS, "save", NBT_TAG_COMPOUND);
+    private static final Field MAP = Reflect.getField(NBT_TAG_COMPOUND, "map");
+    private static final Method GET_STRING = Reflect.getMethod(NBT_TAG_COMPOUND, "getString", String.class);
 
     private static Logger debug;
 
@@ -30,8 +35,9 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     private String rgx;
     private JsonArray itemTooltip;
     private JsonArray classicTooltip;
-    private JsonParser parser = new JsonParser();
-    private Translator translator = new Translator();
+    private final JsonParser PARSER = new JsonParser();
+    private final JsonParser LENIENT_PARSER = new JsonParser();
+    private final Translator TRANSLATOR = new Translator();
 
     public JSONManipulatorCurrent(){
         if(debug == null) {
@@ -42,7 +48,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
 
 
     public String parse(String json, List<String> replacements, ItemStack item, String replacement) throws InvocationTargetException, IllegalAccessException, InstantiationException {
-        JsonObject obj = parser.parse(json).getAsJsonObject();
+        JsonObject obj = PARSER.parse(json).getAsJsonObject();
         JsonArray array = obj.getAsJsonArray("extra");
         replaces = replacements;
         String regex = "";
@@ -65,15 +71,15 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         JsonArray rep = new JsonArray();
         JsonArray use;
         try {
-            use = parser.parse(translator.toJSON(escapeBackslash(replacement))).getAsJsonArray();
+            use = PARSER.parse(TRANSLATOR.toJSON(escapeBackslash(replacement))).getAsJsonArray();
         }catch(JsonParseException e){ //in case the name of the item was already escaped
-            use = parser.parse(translator.toJSON(replacement)).getAsJsonArray();
+            use = PARSER.parse(TRANSLATOR.toJSON(replacement)).getAsJsonArray();
         }
 
-        JsonObject hover = parser.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
-        Object nmsStack = asNMSCopy.invoke(null, item);
-        Object tag = nbtTagCompoundClass.newInstance();
-        tag = saveNmsItemStackMethod.invoke(nmsStack, tag);
+        JsonObject hover = PARSER.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
+        Object nmsStack = AS_NMS_COPY.invoke(null, item);
+        Object tag = NBT_TAG_COMPOUND.newInstance();
+        tag = SAVE_NMS_ITEM_STACK_METHOD.invoke(nmsStack, tag);
         String stringed = tag.toString();
         String jsonRep = escapeBackslash(stringed);
 
@@ -147,7 +153,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                         boolean endDot = (j == splits.length - 1) && isLast;
                         if (!splits[j].isEmpty() && !endDot) {
                             String st = o.toString();
-                            JsonObject fix = parser.parse(st).getAsJsonObject();
+                            JsonObject fix = PARSER.parse(st).getAsJsonObject();
                             fix.addProperty("text", splits[j]);
                             rep.add(fix);
                         }
@@ -213,7 +219,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
 
     @Override
     public String parseEmpty(String json, List<String> replacements, String repl, List<String> tooltip, Player sender) {
-        JsonObject obj = parser.parse(json).getAsJsonObject();
+        JsonObject obj = PARSER.parse(json).getAsJsonObject();
         JsonArray array = obj.getAsJsonArray("extra");
         replaces = replacements;
         String regex = "";
@@ -235,12 +241,12 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         rgx = regex;
         JsonArray rep = new JsonArray();
         JsonArray use;
-        use = parser.parse(translator.toJSON(
+        use = PARSER.parse(TRANSLATOR.toJSON(
                 escapeBackslash(
                         repl.replace("{name}", sender.getName()).
                                 replace("{display-name}", sender.getDisplayName())))).
                 getAsJsonArray();
-        JsonObject hover = parser.parse("{\"action\":\"show_text\", \"value\": \"\"}").getAsJsonObject();
+        JsonObject hover = PARSER.parse("{\"action\":\"show_text\", \"value\": \"\"}").getAsJsonObject();
 
         StringBuilder oneLineTooltip = new StringBuilder("");
         int index = 0;
@@ -252,7 +258,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
            }
         }
 
-        hover.add("value", parser.parse(translator.toJSON(oneLineTooltip.toString())));
+        hover.add("value", PARSER.parse(TRANSLATOR.toJSON(oneLineTooltip.toString())));
         for (JsonElement ob : use)
             ob.getAsJsonObject().add("hoverEvent", hover);
 
@@ -319,7 +325,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                         boolean endDot = (j == splits.length - 1) && isLast;
                         if (!splits[j].isEmpty() && !endDot) {
                             String st = o.toString();
-                            JsonObject fix = parser.parse(st).getAsJsonObject();
+                            JsonObject fix = PARSER.parse(st).getAsJsonObject();
                             fix.addProperty("text", splits[j]);
                             rep.add(fix);
                         }
@@ -443,7 +449,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                         boolean endDot = (j == splits.length - 1) && isLast;
                         if (!splits[j].isEmpty() && !endDot) {
                             String st = o.toString();
-                            JsonObject fix = parser.parse(st).getAsJsonObject();
+                            JsonObject fix = PARSER.parse(st).getAsJsonObject();
                             fix.addProperty("text", splits[j]);
                             replacer.add(fix);
                         }
@@ -561,7 +567,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                         boolean endDot = (j == splits.length - 1) && isLast;
                         if (!splits[j].isEmpty() && !endDot) {
                             String st = o.toString();
-                            JsonObject fix = parser.parse(st).getAsJsonObject();
+                            JsonObject fix = PARSER.parse(st).getAsJsonObject();
                             fix.addProperty("text", splits[j]);
                             replacer.add(fix);
                         }
@@ -625,6 +631,63 @@ public class JSONManipulatorCurrent implements JSONManipulator{
 
     private String escapeBackslash(String json){
         return json.replace("\\",  "\\\\");
+    }
+
+    private String escapeSpecials(String initial){
+        return initial.replace("\"", "\\\"").replace("\\", "\\\\").replace("/", "\\/").replace("\b", "\\b")
+                .replace("\f", "\\f").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
+    }
+
+    private String escapeNonQuotesSpecials(String initial){
+        return initial.replace("\\", "\\\\").replace("/", "\\/").replace("\b", "\\b")
+                .replace("\f", "\\f").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
+    }
+
+    private String stringifyItem(ItemStack item) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException {
+        Object nmsStack = AS_NMS_COPY.invoke(null, item);
+        Object tag = NBT_TAG_COMPOUND.newInstance();
+        tag = SAVE_NMS_ITEM_STACK_METHOD.invoke(nmsStack, tag);
+        Map<String, Object> map = (Map<String, Object>) MAP.get(tag);
+        Set<Map.Entry<String, Object>> entrySet = map.entrySet();
+        StringBuilder sb = new StringBuilder("{");
+        for(Map.Entry<String, Object> entry : entrySet){
+            String key = "\""+escapeSpecials(entry.getKey())+"\"";
+            String value = stringifyNBTBase(entry.getValue());
+            if(sb.length() > 1){
+                sb.append(',');
+            }
+            sb.append(key).append(':').append(value);
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
+    private String stringifyNBTBase(Object nbtCompound) throws IllegalAccessException {
+        if(NBT_TAG_COMPOUND.isInstance(nbtCompound)){ //If we have an NBTTagCompound, not other NBTBase
+            Map<String, Object> map = (Map<String, Object>) MAP.get(nbtCompound);
+            Set<Map.Entry<String, Object>> entrySet = map.entrySet();
+            StringBuilder sb = new StringBuilder("{");
+            for(Map.Entry<String, Object> entry : entrySet){
+                String key = "\""+escapeSpecials(entry.getKey())+"\"";
+                String value = stringifyNBTBase(entry.getValue());
+                if(sb.length() > 1){
+                    sb.append(',');
+                }
+                sb.append(key).append(':').append(value);
+            }
+            sb.append("}");
+            return sb.toString();
+        }else{
+            String toString = nbtCompound.toString();
+            if(toString.startsWith("\"") &&toString.endsWith("\"")){
+                toString = toString.substring(1, toString.length()-2);
+                toString = escapeNonQuotesSpecials(toString);
+                StringBuilder bld = new StringBuilder();
+                bld.append("\"").append(toString).append("\"");
+                return bld.toString();
+            }
+            return toString;
+        }
     }
 
 

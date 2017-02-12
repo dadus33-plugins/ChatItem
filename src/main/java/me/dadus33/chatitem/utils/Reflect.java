@@ -2,6 +2,7 @@ package me.dadus33.chatitem.utils;
 
 import org.bukkit.Bukkit;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class Reflect {
@@ -55,6 +56,17 @@ public class Reflect {
         try {
             return clazz.getMethod(methodName, params);
         } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static Field getField(Class<?> clazz, String fieldName){
+        try{
+            Field f = clazz.getDeclaredField(fieldName);
+            f.setAccessible(true);
+            return f;
+        } catch (NoSuchFieldException e) {
             e.printStackTrace();
             return null;
         }
