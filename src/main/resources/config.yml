@@ -5,11 +5,6 @@
 #Version info, DON'T TOUCH
 config-version: 11
 
-#  Before reporting any errors, enable debug mode and try to reproduce the error.
-# Then, make sure to include a link to your last 50 lines from your log.
-# You can use pastebin, hastebin, or any other paste service for that.
-debug: false
-
 #General configuration
 General:
   #The placeholders you want to use for the item. You can add as many as you want.
