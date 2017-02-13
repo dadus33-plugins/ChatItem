@@ -202,13 +202,13 @@ public class ChatPacketListener extends PacketAdapter {
                                 }
                             }
                         }
-                        message = ChatItem.getManipulator().parse(json, c.PLACEHOLDERS, copy, replacer, c.DEBUG);
+                        message = ChatItem.getManipulator().parse(json, c.PLACEHOLDERS, copy, replacer);
                     } else {
                         if(!c.HAND_DISABLED){
-                            message = ChatItem.getManipulator().parseEmpty(json, c.PLACEHOLDERS, c.HAND_NAME, c.HAND_TOOLTIP, p, c.DEBUG);
+                            message = ChatItem.getManipulator().parseEmpty(json, c.PLACEHOLDERS, c.HAND_NAME, c.HAND_TOOLTIP, p);
                         }
                     }
-                } catch (InvocationTargetException | IllegalAccessException | InstantiationException e1) {
+                } catch (InvocationTargetException | IllegalAccessException | InstantiationException | NoSuchFieldException e1) {
                     e1.printStackTrace();
                 }
                 if(message!=null) {

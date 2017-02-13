@@ -152,4 +152,8 @@ public class ChatItem extends JavaPlugin {
     public static JSONManipulator getManipulator(){
         return new JSONManipulatorCurrent();
     }
+
+    public static ChatItem instance(){
+        return instance;
+    }
 }

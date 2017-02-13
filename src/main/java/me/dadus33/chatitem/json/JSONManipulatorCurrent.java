@@ -3,19 +3,20 @@ package me.dadus33.chatitem.json;
 
 import com.google.gson.*;
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.namecheck.Checker;
 import me.dadus33.chatitem.utils.Reflect;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -27,27 +28,21 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     private static final Class<?> NBT_TAG_COMPOUND = Reflect.getNMSClass("NBTTagCompound");
     private static final Method SAVE_NMS_ITEM_STACK_METHOD = Reflect.getMethod(NMS_ITEM_STACK_CLASS, "save", NBT_TAG_COMPOUND);
     private static final Field MAP = Reflect.getField(NBT_TAG_COMPOUND, "map");
-    private static final Method GET_STRING = Reflect.getMethod(NBT_TAG_COMPOUND, "getString", String.class);
+    //Tags to be ignored. Currently it only contains tags from PortableHorses, but feel free to submit a pull request to add tags from your plugins
+    private static final List<String> IGNORED = Arrays.asList("horsetag", "phorse", "iscnameviz", "cname");
 
-    private static Logger debug;
+    private static final ConcurrentHashMap<ItemStack, JsonArray> STACKS = new ConcurrentHashMap<>();
+
 
     private List<String> replaces;
     private String rgx;
     private JsonArray itemTooltip;
     private JsonArray classicTooltip;
     private final JsonParser PARSER = new JsonParser();
-    private final JsonParser LENIENT_PARSER = new JsonParser();
     private final Translator TRANSLATOR = new Translator();
 
-    public JSONManipulatorCurrent(){
-        if(debug == null) {
-            debug = ChatItem.getInstance().getLogger();
-            debug.setLevel(Level.INFO);
-        }
-    }
 
-
-    public String parse(String json, List<String> replacements, ItemStack item, String replacement) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+    public String parse(String json, List<String> replacements, final ItemStack item, String replacement) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException {
         JsonObject obj = PARSER.parse(json).getAsJsonObject();
         JsonArray array = obj.getAsJsonArray("extra");
         replaces = replacements;
@@ -69,28 +64,26 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         }
         rgx = regex;
         JsonArray rep = new JsonArray();
-        JsonArray use;
-        try {
-            use = PARSER.parse(TRANSLATOR.toJSON(escapeBackslash(replacement))).getAsJsonArray();
-        }catch(JsonParseException e){ //in case the name of the item was already escaped
-            use = PARSER.parse(TRANSLATOR.toJSON(replacement)).getAsJsonArray();
+
+        if ((itemTooltip = STACKS.get(item)) == null) {
+            JsonArray use = PARSER.parse(TRANSLATOR.toJSON(escapeSpecials(replacement))).getAsJsonArray();
+            JsonObject hover = PARSER.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
+            String jsonRep = stringifyItem(item);
+            hover.addProperty("value", jsonRep);
+            for (JsonElement ob : use)
+                ob.getAsJsonObject().add("hoverEvent", hover);
+
+            itemTooltip = use;
+            STACKS.put(item, itemTooltip);
+            Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), new Runnable() {
+                @Override
+                public void run() {
+                    STACKS.remove(item);
+                }
+            }, 100L);
+        }else{
+            System.out.println("FOUND!");
         }
-
-        JsonObject hover = PARSER.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
-        Object nmsStack = AS_NMS_COPY.invoke(null, item);
-        Object tag = NBT_TAG_COMPOUND.newInstance();
-        tag = SAVE_NMS_ITEM_STACK_METHOD.invoke(nmsStack, tag);
-        String stringed = tag.toString();
-        String jsonRep = escapeBackslash(stringed);
-
-        if(!Checker.checkItem(jsonRep)){ //We make sure the item will display properly client side by making the same checks the client does
-            jsonRep = stringed;
-        }
-        hover.addProperty("value", jsonRep);
-        for (JsonElement ob : use)
-            ob.getAsJsonObject().add("hoverEvent", hover);
-
-        itemTooltip = use;
 
         for (int i = 0; i < array.size(); ++i) {
             if (array.get(i).isJsonObject()){
@@ -158,7 +151,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                             rep.add(fix);
                         }
                         if (j != splits.length - 1) {
-                            rep.addAll(use);
+                            rep.addAll(itemTooltip);
                         }
                     }
                 if (!fnd) {
@@ -202,7 +195,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                                     rep.add(fix);
                                 }
                                 if (j != splits.length - 1) {
-                                    rep.addAll(use);
+                                    rep.addAll(itemTooltip);
                                 }
                             }
                         if (!fnd) {
@@ -240,9 +233,8 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         }
         rgx = regex;
         JsonArray rep = new JsonArray();
-        JsonArray use;
-        use = PARSER.parse(TRANSLATOR.toJSON(
-                escapeBackslash(
+        JsonArray use = PARSER.parse(TRANSLATOR.toJSON(
+                escapeSpecials(
                         repl.replace("{name}", sender.getName()).
                                 replace("{display-name}", sender.getDisplayName())))).
                 getAsJsonArray();
@@ -629,10 +621,6 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     }
 
 
-    private String escapeBackslash(String json){
-        return json.replace("\\",  "\\\\");
-    }
-
     private String escapeSpecials(String initial){
         return initial.replace("\"", "\\\"").replace("\\", "\\\\").replace("/", "\\/").replace("\b", "\\b")
                 .replace("\f", "\\f").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
@@ -651,7 +639,16 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         Set<Map.Entry<String, Object>> entrySet = map.entrySet();
         StringBuilder sb = new StringBuilder("{");
         for(Map.Entry<String, Object> entry : entrySet){
-            String key = "\""+escapeSpecials(entry.getKey())+"\"";
+            String key = entry.getKey();
+            if(IGNORED.contains(key)){  //We ignore keys that should be ignored
+                continue;
+            }
+            Pattern pattern = Pattern.compile("[{}\\[\\],\":]");
+            Matcher matcher = pattern.matcher(key);
+            if(matcher.find()){
+                continue;
+            }
+            key = escapeSpecials(key);
             String value = stringifyNBTBase(entry.getValue());
             if(sb.length() > 1){
                 sb.append(',');
@@ -668,7 +665,16 @@ public class JSONManipulatorCurrent implements JSONManipulator{
             Set<Map.Entry<String, Object>> entrySet = map.entrySet();
             StringBuilder sb = new StringBuilder("{");
             for(Map.Entry<String, Object> entry : entrySet){
-                String key = "\""+escapeSpecials(entry.getKey())+"\"";
+                String key = entry.getKey();
+                if(IGNORED.contains(key)){
+                    continue;
+                }
+                Pattern pattern = Pattern.compile("[{}\\[\\],\":]");
+                Matcher matcher = pattern.matcher(key);
+                if(matcher.find()){
+                    continue;
+                }
+                key = escapeSpecials(key);
                 String value = stringifyNBTBase(entry.getValue());
                 if(sb.length() > 1){
                     sb.append(',');
@@ -680,7 +686,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         }else{
             String toString = nbtCompound.toString();
             if(toString.startsWith("\"") &&toString.endsWith("\"")){
-                toString = toString.substring(1, toString.length()-2);
+                toString = toString.substring(1, toString.length()-1);
                 toString = escapeNonQuotesSpecials(toString);
                 StringBuilder bld = new StringBuilder();
                 bld.append("\"").append(toString).append("\"");
