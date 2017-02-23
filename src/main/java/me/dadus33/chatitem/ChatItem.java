@@ -11,11 +11,13 @@ import me.dadus33.chatitem.json.JSONManipulatorCurrent;
 import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatPacketListener;
 import me.dadus33.chatitem.listeners.ChatPacketValidator;
+import me.dadus33.chatitem.listeners.HandshakeListener;
 import me.dadus33.chatitem.utils.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mcstats.MetricsLite;
 
@@ -35,6 +37,11 @@ public class ChatItem extends JavaPlugin {
     private static boolean post17 = false;
     private static boolean post111 = false;
     private static boolean baseComponentAvailable = true;
+    private static boolean viaVersion = false;
+    private static boolean protocolSupport = false;
+
+    private static Plugin viaPlugin;
+    private static Plugin protocolPlugin;
 
     public static void reload(CommandSender sender) {
         ChatItem obj = getInstance();
@@ -65,9 +72,19 @@ public class ChatItem extends JavaPlugin {
         if(isMc111OrLater()){
             post111 = true; //for shulker box filtering
         }
+
         packetListener = new ChatPacketListener(this, ListenerPriority.LOW, storage, PacketType.Play.Server.CHAT);
         packetValidator = new ChatPacketValidator(this, ListenerPriority.LOWEST, storage, PacketType.Play.Server.CHAT);
         pm.addPacketListener(packetValidator);
+        if((viaPlugin = Bukkit.getPluginManager().getPlugin("ViaVersion")) != null){
+            viaVersion = true;
+        }else if((protocolPlugin = Bukkit.getPluginManager().getPlugin("ProtocolSupport")) != null){
+            protocolSupport = true;
+        }
+        if(!protocolSupport && !viaVersion) {
+            //We only implement our own way of getting protocol versions if we have no other choice
+            pm.addPacketListener(new HandshakeListener(this, ListenerPriority.LOWEST, PacketType.Handshake.Client.SET_PROTOCOL));
+        }
         pm.addPacketListener(packetListener);
         CIReload rld = new CIReload();
         Bukkit.getPluginCommand("cireload").setExecutor(rld);
@@ -131,7 +148,7 @@ public class ChatItem extends JavaPlugin {
     }
 
 
-    private static String getVersion(Server server) {
+    public static String getVersion(Server server) {
         final String packageName = server.getClass().getPackage().getName();
 
         return packageName.substring(packageName.lastIndexOf('.') + 1);
@@ -153,7 +170,16 @@ public class ChatItem extends JavaPlugin {
         return new JSONManipulatorCurrent();
     }
 
+    public static boolean usesViaVersion(){
+        return viaVersion;
+    }
+
+    public static boolean usesProtocolSupport(){
+        return protocolSupport;
+    }
+
     public static ChatItem instance(){
         return instance;
     }
+
 }

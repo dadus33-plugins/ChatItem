@@ -6,7 +6,7 @@
 
     <groupId>me.dadus33</groupId>
     <artifactId>ChatItem</artifactId>
-    <version>1.3.4</version>
+    <version>1.3.5</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,6 +24,14 @@
         <repository>
             <id>Plugin Metrics</id>
             <url>http://repo.mcstats.org/content/repositories/public</url>
+        </repository>
+        <repository>
+            <id>spacehq</id>
+            <url>https://repo.spacehq.org/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>viaversion-repo</id>
+            <url>https://repo.viaversion.com</url>
         </repository>
     </repositories>
     <dependencies>
@@ -67,6 +75,24 @@
             <artifactId>log4j-core</artifactId>
             <version>2.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>us.myles</groupId>
+            <artifactId>viaversion</artifactId>
+            <version>1.0.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>protocolsupport</groupId>
+            <artifactId>protocolsupport</artifactId>
+            <version>4.24</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spacehq</groupId>
+            <artifactId>opennbt</artifactId>
+            <version>1.1</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -116,7 +142,11 @@
                             <relocations>
                                 <relocation>
                                     <pattern>com.google.gson</pattern>
-                                    <shadedPattern>me.dadus33.gson</shadedPattern>
+                                    <shadedPattern>me.dadus33.libs.gson</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.spacehq.opennbt</pattern>
+                                    <shadedPattern>me.dadus33.libs.opennbt</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

@@ -8,6 +8,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.utils.ProtocolVersion;
 import me.dadus33.chatitem.utils.Storage;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -121,9 +122,9 @@ public class ChatPacketListener extends PacketAdapter {
                 }
 
                 Player p = Bukkit.getPlayer(name);
-                StringBuffer buff = new StringBuffer(json);
-                buff.replace(topIndex-(name.length()+6), topIndex, ""); //we remove both the name and the separator from the json string
-                json = buff.toString();
+                StringBuilder builder = new StringBuilder(json);
+                builder.replace(topIndex-(name.length()+6), topIndex, ""); //we remove both the name and the separator from the json string
+                json = builder.toString();
 
 
                 //Item Styling
@@ -202,7 +203,7 @@ public class ChatPacketListener extends PacketAdapter {
                                 }
                             }
                         }
-                        message = ChatItem.getManipulator().parse(json, c.PLACEHOLDERS, copy, replacer);
+                        message = ChatItem.getManipulator().parse(json, c.PLACEHOLDERS, copy, replacer, ProtocolVersion.getClientVersion(e.getPlayer()));
                     } else {
                         if(!c.HAND_DISABLED){
                             message = ChatItem.getManipulator().parseEmpty(json, c.PLACEHOLDERS, c.HAND_NAME, c.HAND_TOOLTIP, p);

@@ -51,6 +51,20 @@ public class Reflect {
         return clazz;
     }
 
+    public static Class<?> getOBCEntityClass(String obcClassName){
+        String clazzName = "org.bukkit.craftbukkit." + getVersion() + "entity." + obcClassName;
+        Class<?> clazz;
+
+        try {
+            clazz = Class.forName(clazzName);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return null;
+        }
+
+        return clazz;
+    }
+
 
     public static Method getMethod(Class<?> clazz, String methodName, Class<?>... params) {
         try {
