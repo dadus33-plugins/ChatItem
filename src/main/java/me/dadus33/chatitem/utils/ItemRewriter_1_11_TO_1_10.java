@@ -8,7 +8,7 @@ import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.opennbt.tag.builtin.StringTag;
 
 /**
- * For clients connecting with 1.11 on 1.10 servers
+ * Thanks to the developers of ViaVersion for this!
  */
 public class ItemRewriter_1_11_TO_1_10 {
     private static BiMap<String, String> oldToNewNames = HashBiMap.create();
@@ -91,7 +91,7 @@ public class ItemRewriter_1_11_TO_1_10 {
         oldToNewNames.put("ZombieVillager", "minecraft:zombie_villager");
     }
 
-    public static void toClient(Item item) {
+    static void toClient(Item item) {
         if (hasEntityTag(item)) {
             CompoundTag entityTag = item.getTag().get("EntityTag");
             if (entityTag.get("id") instanceof StringTag) {
@@ -115,7 +115,7 @@ public class ItemRewriter_1_11_TO_1_10 {
         }
     }
 
-    public static void reverseToClient(Item item) {
+    static void reverseToClient(Item item) {
         if (hasEntityTag(item)) {
             CompoundTag entityTag = item.getTag().get("EntityTag");
             if (entityTag.get("id") instanceof StringTag) {

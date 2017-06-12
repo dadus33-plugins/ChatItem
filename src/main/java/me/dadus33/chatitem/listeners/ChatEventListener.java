@@ -94,7 +94,6 @@ public class ChatEventListener implements Listener {
                 e.setCancelled(true);
             return;
         }
-
         if (p.getItemInHand().getType().equals(Material.AIR)) {
             if (c.DENY_IF_NO_ITEM) {
                 e.setCancelled(true);
@@ -106,7 +105,6 @@ public class ChatEventListener implements Listener {
                 return;
             }
         }
-
         if(c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")){
             if(COOLDOWNS.containsKey(p.getName())){
                 long start = COOLDOWNS.get(p.getName());
@@ -126,7 +124,6 @@ public class ChatEventListener implements Listener {
                 }
             }
         }
-
         String s = e.getMessage();
         for(String placeholder : c.PLACEHOLDERS){
             s = s.replace(placeholder, c.PLACEHOLDERS.get(0));

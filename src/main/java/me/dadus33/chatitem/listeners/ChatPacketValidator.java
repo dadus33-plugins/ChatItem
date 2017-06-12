@@ -22,8 +22,12 @@ public class ChatPacketValidator extends PacketAdapter {
     }
 
     public void onPacketSending(PacketEvent e){
-        if(ChatItem.mcSupportsActionBar()) { //only if action bar messages are supported in this version of minecraft
-            if (e.getPacket().getBytes().readSafely(0) == (byte) 2) {
+        if(ChatItem.supportsActionBar()) { //only if action bar messages are supported in this version of minecraft
+            if(ChatItem.supportsChatTypeEnum()){
+                if(((Enum)e.getPacket().getSpecificModifier(ChatItem.getChatMessageTypeClass()).read(0)).name().equals("GAME_INFO")){
+                    return; //It means it's an actionbar message, and we ain't intercepting those
+                }
+            }else if (e.getPacket().getBytes().readSafely(0) == (byte) 2) {
                 return;  //It means it's an actionbar message, and we ain't intercepting those
             }
         }
@@ -39,7 +43,7 @@ public class ChatPacketValidator extends PacketAdapter {
                 json = ComponentSerializer.toString(components);
                 usesBaseComponents = true;
             }else{
-                return;
+                return; //We don't know how to deal with anything else. Most probably some mod message we shouldn't mess with anyways
             }
         }else{
             json = packet.getChatComponents().readSafely(0).getJson();

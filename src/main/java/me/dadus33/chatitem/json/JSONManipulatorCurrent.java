@@ -2,7 +2,6 @@ package me.dadus33.chatitem.json;
 
 
 import com.google.gson.*;
-import javafx.util.Pair;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.utils.Item;
 import me.dadus33.chatitem.utils.ProtocolVersion;
@@ -40,7 +39,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     //Tags to be ignored. Currently it only contains tags from PortableHorses, but feel free to submit a pull request to add tags from your plugins
     private static final List<String> IGNORED = Arrays.asList("horsetag", "phorse", "iscnameviz", "cname");
 
-    private static final ConcurrentHashMap<Pair<ProtocolVersion, ItemStack>, JsonArray> STACKS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Map.Entry<ProtocolVersion, ItemStack>, JsonArray> STACKS = new ConcurrentHashMap<>();
 
     static{
         NBT_BASE_CLASSES.add(Reflect.getNMSClass("NBTTagByte"));
@@ -56,6 +55,15 @@ public class JSONManipulatorCurrent implements JSONManipulator{
             NBT_BASE_DATA_FIELD.add(Reflect.getField(NBT_BASE_CLASS, "data"));
         }
 
+        TYPES_TO_OPEN_NBT_TAGS.put(Byte.class, new ByteTag(""));
+        TYPES_TO_OPEN_NBT_TAGS.put(Byte[].class, new ByteArrayTag(""));
+        TYPES_TO_OPEN_NBT_TAGS.put(Double.class, new DoubleTag(""));
+        TYPES_TO_OPEN_NBT_TAGS.put(Float.class, new FloatTag(""));
+        TYPES_TO_OPEN_NBT_TAGS.put(Integer.class, new IntTag(""));
+        TYPES_TO_OPEN_NBT_TAGS.put(Integer[].class, new IntArrayTag(""));
+        TYPES_TO_OPEN_NBT_TAGS.put(Long.class, new LongTag(""));
+        TYPES_TO_OPEN_NBT_TAGS.put(Short.class, new ShortTag(""));
+        //Add the primitive types too, just in case
         TYPES_TO_OPEN_NBT_TAGS.put(byte.class, new ByteTag(""));
         TYPES_TO_OPEN_NBT_TAGS.put(byte[].class, new ByteArrayTag(""));
         TYPES_TO_OPEN_NBT_TAGS.put(double.class, new DoubleTag(""));
@@ -76,7 +84,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     private final Translator TRANSLATOR = new Translator();
 
 
-    public String parse(String json, List<String> replacements, ItemStack item, String replacement, int protocol) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException {
+    public String parse(String json, List<String> replacements, ItemStack item, String replacement, int protocol) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException, NoSuchMethodException {
         JsonObject obj = PARSER.parse(json).getAsJsonObject();
         JsonArray array = obj.getAsJsonArray("extra");
         replaces = replacements;
@@ -98,7 +106,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         }
         rgx = regex;
         JsonArray rep = new JsonArray();
-        final Pair<ProtocolVersion, ItemStack> p = new Pair<>(protocolVersion = ProtocolVersion.getVersion(protocol), item);
+        final AbstractMap.SimpleEntry<ProtocolVersion, ItemStack> p = new AbstractMap.SimpleEntry<>(protocolVersion = ProtocolVersion.getVersion(protocol), item);
         if ((itemTooltip = STACKS.get(p)) == null) {
             JsonArray use = PARSER.parse(TRANSLATOR.toJSON(escapeSpecials(replacement))).getAsJsonArray();
             JsonObject hover = PARSER.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
@@ -276,12 +284,12 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         for(String m : tooltip){
            oneLineTooltip.append(m.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
            ++index;
-           if(index!=tooltip.size()-1){
+           if(index!=tooltip.size()){
                oneLineTooltip.append('\n');
            }
         }
 
-        hover.add("value", PARSER.parse(TRANSLATOR.toJSON(oneLineTooltip.toString())));
+        hover.add("value", new JsonPrimitive(oneLineTooltip.toString()));
         for (JsonElement ob : use)
             ob.getAsJsonObject().add("hoverEvent", hover);
 
@@ -658,7 +666,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     }
 
 
-    private Item toItem(ItemStack is) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    private Item toItem(ItemStack is) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
         CompoundTag tag = new CompoundTag("tag");
 
         Object nmsStack = AS_NMS_COPY.invoke(null, is);
@@ -685,7 +693,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         return item;
     }
 
-    private Tag toOpenTag(Object nmsTag, String name) throws IllegalAccessException {
+    private Tag toOpenTag(Object nmsTag, String name) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException {
         if(NBT_TAG_COMPOUND.isInstance(nmsTag)) {
             CompoundTag tag = new CompoundTag(name);
             Map<String, Tag> tagMap = tag.getValue();
@@ -725,8 +733,11 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                 Class c = NBT_BASE_CLASSES.get(i);
                 if(c.isInstance(nmsTag)){
                     Object value = NBT_BASE_DATA_FIELD.get(i).get(nmsTag);
-                    Tag t = TYPES_TO_OPEN_NBT_TAGS.get(value.getClass());
+
+                    Tag t = TYPES_TO_OPEN_NBT_TAGS.get(value.getClass()).getClass().getConstructor(String.class).newInstance(name);
+
                     if(t instanceof ByteTag){
+                        ((ByteTag)t).setValue((byte)value);
                         ((ByteTag)t).setValue((byte)value);
                         return t;
                     }
@@ -765,7 +776,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         }
     }
 
-    private String stringifyItem(ItemStack stack) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException {
+    private String stringifyItem(ItemStack stack) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException, NoSuchMethodException {
         Item item = toItem(stack);
         ProtocolVersion.remapIds(ProtocolVersion.getServerVersion(), protocolVersion, item);
         StringBuilder sb = new StringBuilder("{id:");
@@ -808,7 +819,6 @@ public class JSONManipulatorCurrent implements JSONManipulator{
             CompoundTag tagCompound = (CompoundTag) normalTag;
             Map<String, Tag> tagMap = tagCompound.getValue();
             Set<Map.Entry<String, Tag>> entrySet = tagMap.entrySet();
-
             for(Map.Entry<String, Tag> entry : entrySet){
                 String value = stringifyTag(entry.getValue());
                 if(value == null){
@@ -833,15 +843,19 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                 boolean first = true;
                 for(Tag tag : list){
                     String index = tag.getName();
-
-                    String value = stringifyTag((Tag)tag.getValue());
+                    String value = stringifyTag(tag);
                     if(value == null){
                         continue;
                     }
                     if(!first){
                         sb.append(",");
                     }
-                    sb.append(index).append(":").append(value);
+                    if(!ChatItem.supportsChatTypeEnum()){ //it's after 1.12
+                        sb.append(index).append(":").append(value);
+                    }else{
+                        sb.append(value);
+                    }
+
                     first = false;
                 }
                 sb.append("]");

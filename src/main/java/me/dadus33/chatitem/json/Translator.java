@@ -3,11 +3,11 @@ package me.dadus33.chatitem.json;
 
 import org.bukkit.ChatColor;
 
-/*
-Many thanks to @DarkSeraphim for this!
-I only modified his work to make it compatible with what I was building.
-*/
-public class Translator {
+/**
+ *Many thanks to @DarkSeraphim for this!
+ *I only modified his work to make it compatible with what I was building.
+ */
+class Translator {
     private final StringBuilder BUILDER = new StringBuilder();
     private final StringBuilder STYLE = new StringBuilder();
 

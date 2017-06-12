@@ -6,7 +6,9 @@ import org.spacehq.opennbt.tag.builtin.StringTag;
 
 import java.util.HashMap;
 import java.util.Map;
-
+/**
+ * Thanks to the developers of ViaVersion for this!
+ */
 public class ItemRewriter_1_9_TO_1_8 {
 
     private static final Map<String, Integer> ENTTIY_NAME_TO_ID = new HashMap<>();
@@ -134,7 +136,7 @@ public class ItemRewriter_1_9_TO_1_8 {
 
     }
 
-    public static void toServer(Item item) {
+    private static void toServer(Item item) {
         if (item != null) {
             if (item.getId().equals("minecraft:spawn_egg") && item.getData() == 0) { // Monster Egg
                 CompoundTag tag = item.getTag();
@@ -190,7 +192,7 @@ public class ItemRewriter_1_9_TO_1_8 {
         }
     }
 
-    public static void toClient(Item item) {
+    static void toClient(Item item) {
         if (item != null) {
             if (item.getId().equals("minecraft:spawn_egg") && item.getData() != 0) { // Monster Egg
                 CompoundTag tag = item.getTag();
@@ -230,12 +232,12 @@ public class ItemRewriter_1_9_TO_1_8 {
         toClient(item);
     }
 
-    public static void reversedToClient(Item item) {
+    static void reversedToClient(Item item) {
         toServer(item);
     }
 
 
-    public static String potionNameFromDamage(short damage) {
+    private static String potionNameFromDamage(short damage) {
         String cached = POTION_ID_TO_NAME.get((int) damage);
         if (cached != null) {
             return cached;

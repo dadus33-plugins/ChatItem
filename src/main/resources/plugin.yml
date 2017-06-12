@@ -2,6 +2,7 @@ name: ChatItem
 main: me.dadus33.chatitem.ChatItem
 version: ${project.version}
 depend: [ProtocolLib]
+softdepend: [ViaVersion, ProtocolSupport]
 author: dadus33
 commands:
   cireload:

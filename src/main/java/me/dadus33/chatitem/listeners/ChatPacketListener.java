@@ -39,7 +39,7 @@ public class ChatPacketListener extends PacketAdapter {
 
     public ChatPacketListener(Plugin plugin, ListenerPriority listenerPriority, Storage s, PacketType... types) {
         super(plugin, listenerPriority, types);
-        if(ChatItem.mcSupportsShulkerBoxes()){
+        if(ChatItem.supportsShulkerBoxes()){
             SHULKER_BOXES.addAll(Arrays.asList(Material.BLACK_SHULKER_BOX, Material.BLUE_SHULKER_BOX,
                     Material.BROWN_SHULKER_BOX, Material.CYAN_SHULKER_BOX, Material.GRAY_SHULKER_BOX, Material.GREEN_SHULKER_BOX,
                     Material.LIGHT_BLUE_SHULKER_BOX, Material.LIME_SHULKER_BOX, Material.MAGENTA_SHULKER_BOX, Material.ORANGE_SHULKER_BOX,
@@ -117,7 +117,6 @@ public class ChatPacketListener extends PacketAdapter {
                     }
                 }
                 if(name==null){ //something went really bad, so we run away and hide (AKA the player left or is on another server)
-                    e.setCancelled(true);
                     return;
                 }
 
@@ -187,7 +186,7 @@ public class ChatPacketListener extends PacketAdapter {
                             bm.setPages(Collections.<String>emptyList());
                             copy.setItemMeta(bm);
                         } else {
-                            if (ChatItem.mcSupportsShulkerBoxes()) { //filtering shulker boxes
+                            if (ChatItem.supportsShulkerBoxes()) { //filtering shulker boxes
                                 if (SHULKER_BOXES.contains(copy.getType())) {
                                     if (copy.hasItemMeta()) {
                                         BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
@@ -209,7 +208,7 @@ public class ChatPacketListener extends PacketAdapter {
                             message = ChatItem.getManipulator().parseEmpty(json, c.PLACEHOLDERS, c.HAND_NAME, c.HAND_TOOLTIP, p);
                         }
                     }
-                } catch (InvocationTargetException | IllegalAccessException | InstantiationException | NoSuchFieldException e1) {
+                } catch (InvocationTargetException | IllegalAccessException | InstantiationException | NoSuchFieldException | NoSuchMethodException e1) {
                     e1.printStackTrace();
                 }
                 if(message!=null) {

@@ -96,8 +96,13 @@ public enum ProtocolVersion {
     }
 
     public static int getClientVersion(Player p){
+
+        if(p==null){
+            throw new NullPointerException("Player cannot be null!");
+        }
+
         if(ChatItem.usesViaVersion()){
-            return Via.getAPI().getPlayerVersion(p);
+            return Via.getAPI().getPlayerVersion(p.getUniqueId());
         }else if(ChatItem.usesProtocolSupport()){
              return ProtocolSupportAPI.getProtocolVersion(p).getId();
         }
