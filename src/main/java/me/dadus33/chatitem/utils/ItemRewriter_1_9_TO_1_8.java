@@ -1,8 +1,8 @@
 package me.dadus33.chatitem.utils;
 
 
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
-import org.spacehq.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,11 +1,11 @@
 package me.dadus33.chatitem.utils;
 
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-import org.spacehq.opennbt.tag.builtin.CompoundTag;
-import org.spacehq.opennbt.tag.builtin.StringTag;
 
 /**
  * Thanks to the developers of ViaVersion for this!

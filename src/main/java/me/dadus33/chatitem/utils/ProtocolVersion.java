@@ -3,7 +3,6 @@ package me.dadus33.chatitem.utils;
 import me.dadus33.chatitem.ChatItem;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import protocolsupport.api.ProtocolSupportAPI;
 import us.myles.ViaVersion.api.Via;
 
 import java.util.Map;
@@ -104,7 +103,7 @@ public enum ProtocolVersion {
         if(ChatItem.usesViaVersion()){
             return Via.getAPI().getPlayerVersion(p.getUniqueId());
         }else if(ChatItem.usesProtocolSupport()){
-             return ProtocolSupportAPI.getProtocolVersion(p).getId();
+             return ProtocolSupportUtil.getProtocolVersion(p);
         }
         return PLAYER_VERSION_MAP.get(p.getAddress().toString());
     }

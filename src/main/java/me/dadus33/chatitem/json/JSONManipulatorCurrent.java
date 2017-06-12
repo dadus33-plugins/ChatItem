@@ -1,6 +1,7 @@
 package me.dadus33.chatitem.json;
 
 
+import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.gson.*;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.utils.Item;
@@ -9,7 +10,6 @@ import me.dadus33.chatitem.utils.Reflect;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.spacehq.opennbt.tag.builtin.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

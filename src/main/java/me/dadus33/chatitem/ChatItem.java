@@ -12,6 +12,7 @@ import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatPacketListener;
 import me.dadus33.chatitem.listeners.ChatPacketValidator;
 import me.dadus33.chatitem.listeners.HandshakeListener;
+import me.dadus33.chatitem.utils.ProtocolSupportUtil;
 import me.dadus33.chatitem.utils.Storage;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
@@ -92,6 +93,7 @@ public class ChatItem extends JavaPlugin {
             viaVersion = true;
         }else if(Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null){
             protocolSupport = true;
+            ProtocolSupportUtil.initialize();
         }
 
         if(!protocolSupport && !viaVersion) {
