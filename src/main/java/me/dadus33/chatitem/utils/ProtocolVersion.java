@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import us.myles.ViaVersion.api.Via;
 
+import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,11 +20,6 @@ public enum ProtocolVersion {
     private final int MIN_VER;
     private final int MAX_VER;
     public final int INDEX; //Represents how new the version is (0 - extremely old)
-
-    private final static Class CRAFT_PLAYER = Reflect.getOBCEntityClass("CraftPlayer");
-    private final static Class NMS_PLAYER = Reflect.getNMSClass("EntityPlayer");
-    private final static Class PLAYER_CONNECTION_CLASS = Reflect.getNMSClass("PlayerConnection");
-    private final static Class NETWORK_MANAGER_CLASS = Reflect.getNMSClass("NetworkManager");
 
     private static ProtocolVersion serverVersion;
 
@@ -94,7 +90,7 @@ public enum ProtocolVersion {
         return true;
     }
 
-    public static int getClientVersion(Player p){
+    public static int getClientVersion(final Player p){
 
         if(p==null){
             throw new NullPointerException("Player cannot be null!");
@@ -105,7 +101,13 @@ public enum ProtocolVersion {
         }else if(ChatItem.usesProtocolSupport()){
              return ProtocolSupportUtil.getProtocolVersion(p);
         }
-        return PLAYER_VERSION_MAP.get(p.getAddress().toString());
+        return PLAYER_VERSION_MAP.get(stringifyAdress(p.getAddress()));
+    }
+
+    public static String stringifyAdress(InetSocketAddress address){
+        String port = String.valueOf(address.getPort());
+        String ip = address.getAddress().getHostAddress();
+        return ip+":"+port;
     }
 
     public static Map<String, Integer> getPlayerVersionMap(){

@@ -98,7 +98,7 @@ public class ChatItem extends JavaPlugin {
 
         if(!protocolSupport && !viaVersion) {
             //We only implement our own way of getting protocol versions if we have no other choice
-            pm.addPacketListener(new HandshakeListener(this, ListenerPriority.LOWEST, PacketType.Handshake.Client.SET_PROTOCOL));
+            pm.addPacketListener(new HandshakeListener(this, ListenerPriority.MONITOR, PacketType.Handshake.Client.SET_PROTOCOL));
         }
 
         //Commands
