@@ -31,7 +31,9 @@ public class HandshakeListener extends PacketAdapter{
             @Override
             public void run() {
                 Player updated = TemporaryPlayerFactory.getInjectorFromPlayer(e.getPlayer()).getUpdatedPlayer();
-                ProtocolVersion.getPlayerVersionMap().put(ProtocolVersion.stringifyAdress(updated.getAddress()), version);
+                Player pl = e.getPlayer();
+                Player toUse = updated == null ? pl : updated;
+                ProtocolVersion.getPlayerVersionMap().put(ProtocolVersion.stringifyAdress(toUse.getAddress()), version);
             }
         }, 5L);
 
