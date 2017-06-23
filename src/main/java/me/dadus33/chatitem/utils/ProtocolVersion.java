@@ -101,6 +101,21 @@ public enum ProtocolVersion {
         }else if(ChatItem.usesProtocolSupport()){
              return ProtocolSupportUtil.getProtocolVersion(p);
         }
+
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ChatItem.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                for(Map.Entry<String, Integer> entry : PLAYER_VERSION_MAP.entrySet()){
+                    System.out.println(entry.getKey()+"      ==      "+entry.getValue());
+                }
+                for(int i = 1; i<=5; ++i){
+                    System.out.println(" ");
+                }
+                System.out.println(stringifyAdress(p.getAddress()));
+            }
+        });
+
         return PLAYER_VERSION_MAP.get(stringifyAdress(p.getAddress()));
     }
 

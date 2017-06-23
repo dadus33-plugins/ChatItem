@@ -5,6 +5,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.injector.server.SocketInjector;
 import com.comphenix.protocol.injector.server.TemporaryPlayerFactory;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.utils.ProtocolVersion;
@@ -30,9 +31,16 @@ public class HandshakeListener extends PacketAdapter{
         Bukkit.getScheduler().scheduleSyncDelayedTask(ChatItem.getInstance(), new Runnable() {
             @Override
             public void run() {
-                Player updated = TemporaryPlayerFactory.getInjectorFromPlayer(e.getPlayer()).getUpdatedPlayer();
+                SocketInjector si = TemporaryPlayerFactory.getInjectorFromPlayer(e.getPlayer());
+                Player updated = si == null ? null : si.getUpdatedPlayer();
                 Player pl = e.getPlayer();
                 Player toUse = updated == null ? pl : updated;
+                if(toUse == null){
+                    return;
+                }
+                if(toUse.getAddress() == null){
+                    return;
+                }
                 ProtocolVersion.getPlayerVersionMap().put(ProtocolVersion.stringifyAdress(toUse.getAddress()), version);
             }
         }, 5L);
