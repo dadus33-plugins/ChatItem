@@ -103,7 +103,7 @@ public enum ProtocolVersion {
         }
 
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ChatItem.getInstance(), new Runnable() {
+        /*Bukkit.getScheduler().scheduleSyncDelayedTask(ChatItem.getInstance(), new Runnable() {
             @Override
             public void run() {
                 for(Map.Entry<String, Integer> entry : PLAYER_VERSION_MAP.entrySet()){
@@ -114,7 +114,7 @@ public enum ProtocolVersion {
                 }
                 System.out.println(stringifyAdress(p.getAddress()));
             }
-        });
+        });*/
 
         return PLAYER_VERSION_MAP.get(stringifyAdress(p.getAddress()));
     }
