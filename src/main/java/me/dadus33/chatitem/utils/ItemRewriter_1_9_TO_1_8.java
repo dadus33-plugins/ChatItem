@@ -136,7 +136,44 @@ public class ItemRewriter_1_9_TO_1_8 {
 
     }
 
-    private static void toServer(Item item) {
+
+    static void toClient(Item item) {
+        if (item != null) {
+            if (item.getId().equals("minecraft:spawn_egg") && item.getData() != 0) { // Monster Egg
+                CompoundTag tag = item.getTag();
+                if (tag == null) {
+                    tag = new CompoundTag("tag");
+                }
+                CompoundTag entityTag = new CompoundTag("EntityTag");
+                if (ENTTIY_ID_TO_NAME.containsKey((int) item.getData())) {
+                    StringTag id = new StringTag("id", ENTTIY_ID_TO_NAME.get((int) item.getData()));
+                    entityTag.put(id);
+                    tag.put(entityTag);
+                }
+                item.setTag(tag);
+                item.setData((short) 0);
+            }
+            if (item.getId().equals("minecraft:potion")) { // Potion
+                CompoundTag tag = item.getTag();
+                if (tag == null) {
+                    tag = new CompoundTag("tag");
+                }
+                if (item.getData() >= 16384) {
+                    item.setId("minecraft:splash_potion"); // splash id
+                    item.setData((short) (item.getData() - 8192));
+                }
+                String name = potionNameFromDamage(item.getData());
+                StringTag potion = new StringTag("Potion", "minecraft:" + name);
+                tag.put(potion);
+                item.setTag(tag);
+                item.setData((short) 0);
+            }
+        }
+    }
+
+
+
+    static void reversedToClient(Item item) {
         if (item != null) {
             if (item.getId().equals("minecraft:spawn_egg") && item.getData() == 0) { // Monster Egg
                 CompoundTag tag = item.getTag();
@@ -190,50 +227,6 @@ public class ItemRewriter_1_9_TO_1_8 {
                 item.setData((short) data);
             }
         }
-    }
-
-    static void toClient(Item item) {
-        if (item != null) {
-            if (item.getId().equals("minecraft:spawn_egg") && item.getData() != 0) { // Monster Egg
-                CompoundTag tag = item.getTag();
-                if (tag == null) {
-                    tag = new CompoundTag("tag");
-                }
-                CompoundTag entityTag = new CompoundTag("EntityTag");
-                if (ENTTIY_ID_TO_NAME.containsKey((int) item.getData())) {
-                    StringTag id = new StringTag("id", ENTTIY_ID_TO_NAME.get((int) item.getData()));
-                    entityTag.put(id);
-                    tag.put(entityTag);
-                }
-                item.setTag(tag);
-                item.setData((short) 0);
-            }
-            if (item.getId().equals("minecraft:potion")) { // Potion
-                CompoundTag tag = item.getTag();
-                if (tag == null) {
-                    tag = new CompoundTag("tag");
-                }
-                if (item.getData() >= 16384) {
-                    item.setId("minecraft:splash_potion"); // splash id
-                    item.setData((short) (item.getData() - 8192));
-                }
-                String name = potionNameFromDamage(item.getData());
-                StringTag potion = new StringTag("Potion", "minecraft:" + name);
-                tag.put(potion);
-                item.setTag(tag);
-                item.setData((short) 0);
-            }
-        }
-    }
-
-
-
-    public static void reversedToServer(Item item) {
-        toClient(item);
-    }
-
-    static void reversedToClient(Item item) {
-        toServer(item);
     }
 
 
@@ -333,18 +326,6 @@ public class ItemRewriter_1_9_TO_1_8 {
         }
 
         return id;
-    }
-
-    public static int getNewEffectID(int oldID) {
-        if (oldID >= 16384) {
-            oldID -= 8192;
-        }
-        if (POTION_INDEX.containsKey(oldID)) {
-            return POTION_INDEX.get(oldID);
-        }
-
-        oldID = POTION_NAME_TO_ID.get(potionNameFromDamage((short) oldID));
-        return POTION_INDEX.containsKey(oldID) ? POTION_INDEX.get(oldID) : 0;
     }
 
     private static void registerEntity(Integer id, String name) {

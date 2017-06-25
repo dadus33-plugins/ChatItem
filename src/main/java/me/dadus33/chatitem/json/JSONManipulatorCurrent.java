@@ -661,7 +661,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
 
 
     private String escapeSpecials(String initial){
-        return initial.replace("\"", "\\\"").replace("\\", "\\\\").replace("/", "\\/").replace("\b", "\\b")
+        return initial.replace("\"", "\\\"").replace("\\", "\\\\").replace("\b", "\\b")
                 .replace("\f", "\\f").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
     }
 
@@ -778,7 +778,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
 
     private String stringifyItem(ItemStack stack) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException, NoSuchMethodException {
         Item item = toItem(stack);
-        ProtocolVersion.remapIds(ProtocolVersion.getServerVersion(), protocolVersion, item);
+        ProtocolVersion.remapIds(ProtocolVersion.getServerVersion().MAX_VER, protocolVersion.MAX_VER, item);
         StringBuilder sb = new StringBuilder("{id:");
         sb.append("\"").append(item.getId()).append("\"").append(","); //Append the id
         sb.append("Count:").append(item.getAmount()).append("b,"); //Append the amount
@@ -797,7 +797,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
             if(IGNORED.contains(key)){
                 continue;
             }
-            Pattern pattern = Pattern.compile("[{}\\[\\],\":\\\\\\/]");
+            Pattern pattern = Pattern.compile("[{}\\[\\],\":\\\\/]");
             Matcher matcher = pattern.matcher(key);
             if(matcher.find()){
                 continue; //Skip invalid keys, as they can cause exceptions client-side
@@ -850,7 +850,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                     if(!first){
                         sb.append(",");
                     }
-                    if(!ChatItem.supportsChatTypeEnum()){ //it's after 1.12
+                    if(protocolVersion.MAX_VER <= ProtocolVersion.BETWEEN_1_11_AND_1_12.MAX_VER){ //it's before 1.12
                         sb.append(index).append(":").append(value);
                     }else{
                         sb.append(value);

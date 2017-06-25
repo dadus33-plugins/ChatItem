@@ -13,12 +13,13 @@ public enum ProtocolVersion {
     PRE_1_8(0, 5, 0),  //1.7.X
     BETWEEN_1_8_AND_1_9(6, 47, 1),  //1.8.X
     BETWEEN_1_9_AND_1_10(49, 110, 2),  //1.9.X - Starts with 49 as 48 was an april fools update
-    BETWEEN_1_10_AND_1_11(201, 210, 3),  //1.10.X
-    POST_1_11(311, 316, 4),  //1.11.X
-    INVALID(-1, -1, 5);
+    BETWEEN_1_10_AND_1_11(201, 210, 3),  //1.10.X - Starts with 201 because why not. Really, check it yourself: http://wiki.vg/Protocol_version_numbers
+    BETWEEN_1_11_AND_1_12(301, 316, 4), //1.11.X and pre-releases
+    POST_1_12(317, 335, 5),  //1.12.X and pre-releases
+    INVALID(-1, -1, 6);
 
-    private final int MIN_VER;
-    private final int MAX_VER;
+    public final int MIN_VER;
+    public final int MAX_VER;
     public final int INDEX; //Represents how new the version is (0 - extremely old)
 
     private static ProtocolVersion serverVersion;
@@ -54,25 +55,27 @@ public enum ProtocolVersion {
                 case "v1_9_R2": serverVersion = BETWEEN_1_9_AND_1_10; break;
                 case "v1_10_R1": serverVersion = BETWEEN_1_10_AND_1_11; break;
                 case "v1_10_R2": serverVersion = BETWEEN_1_10_AND_1_11; break;
-                case "v1_11_R1": serverVersion = POST_1_11; break;
-                case "v1_11_R2": serverVersion = POST_1_11; break;
+                case "v1_11_R1": serverVersion = BETWEEN_1_11_AND_1_12; break;
+                case "v1_12_R1": serverVersion = POST_1_12; break;
             }
         }
         return serverVersion;
     }
 
-    public static void remapIds(ProtocolVersion server, ProtocolVersion player, Item item){
+    public static void remapIds(int server, int player, Item item){
         if(areIdsCompatible(server, player)){
             return;
         }
-        if((server == BETWEEN_1_9_AND_1_10 && player == BETWEEN_1_8_AND_1_9) || (server == BETWEEN_1_8_AND_1_9 && player == BETWEEN_1_9_AND_1_10)){
-            if(server == BETWEEN_1_9_AND_1_10){
+        if((server >= BETWEEN_1_9_AND_1_10.MIN_VER && player <= BETWEEN_1_8_AND_1_9.MAX_VER) || (server >= BETWEEN_1_9_AND_1_10.MIN_VER && player <= BETWEEN_1_8_AND_1_9.MAX_VER)){
+            if((server >= BETWEEN_1_9_AND_1_10.MIN_VER && player <= BETWEEN_1_8_AND_1_9.MAX_VER)){
                 ItemRewriter_1_9_TO_1_8.reversedToClient(item);
-            }else{
-                ItemRewriter_1_9_TO_1_8.toClient(item);
+                return;
             }
-        }else{
-            if(server == BETWEEN_1_10_AND_1_11){
+            ItemRewriter_1_9_TO_1_8.toClient(item);
+            return;
+        }
+        if((server <= BETWEEN_1_10_AND_1_11.MAX_VER && player >= BETWEEN_1_11_AND_1_12.MIN_VER) || (server <= BETWEEN_1_10_AND_1_11.MAX_VER && player >= BETWEEN_1_11_AND_1_12.MIN_VER)){
+            if(server <= BETWEEN_1_10_AND_1_11.MAX_VER && player >= BETWEEN_1_11_AND_1_12.MIN_VER){
                 ItemRewriter_1_11_TO_1_10.toClient(item);
             }else{
                 ItemRewriter_1_11_TO_1_10.reverseToClient(item);
@@ -80,15 +83,17 @@ public enum ProtocolVersion {
         }
     }
 
-    public static boolean areIdsCompatible(ProtocolVersion first, ProtocolVersion second){
-        if((first == BETWEEN_1_9_AND_1_10 && second == BETWEEN_1_8_AND_1_9) || (first == BETWEEN_1_8_AND_1_9 && second == BETWEEN_1_9_AND_1_10)){
+    public static boolean areIdsCompatible(int version1, int version2){
+        if((version1 >= BETWEEN_1_9_AND_1_10.MIN_VER && version2 <= BETWEEN_1_8_AND_1_9.MAX_VER) || (version2 >= BETWEEN_1_9_AND_1_10.MIN_VER && version1 <= BETWEEN_1_8_AND_1_9.MAX_VER)){
             return false;
         }
-        if((first == BETWEEN_1_10_AND_1_11 && second == POST_1_11) || (first == POST_1_11 && second == BETWEEN_1_10_AND_1_11)){
+        if((version1 <= BETWEEN_1_10_AND_1_11.MAX_VER && version2 >= BETWEEN_1_11_AND_1_12.MIN_VER) || (version1 <= BETWEEN_1_10_AND_1_11.MAX_VER && version2 >= BETWEEN_1_11_AND_1_12.MIN_VER)){
             return false;
         }
         return true;
     }
+
+
 
     public static int getClientVersion(final Player p){
 

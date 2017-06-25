@@ -103,17 +103,6 @@ public class ItemRewriter_1_11_TO_1_10 {
         }
     }
 
-    public static void toServer(Item item) {
-        if (hasEntityTag(item)) {
-            CompoundTag entityTag = item.getTag().get("EntityTag");
-            if (entityTag.get("id") instanceof StringTag) {
-                StringTag id = entityTag.get("id");
-                if (oldToNewNames.inverse().containsKey(id.getValue())) {
-                    id.setValue(oldToNewNames.inverse().get(id.getValue()));
-                }
-            }
-        }
-    }
 
     static void reverseToClient(Item item) {
         if (hasEntityTag(item)) {
@@ -127,17 +116,6 @@ public class ItemRewriter_1_11_TO_1_10 {
         }
     }
 
-    public static void reverseToServer(Item item) {
-        if (hasEntityTag(item)) {
-            CompoundTag entityTag = item.getTag().get("EntityTag");
-            if (entityTag.get("id") instanceof StringTag) {
-                StringTag id = entityTag.get("id");
-                if (oldToNewNames.inverse().containsKey(id.getValue())) {
-                    id.setValue(oldToNewNames.inverse().get(id.getValue()));
-                }
-            }
-        }
-    }
 
     private static boolean hasEntityTag(Item item) {
         if (item != null && item.getId().equals("minecraft:spawn_egg")) { // Monster Egg
