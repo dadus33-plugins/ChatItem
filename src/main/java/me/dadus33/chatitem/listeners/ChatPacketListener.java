@@ -125,58 +125,6 @@ public class ChatPacketListener extends PacketAdapter {
                 builder.replace(topIndex-(name.length()+6), topIndex, ""); //we remove both the name and the separator from the json string
                 json = builder.toString();
 
-
-                //Item Styling
-                //STYLE BEGIN
-
-                ItemStack inHand = p.getItemInHand();
-                String replacer = c.NAME_FORMAT;
-                String amount = c.AMOUNT_FORMAT;
-                boolean dname = false;
-                if (!c.COLOR_IF_ALREADY_COLORED && inHand.hasItemMeta()) {
-                    if (inHand.getItemMeta().hasDisplayName()) {
-                        replacer = ChatColor.stripColor(replacer);
-                        dname = true;
-                    }
-                } else {
-                    if (inHand.hasItemMeta()) {
-                        if (inHand.getItemMeta().hasDisplayName()) {
-                            dname = true;
-                        }
-                    }
-                }
-                if (inHand.getAmount() == 1) {
-                    if (c.FORCE_ADD_AMOUNT) {
-                        amount = amount.replace(TIMES, "1");
-                        replacer = replacer.replace(AMOUNT, amount);
-                    } else {
-                        replacer = replacer.replace(AMOUNT, "");
-                    }
-                } else {
-                    amount = amount.replace(TIMES, String.valueOf(inHand.getAmount()));
-                    replacer = replacer.replace(AMOUNT, amount);
-                }
-                if (dname) {
-                    String trp = inHand.getItemMeta().getDisplayName();
-                    replacer = replacer.replace(NAME, trp);
-                } else {
-                    HashMap<Short, String> translationSection = c.TRANSLATIONS.get(inHand.getType().name());
-                    if(translationSection==null){
-                        String trp = materialToName(inHand.getType());
-                        replacer = replacer.replace(NAME, trp);
-                    }else {
-                        String translated = translationSection.get(inHand.getDurability());
-                        if (translated != null) {
-                            replacer = replacer.replace(NAME, translated);
-                        } else {
-                            replacer = replacer.replace(NAME, materialToName(inHand.getType()));
-                        }
-                    }
-                }
-                //STYLE END
-
-
-
                 String message = null;
                 try {
                     if(!p.getItemInHand().getType().equals(Material.AIR)) {
@@ -202,7 +150,7 @@ public class ChatPacketListener extends PacketAdapter {
                                 }
                             }
                         }
-                        message = ChatItem.getManipulator().parse(json, c.PLACEHOLDERS, copy, replacer, ProtocolVersion.getClientVersion(e.getPlayer()));
+                        message = ChatItem.getManipulator().parse(json, c.PLACEHOLDERS, copy, styleItem(copy, c), ProtocolVersion.getClientVersion(e.getPlayer()));
                     } else {
                         if(!c.HAND_DISABLED){
                             message = ChatItem.getManipulator().parseEmpty(json, c.PLACEHOLDERS, c.HAND_NAME, c.HAND_TOOLTIP, p);
@@ -238,5 +186,53 @@ public class ChatPacketListener extends PacketAdapter {
         c = st;
     }
 
+    public static String styleItem(ItemStack item, Storage c){
+
+        String replacer = c.NAME_FORMAT;
+        String amount = c.AMOUNT_FORMAT;
+        boolean dname = false;
+        if (!c.COLOR_IF_ALREADY_COLORED && item.hasItemMeta()) {
+            if (item.getItemMeta().hasDisplayName()) {
+                replacer = ChatColor.stripColor(replacer);
+                dname = true;
+            }
+        } else {
+            if (item.hasItemMeta()) {
+                if (item.getItemMeta().hasDisplayName()) {
+                    dname = true;
+                }
+            }
+        }
+        if (item.getAmount() == 1) {
+            if (c.FORCE_ADD_AMOUNT) {
+                amount = amount.replace(TIMES, "1");
+                replacer = replacer.replace(AMOUNT, amount);
+            } else {
+                replacer = replacer.replace(AMOUNT, "");
+            }
+        } else {
+            amount = amount.replace(TIMES, String.valueOf(item.getAmount()));
+            replacer = replacer.replace(AMOUNT, amount);
+        }
+        if (dname) {
+            String trp = item.getItemMeta().getDisplayName();
+            replacer = replacer.replace(NAME, trp);
+        } else {
+            HashMap<Short, String> translationSection = c.TRANSLATIONS.get(item.getType().name());
+            if(translationSection==null){
+                String trp = materialToName(item.getType());
+                replacer = replacer.replace(NAME, trp);
+            }else {
+                String translated = translationSection.get(item.getDurability());
+                if (translated != null) {
+                    replacer = replacer.replace(NAME, translated);
+                } else {
+                    replacer = replacer.replace(NAME, materialToName(item.getType()));
+                }
+            }
+        }
+
+        return replacer;
+    }
 
 }

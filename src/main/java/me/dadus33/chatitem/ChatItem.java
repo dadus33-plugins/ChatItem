@@ -4,6 +4,8 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
+import me.dadus33.chatitem.api.APIImplementation;
+import me.dadus33.chatitem.api.ChatItemAPI;
 import me.dadus33.chatitem.commands.CIReload;
 import me.dadus33.chatitem.filters.Log4jFilter;
 import me.dadus33.chatitem.json.JSONManipulator;
@@ -18,7 +20,11 @@ import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class ChatItem extends JavaPlugin {
 
@@ -30,6 +36,7 @@ public class ChatItem extends JavaPlugin {
     private ProtocolManager pm;
     private ChatPacketListener packetListener;
     private ChatPacketValidator packetValidator;
+    private static Queue<JSONManipulator> manipulatorQueue = new LinkedList<>();
     private static Class chatMessageTypeClass;
     private static boolean post17 = false;
     private static boolean post111 = false;
@@ -49,6 +56,9 @@ public class ChatItem extends JavaPlugin {
         obj.packetValidator.setStorage(obj.storage);
         obj.chatEventListener.setStorage(obj.storage);
         obj.filter.setStorage(obj.storage);
+        APIImplementation api = (APIImplementation) Bukkit.getServicesManager().getRegistration(ChatItemAPI.class).getProvider();
+        api.setStorage(obj.storage);
+        api.updateLogger();
         if (!obj.storage.RELOAD_MESSAGE.isEmpty())
             sender.sendMessage(obj.storage.RELOAD_MESSAGE);
     }
@@ -67,6 +77,10 @@ public class ChatItem extends JavaPlugin {
         //Load config
         saveDefaultConfig();
         storage = new Storage(getConfig());
+
+        //Load API
+        APIImplementation api = new APIImplementation(storage);
+        Bukkit.getServicesManager().register(ChatItemAPI.class, api, this, ServicePriority.Highest);
 
         if(isMc18OrLater()) {
             post17 = true; //for actionbar messages ignoring
@@ -118,6 +132,18 @@ public class ChatItem extends JavaPlugin {
 
         //Initialize Log4J filter (remove ugly console messages)
         filter = new Log4jFilter(storage);
+
+        //Initialize queue monitor
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                if(manipulatorQueue.size() < 512){
+                    while(manipulatorQueue.size() < 512){
+                        manipulatorQueue.add(new JSONManipulatorCurrent());
+                    }
+                }
+            }
+        }, 20L, 20L);
 
         new Metrics(this);
     }
@@ -195,10 +221,6 @@ public class ChatItem extends JavaPlugin {
 
     public static Class getChatMessageTypeClass(){
         return chatMessageTypeClass;
-    }
-
-    public static ChatItem instance(){
-        return instance;
     }
 
 }

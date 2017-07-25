@@ -39,7 +39,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     //Tags to be ignored. Currently it only contains tags from PortableHorses, but feel free to submit a pull request to add tags from your plugins
     private static final List<String> IGNORED = Arrays.asList("horsetag", "phorse", "iscnameviz", "cname");
 
-    private static final ConcurrentHashMap<Map.Entry<ProtocolVersion, ItemStack>, JsonArray> STACKS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Map.Entry<ProtocolVersion, ItemStack>, JsonObject> STACKS = new ConcurrentHashMap<>();
 
     static{
         NBT_BASE_CLASSES.add(Reflect.getNMSClass("NBTTagByte"));
@@ -78,10 +78,9 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     private List<String> replaces;
     private String rgx;
     private ProtocolVersion protocolVersion;
-    private JsonArray itemTooltip;
+    private JsonObject itemTooltip;
     private JsonArray classicTooltip;
     private final JsonParser PARSER = new JsonParser();
-    private final Translator TRANSLATOR = new Translator();
 
 
     public String parse(String json, List<String> replacements, ItemStack item, String replacement, int protocol) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException, NoSuchMethodException {
@@ -107,21 +106,28 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         rgx = regex;
         JsonArray rep = new JsonArray();
         final AbstractMap.SimpleEntry<ProtocolVersion, ItemStack> p = new AbstractMap.SimpleEntry<>(protocolVersion = ProtocolVersion.getVersion(protocol), item);
+
         if ((itemTooltip = STACKS.get(p)) == null) {
-            JsonArray use = PARSER.parse(TRANSLATOR.toJSON(escapeSpecials(replacement))).getAsJsonArray();
-            JsonObject hover = PARSER.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
-            String jsonRep = stringifyItem(item);
+            JsonArray use = Translator.toJson(replacement); //We get the json representation of the old color formatting method
+
+            JsonObject hover = PARSER.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject(); //There's no public clone method for JSONObjects so we need to parse them every time
+
+            String jsonRep = stringifyItem(item); //Get the JSON representation of the item (well, not really JSON, but rather a string representation of NBT data)
             hover.addProperty("value", jsonRep);
-            for (JsonElement ob : use)
-                ob.getAsJsonObject().add("hoverEvent", hover);
-            itemTooltip = use;
-            STACKS.put(p, itemTooltip);
+
+            JsonObject wrapper = new JsonObject(); //Create a wrapper object for the whole array
+            wrapper.addProperty("text", ""); //The text field is compulsory, even if it's empty
+            wrapper.add("extra", use);
+            wrapper.add("hoverEvent", hover);
+
+            itemTooltip = wrapper; //Save the tooltip for later use when we encounter a placeholder
+            STACKS.put(p, itemTooltip); //Save it in the cache too so when parsing other packets with the same item (and client version) we no longer have to create it again
             Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), new Runnable() {
                 @Override
                 public void run() {
                     STACKS.remove(p);
                 }
-            }, 100L);
+            }, 100L); //We remove it later when no longer needed to save memory
         }
 
         for (int i = 0; i < array.size(); ++i) {
@@ -190,7 +196,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                             rep.add(fix);
                         }
                         if (j != splits.length - 1) {
-                            rep.addAll(itemTooltip);
+                            rep.add(itemTooltip);
                         }
                     }
                 if (!fnd) {
@@ -234,7 +240,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                                     rep.add(fix);
                                 }
                                 if (j != splits.length - 1) {
-                                    rep.addAll(itemTooltip);
+                                    rep.add(itemTooltip);
                                 }
                             }
                         if (!fnd) {
@@ -246,6 +252,9 @@ public class JSONManipulatorCurrent implements JSONManipulator{
 
         }
         obj.add("extra", rep);
+        if(!obj.has("text")){
+            obj.addProperty("text", "");
+        }
         return obj.toString();
     }
 
@@ -272,11 +281,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         }
         rgx = regex;
         JsonArray rep = new JsonArray();
-        JsonArray use = PARSER.parse(TRANSLATOR.toJSON(
-                escapeSpecials(
-                        repl.replace("{name}", sender.getName()).
-                                replace("{display-name}", sender.getDisplayName())))).
-                getAsJsonArray();
+        JsonArray use = Translator.toJson(repl.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
         JsonObject hover = PARSER.parse("{\"action\":\"show_text\", \"value\": \"\"}").getAsJsonObject();
 
         StringBuilder oneLineTooltip = new StringBuilder("");
@@ -603,7 +608,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                             replacer.add(fix);
                         }
                         if (j != splits.length - 1) {
-                            replacer.addAll(itemTooltip);
+                            replacer.add(itemTooltip);
                         }
                     }
                 if (!fnd) {
@@ -645,7 +650,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                                     replacer.add(fix);
                                 }
                                 if (j != splits.length - 1) {
-                                    replacer.addAll(itemTooltip);
+                                    replacer.add(itemTooltip);
                                 }
                             }
                         if (!fnd) {
@@ -712,7 +717,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                 String toString = nmsTag.toString();
                 if (toString.startsWith("\"") && toString.endsWith("\"")) {
                     toString = toString.substring(1, toString.length() - 1);
-                    toString = escapeSpecials(toString);
+                    //toString = escapeSpecials(toString);
                     return new StringTag(name, toString);
                 }
             }

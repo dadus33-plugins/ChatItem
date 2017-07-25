@@ -10,8 +10,9 @@ import com.comphenix.protocol.injector.server.TemporaryPlayerFactory;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.utils.ProtocolVersion;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import java.net.InetSocketAddress;
 
 public class HandshakeListener extends PacketAdapter{
 
@@ -32,16 +33,11 @@ public class HandshakeListener extends PacketAdapter{
             @Override
             public void run() {
                 SocketInjector si = TemporaryPlayerFactory.getInjectorFromPlayer(e.getPlayer());
-                Player updated = si == null ? null : si.getUpdatedPlayer();
-                Player pl = e.getPlayer();
-                Player toUse = updated == null ? pl : updated;
-                if(toUse == null){
-                    return;
+                try {
+                    ProtocolVersion.getPlayerVersionMap().put(ProtocolVersion.stringifyAdress((InetSocketAddress) si.getAddress()), version);
+                } catch (IllegalAccessException e){
+                    e.printStackTrace();
                 }
-                if(toUse.getAddress() == null){
-                    return;
-                }
-                ProtocolVersion.getPlayerVersionMap().put(ProtocolVersion.stringifyAdress(toUse.getAddress()), version);
             }
         }, 5L);
 
