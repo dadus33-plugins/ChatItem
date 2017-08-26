@@ -30,10 +30,6 @@
             <url>https://repo.viaversion.com</url>
         </repository>
         <repository>
-            <id>app.deveo.com</id>
-            <url>https://app.deveo.com/vladsplugins/projects/chatitem/repositories/maven/chatitem-api</url>
-        </repository>
-        <repository>
             <id>spigot-romania</id>
             <url>http://repo.andrei1058.com:8080/repository/spigot-romania/</url>
         </repository>
