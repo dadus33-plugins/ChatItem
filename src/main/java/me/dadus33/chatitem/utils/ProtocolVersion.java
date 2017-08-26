@@ -15,7 +15,7 @@ public enum ProtocolVersion {
     BETWEEN_1_9_AND_1_10(49, 110, 2),  //1.9.X - Starts with 49 as 48 was an april fools update
     BETWEEN_1_10_AND_1_11(201, 210, 3),  //1.10.X - Starts with 201 because why not. Really, check it yourself: http://wiki.vg/Protocol_version_numbers
     BETWEEN_1_11_AND_1_12(301, 316, 4), //1.11.X and pre-releases
-    POST_1_12(317, 335, 5),  //1.12.X and pre-releases
+    POST_1_12(317, 338, 5),  //1.12.X and pre-releases
     INVALID(-1, -1, 6);
 
     public final int MIN_VER;
@@ -57,6 +57,7 @@ public enum ProtocolVersion {
                 case "v1_10_R2": serverVersion = BETWEEN_1_10_AND_1_11; break;
                 case "v1_11_R1": serverVersion = BETWEEN_1_11_AND_1_12; break;
                 case "v1_12_R1": serverVersion = POST_1_12; break;
+                case "v1_12_R2": serverVersion = POST_1_12; break;
             }
         }
         return serverVersion;
@@ -107,7 +108,8 @@ public enum ProtocolVersion {
              return ProtocolSupportUtil.getProtocolVersion(p);
         }
 
-
+        return getServerVersion().MAX_VER;
+        //We disable this feature for now as it causes errors I can't trace without truly extensive testing on production servers
         /*Bukkit.getScheduler().scheduleSyncDelayedTask(ChatItem.getInstance(), new Runnable() {
             @Override
             public void run() {
@@ -121,7 +123,7 @@ public enum ProtocolVersion {
             }
         });*/
 
-        return PLAYER_VERSION_MAP.get(stringifyAdress(p.getAddress()));
+        //return PLAYER_VERSION_MAP.get(stringifyAdress(p.getAddress()));
     }
 
     public static String stringifyAdress(InetSocketAddress address){

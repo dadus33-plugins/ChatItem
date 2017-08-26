@@ -13,7 +13,6 @@ import me.dadus33.chatitem.json.JSONManipulatorCurrent;
 import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatPacketListener;
 import me.dadus33.chatitem.listeners.ChatPacketValidator;
-import me.dadus33.chatitem.listeners.HandshakeListener;
 import me.dadus33.chatitem.utils.ProtocolSupportUtil;
 import me.dadus33.chatitem.utils.Storage;
 import org.bstats.Metrics;
@@ -110,10 +109,12 @@ public class ChatItem extends JavaPlugin {
             ProtocolSupportUtil.initialize();
         }
 
-        if(!protocolSupport && !viaVersion) {
+        //We halt the use of this system for now, until we can solve the infamous getProtocolVersion issue
+        //Till then, users of both ViaVersion and ProtocolSupport should do just fine
+        /*if(!protocolSupport && !viaVersion) {
             //We only implement our own way of getting protocol versions if we have no other choice
             pm.addPacketListener(new HandshakeListener(this, ListenerPriority.MONITOR, PacketType.Handshake.Client.SET_PROTOCOL));
-        }
+        }*/
 
         //Commands
         CIReload rld = new CIReload();
@@ -133,18 +134,6 @@ public class ChatItem extends JavaPlugin {
         //Initialize Log4J filter (remove ugly console messages)
         filter = new Log4jFilter(storage);
 
-        //Initialize queue monitor
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                if(manipulatorQueue.size() < 512){
-                    while(manipulatorQueue.size() < 512){
-                        manipulatorQueue.add(new JSONManipulatorCurrent());
-                    }
-                }
-            }
-        }, 20L, 20L);
-
         new Metrics(this);
     }
 
@@ -156,31 +145,46 @@ public class ChatItem extends JavaPlugin {
 
     private boolean isMc18OrLater(){
         switch(getVersion(Bukkit.getServer())){
-            case "v1_8_R1": return true;
-            case "v1_8_R2": return true;
-            case "v1_8_R3": return true;
-            case "v1_9_R1": return true;
-            case "v1_9_R2": return true;
-            case "v1_10_R1": return true;
-            case "v1_10_R2": return true;
-            case "v1_11_R1": return true;
-            case "v1_12_R1": return true;
-            default: return false;
+            case "v1_7_R1": return false;
+            case "v1_7_R2": return false;
+            case "v1_7_R3": return false;
+            case "v1_7_R4": return false;
+            default: return true;
         }
     }
 
     private boolean isMc111OrLater(){
         switch(getVersion(Bukkit.getServer())){
-            case "v1_11_R1": return true;
-            case "v1_12_R1": return true;
-            default: return false;
+            case "v1_7_R1": return false;
+            case "v1_7_R2": return false;
+            case "v1_7_R3": return false;
+            case "v1_7_R4": return false;
+            case "v1_8_R1": return false;
+            case "v1_8_R2": return false;
+            case "v1_8_R3": return false;
+            case "v1_9_R1": return false;
+            case "v1_9_R2": return false;
+            case "v1_10_R1": return false;
+            case "v1_10_R2": return false;
+            default: return true;
         }
     }
 
     private boolean isMc112Orlater(){
         switch(getVersion(Bukkit.getServer())){
-            case "v1_12_R1": return true;
-            default: return false;
+            case "v1_7_R1": return false;
+            case "v1_7_R2": return false;
+            case "v1_7_R3": return false;
+            case "v1_7_R4": return false;
+            case "v1_8_R1": return false;
+            case "v1_8_R2": return false;
+            case "v1_8_R3": return false;
+            case "v1_9_R1": return false;
+            case "v1_9_R2": return false;
+            case "v1_10_R1": return false;
+            case "v1_10_R2": return false;
+            case "v1_11_R1": return false;
+            default: return true;
         }
     }
 

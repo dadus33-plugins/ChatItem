@@ -33,6 +33,10 @@
             <id>app.deveo.com</id>
             <url>https://app.deveo.com/vladsplugins/projects/chatitem/repositories/maven/chatitem-api</url>
         </repository>
+        <repository>
+            <id>spigot-romania</id>
+            <url>http://repo.andrei1058.com:8080/repository/spigot-romania/</url>
+        </repository>
     </repositories>
 
 
@@ -119,8 +123,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>

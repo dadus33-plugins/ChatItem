@@ -5,14 +5,10 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.injector.server.SocketInjector;
-import com.comphenix.protocol.injector.server.TemporaryPlayerFactory;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.utils.ProtocolVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-
-import java.net.InetSocketAddress;
 
 public class HandshakeListener extends PacketAdapter{
 
@@ -29,17 +25,9 @@ public class HandshakeListener extends PacketAdapter{
             return;
         }
         final int version = e.getPacket().getIntegers().readSafely(0);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ChatItem.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                SocketInjector si = TemporaryPlayerFactory.getInjectorFromPlayer(e.getPlayer());
-                try {
-                    ProtocolVersion.getPlayerVersionMap().put(ProtocolVersion.stringifyAdress((InetSocketAddress) si.getAddress()), version);
-                } catch (IllegalAccessException e){
-                    e.printStackTrace();
-                }
-            }
-        }, 5L);
+        //Delay the mapping to make sure the true address of the player was received when using bungeecord or other types of proxies
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ChatItem.getInstance(), () ->
+                ProtocolVersion.getPlayerVersionMap().put(ProtocolVersion.stringifyAdress(e.getPlayer().getAddress()), version), 10L);
 
     }
 }

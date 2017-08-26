@@ -12,6 +12,13 @@ public class Translator {
     private static final String STYLES = "klmnor"; //All style codes
 
     public static JsonArray toJson(String old){
+        if(old.lastIndexOf(ChatColor.COLOR_CHAR) == -1){
+            JsonArray arr = new JsonArray();
+            JsonObject obj = new JsonObject();
+            obj.addProperty("text", old);
+            arr.add(obj);
+            return arr;
+        }
         JsonArray message = new JsonArray();
         String[] parts = old.split(Character.toString(ChatColor.COLOR_CHAR));
         JsonObject next = null; //refers to the object we created before (in time) but next in the message, as we're going from end to start
@@ -46,11 +53,7 @@ public class Translator {
                 }
 
                 if(isStyle(code)){
-                    if(isAlreadyFormatted(next)){
-                        continue;
-                    }
                     next.addProperty(getStyleName(code), true);
-                    next.addProperty("formatted", true); //mark it as formatted - before returning the JsonArray we'll remove the marking
                 }else{ //it's a color
                     if(isAlreadyColored(next)){
                         continue;
@@ -64,13 +67,18 @@ public class Translator {
             added.addProperty("text", part.substring(1));
             if(isStyle(code)){
                 added.addProperty(getStyleName(code), true);
-                added.addProperty("formatted", true);
                 message.add(added);
                 next = added;
                 continue;
             }
             //else it can only be a color
             added.addProperty("color", getColorName(code));
+            //also try to color the next element if not colored already
+            if(next != null){
+                if(!isAlreadyColored(next)){
+                    next.addProperty("color", getColorName(code));
+                }
+            }
             message.add(added);
             next = added;
         }
@@ -83,7 +91,6 @@ public class Translator {
         }
         for(JsonElement element : message){
             JsonObject obj = (JsonObject) element;
-            obj.remove("formatted"); //We remove any possible occurrences of the 'formatted' flag
             orderedMessage.set(i, obj); //And then we add the object to the properly ordered array
             --i;
         }
@@ -113,10 +120,6 @@ public class Translator {
 
     private static boolean isStyle(char c){
         return STYLES.indexOf(c) != -1;
-    }
-
-    private static boolean isAlreadyFormatted(JsonObject obj){
-        return obj.has("formatted");
     }
 
     private static boolean isAlreadyColored(JsonObject obj){

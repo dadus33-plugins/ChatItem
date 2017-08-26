@@ -49,7 +49,6 @@ public class ChatPacketValidator extends PacketAdapter {
             json = packet.getChatComponents().readSafely(0).getJson();
         }
 
-
         boolean found = false;
         for (String rep : c.PLACEHOLDERS)
             if (json.contains(rep)) {

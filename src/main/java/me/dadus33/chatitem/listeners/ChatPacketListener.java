@@ -99,85 +99,82 @@ public class ChatPacketListener extends PacketAdapter {
         }
         final boolean usesBaseComponents = (boolean)packet.getMetadata("base-component"); //The packet validator should also tell if this packet uses base components
         e.setCancelled(true); //We cancel the packet as we're going to resend it anyways (ignoring listeners this time)
-        Bukkit.getScheduler().runTaskAsynchronously(ChatItem.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                String json = (String)packet.getMetadata("json"); //The packet validator got the json for us, so no need to get it again
-                int topIndex = -1;
-                String name = null;
-                for(Player p : Bukkit.getOnlinePlayers()){
-                    String pname = "\\u0007"+p.getName();
-                    if(!json.contains(pname)){
-                        continue;
-                    }
-                    int index = json.lastIndexOf(pname)+pname.length();
-                    if(index>topIndex){
-                        topIndex = index;
-                        name = pname.replace("\\u0007", "");
-                    }
+        Bukkit.getScheduler().runTaskAsynchronously(ChatItem.getInstance(), () -> {
+            String json = (String)packet.getMetadata("json"); //The packet validator got the json for us, so no need to get it again
+            int topIndex = -1;
+            String name = null;
+            for(Player p : Bukkit.getOnlinePlayers()){
+                String pname = "\\u0007"+p.getName();
+                if(!json.contains(pname)){
+                    continue;
                 }
-                if(name==null){ //something went really bad, so we run away and hide (AKA the player left or is on another server)
-                    return;
+                int index = json.lastIndexOf(pname)+pname.length();
+                if(index>topIndex){
+                    topIndex = index;
+                    name = pname.replace("\\u0007", "");
                 }
+            }
+            if(name==null){ //something went really bad, so we run away and hide (AKA the player left or is on another server)
+                return;
+            }
 
-                Player p = Bukkit.getPlayer(name);
-                StringBuilder builder = new StringBuilder(json);
-                builder.replace(topIndex-(name.length()+6), topIndex, ""); //we remove both the name and the separator from the json string
-                json = builder.toString();
+            Player p = Bukkit.getPlayer(name);
+            StringBuilder builder = new StringBuilder(json);
+            builder.replace(topIndex-(name.length()+6), topIndex, ""); //we remove both the name and the separator from the json string
+            json = builder.toString();
 
-                String message = null;
-                try {
-                    if(!p.getItemInHand().getType().equals(Material.AIR)) {
-                        ItemStack copy = p.getItemInHand().clone();
-                        if(copy.getType().equals(Material.BOOK_AND_QUILL) || copy.getType().equals(Material.WRITTEN_BOOK)){ //filtering written books
-                            BookMeta bm = (BookMeta)copy.getItemMeta();
-                            bm.setPages(Collections.<String>emptyList());
-                            copy.setItemMeta(bm);
-                        } else {
-                            if (ChatItem.supportsShulkerBoxes()) { //filtering shulker boxes
-                                if (SHULKER_BOXES.contains(copy.getType())) {
-                                    if (copy.hasItemMeta()) {
-                                        BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
-                                        if (bsm.hasBlockState()) {
-                                            ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
-                                            for (ItemStack item : sb.getInventory()) {
-                                                stripData(item);
-                                            }
-                                            bsm.setBlockState(sb);
+            String message = null;
+            try {
+                if(!p.getItemInHand().getType().equals(Material.AIR)) {
+                    ItemStack copy = p.getItemInHand().clone();
+                    if(copy.getType().equals(Material.BOOK_AND_QUILL) || copy.getType().equals(Material.WRITTEN_BOOK)){ //filtering written books
+                        BookMeta bm = (BookMeta)copy.getItemMeta();
+                        bm.setPages(Collections.emptyList());
+                        copy.setItemMeta(bm);
+                    } else {
+                        if (ChatItem.supportsShulkerBoxes()) { //filtering shulker boxes
+                            if (SHULKER_BOXES.contains(copy.getType())) {
+                                if (copy.hasItemMeta()) {
+                                    BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
+                                    if (bsm.hasBlockState()) {
+                                        ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
+                                        for (ItemStack item : sb.getInventory()) {
+                                            stripData(item);
                                         }
-                                        copy.setItemMeta(bsm);
+                                        bsm.setBlockState(sb);
                                     }
+                                    copy.setItemMeta(bsm);
                                 }
                             }
                         }
-                        message = ChatItem.getManipulator().parse(json, c.PLACEHOLDERS, copy, styleItem(copy, c), ProtocolVersion.getClientVersion(e.getPlayer()));
-                    } else {
-                        if(!c.HAND_DISABLED){
-                            message = ChatItem.getManipulator().parseEmpty(json, c.PLACEHOLDERS, c.HAND_NAME, c.HAND_TOOLTIP, p);
-                        }
                     }
-                } catch (InvocationTargetException | IllegalAccessException | InstantiationException | NoSuchFieldException | NoSuchMethodException e1) {
+                    message = ChatItem.getManipulator().parse(json, c.PLACEHOLDERS, copy, styleItem(copy, c), ProtocolVersion.getClientVersion(e.getPlayer()));
+                } else {
+                    if(!c.HAND_DISABLED){
+                        message = ChatItem.getManipulator().parseEmpty(json, c.PLACEHOLDERS, c.HAND_NAME, c.HAND_TOOLTIP, p);
+                    }
+                }
+            } catch (InvocationTargetException | IllegalAccessException | InstantiationException | NoSuchFieldException | NoSuchMethodException e1) {
+                e1.printStackTrace();
+            }
+            if(message!=null) {
+                if(!usesBaseComponents) {
+                    packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
+                }else{
+                    packet.getSpecificModifier(BaseComponent[].class).writeSafely(0, ComponentSerializer.parse(message));
+                }
+                try {
+                    ProtocolLibrary.getProtocolManager().sendServerPacket(e.getPlayer(), packet, false);
+                } catch (InvocationTargetException e1) {
                     e1.printStackTrace();
                 }
-                if(message!=null) {
-                    if(!usesBaseComponents) {
-                        packet.getChatComponents().writeSafely(0, WrappedChatComponent.fromJson(message));
-                    }else{
-                        packet.getSpecificModifier(BaseComponent[].class).writeSafely(0, ComponentSerializer.parse(message));
-                    }
-                    try {
-                        ProtocolLibrary.getProtocolManager().sendServerPacket(e.getPlayer(), packet, false);
-                    } catch (InvocationTargetException e1) {
-                        e1.printStackTrace();
-                    }
-                } else {
-                    try {
-                        ProtocolLibrary.getProtocolManager().sendServerPacket(e.getPlayer(), packet, false);
-                    } catch (InvocationTargetException e1) {
-                        e1.printStackTrace();
-                    }
-
+            } else {
+                try {
+                    ProtocolLibrary.getProtocolManager().sendServerPacket(e.getPlayer(), packet, false);
+                } catch (InvocationTargetException e1) {
+                    e1.printStackTrace();
                 }
+
             }
         });
     }
