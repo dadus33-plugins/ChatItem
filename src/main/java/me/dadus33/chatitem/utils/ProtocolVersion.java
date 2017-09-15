@@ -11,11 +11,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public enum ProtocolVersion {
     PRE_1_8(0, 5, 0),  //1.7.X
-    BETWEEN_1_8_AND_1_9(6, 47, 1),  //1.8.X
-    BETWEEN_1_9_AND_1_10(49, 110, 2),  //1.9.X - Starts with 49 as 48 was an april fools update
-    BETWEEN_1_10_AND_1_11(201, 210, 3),  //1.10.X - Starts with 201 because why not. Really, check it yourself: http://wiki.vg/Protocol_version_numbers
-    BETWEEN_1_11_AND_1_12(301, 316, 4), //1.11.X and pre-releases
-    POST_1_12(317, 338, 5),  //1.12.X and pre-releases
+    V1_8_X(6, 47, 1),  //1.8.X
+    V1_9_X(49, 110, 2),  //1.9.X - Starts with 49 as 48 was an april fools update
+    V1_10_X(201, 210, 3),  //1.10.X - Starts with 201 because why not. Really, check it yourself: http://wiki.vg/Protocol_version_numbers
+    V1_11_X(301, 316, 4), //1.11.X and pre-releases
+    V1_12_X(317, 339, 5),  //1.12.X and pre-releases
     INVALID(-1, -1, 6);
 
     public final int MIN_VER;
@@ -48,16 +48,16 @@ public enum ProtocolVersion {
                 case "v1_7_R1": serverVersion = PRE_1_8; break;
                 case "v1_7_R2": serverVersion = PRE_1_8; break;
                 case "v1_7_R3": serverVersion = PRE_1_8; break;
-                case "v1_8_R1": serverVersion = BETWEEN_1_8_AND_1_9; break;
-                case "v1_8_R2": serverVersion = BETWEEN_1_8_AND_1_9; break;
-                case "v1_8_R3": serverVersion = BETWEEN_1_8_AND_1_9; break;
-                case "v1_9_R1": serverVersion = BETWEEN_1_9_AND_1_10; break;
-                case "v1_9_R2": serverVersion = BETWEEN_1_9_AND_1_10; break;
-                case "v1_10_R1": serverVersion = BETWEEN_1_10_AND_1_11; break;
-                case "v1_10_R2": serverVersion = BETWEEN_1_10_AND_1_11; break;
-                case "v1_11_R1": serverVersion = BETWEEN_1_11_AND_1_12; break;
-                case "v1_12_R1": serverVersion = POST_1_12; break;
-                case "v1_12_R2": serverVersion = POST_1_12; break;
+                case "v1_8_R1": serverVersion = V1_8_X; break;
+                case "v1_8_R2": serverVersion = V1_8_X; break;
+                case "v1_8_R3": serverVersion = V1_8_X; break;
+                case "v1_9_R1": serverVersion = V1_9_X; break;
+                case "v1_9_R2": serverVersion = V1_9_X; break;
+                case "v1_10_R1": serverVersion = V1_10_X; break;
+                case "v1_10_R2": serverVersion = V1_10_X; break;
+                case "v1_11_R1": serverVersion = V1_11_X; break;
+                case "v1_12_R1": serverVersion = V1_12_X; break;
+                case "v1_12_R2": serverVersion = V1_12_X; break;
             }
         }
         return serverVersion;
@@ -67,16 +67,16 @@ public enum ProtocolVersion {
         if(areIdsCompatible(server, player)){
             return;
         }
-        if((server >= BETWEEN_1_9_AND_1_10.MIN_VER && player <= BETWEEN_1_8_AND_1_9.MAX_VER) || (server >= BETWEEN_1_9_AND_1_10.MIN_VER && player <= BETWEEN_1_8_AND_1_9.MAX_VER)){
-            if((server >= BETWEEN_1_9_AND_1_10.MIN_VER && player <= BETWEEN_1_8_AND_1_9.MAX_VER)){
+        if((server >= V1_9_X.MIN_VER && player <= V1_8_X.MAX_VER) || (player >= V1_9_X.MIN_VER && server <= V1_8_X.MAX_VER)){
+            if((server >= V1_9_X.MIN_VER && player <= V1_8_X.MAX_VER)){
                 ItemRewriter_1_9_TO_1_8.reversedToClient(item);
                 return;
             }
             ItemRewriter_1_9_TO_1_8.toClient(item);
             return;
         }
-        if((server <= BETWEEN_1_10_AND_1_11.MAX_VER && player >= BETWEEN_1_11_AND_1_12.MIN_VER) || (server <= BETWEEN_1_10_AND_1_11.MAX_VER && player >= BETWEEN_1_11_AND_1_12.MIN_VER)){
-            if(server <= BETWEEN_1_10_AND_1_11.MAX_VER && player >= BETWEEN_1_11_AND_1_12.MIN_VER){
+        if((server <= V1_10_X.MAX_VER && player >= V1_11_X.MIN_VER) || (player <= V1_10_X.MAX_VER && server >= V1_11_X.MIN_VER)){
+            if(server <= V1_10_X.MAX_VER && player >= V1_11_X.MIN_VER){
                 ItemRewriter_1_11_TO_1_10.toClient(item);
             }else{
                 ItemRewriter_1_11_TO_1_10.reverseToClient(item);
@@ -85,10 +85,10 @@ public enum ProtocolVersion {
     }
 
     public static boolean areIdsCompatible(int version1, int version2){
-        if((version1 >= BETWEEN_1_9_AND_1_10.MIN_VER && version2 <= BETWEEN_1_8_AND_1_9.MAX_VER) || (version2 >= BETWEEN_1_9_AND_1_10.MIN_VER && version1 <= BETWEEN_1_8_AND_1_9.MAX_VER)){
+        if((version1 >= V1_9_X.MIN_VER && version2 <= V1_8_X.MAX_VER) || (version2 >= V1_9_X.MIN_VER && version1 <= V1_8_X.MAX_VER)){
             return false;
         }
-        if((version1 <= BETWEEN_1_10_AND_1_11.MAX_VER && version2 >= BETWEEN_1_11_AND_1_12.MIN_VER) || (version1 <= BETWEEN_1_10_AND_1_11.MAX_VER && version2 >= BETWEEN_1_11_AND_1_12.MIN_VER)){
+        if((version1 <= V1_10_X.MAX_VER && version2 >= V1_11_X.MIN_VER) || (version1 <= V1_10_X.MAX_VER && version2 >= V1_11_X.MIN_VER)){
             return false;
         }
         return true;
@@ -109,19 +109,6 @@ public enum ProtocolVersion {
         }
 
         return getServerVersion().MAX_VER;
-        //We disable this feature for now as it causes errors I can't trace without truly extensive testing on production servers
-        /*Bukkit.getScheduler().scheduleSyncDelayedTask(ChatItem.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                for(Map.Entry<String, Integer> entry : PLAYER_VERSION_MAP.entrySet()){
-                    System.out.println(entry.getKey()+"      ==      "+entry.getValue());
-                }
-                for(int i = 1; i<=5; ++i){
-                    System.out.println(" ");
-                }
-                System.out.println(stringifyAdress(p.getAddress()));
-            }
-        });*/
 
         //return PLAYER_VERSION_MAP.get(stringifyAdress(p.getAddress()));
     }
