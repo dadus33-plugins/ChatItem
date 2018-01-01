@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.bukkit.ChatColor;
 
-//Based on DarkSeraphim's system, but using Gson
+//Based on DarkSeraphim's system, but using Gson and supporting some more edge cases
 public class Translator {
 
     private static final String STYLES = "klmnor"; //All style codes
@@ -19,16 +19,22 @@ public class Translator {
             arr.add(obj);
             return arr;
         }
+        boolean startsWithCode = old.startsWith(Character.toString(ChatColor.COLOR_CHAR));
         JsonArray message = new JsonArray();
         String[] parts = old.split(Character.toString(ChatColor.COLOR_CHAR));
         JsonObject next = null; //refers to the object we created before (in time) but next in the message, as we're going from end to start
         for(int i = parts.length-1; i >= 0; --i){ //We go in reverse order
             String part = parts[i];
-            if(part == null){
-                continue;
-            }
+
             if(part.isEmpty()){
                 continue;
+            }
+
+            if(i == 0 && !startsWithCode){
+                JsonObject toAdd = new JsonObject();
+                toAdd.addProperty("text", part);
+                message.add(toAdd);
+                break;
             }
 
             char code = Character.toLowerCase(part.charAt(0));
@@ -125,87 +131,5 @@ public class Translator {
     private static boolean isAlreadyColored(JsonObject obj){
         return obj.has("color");
     }
-
-
-
-    /*private final StringBuilder BUILDER = new StringBuilder();
-    private final StringBuilder STYLE = new StringBuilder();
-
-    String toJSON(String message) {
-        if (message == null || message.isEmpty())
-            return null;
-        String[] parts = message.split(Character.toString(ChatColor.COLOR_CHAR));
-        boolean first = true;
-        String colour = null;
-        String format = null;
-        BUILDER.setLength(0);
-        BUILDER.append("[");
-        boolean ignoreFirst = !parts[0].isEmpty() && ChatColor.getByChar(parts[0].charAt(0)) != null;
-        for (String part : parts) {
-            if (part.isEmpty()) {
-                continue;
-            }
-
-            String newStyle = null;
-            if (!ignoreFirst) {
-                newStyle = getStyle(part.charAt(0));
-            } else {
-                ignoreFirst = false;
-            }
-
-            if (newStyle != null) {
-                part = part.substring(1);
-                if (newStyle.startsWith("\"c"))
-                    colour = newStyle;
-                else
-                    format = newStyle;
-            }
-            if (!part.isEmpty()) {
-                if (first)
-                    first = false;
-                else {
-                    BUILDER.append(", ");
-                }
-                BUILDER.append("{");
-                if (colour != null) {
-                    BUILDER.append(colour);
-                    colour = null;
-                }
-                if (format != null) {
-                    BUILDER.append(format);
-                    format = null;
-                }
-                BUILDER.append(String.format("\"text\":\"%s\"", part));
-                BUILDER.append("}");
-            }
-        }
-        BUILDER.append("]");
-        return BUILDER.toString();
-    }
-
-    private String getStyle(char colour) {
-        if (STYLE.length() > 0)
-            STYLE.delete(0, STYLE.length());
-        switch (colour) {
-            case 'k':
-                return "\"obfuscated\": true,";
-            case 'l':
-                return "\"bold\": true,";
-            case 'm':
-                return "\"strikethrough\": true,";
-            case 'n':
-                return "\"underlined\": true,";
-            case 'o':
-                return "\"italic\": true,";
-            case 'r':
-                return "\"reset\": true,";
-            default:
-                break;
-        }
-        ChatColor cc = ChatColor.getByChar(colour);
-        if (cc == null)
-            return null;
-        return STYLE.append("\"color\":\"").append(cc.name().toLowerCase()).append("\", ").toString();
-    }*/
 
 }

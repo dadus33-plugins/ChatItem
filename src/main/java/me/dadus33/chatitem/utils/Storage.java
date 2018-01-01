@@ -23,9 +23,12 @@ public class Storage {
     public final Boolean LET_MESSAGE_THROUGH;
     public final Boolean DENY_IF_NO_ITEM;
     public final Boolean HAND_DISABLED;
+    public final Boolean SHOW_NO_PERM_NORMAL;
+    public final Boolean SHOW_NO_PERM_COMMAND;
     public final String HAND_NAME;
     public final String NAME_FORMAT;
     public final String AMOUNT_FORMAT;
+    public final String NO_PERMISSION_MESSAGE;
     public final String DENY_MESSAGE;
     public final String LIMIT_MESSAGE;
     public final String RELOAD_MESSAGE;
@@ -67,10 +70,13 @@ public class Storage {
         FORCE_ADD_AMOUNT = conf.getBoolean("General.force-add-amount");
         DENY_IF_NO_ITEM = conf.getBoolean("General.deny-if-no-item");
         HAND_DISABLED = conf.getBoolean("General.hand.disabled");
+        SHOW_NO_PERM_NORMAL = conf.getBoolean("General.show-no-permission-message.normal");
+        SHOW_NO_PERM_COMMAND = conf.getBoolean("General.show-no-permission-message.command");
         DENY_MESSAGE = color(conf.getString("Messages.deny-message"));
         HAND_NAME = color(conf.getString("General.hand.name"));
         LIMIT_MESSAGE = color(conf.getString("Messages.limit-message"));
         RELOAD_MESSAGE = color(conf.getString("Messages.reload-success"));
+        NO_PERMISSION_MESSAGE = color(conf.getString("Messages.no-permission"));
         COOLDOWN_MESSAGE = color(conf.getString("Messages.cooldown-message"));
         SECONDS = color(conf.getString("Messages.seconds"));
         MINUTES = color(conf.getString("Messages.minutes"));

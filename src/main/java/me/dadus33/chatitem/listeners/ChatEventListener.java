@@ -90,8 +90,12 @@ public class ChatEventListener implements Listener {
         Player p = e.getPlayer();
 
         if (!p.hasPermission("chatitem.use")) {
-            if(!c.LET_MESSAGE_THROUGH)
+            if(!c.LET_MESSAGE_THROUGH) {
                 e.setCancelled(true);
+            }
+            if(!c.NO_PERMISSION_MESSAGE.isEmpty() && c.SHOW_NO_PERM_NORMAL){
+                p.sendMessage(c.NO_PERMISSION_MESSAGE);
+            }
             return;
         }
         if (p.getItemInHand().getType().equals(Material.AIR)) {
@@ -184,6 +188,9 @@ public class ChatEventListener implements Listener {
         }
 
         if (!p.hasPermission("chatitem.use")) {
+            if(!c.NO_PERMISSION_MESSAGE.isEmpty() && c.SHOW_NO_PERM_COMMAND){
+                p.sendMessage(c.NO_PERMISSION_MESSAGE);
+            }
             e.setCancelled(true);
             return;
         }

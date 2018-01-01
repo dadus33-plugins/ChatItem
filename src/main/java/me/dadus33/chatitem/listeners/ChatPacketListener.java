@@ -213,7 +213,11 @@ public class ChatPacketListener extends PacketAdapter {
         }
         if (dname) {
             String trp = item.getItemMeta().getDisplayName();
-            replacer = replacer.replace(NAME, trp);
+            if(c.COLOR_IF_ALREADY_COLORED){
+                replacer = replacer.replace(NAME, ChatColor.stripColor(trp));
+            } else {
+                replacer = replacer.replace(NAME, trp);
+            }
         } else {
             HashMap<Short, String> translationSection = c.TRANSLATIONS.get(item.getType().name());
             if(translationSection==null){

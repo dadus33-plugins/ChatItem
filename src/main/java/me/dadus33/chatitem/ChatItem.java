@@ -22,12 +22,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 public class ChatItem extends JavaPlugin {
 
-    public final static int CFG_VER = 11;
+    public final static int CFG_VER = 12;
     private static ChatItem instance;
     private ChatEventListener chatEventListener;
     private Log4jFilter filter;
@@ -35,7 +32,6 @@ public class ChatItem extends JavaPlugin {
     private ProtocolManager pm;
     private ChatPacketListener packetListener;
     private ChatPacketValidator packetValidator;
-    private static Queue<JSONManipulator> manipulatorQueue = new LinkedList<>();
     private static Class chatMessageTypeClass;
     private static boolean post17 = false;
     private static boolean post111 = false;
@@ -212,7 +208,12 @@ public class ChatItem extends JavaPlugin {
     }
 
     public static JSONManipulator getManipulator(){
+        /*
+            We used to have 2 kinds of JSONManipulators because of my bad understanding of the 1.7 way of parsing JSON chat
+            The interface should however stay as there might be great changes in future versions in JSON parsing (most likely 1.13)
+         */
         return new JSONManipulatorCurrent();
+        //We just return a new one whenever requested for the moment, should implement a cache of some sort some time though
     }
 
     public static boolean usesViaVersion(){
