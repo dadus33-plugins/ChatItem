@@ -22,11 +22,10 @@ General:
   # presented in the itemstack, in other words, the actual item amount in the stack
   # the player holds. You can use color codes too.
   amount-format: "x{times}"
-  #  Should we apply the color and formatting defined in the name-format field even if
-  # the item is already colored/formated (ex. From anvils or other plugins that change
-  # the display name of an item). I recommend leaving this to true as not applying color
-  # codes or formatting at all can lead to an unexpected output compared to what you
-  # actually want, but feel free to experiment with it ;)
+  #  Should we apply the colors/formats set in the name format and/or amount format
+  # settings on the name of the item even though it already has a color of it's own,
+  # like a custom display name? Setting this to true will always disregard any color
+  # or or message
   color-if-already-colored: true
   #  Should we add the item amount even if there's only one item in the stack?
   force-add-amount: true

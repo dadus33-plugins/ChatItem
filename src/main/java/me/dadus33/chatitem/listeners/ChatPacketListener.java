@@ -184,22 +184,10 @@ public class ChatPacketListener extends PacketAdapter {
     }
 
     public static String styleItem(ItemStack item, Storage c){
-
         String replacer = c.NAME_FORMAT;
         String amount = c.AMOUNT_FORMAT;
-        boolean dname = false;
-        if (!c.COLOR_IF_ALREADY_COLORED && item.hasItemMeta()) {
-            if (item.getItemMeta().hasDisplayName()) {
-                replacer = ChatColor.stripColor(replacer);
-                dname = true;
-            }
-        } else {
-            if (item.hasItemMeta()) {
-                if (item.getItemMeta().hasDisplayName()) {
-                    dname = true;
-                }
-            }
-        }
+        boolean dname = item.hasItemMeta() ? item.getItemMeta().hasDisplayName() : false;
+
         if (item.getAmount() == 1) {
             if (c.FORCE_ADD_AMOUNT) {
                 amount = amount.replace(TIMES, "1");
@@ -232,7 +220,6 @@ public class ChatPacketListener extends PacketAdapter {
                 }
             }
         }
-
         return replacer;
     }
 
