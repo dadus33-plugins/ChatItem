@@ -41,6 +41,56 @@ public class Log4jFilter implements Filter {
         return checkMessage(s);
     }
 
+
+    @Override
+    public Result filter(Logger logger, Level level, Marker marker, String s, Object objects) {
+        return checkMessage(s);
+    }
+    @Override
+    public Result filter(Logger logger, Level level, Marker marker, String s, Object objects,Object obj) {
+        return checkMessage(s);
+    }
+
+    @Override
+    public Result filter(Logger logger, Level level, Marker marker, String s, Object o, Object o1, Object o2) {
+        return checkMessage(s);
+    }
+
+    @Override
+    public Result filter(Logger logger, Level level, Marker marker, String s, Object o, Object o1, Object o2, Object o3) {
+        return checkMessage(s);
+    }
+
+    @Override
+    public Result filter(Logger logger, Level level, Marker marker, String s, Object o, Object o1, Object o2, Object o3, Object o4) {
+        return checkMessage(s);
+    }
+
+    @Override
+    public Result filter(Logger logger, Level level, Marker marker, String s, Object o, Object o1, Object o2, Object o3, Object o4, Object o5) {
+        return checkMessage(s);
+    }
+
+    @Override
+    public Result filter(Logger logger, Level level, Marker marker, String s, Object o, Object o1, Object o2, Object o3, Object o4, Object o5, Object o6) {
+        return checkMessage(s);
+    }
+
+    @Override
+    public Result filter(Logger logger, Level level, Marker marker, String s, Object o, Object o1, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7) {
+        return checkMessage(s);
+    }
+
+    @Override
+    public Result filter(Logger logger, Level level, Marker marker, String s, Object o, Object o1, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7, Object o8) {
+        return checkMessage(s);
+    }
+
+    @Override
+    public Result filter(Logger logger, Level level, Marker marker, String s, Object o, Object o1, Object o2, Object o3, Object o4, Object o5, Object o6, Object o7, Object o8, Object o9) {
+        return checkMessage(s);
+    }
+
     @Override
     public Result filter(Logger logger, Level level, Marker marker, Object o, Throwable throwable) {
         return checkMessage(((Message)o).getFormattedMessage());
@@ -54,6 +104,16 @@ public class Log4jFilter implements Filter {
     @Override
     public Result filter(LogEvent logEvent) {
         return checkMessage(logEvent.getMessage().getFormattedMessage());
+    }
+
+    @Override
+    public State getState() {
+        return State.INITIALIZED;
+    }
+
+    @Override
+    public void initialize() {
+
     }
 
     @Override
@@ -83,7 +143,7 @@ public class Log4jFilter implements Filter {
         for(String placeholder : c.PLACEHOLDERS){
             if(msg.contains(placeholder)){
                 for(Player p : Bukkit.getOnlinePlayers()){
-                    if(msg.contains(Character.toString(ChatEventListener.SEPARATOR)+p.getName())){
+                    if(msg.contains(ChatEventListener.SEPARATOR +p.getName())){
                         return Result.DENY;
                     }
                 }

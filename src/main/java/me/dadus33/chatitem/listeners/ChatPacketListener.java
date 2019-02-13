@@ -43,7 +43,7 @@ public class ChatPacketListener extends PacketAdapter {
             SHULKER_BOXES.addAll(Arrays.asList(Material.BLACK_SHULKER_BOX, Material.BLUE_SHULKER_BOX,
                     Material.BROWN_SHULKER_BOX, Material.CYAN_SHULKER_BOX, Material.GRAY_SHULKER_BOX, Material.GREEN_SHULKER_BOX,
                     Material.LIGHT_BLUE_SHULKER_BOX, Material.LIME_SHULKER_BOX, Material.MAGENTA_SHULKER_BOX, Material.ORANGE_SHULKER_BOX,
-                    Material.PINK_SHULKER_BOX, Material.PURPLE_SHULKER_BOX, Material.RED_SHULKER_BOX, Material.SILVER_SHULKER_BOX,
+                    Material.PINK_SHULKER_BOX, Material.PURPLE_SHULKER_BOX, Material.RED_SHULKER_BOX, Material.LIGHT_GRAY_SHULKER_BOX,
                     Material.WHITE_SHULKER_BOX, Material.YELLOW_SHULKER_BOX));
         }
         c = s;
@@ -127,7 +127,7 @@ public class ChatPacketListener extends PacketAdapter {
             try {
                 if(!p.getItemInHand().getType().equals(Material.AIR)) {
                     ItemStack copy = p.getItemInHand().clone();
-                    if(copy.getType().equals(Material.BOOK_AND_QUILL) || copy.getType().equals(Material.WRITTEN_BOOK)){ //filtering written books
+                    if(copy.getType().equals(Material.WRITABLE_BOOK) || copy.getType().equals(Material.WRITTEN_BOOK)){ //filtering written books
                         BookMeta bm = (BookMeta)copy.getItemMeta();
                         bm.setPages(Collections.emptyList());
                         copy.setItemMeta(bm);
