@@ -1038,7 +1038,7 @@ Translations:
     0: "Bottle o' Enchanting"
   FIREBALL:
     0: "Fire Charge"
-  BOOK_AND_QUILL:
+  WRITEABLE_BOOK:
     0: "Book and Quill"
   WRITTEN_BOOK:
     0: "Written Book"

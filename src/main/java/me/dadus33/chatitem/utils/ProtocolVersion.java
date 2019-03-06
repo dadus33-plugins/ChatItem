@@ -15,8 +15,9 @@ public enum ProtocolVersion {
     V1_9_X(49, 110, 2),  //1.9.X - Starts with 49 as 48 was an april fools update
     V1_10_X(201, 210, 3),  //1.10.X - Starts with 201 because why not. Really, check it yourself: http://wiki.vg/Protocol_version_numbers
     V1_11_X(301, 316, 4), //1.11.X and pre-releases
-    V1_12_X(317, Integer.MAX_VALUE, 5),  //1.12.X and pre-releases
-    INVALID(-1, -1, 6);
+    V1_12_X(317, 340, 5),  //1.12.X and pre-releases
+    V1_13_X(341, Integer.MAX_VALUE, 6),  //1.12.X and pre-releases
+    INVALID(-1, -1, 7);
 
     //Latest version should always have the upper limit set to Integer.MAX_VALUE so I don't have to update the plugin for every minor protocol change
 
@@ -60,6 +61,10 @@ public enum ProtocolVersion {
                 case "v1_11_R1": serverVersion = V1_11_X; break;
                 case "v1_12_R1": serverVersion = V1_12_X; break;
                 case "v1_12_R2": serverVersion = V1_12_X; break;
+                case "v1_13_R1": serverVersion = V1_13_X; break;
+                case "v1_13_R2": serverVersion = V1_13_X; break;
+
+                default: serverVersion = INVALID;
             }
         }
         return serverVersion;
