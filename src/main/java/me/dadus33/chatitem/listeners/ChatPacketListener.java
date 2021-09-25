@@ -212,7 +212,8 @@ public class ChatPacketListener extends PacketAdapter {
                 String trp = materialToName(item.getType());
                 replacer = replacer.replace(NAME, trp);
             }else {
-                String translated = translationSection.get(item.getDurability());
+                @SuppressWarnings("deprecation")
+				String translated = translationSection.get(item.getDurability());
                 if (translated != null) {
                     replacer = replacer.replace(NAME, translated);
                 } else {

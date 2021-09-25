@@ -33,7 +33,7 @@ public class ChatItem extends JavaPlugin {
     private ProtocolManager pm;
     private ChatPacketListener packetListener;
     private ChatPacketValidator packetValidator;
-    private static Class chatMessageTypeClass;
+    private static Class<?> chatMessageTypeClass;
     private static boolean post17 = false;
     private static boolean post111 = false;
     private static boolean post112 = false;
@@ -223,7 +223,7 @@ public class ChatItem extends JavaPlugin {
         return protocolSupport;
     }
 
-    public static Class getChatMessageTypeClass(){
+    public static Class<?> getChatMessageTypeClass(){
         return chatMessageTypeClass;
     }
 
