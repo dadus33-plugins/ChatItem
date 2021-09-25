@@ -1,5 +1,9 @@
 .idea/
 src/test/
+bin/
 target/
 *.iml
 dependency-reduced-pom.xml
+.classpath
+.project
+.settings/
