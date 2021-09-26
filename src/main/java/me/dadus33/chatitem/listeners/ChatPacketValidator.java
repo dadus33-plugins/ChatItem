@@ -23,6 +23,8 @@ public class ChatPacketValidator extends PacketAdapter {
 
     @SuppressWarnings("deprecation")
 	public void onPacketSending(PacketEvent e){
+    	if(e.isPlayerTemporary())
+    		return;
         if(ChatItem.supportsActionBar()) { //only if action bar messages are supported in this version of minecraft
             if(ChatItem.supportsChatTypeEnum()){
                 if(((Enum<?>)e.getPacket().getSpecificModifier(ChatItem.getChatMessageTypeClass()).read(0)).name().equals("GAME_INFO")){

@@ -93,6 +93,8 @@ public class ChatPacketListener extends PacketAdapter {
     @SuppressWarnings("deprecation")
     @Override
     public void onPacketSending(final PacketEvent e) {
+    	if(e.isPlayerTemporary())
+    		return;
         final PacketContainer packet = e.getPacket();
         if(!packet.hasMetadata("parse")){ //First we check if the packet validator has validated this packet to be parsed by us
             return;
