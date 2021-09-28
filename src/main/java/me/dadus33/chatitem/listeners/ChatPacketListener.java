@@ -93,14 +93,16 @@ public class ChatPacketListener extends PacketAdapter {
     @SuppressWarnings("deprecation")
     @Override
     public void onPacketSending(final PacketEvent e) {
+    	if(e.isPlayerTemporary())
+    		return;
         final PacketContainer packet = e.getPacket();
-        if(!packet.hasMetadata("parse")){ //First we check if the packet validator has validated this packet to be parsed by us
+        if(!packet.getMeta("parse").isPresent()){ //First we check if the packet validator has validated this packet to be parsed by us
             return;
         }
-        final boolean usesBaseComponents = (boolean)packet.getMetadata("base-component"); //The packet validator should also tell if this packet uses base components
+        final boolean usesBaseComponents = (boolean)packet.getMeta("base-component").orElse(false); //The packet validator should also tell if this packet uses base components
         e.setCancelled(true); //We cancel the packet as we're going to resend it anyways (ignoring listeners this time)
         Bukkit.getScheduler().runTaskAsynchronously(ChatItem.getInstance(), () -> {
-            String json = (String)packet.getMetadata("json"); //The packet validator got the json for us, so no need to get it again
+            String json = (String)packet.getMeta("json").orElse(""); //The packet validator got the json for us, so no need to get it again
             int topIndex = -1;
             String name = null;
             for(Player p : Bukkit.getOnlinePlayers()){
@@ -127,7 +129,7 @@ public class ChatPacketListener extends PacketAdapter {
             try {
                 if(!p.getItemInHand().getType().equals(Material.AIR)) {
                     ItemStack copy = p.getItemInHand().clone();
-                    if(copy.getType().equals(Material.WRITABLE_BOOK) || copy.getType().equals(Material.WRITTEN_BOOK)){ //filtering written books
+                    if(copy.getType().name().contains("_BOOK")){ //filtering written books
                         BookMeta bm = (BookMeta)copy.getItemMeta();
                         bm.setPages(Collections.emptyList());
                         copy.setItemMeta(bm);
@@ -212,7 +214,8 @@ public class ChatPacketListener extends PacketAdapter {
                 String trp = materialToName(item.getType());
                 replacer = replacer.replace(NAME, trp);
             }else {
-                String translated = translationSection.get(item.getDurability());
+                @SuppressWarnings("deprecation")
+				String translated = translationSection.get(item.getDurability());
                 if (translated != null) {
                     replacer = replacer.replace(NAME, translated);
                 } else {

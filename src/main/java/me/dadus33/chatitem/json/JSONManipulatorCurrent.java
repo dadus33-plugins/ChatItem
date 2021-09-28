@@ -1,6 +1,5 @@
 package me.dadus33.chatitem.json;
 
-
 import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.gson.*;
 import me.dadus33.chatitem.ChatItem;
@@ -20,18 +19,18 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+@SuppressWarnings("unchecked")
 public class JSONManipulatorCurrent implements JSONManipulator{
 
-    private static final Class CRAFT_ITEM_STACK_CLASS = Reflect.getOBCClass("inventory.CraftItemStack");
-    private static final Class NBT_STRING = Reflect.getNMSClass("NBTTagString");
-    private static final Class NBT_LIST = Reflect.getNMSClass("NBTTagList");
+    private static final Class<?> CRAFT_ITEM_STACK_CLASS = Reflect.getOBCClass("inventory.CraftItemStack");
+    private static final Class<?> NBT_STRING = Reflect.getNMSClass("NBTTagString");
+    private static final Class<?> NBT_LIST = Reflect.getNMSClass("NBTTagList");
     private static final Map<Type, Tag> TYPES_TO_OPEN_NBT_TAGS = new HashMap<>();
-    private static final List<Class> NBT_BASE_CLASSES = new ArrayList<>();
+    private static final List<Class<?>> NBT_BASE_CLASSES = new ArrayList<>();
     private static final List<Field> NBT_BASE_DATA_FIELD = new ArrayList<>();
-    private static final Class NMS_ITEM_STACK_CLASS = Reflect.getNMSClass("ItemStack");
+    private static final Class<?> NMS_ITEM_STACK_CLASS = Reflect.getNMSClass("ItemStack");
     private static final Method AS_NMS_COPY = Reflect.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
-    private static final Class NBT_TAG_COMPOUND = Reflect.getNMSClass("NBTTagCompound");
+    private static final Class<?> NBT_TAG_COMPOUND = Reflect.getNMSClass("NBTTagCompound");
     private static final Method SAVE_NMS_ITEM_STACK_METHOD = Reflect.getMethod(NMS_ITEM_STACK_CLASS, "save", NBT_TAG_COMPOUND);
     private static final Field MAP = Reflect.getField(NBT_TAG_COMPOUND, "map");
     private static final Field LIST_FIELD = Reflect.getField(NBT_LIST, "list");
@@ -51,7 +50,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         NBT_BASE_CLASSES.add(Reflect.getNMSClass("NBTTagLong"));
         NBT_BASE_CLASSES.add(Reflect.getNMSClass("NBTTagShort"));
 
-        for (Class NBT_BASE_CLASS : NBT_BASE_CLASSES) {
+        for (Class<?> NBT_BASE_CLASS : NBT_BASE_CLASSES) {
             NBT_BASE_DATA_FIELD.add(Reflect.getField(NBT_BASE_CLASS, "data"));
         }
 
@@ -661,14 +660,8 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         return replacer;
     }
 
-
-    private String escapeSpecials(String initial){
-        return initial.replace("\"", "\\\"").replace("\\", "\\\\").replace("\b", "\\b")
-                .replace("\f", "\\f").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
-    }
-
-
-    private Item toItem(ItemStack is) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+	@SuppressWarnings("deprecation")
+	private Item toItem(ItemStack is) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
         CompoundTag tag = new CompoundTag("tag");
 
         Object nmsStack = AS_NMS_COPY.invoke(null, is);
@@ -732,7 +725,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
             }
 
             for(int i = 0; i < NBT_BASE_CLASSES.size(); ++i){
-                Class c = NBT_BASE_CLASSES.get(i);
+                Class<?> c = NBT_BASE_CLASSES.get(i);
                 if(c.isInstance(nmsTag)){
                     Object value = NBT_BASE_DATA_FIELD.get(i).get(nmsTag);
 

@@ -1,9 +1,16 @@
 package me.dadus33.chatitem;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.ServicePriority;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
+
 import me.dadus33.chatitem.api.APIImplementation;
 import me.dadus33.chatitem.api.ChatItemAPI;
 import me.dadus33.chatitem.commands.CIReload;
@@ -15,12 +22,6 @@ import me.dadus33.chatitem.listeners.ChatPacketListener;
 import me.dadus33.chatitem.listeners.ChatPacketValidator;
 import me.dadus33.chatitem.utils.ProtocolSupportUtil;
 import me.dadus33.chatitem.utils.Storage;
-import org.bstats.Metrics;
-import org.bukkit.Bukkit;
-import org.bukkit.Server;
-import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.ServicePriority;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class ChatItem extends JavaPlugin {
 
@@ -32,7 +33,7 @@ public class ChatItem extends JavaPlugin {
     private ProtocolManager pm;
     private ChatPacketListener packetListener;
     private ChatPacketValidator packetValidator;
-    private static Class chatMessageTypeClass;
+    private static Class<?> chatMessageTypeClass;
     private static boolean post17 = false;
     private static boolean post111 = false;
     private static boolean post112 = false;
@@ -129,8 +130,6 @@ public class ChatItem extends JavaPlugin {
 
         //Initialize Log4J filter (remove ugly console messages)
         filter = new Log4jFilter(storage);
-
-        new Metrics(this);
     }
 
 
@@ -224,7 +223,7 @@ public class ChatItem extends JavaPlugin {
         return protocolSupport;
     }
 
-    public static Class getChatMessageTypeClass(){
+    public static Class<?> getChatMessageTypeClass(){
         return chatMessageTypeClass;
     }
 

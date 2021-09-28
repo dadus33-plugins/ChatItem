@@ -21,10 +21,12 @@ public class ChatPacketValidator extends PacketAdapter {
         c = s;
     }
 
-    public void onPacketSending(PacketEvent e){
+	public void onPacketSending(PacketEvent e){
+    	if(e.isPlayerTemporary())
+    		return;
         if(ChatItem.supportsActionBar()) { //only if action bar messages are supported in this version of minecraft
             if(ChatItem.supportsChatTypeEnum()){
-                if(((Enum)e.getPacket().getSpecificModifier(ChatItem.getChatMessageTypeClass()).read(0)).name().equals("GAME_INFO")){
+                if(((Enum<?>)e.getPacket().getSpecificModifier(ChatItem.getChatMessageTypeClass()).read(0)).name().equals("GAME_INFO")){
                     return; //It means it's an actionbar message, and we ain't intercepting those
                 }
             }else if (e.getPacket().getBytes().readSafely(0) == (byte) 2) {
@@ -61,10 +63,10 @@ public class ChatPacketValidator extends PacketAdapter {
         if(json.lastIndexOf("\\u0007")==-1){ //if the message doesn't contain the BELL separator, then it's certainly NOT a message we want to parse
             return;
         }
-
-        packet.addMetadata("parse", true); //We mark this packet to be parsed by the packet listener
-        packet.addMetadata("base-component", usesBaseComponents); //We also tell it whether this packet uses the base component API
-        packet.addMetadata("json", json); //And we finally provide it with the json we already got from the packet
+        
+        packet.setMeta("parse", true); //We mark this packet to be parsed by the packet listener
+        packet.setMeta("base-component", usesBaseComponents); //We also tell it whether this packet uses the base component API
+        packet.setMeta("json", json); //And we finally provide it with the json we already got from the packet
     }
 
     public void setStorage(Storage st){
