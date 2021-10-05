@@ -13,7 +13,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
-import me.dadus33.chatitem.packets.AbstractPacket;
+import me.dadus33.chatitem.packets.ChatItemPacket;
 import me.dadus33.chatitem.packets.PacketContent;
 import me.dadus33.chatitem.packets.PacketType;
 import me.dadus33.chatitem.packets.custom.CustomPacketManager;
@@ -99,7 +99,7 @@ public class INCChannel extends ChannelAbstract {
 
 		@Override
 		public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
-			AbstractPacket nextPacket = getPacketManager().onPacketSent(PacketType.getType(packet.getClass().getSimpleName()), owner, packet);
+			ChatItemPacket nextPacket = getPacketManager().onPacketSent(PacketType.getType(packet.getClass().getSimpleName()), owner, packet);
 			if(nextPacket != null && nextPacket.isCancelled())
 				return;
 			super.write(ctx, packet, promise);

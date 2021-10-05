@@ -9,9 +9,9 @@ import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
 
-import me.dadus33.chatitem.packets.AbstractPacket;
+import me.dadus33.chatitem.packets.ChatItemPacket;
+import me.dadus33.chatitem.packets.PacketContent;
 import me.dadus33.chatitem.packets.PacketType;
-import me.dadus33.chatitem.packets.custom.CustomPacket;
 import me.dadus33.chatitem.packets.custom.CustomPacketManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
@@ -126,7 +126,7 @@ public class NMUChannel extends ChannelAbstract {
 		
 		@Override
 		public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
-			AbstractPacket nextPacket = getPacketManager().onPacketSent(PacketType.getType(packet.getClass().getSimpleName()), owner, packet);
+			ChatItemPacket nextPacket = getPacketManager().onPacketSent(PacketType.getType(packet.getClass().getSimpleName()), owner, packet);
 			if(nextPacket != null && nextPacket.isCancelled())
 				return;
 			super.write(ctx, packet, promise);
@@ -145,12 +145,8 @@ public class NMUChannel extends ChannelAbstract {
 		public void channelRead(ChannelHandlerContext ctx, Object packet) {
 			try {
 				PacketType packetType = PacketType.getType(packet.getClass().getSimpleName());
-				if(!(packetType instanceof PacketType.Client || packetType instanceof PacketType.Server) && packetType != null) {
-					CustomPacket nextPacket = new CustomPacket(packetType, packet, null);
-					if(nextPacket != null && nextPacket.isCancelled())
-						return;
-					if(packetType.equals(PacketType.Handshake.IS_SET_PROTOCOL))
-						getPacketManager().protocolVersionPerChannel.put(channel, nextPacket.getContent().getIntegers().readSafely(0, 0));
+				if(packetType != null && packetType == PacketType.Handshake.IS_SET_PROTOCOL) {
+					getPacketManager().protocolVersionPerChannel.put(channel, new PacketContent(packet).getIntegers().readSafely(0, 0));
 				}
 				super.channelRead(ctx, packet);
 			} catch (Exception e) {

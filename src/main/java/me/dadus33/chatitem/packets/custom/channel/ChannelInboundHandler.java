@@ -8,14 +8,14 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
-import me.dadus33.chatitem.packets.AbstractPacket;
+import me.dadus33.chatitem.packets.ChatItemPacket;
+import me.dadus33.chatitem.packets.PacketContent;
 import me.dadus33.chatitem.packets.PacketType;
-import me.dadus33.chatitem.packets.custom.CustomPacket;
 import me.dadus33.chatitem.packets.custom.CustomPacketManager;
 
 public class ChannelInboundHandler extends ChannelInboundHandlerAdapter {
 
-	public static final HashMap<Channel, AbstractPacket> TMP = new HashMap<>();
+	public static final HashMap<Channel, ChatItemPacket> TMP = new HashMap<>();
 	private CustomPacketManager packetManager;
 	
 	public ChannelInboundHandler(CustomPacketManager packetManager) {
@@ -62,12 +62,8 @@ public class ChannelInboundHandler extends ChannelInboundHandlerAdapter {
 		public void channelRead(ChannelHandlerContext ctx, Object packet) {
 			try {
 				PacketType packetType = PacketType.getType(packet.getClass().getSimpleName());
-				if(!(packetType instanceof PacketType.Client || packetType instanceof PacketType.Server) && packetType != null) {
-					CustomPacket nextPacket = new CustomPacket(packetType, packet, null);
-					if(nextPacket != null && nextPacket.isCancelled())
-						return;
-					if(packetType.equals(PacketType.Handshake.IS_SET_PROTOCOL))
-						packetManager.protocolVersionPerChannel.put(channel, nextPacket.getContent().getIntegers().readSafely(0, 0));
+				if(packetType != null && packetType == PacketType.Handshake.IS_SET_PROTOCOL) {
+					packetManager.protocolVersionPerChannel.put(channel, new PacketContent(packet).getIntegers().readSafely(0, 0));
 				}
 				super.channelRead(ctx, packet);
 			} catch (Exception e) {

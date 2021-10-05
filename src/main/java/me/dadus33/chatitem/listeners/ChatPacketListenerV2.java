@@ -17,7 +17,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.packets.AbstractPacket;
+import me.dadus33.chatitem.packets.ChatItemPacket;
 import me.dadus33.chatitem.packets.PacketContent;
 import me.dadus33.chatitem.packets.PacketHandler;
 import me.dadus33.chatitem.packets.PacketMetadata;
@@ -92,7 +92,7 @@ public class ChatPacketListenerV2 extends PacketHandler {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onSend(AbstractPacket e) {
+	public void onSend(ChatItemPacket e) {
     	if(!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT))
     		return;
 		final PacketContent packet = e.getContent();

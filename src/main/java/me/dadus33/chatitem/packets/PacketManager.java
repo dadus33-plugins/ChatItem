@@ -20,7 +20,7 @@ public abstract class PacketManager {
 		return handlers.remove(handler);
 	}
 
-	public void notifyHandlersSent(AbstractPacket packet) {
+	public void notifyHandlersSent(ChatItemPacket packet) {
 		handlers.forEach((handler) -> handler.onSend(packet));
 	}
 }

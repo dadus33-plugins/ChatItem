@@ -3,7 +3,7 @@ package me.dadus33.chatitem.listeners;
 import java.lang.reflect.Method;
 
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.packets.AbstractPacket;
+import me.dadus33.chatitem.packets.ChatItemPacket;
 import me.dadus33.chatitem.packets.PacketContent;
 import me.dadus33.chatitem.packets.PacketHandler;
 import me.dadus33.chatitem.packets.PacketMetadata;
@@ -36,7 +36,7 @@ public class ChatPacketValidatorV2 extends PacketHandler {
     }
 
     @Override
-    public void onSend(AbstractPacket e) {
+    public void onSend(ChatItemPacket e) {
     	if(!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT))
     		return;
     	ProtocolVersion version = ProtocolVersion.getServerVersion();

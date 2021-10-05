@@ -2,7 +2,7 @@ package me.dadus33.chatitem.packets;
 
 import org.bukkit.entity.Player;
 
-public abstract class AbstractPacket {
+public class ChatItemPacket {
 
 	protected Player player;
 	protected Object packet;
@@ -10,7 +10,7 @@ public abstract class AbstractPacket {
 	protected boolean cancel = false;
 	protected PacketMetadata metaData = new PacketMetadata();
 	
-	public AbstractPacket(PacketType type, Object packet, Player player) {
+	public ChatItemPacket(PacketType type, Object packet, Player player) {
 		this.player = player;
 		this.packet = packet;
 		this.type = type;

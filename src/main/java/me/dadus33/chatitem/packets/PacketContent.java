@@ -9,7 +9,7 @@ import me.dadus33.chatitem.utils.PacketUtils;
 public class PacketContent {
 
 	
-	private final AbstractPacket packet;
+	private final ChatItemPacket packet;
 	private final Object obj;
 	
 	/**
@@ -17,7 +17,7 @@ public class PacketContent {
 	 * 
 	 * @param packet the Negativity's packet
 	 */
-	public PacketContent(AbstractPacket packet) {
+	public PacketContent(ChatItemPacket packet) {
 		this.packet = packet;
 		this.obj = packet.getPacket();
 	}
@@ -32,7 +32,7 @@ public class PacketContent {
 		this.obj = obj;
 	}
 	
-	public AbstractPacket getPacket() {
+	public ChatItemPacket getPacket() {
 		return packet;
 	}
 	

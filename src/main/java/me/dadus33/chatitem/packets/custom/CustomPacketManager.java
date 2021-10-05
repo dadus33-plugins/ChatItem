@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-import me.dadus33.chatitem.packets.AbstractPacket;
+import me.dadus33.chatitem.packets.ChatItemPacket;
 import me.dadus33.chatitem.packets.PacketManager;
 import me.dadus33.chatitem.packets.PacketType;
 import me.dadus33.chatitem.packets.custom.channel.ChannelAbstract;
@@ -84,10 +84,10 @@ public class CustomPacketManager extends PacketManager implements Listener {
 			channel.getRemoveChannelExecutor().shutdownNow();
 	}
 
-	public AbstractPacket onPacketSent(PacketType type, Player sender, Object packet) {
+	public ChatItemPacket onPacketSent(PacketType type, Player sender, Object packet) {
 		if(type == null)
 			return null;
-		CustomPacket customPacket = new CustomPacket(type, packet, sender);
+		ChatItemPacket customPacket = new ChatItemPacket(type, packet, sender);
 		notifyHandlersSent(customPacket);
 		return customPacket;
 	}

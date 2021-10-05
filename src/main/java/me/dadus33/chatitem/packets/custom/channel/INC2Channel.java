@@ -12,7 +12,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
-import me.dadus33.chatitem.packets.AbstractPacket;
+import me.dadus33.chatitem.packets.ChatItemPacket;
 import me.dadus33.chatitem.packets.PacketType;
 import me.dadus33.chatitem.packets.custom.CustomPacketManager;
 import me.dadus33.chatitem.playerversion.hooks.DefaultVersionHook;
@@ -46,7 +46,7 @@ public class INC2Channel extends ChannelAbstract {
 				// Managing outgoing packet (to the player)
 				channel.pipeline().addAfter(KEY_HANDLER_SERVER, KEY_SERVER + endChannelName, new ChannelHandlerSent(player));
 
-				AbstractPacket pa = ChannelInboundHandler.TMP.remove(channel);
+				ChatItemPacket pa = ChannelInboundHandler.TMP.remove(channel);
 				if(pa != null)
 					DefaultVersionHook.PROTOCOL_PER_UUID.put(player.getUniqueId(), pa.getContent().getIntegers().readSafely(0, ProtocolVersion.getServerVersion().MAX_VER));
 			} catch (NoSuchElementException e) {
@@ -92,7 +92,7 @@ public class INC2Channel extends ChannelAbstract {
 
 		@Override
 		public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
-			AbstractPacket nextPacket = getPacketManager().onPacketSent(PacketType.getType(packet.getClass().getSimpleName()), owner, packet);
+			ChatItemPacket nextPacket = getPacketManager().onPacketSent(PacketType.getType(packet.getClass().getSimpleName()), owner, packet);
 			if(nextPacket != null && nextPacket.isCancelled())
 				return;
 			super.write(ctx, packet, promise);
