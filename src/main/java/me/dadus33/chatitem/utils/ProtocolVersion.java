@@ -1,8 +1,6 @@
 package me.dadus33.chatitem.utils;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -34,8 +32,6 @@ public enum ProtocolVersion {
 		BUKKIT_VERSION = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
 		SERVER_VERSION = getVersionByName(BUKKIT_VERSION);
 	}
-
-	private static ConcurrentHashMap<String, Integer> PLAYER_VERSION_MAP = new ConcurrentHashMap<>();
 
 	ProtocolVersion(int min, int max, int index) {
 		this.MIN_VER = min;
@@ -113,10 +109,6 @@ public enum ProtocolVersion {
 		String port = String.valueOf(address.getPort());
 		String ip = address.getAddress().getHostAddress();
 		return ip + ":" + port;
-	}
-
-	public static Map<String, Integer> getPlayerVersionMap() {
-		return PLAYER_VERSION_MAP;
 	}
 
 }
