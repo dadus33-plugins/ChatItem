@@ -845,7 +845,7 @@ public class JSONManipulatorCurrent implements JSONManipulator{
                     if(!first){
                         sb.append(",");
                     }
-                    if(protocolVersion.MAX_VER <= ProtocolVersion.V1_11_X.MAX_VER){ //it's before 1.12
+                    if(protocolVersion.MAX_VER <= ProtocolVersion.V1_11.MAX_VER){ //it's before 1.12
                         sb.append(index).append(":").append(value);
                     }else{
                         sb.append(value);

@@ -1,17 +1,12 @@
 package me.dadus33.chatitem.listeners;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.utils.ProtocolVersion;
-import me.dadus33.chatitem.utils.Storage;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -23,8 +18,19 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
+
+import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.utils.ProtocolVersion;
+import me.dadus33.chatitem.utils.Storage;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
 
 public class ChatPacketListener extends PacketAdapter {
@@ -39,7 +45,7 @@ public class ChatPacketListener extends PacketAdapter {
 
     public ChatPacketListener(Plugin plugin, ListenerPriority listenerPriority, Storage s, PacketType... types) {
         super(plugin, listenerPriority, types);
-        if(ChatItem.supportsShulkerBoxes()){
+        if(ProtocolVersion.getServerVersion().isNewerOrEquals(ProtocolVersion.V1_11)){
             SHULKER_BOXES.addAll(Arrays.asList(Material.BLACK_SHULKER_BOX, Material.BLUE_SHULKER_BOX,
                     Material.BROWN_SHULKER_BOX, Material.CYAN_SHULKER_BOX, Material.GRAY_SHULKER_BOX, Material.GREEN_SHULKER_BOX,
                     Material.LIGHT_BLUE_SHULKER_BOX, Material.LIME_SHULKER_BOX, Material.MAGENTA_SHULKER_BOX, Material.ORANGE_SHULKER_BOX,
@@ -134,7 +140,7 @@ public class ChatPacketListener extends PacketAdapter {
                         bm.setPages(Collections.emptyList());
                         copy.setItemMeta(bm);
                     } else {
-                        if (ChatItem.supportsShulkerBoxes()) { //filtering shulker boxes
+                        if (ProtocolVersion.getServerVersion().isNewerOrEquals(ProtocolVersion.V1_11)) { //filtering shulker boxes
                             if (SHULKER_BOXES.contains(copy.getType())) {
                                 if (copy.hasItemMeta()) {
                                     BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();

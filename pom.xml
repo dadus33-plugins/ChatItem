@@ -77,12 +77,17 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.github.ProtocolSupport</groupId>
+            <artifactId>ProtocolSupport</artifactId>
+            <version>f34959c331</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.GeyserMC</groupId>
             <artifactId>opennbt</artifactId>
             <version>1.4</version>
             <scope>compile</scope>
         </dependency>
-
     </dependencies>
 
     <build>

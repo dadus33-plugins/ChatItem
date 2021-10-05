@@ -20,7 +20,10 @@ import me.dadus33.chatitem.json.JSONManipulatorCurrent;
 import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatPacketListener;
 import me.dadus33.chatitem.listeners.ChatPacketValidator;
-import me.dadus33.chatitem.utils.ProtocolSupportUtil;
+import me.dadus33.chatitem.playerversion.IPlayerVersion;
+import me.dadus33.chatitem.playerversion.hooks.DefaultVersionHook;
+import me.dadus33.chatitem.playerversion.hooks.ProtocolSupportHook;
+import me.dadus33.chatitem.playerversion.hooks.ViaVersionHook;
 import me.dadus33.chatitem.utils.Storage;
 
 public class ChatItem extends JavaPlugin {
@@ -33,14 +36,8 @@ public class ChatItem extends JavaPlugin {
     private ProtocolManager pm;
     private ChatPacketListener packetListener;
     private ChatPacketValidator packetValidator;
-    private static Class<?> chatMessageTypeClass;
-    private static boolean post17 = false;
-    private static boolean post111 = false;
-    private static boolean post112 = false;
     private static boolean baseComponentAvailable = true;
-    private static boolean viaVersion = false;
-    private static boolean protocolSupport = false;
-
+    private IPlayerVersion playerVersionAdapter;
 
     public static void reload(CommandSender sender) {
         ChatItem obj = getInstance();
@@ -63,6 +60,7 @@ public class ChatItem extends JavaPlugin {
         return instance;
     }
 
+    @Override
     public void onEnable() {
         //Save the instance (we're basically a singleton)
         instance = this;
@@ -78,21 +76,6 @@ public class ChatItem extends JavaPlugin {
         APIImplementation api = new APIImplementation(storage);
         Bukkit.getServicesManager().register(ChatItemAPI.class, api, this, ServicePriority.Highest);
 
-        if(isMc18OrLater()) {
-            post17 = true; //for actionbar messages ignoring
-        }
-        if(isMc111OrLater()){
-            post111 = true; //for shulker box filtering
-        }
-        if(isMc112Orlater()){
-            post112 = true; //for new ChatType enum instead of using bytes
-            try{
-                chatMessageTypeClass = Class.forName("net.minecraft.server." + getVersion(Bukkit.getServer()) + ".ChatMessageType");
-            } catch (ClassNotFoundException e){
-                e.printStackTrace(); //This should never happen anyways, so no need to think of fancy stuff like disabling the plugin
-            }
-        }
-
         //Packet listeners
         packetListener = new ChatPacketListener(this, ListenerPriority.LOW, storage, PacketType.Play.Server.CHAT);
         packetValidator = new ChatPacketValidator(this, ListenerPriority.LOWEST, storage, PacketType.Play.Server.CHAT);
@@ -100,10 +83,11 @@ public class ChatItem extends JavaPlugin {
         pm.addPacketListener(packetListener);
 
         if(Bukkit.getPluginManager().getPlugin("ViaVersion") != null){
-            viaVersion = true;
-        }else if(Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null){
-            protocolSupport = true;
-            ProtocolSupportUtil.initialize();
+        	playerVersionAdapter = new ViaVersionHook();
+        } else if(Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null){
+        	playerVersionAdapter = new ProtocolSupportHook();
+        } else {
+        	playerVersionAdapter = new DefaultVersionHook();
         }
 
         //We halt the use of this system for now, until we can solve the infamous getProtocolVersion issue
@@ -131,58 +115,10 @@ public class ChatItem extends JavaPlugin {
         //Initialize Log4J filter (remove ugly console messages)
         filter = new Log4jFilter(storage);
     }
-
-
-    public void onDisable() {
-        instance = null;
-        post17 = false;
-    }
-
-    private boolean isMc18OrLater(){
-        switch(getVersion(Bukkit.getServer())){
-            case "v1_7_R1": return false;
-            case "v1_7_R2": return false;
-            case "v1_7_R3": return false;
-            case "v1_7_R4": return false;
-            default: return true;
-        }
-    }
-
-    private boolean isMc111OrLater(){
-        switch(getVersion(Bukkit.getServer())){
-            case "v1_7_R1": return false;
-            case "v1_7_R2": return false;
-            case "v1_7_R3": return false;
-            case "v1_7_R4": return false;
-            case "v1_8_R1": return false;
-            case "v1_8_R2": return false;
-            case "v1_8_R3": return false;
-            case "v1_9_R1": return false;
-            case "v1_9_R2": return false;
-            case "v1_10_R1": return false;
-            case "v1_10_R2": return false;
-            default: return true;
-        }
-    }
-
-    private boolean isMc112Orlater(){
-        switch(getVersion(Bukkit.getServer())){
-            case "v1_7_R1": return false;
-            case "v1_7_R2": return false;
-            case "v1_7_R3": return false;
-            case "v1_7_R4": return false;
-            case "v1_8_R1": return false;
-            case "v1_8_R2": return false;
-            case "v1_8_R3": return false;
-            case "v1_9_R1": return false;
-            case "v1_9_R2": return false;
-            case "v1_10_R1": return false;
-            case "v1_10_R2": return false;
-            case "v1_11_R1": return false;
-            default: return true;
-        }
-    }
-
+    
+    public IPlayerVersion getPlayerVersionAdapter() {
+		return playerVersionAdapter;
+	}
 
     public static String getVersion(Server server) {
         final String packageName = server.getClass().getPackage().getName();
@@ -190,20 +126,8 @@ public class ChatItem extends JavaPlugin {
         return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
 
-    public static boolean supportsActionBar(){
-        return post17;
-    }
-
-    public static boolean supportsShulkerBoxes(){
-        return post111;
-    }
-
     public static boolean supportsChatComponentApi(){
         return baseComponentAvailable;
-    }
-
-    public static boolean supportsChatTypeEnum(){
-        return post112;
     }
 
     public static JSONManipulator getManipulator(){
@@ -214,17 +138,4 @@ public class ChatItem extends JavaPlugin {
         return new JSONManipulatorCurrent();
         //We just return a new one whenever requested for the moment, should implement a cache of some sort some time though
     }
-
-    public static boolean usesViaVersion(){
-        return viaVersion;
-    }
-
-    public static boolean usesProtocolSupport(){
-        return protocolSupport;
-    }
-
-    public static Class<?> getChatMessageTypeClass(){
-        return chatMessageTypeClass;
-    }
-
 }

@@ -1,15 +1,18 @@
 package me.dadus33.chatitem.listeners;
 
+import org.bukkit.plugin.Plugin;
+
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.utils.ProtocolVersion;
 import me.dadus33.chatitem.utils.Storage;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
-import org.bukkit.plugin.Plugin;
 
 
 public class ChatPacketValidator extends PacketAdapter {
@@ -21,15 +24,21 @@ public class ChatPacketValidator extends PacketAdapter {
         c = s;
     }
 
+    @Override
 	public void onPacketSending(PacketEvent e){
     	if(e.isPlayerTemporary())
     		return;
-        if(ChatItem.supportsActionBar()) { //only if action bar messages are supported in this version of minecraft
-            if(ChatItem.supportsChatTypeEnum()){
-                if(((Enum<?>)e.getPacket().getSpecificModifier(ChatItem.getChatMessageTypeClass()).read(0)).name().equals("GAME_INFO")){
-                    return; //It means it's an actionbar message, and we ain't intercepting those
-                }
-            }else if (e.getPacket().getBytes().readSafely(0) == (byte) 2) {
+    	ProtocolVersion version = ProtocolVersion.getServerVersion();
+        if(version.isNewerOrEquals(ProtocolVersion.V1_8)) { //only if action bar messages are supported in this version of minecraft
+            if(version.isNewerOrEquals(ProtocolVersion.V1_12)){
+            	try {
+	                if(((Enum<?>)e.getPacket().getSpecificModifier(Class.forName("net.minecraft.server." + ProtocolVersion.BUKKIT_VERSION + ".ChatMessageType")).read(0)).name().equals("GAME_INFO")){
+	                    return; //It means it's an actionbar message, and we ain't intercepting those
+	                }
+            	} catch (Exception exc) {
+            		exc.printStackTrace();
+				}
+            } else if (e.getPacket().getBytes().readSafely(0) == (byte) 2) {
                 return;  //It means it's an actionbar message, and we ain't intercepting those
             }
         }

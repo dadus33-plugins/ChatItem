@@ -1,134 +1,122 @@
 package me.dadus33.chatitem.utils;
 
-import me.dadus33.chatitem.ChatItem;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import us.myles.ViaVersion.api.Via;
-
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import me.dadus33.chatitem.ChatItem;
+
 public enum ProtocolVersion {
-    PRE_1_8(0, 5, 0),  //1.7.X
-    V1_8_X(6, 47, 1),  //1.8.X
-    V1_9_X(49, 110, 2),  //1.9.X - Starts with 49 as 48 was an april fools update
-    V1_10_X(201, 210, 3),  //1.10.X - Starts with 201 because why not. Really, check it yourself: http://wiki.vg/Protocol_version_numbers
-    V1_11_X(301, 316, 4), //1.11.X and pre-releases
-    V1_12_X(317, 340, 5),  //1.12.X and pre-releases
-    V1_13_X(341, Integer.MAX_VALUE, 6),  //1.12.X and pre-releases
-    INVALID(-1, -1, 7);
+	V1_7(0, 5, 0), // 1.7.X
+	V1_8(6, 47, 1), // 1.8.X
+	V1_9(49, 110, 2), // 1.9.X - Starts with 49 as 48 was an april fools update
+	V1_10(201, 210, 3), // 1.10.X - Starts with 201 because why not. Really, check it yourself:
+						// http://wiki.vg/Protocol_version_numbers
+	V1_11(301, 316, 4), // 1.11.X and pre-releases
+	V1_12(317, 340, 5), // 1.12.X and pre-releases
+	V1_13(341, Integer.MAX_VALUE, 6), // 1.12.X and pre-releases
+	HIGHER(Integer.MAX_VALUE, -1, Integer.MAX_VALUE);
 
-    //Latest version should always have the upper limit set to Integer.MAX_VALUE so I don't have to update the plugin for every minor protocol change
+	// Latest version should always have the upper limit set to Integer.MAX_VALUE so
+	// I don't have to update the plugin for every minor protocol change
 
-    public final int MIN_VER;
-    public final int MAX_VER;
-    public final int INDEX; //Represents how new the version is (0 - extremely old)
+	public final int MIN_VER;
+	public final int MAX_VER;
+	public final int index; // Represents how new the version is (0 - extremely old)
 
-    private static ProtocolVersion serverVersion;
+	private static final ProtocolVersion SERVER_VERSION;
+	public static final String BUKKIT_VERSION;
 
-    private static ConcurrentHashMap<String, Integer> PLAYER_VERSION_MAP = new ConcurrentHashMap<>();
+	static {
+		BUKKIT_VERSION = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+		SERVER_VERSION = getVersionByName(BUKKIT_VERSION);
+	}
 
-    ProtocolVersion(int min, int max, int index){
-        this.MIN_VER = min;
-        this.MAX_VER = max;
-        this.INDEX = index;
-    }
+	private static ConcurrentHashMap<String, Integer> PLAYER_VERSION_MAP = new ConcurrentHashMap<>();
 
-    public static ProtocolVersion getVersion(int protocolVersion){
-        for (ProtocolVersion ver : ProtocolVersion.values()) {
-            if(protocolVersion >= ver.MIN_VER && protocolVersion <= ver.MAX_VER){
-                return ver;
-            }
-        }
-        return INVALID;
-    }
+	ProtocolVersion(int min, int max, int index) {
+		this.MIN_VER = min;
+		this.MAX_VER = max;
+		this.index = index;
+	}
 
-    public static ProtocolVersion getServerVersion(){
-        if(serverVersion == null){
-            String version = ChatItem.getVersion(Bukkit.getServer());
-            switch (version){
-                case "v1_7_R1": serverVersion = PRE_1_8; break;
-                case "v1_7_R2": serverVersion = PRE_1_8; break;
-                case "v1_7_R3": serverVersion = PRE_1_8; break;
-                case "v1_8_R1": serverVersion = V1_8_X; break;
-                case "v1_8_R2": serverVersion = V1_8_X; break;
-                case "v1_8_R3": serverVersion = V1_8_X; break;
-                case "v1_9_R1": serverVersion = V1_9_X; break;
-                case "v1_9_R2": serverVersion = V1_9_X; break;
-                case "v1_10_R1": serverVersion = V1_10_X; break;
-                case "v1_10_R2": serverVersion = V1_10_X; break;
-                case "v1_11_R1": serverVersion = V1_11_X; break;
-                case "v1_12_R1": serverVersion = V1_12_X; break;
-                case "v1_12_R2": serverVersion = V1_12_X; break;
-                case "v1_13_R1": serverVersion = V1_13_X; break;
-                case "v1_13_R2": serverVersion = V1_13_X; break;
+	public boolean isNewerThan(ProtocolVersion other) {
+		return index > other.index;
+	}
+	
+	public boolean isNewerOrEquals(ProtocolVersion other) {
+		return index >= other.index;
+	}
 
-                default: serverVersion = INVALID;
-            }
-        }
-        return serverVersion;
-    }
+	public static ProtocolVersion getVersionByName(String name) {
+		for (ProtocolVersion v : ProtocolVersion.values())
+			if (name.toLowerCase().startsWith(v.name().toLowerCase()))
+				return v;
+		return HIGHER;
+	}
 
-    public static void remapIds(int server, int player, Item item){
-        if(areIdsCompatible(server, player)){
-            return;
-        }
-        if((server >= V1_9_X.MIN_VER && player <= V1_8_X.MAX_VER) || (player >= V1_9_X.MIN_VER && server <= V1_8_X.MAX_VER)){
-            if((server >= V1_9_X.MIN_VER && player <= V1_8_X.MAX_VER)){
-                ItemRewriter_1_9_TO_1_8.reversedToClient(item);
-                return;
-            }
-            ItemRewriter_1_9_TO_1_8.toClient(item);
-            return;
-        }
-        if((server <= V1_10_X.MAX_VER && player >= V1_11_X.MIN_VER) || (player <= V1_10_X.MAX_VER && server >= V1_11_X.MIN_VER)){
-            if(server <= V1_10_X.MAX_VER && player >= V1_11_X.MIN_VER){
-                ItemRewriter_1_11_TO_1_10.toClient(item);
-            }else{
-                ItemRewriter_1_11_TO_1_10.reverseToClient(item);
-            }
-        }
-    }
+	public static ProtocolVersion getVersion(int protocolVersion) {
+		for (ProtocolVersion ver : ProtocolVersion.values()) {
+			if (protocolVersion >= ver.MIN_VER && protocolVersion <= ver.MAX_VER) {
+				return ver;
+			}
+		}
+		return HIGHER;
+	}
 
-    public static boolean areIdsCompatible(int version1, int version2){
-        if((version1 >= V1_9_X.MIN_VER && version2 <= V1_8_X.MAX_VER) || (version2 >= V1_9_X.MIN_VER && version1 <= V1_8_X.MAX_VER)){
-            return false;
-        }
-        if((version1 <= V1_10_X.MAX_VER && version2 >= V1_11_X.MIN_VER) || (version1 <= V1_10_X.MAX_VER && version2 >= V1_11_X.MIN_VER)){
-            return false;
-        }
-        return true;
-    }
+	public static ProtocolVersion getServerVersion() {
+		return SERVER_VERSION;
+	}
 
+	public static void remapIds(int server, int player, Item item) {
+		if (areIdsCompatible(server, player)) {
+			return;
+		}
+		if ((server >= V1_9.MIN_VER && player <= V1_8.MAX_VER) || (player >= V1_9.MIN_VER && server <= V1_8.MAX_VER)) {
+			if ((server >= V1_9.MIN_VER && player <= V1_8.MAX_VER)) {
+				ItemRewriter_1_9_TO_1_8.reversedToClient(item);
+				return;
+			}
+			ItemRewriter_1_9_TO_1_8.toClient(item);
+			return;
+		}
+		if ((server <= V1_10.MAX_VER && player >= V1_11.MIN_VER)
+				|| (player <= V1_10.MAX_VER && server >= V1_11.MIN_VER)) {
+			if (server <= V1_10.MAX_VER && player >= V1_11.MIN_VER) {
+				ItemRewriter_1_11_TO_1_10.toClient(item);
+			} else {
+				ItemRewriter_1_11_TO_1_10.reverseToClient(item);
+			}
+		}
+	}
 
+	public static boolean areIdsCompatible(int version1, int version2) {
+		if ((version1 >= V1_9.MIN_VER && version2 <= V1_8.MAX_VER)
+				|| (version2 >= V1_9.MIN_VER && version1 <= V1_8.MAX_VER)) {
+			return false;
+		}
+		if ((version1 <= V1_10.MAX_VER && version2 >= V1_11.MIN_VER)
+				|| (version1 <= V1_10.MAX_VER && version2 >= V1_11.MIN_VER)) {
+			return false;
+		}
+		return true;
+	}
+	
+	public static int getClientVersion(Player p) {
+		return ChatItem.getInstance().getPlayerVersionAdapter().getProtocolVersion(p);
+	}
 
-    public static int getClientVersion(final Player p){
+	public static String stringifyAdress(InetSocketAddress address) {
+		String port = String.valueOf(address.getPort());
+		String ip = address.getAddress().getHostAddress();
+		return ip + ":" + port;
+	}
 
-        if(p==null){
-            throw new NullPointerException("Player cannot be null!");
-        }
-
-        if(ChatItem.usesViaVersion()){
-            return Via.getAPI().getPlayerVersion(p.getUniqueId());
-        }else if(ChatItem.usesProtocolSupport()){
-             return ProtocolSupportUtil.getProtocolVersion(p);
-        }
-
-        return getServerVersion().MAX_VER;
-
-        //return PLAYER_VERSION_MAP.get(stringifyAdress(p.getAddress()));
-    }
-
-    public static String stringifyAdress(InetSocketAddress address){
-        String port = String.valueOf(address.getPort());
-        String ip = address.getAddress().getHostAddress();
-        return ip+":"+port;
-    }
-
-    public static Map<String, Integer> getPlayerVersionMap(){
-        return PLAYER_VERSION_MAP;
-    }
-
+	public static Map<String, Integer> getPlayerVersionMap() {
+		return PLAYER_VERSION_MAP;
+	}
 
 }
