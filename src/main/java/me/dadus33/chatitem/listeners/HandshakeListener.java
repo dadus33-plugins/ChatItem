@@ -14,11 +14,8 @@ import me.dadus33.chatitem.utils.ProtocolVersion;
 
 public class HandshakeListener extends PacketAdapter{
 
-	private final DefaultVersionHook hook;
-	
-    public HandshakeListener(DefaultVersionHook hook) {
+    public HandshakeListener() {
         super(ChatItem.getInstance(), ListenerPriority.MONITOR, PacketType.Handshake.Client.SET_PROTOCOL);
-        this.hook = hook;
     }
 
     @Override
@@ -30,7 +27,6 @@ public class HandshakeListener extends PacketAdapter{
         final int version = e.getPacket().getIntegers().readSafely(0);
         //Delay the mapping to make sure the true address of the player was received when using bungeecord or other types of proxies
         Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), () ->
-        	hook.protocolPerUUID.put(ProtocolVersion.stringifyAdress(e.getPlayer().getAddress()), version), 10L);
-
+        DefaultVersionHook.PROTOCOL_PER_ADDRESS.put(ProtocolVersion.stringifyAdress(e.getPlayer().getAddress()), version), 10L);
     }
 }

@@ -17,7 +17,6 @@ import static org.apache.logging.log4j.core.Filter.Result.NEUTRAL;
 
 public class Log4jFilter implements Filter {
 
-    private boolean stopped;
     private Storage c;
 
     public Log4jFilter(Storage st){
@@ -54,26 +53,6 @@ public class Log4jFilter implements Filter {
     @Override
     public Result filter(LogEvent logEvent) {
         return checkMessage(logEvent.getMessage().getFormattedMessage());
-    }
-
-    @Override
-    public void start() {
-        stopped = false;
-    }
-
-    @Override
-    public void stop() {
-        stopped = true;
-    }
-
-    @Override
-    public boolean isStarted() {
-        return !this.stopped;
-    }
-
-    @Override
-    public boolean isStopped() {
-        return this.stopped;
     }
 
     private Result checkMessage(String msg){

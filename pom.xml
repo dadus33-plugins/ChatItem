@@ -47,6 +47,13 @@
             <version>1.17-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+	    <dependency>
+	        <groupId>org.bukkit</groupId>
+	        <artifactId>minecraft-server</artifactId>
+	        <version>1.7.10</version>
+	        <type>jar</type>
+	        <scope>provided</scope>
+	    </dependency>
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
@@ -88,6 +95,12 @@
             <version>1.4</version>
             <scope>compile</scope>
         </dependency>
+	    <dependency>
+	        <groupId>io.netty</groupId>
+	        <artifactId>netty-all</artifactId>
+	        <version>4.1.53.Final</version>
+	        <scope>compile</scope>
+	    </dependency>
     </dependencies>
 
     <build>

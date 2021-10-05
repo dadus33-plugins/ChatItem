@@ -13,7 +13,6 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import java.util.HashMap;
 
-
 public class ChatEventListener implements Listener {
 
     private Storage c;

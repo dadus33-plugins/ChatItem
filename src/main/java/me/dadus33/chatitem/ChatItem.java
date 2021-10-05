@@ -6,11 +6,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.ListenerPriority;
-
 import me.dadus33.chatitem.api.APIImplementation;
 import me.dadus33.chatitem.api.ChatItemAPI;
 import me.dadus33.chatitem.commands.CIReload;
@@ -19,7 +14,10 @@ import me.dadus33.chatitem.json.JSONManipulator;
 import me.dadus33.chatitem.json.JSONManipulatorCurrent;
 import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatPacketListener;
+import me.dadus33.chatitem.listeners.ChatPacketListenerV2;
 import me.dadus33.chatitem.listeners.ChatPacketValidator;
+import me.dadus33.chatitem.listeners.ChatPacketValidatorV2;
+import me.dadus33.chatitem.packets.ChatItemPacketManager;
 import me.dadus33.chatitem.playerversion.IPlayerVersion;
 import me.dadus33.chatitem.playerversion.hooks.DefaultVersionHook;
 import me.dadus33.chatitem.playerversion.hooks.ProtocolSupportHook;
@@ -33,20 +31,21 @@ public class ChatItem extends JavaPlugin {
     private ChatEventListener chatEventListener;
     private Log4jFilter filter;
     private Storage storage;
-    private ProtocolManager pm;
-    private ChatPacketListener packetListener;
-    private ChatPacketValidator packetValidator;
+    //public ProtocolManager pm;
+    public ChatPacketListener packetListener;
+    public ChatPacketValidator packetValidator;
     private static boolean baseComponentAvailable = true;
     private IPlayerVersion playerVersionAdapter;
+    private ChatItemPacketManager packetManager;
 
     public static void reload(CommandSender sender) {
         ChatItem obj = getInstance();
-        obj.pm = ProtocolLibrary.getProtocolManager();
+        //obj.pm = ProtocolLibrary.getProtocolManager();
         obj.saveDefaultConfig();
         obj.reloadConfig();
         obj.storage = new Storage(obj.getConfig());
-        obj.packetListener.setStorage(obj.storage);
-        obj.packetValidator.setStorage(obj.storage);
+        //obj.packetListener.setStorage(obj.storage);
+        //obj.packetValidator.setStorage(obj.storage);
         obj.chatEventListener.setStorage(obj.storage);
         obj.filter.setStorage(obj.storage);
         APIImplementation api = (APIImplementation) Bukkit.getServicesManager().getRegistration(ChatItemAPI.class).getProvider();
@@ -66,7 +65,7 @@ public class ChatItem extends JavaPlugin {
         instance = this;
 
         //Load ProtocolManager
-        pm = ProtocolLibrary.getProtocolManager();
+        //pm = ProtocolLibrary.getProtocolManager();
 
         //Load config
         saveDefaultConfig();
@@ -77,10 +76,13 @@ public class ChatItem extends JavaPlugin {
         Bukkit.getServicesManager().register(ChatItemAPI.class, api, this, ServicePriority.Highest);
 
         //Packet listeners
-        packetListener = new ChatPacketListener(this, ListenerPriority.LOW, storage, PacketType.Play.Server.CHAT);
+        packetManager = new ChatItemPacketManager(this);
+        packetManager.getPacketManager().addHandler(new ChatPacketValidatorV2(storage));
+        packetManager.getPacketManager().addHandler(new ChatPacketListenerV2(storage));
+        /*packetListener = new ChatPacketListener(this, ListenerPriority.LOW, storage, PacketType.Play.Server.CHAT);
         packetValidator = new ChatPacketValidator(this, ListenerPriority.LOWEST, storage, PacketType.Play.Server.CHAT);
         pm.addPacketListener(packetValidator);
-        pm.addPacketListener(packetListener);
+        pm.addPacketListener(packetListener);*/
 
         if(Bukkit.getPluginManager().getPlugin("ViaVersion") != null){
         	playerVersionAdapter = new ViaVersionHook();
@@ -118,6 +120,10 @@ public class ChatItem extends JavaPlugin {
     
     public IPlayerVersion getPlayerVersionAdapter() {
 		return playerVersionAdapter;
+	}
+    
+    public ChatItemPacketManager getPacketManager() {
+		return packetManager;
 	}
 
     public static String getVersion(Server server) {
