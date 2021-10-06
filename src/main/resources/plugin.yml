@@ -3,7 +3,7 @@ main: me.dadus33.chatitem.ChatItem
 version: ${project.version}
 
 softdepend: [ViaVersion, ProtocolSupport, ProtocolLib]
-authors: [dadus33, WOLFI3654]
+authors: [dadus33, WOLFI3654, Elikill58]
 api-version: 1.13
 
 commands:

@@ -16,7 +16,7 @@ General:
   # display name nor any available translation, and {amount} will be replaced by
   # the amount-format configured bellow.
   #  You can use color codes.
-  name-format: "&f<&b&l&o{name} {amount}&f>&r"
+  name-format: "&b&l&o{name} {amount}&r"
   #  The amount format that will replace the {amount} placeholder in the 'name-format'
   # field above. The {times} placeholder represents the number of times the item is
   # presented in the itemstack, in other words, the actual item amount in the stack
@@ -43,7 +43,7 @@ General:
     disabled: false
     #  The string the placeholder shall be replaced with. You can use {name} as a placeholder for
     # the player's name and {display-name} as a placeholder for the player's display (custom) name.
-    name: "&f<&b&l&o{display-name}&b&l&o's hand&f>"
+    name: "&b&l&o{display-name}&b&l&o's hand"
     #  The text to be displayed whe users hove their cursor above the name
     tooltip:
       - "&7Nothing to see here"
