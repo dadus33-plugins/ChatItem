@@ -4,6 +4,7 @@ import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.gson.*;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.utils.Item;
+import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ProtocolVersion;
 import me.dadus33.chatitem.utils.Reflect;
 import org.bukkit.Bukkit;
@@ -22,18 +23,18 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unchecked")
 public class JSONManipulatorCurrent implements JSONManipulator{
 
-    private static final Class<?> CRAFT_ITEM_STACK_CLASS = Reflect.getOBCClass("inventory.CraftItemStack");
-    private static final Class<?> NBT_STRING = Reflect.getNMSClass("NBTTagString");
-    private static final Class<?> NBT_LIST = Reflect.getNMSClass("NBTTagList");
+    private static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
+    private static final Class<?> NBT_STRING = PacketUtils.getNmsClass("NBTTagString", "nbt.");
+    private static final Class<?> NBT_LIST = PacketUtils.getNmsClass("NBTTagList", "nbt.");
     private static final Map<Type, Tag> TYPES_TO_OPEN_NBT_TAGS = new HashMap<>();
     private static final List<Class<?>> NBT_BASE_CLASSES = new ArrayList<>();
     private static final List<Field> NBT_BASE_DATA_FIELD = new ArrayList<>();
-    private static final Class<?> NMS_ITEM_STACK_CLASS = Reflect.getNMSClass("ItemStack");
+    private static final Class<?> NMS_ITEM_STACK_CLASS = PacketUtils.getNmsClass("ItemStack", "world.item.");
     private static final Method AS_NMS_COPY = Reflect.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
-    private static final Class<?> NBT_TAG_COMPOUND = Reflect.getNMSClass("NBTTagCompound");
+    private static final Class<?> NBT_TAG_COMPOUND = PacketUtils.getNmsClass("NBTTagCompound", "nbt.");
     private static final Method SAVE_NMS_ITEM_STACK_METHOD = Reflect.getMethod(NMS_ITEM_STACK_CLASS, "save", NBT_TAG_COMPOUND);
-    private static final Field MAP = Reflect.getField(NBT_TAG_COMPOUND, "map");
-    private static final Field LIST_FIELD = Reflect.getField(NBT_LIST, "list");
+    private static final Field MAP = Reflect.getField(NBT_TAG_COMPOUND, "map", "x");
+    private static final Field LIST_FIELD = Reflect.getField(NBT_LIST, "list", "c");
 
     //Tags to be ignored. Currently it only contains tags from PortableHorses, but feel free to submit a pull request to add tags from your plugins
     private static final List<String> IGNORED = Arrays.asList("horsetag", "phorse", "iscnameviz", "cname");
@@ -41,17 +42,17 @@ public class JSONManipulatorCurrent implements JSONManipulator{
     private static final ConcurrentHashMap<Map.Entry<ProtocolVersion, ItemStack>, JsonObject> STACKS = new ConcurrentHashMap<>();
 
     static{
-        NBT_BASE_CLASSES.add(Reflect.getNMSClass("NBTTagByte"));
-        NBT_BASE_CLASSES.add(Reflect.getNMSClass("NBTTagByteArray"));
-        NBT_BASE_CLASSES.add(Reflect.getNMSClass("NBTTagDouble"));
-        NBT_BASE_CLASSES.add(Reflect.getNMSClass("NBTTagFloat"));
-        NBT_BASE_CLASSES.add(Reflect.getNMSClass("NBTTagInt"));
-        NBT_BASE_CLASSES.add(Reflect.getNMSClass("NBTTagIntArray"));
-        NBT_BASE_CLASSES.add(Reflect.getNMSClass("NBTTagLong"));
-        NBT_BASE_CLASSES.add(Reflect.getNMSClass("NBTTagShort"));
+        NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagByte", "nbt."));
+        NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagByteArray", "nbt."));
+        NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagDouble", "nbt."));
+        NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagFloat", "nbt."));
+        NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagInt", "nbt."));
+        NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagIntArray", "nbt."));
+        NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagLong", "nbt."));
+        NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagShort", "nbt."));
 
         for (Class<?> NBT_BASE_CLASS : NBT_BASE_CLASSES) {
-            NBT_BASE_DATA_FIELD.add(Reflect.getField(NBT_BASE_CLASS, "data"));
+            NBT_BASE_DATA_FIELD.add(Reflect.getField(NBT_BASE_CLASS, "data", "c", "x"));
         }
 
         TYPES_TO_OPEN_NBT_TAGS.put(Byte.class, new ByteTag(""));
@@ -422,7 +423,6 @@ public class JSONManipulatorCurrent implements JSONManipulator{
         obj.add("extra", rep);
         return obj.toString();
     }
-
 
     private JsonArray parseNoItemArray(JsonArray arr) {
         JsonArray replacer = new JsonArray();
