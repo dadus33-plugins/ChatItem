@@ -1,10 +1,7 @@
 package me.dadus33.chatitem.listeners;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -33,19 +30,10 @@ public class ChatPacketListenerV2 extends PacketHandler {
 	private final static String NAME = "{name}";
 	private final static String AMOUNT = "{amount}";
 	private final static String TIMES = "{times}";
-	private final static List<Material> SHULKER_BOXES = new ArrayList<>();
 
 	private Storage c;
 
 	public ChatPacketListenerV2(Storage s) {
-		if (ProtocolVersion.getServerVersion().isNewerOrEquals(ProtocolVersion.V1_11)) {
-			SHULKER_BOXES.addAll(Arrays.asList(Material.BLACK_SHULKER_BOX, Material.BLUE_SHULKER_BOX,
-					Material.BROWN_SHULKER_BOX, Material.CYAN_SHULKER_BOX, Material.GRAY_SHULKER_BOX,
-					Material.GREEN_SHULKER_BOX, Material.LIGHT_BLUE_SHULKER_BOX, Material.LIME_SHULKER_BOX,
-					Material.MAGENTA_SHULKER_BOX, Material.ORANGE_SHULKER_BOX, Material.PINK_SHULKER_BOX,
-					Material.PURPLE_SHULKER_BOX, Material.RED_SHULKER_BOX, Material.LIGHT_GRAY_SHULKER_BOX,
-					Material.WHITE_SHULKER_BOX, Material.YELLOW_SHULKER_BOX));
-		}
 		c = s;
 	}
 
@@ -142,21 +130,17 @@ public class ChatPacketListenerV2 extends PacketHandler {
 						bm.setPages(Collections.emptyList());
 						copy.setItemMeta(bm);
 					} else {
-						if (ProtocolVersion.getServerVersion().isNewerOrEquals(ProtocolVersion.V1_11)) { // filtering
-																											// shulker
-																											// boxes
-							if (SHULKER_BOXES.contains(copy.getType())) {
-								if (copy.hasItemMeta()) {
-									BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
-									if (bsm.hasBlockState()) {
-										ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
-										for (ItemStack item : sb.getInventory()) {
-											stripData(item);
-										}
-										bsm.setBlockState(sb);
+						if (copy.getType().name().contains("SHULKER_BOX")) { // if it's shulker
+							if (copy.hasItemMeta()) {
+								BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
+								if (bsm.hasBlockState()) {
+									ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
+									for (ItemStack item : sb.getInventory()) {
+										stripData(item);
 									}
-									copy.setItemMeta(bsm);
+									bsm.setBlockState(sb);
 								}
+								copy.setItemMeta(bsm);
 							}
 						}
 					}
