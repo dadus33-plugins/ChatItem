@@ -3,6 +3,7 @@ package me.dadus33.chatitem.packets;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import me.dadus33.chatitem.utils.PacketUtils;
 
@@ -147,7 +148,7 @@ public class PacketContent {
 		 * @throws NoSuchElementException if the value doesn't exist
 		 */
 		public T read(int i) {
-			return content.values().stream().findFirst().get();
+			return content.values().stream().filter(Objects::nonNull).findFirst().get();
 		}
 		
 		/**
@@ -168,7 +169,7 @@ public class PacketContent {
 		 * @return the requested value.
 		 */
 		public T readSafely(int i, T defaultValue) {
-			return content.values().stream().findFirst().orElse(defaultValue);
+			return content.values().stream().filter(Objects::nonNull).findFirst().orElse(defaultValue);
 		}
 		
 		/**
