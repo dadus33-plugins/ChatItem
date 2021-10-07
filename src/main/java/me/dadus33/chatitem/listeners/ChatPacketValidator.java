@@ -14,7 +14,7 @@ import me.dadus33.chatitem.utils.Storage;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-
+@Deprecated
 public class ChatPacketValidator extends PacketAdapter {
 
     private Storage c;

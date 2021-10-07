@@ -32,7 +32,7 @@ import me.dadus33.chatitem.utils.Storage;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-
+@Deprecated
 public class ChatPacketListener extends PacketAdapter {
 
     private final static String NAME = "{name}";
@@ -96,7 +96,6 @@ public class ChatPacketListener extends PacketAdapter {
         i.setItemMeta(im);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void onPacketSending(final PacketEvent e) {
     	if(e.isPlayerTemporary())
@@ -220,7 +219,6 @@ public class ChatPacketListener extends PacketAdapter {
                 String trp = materialToName(item.getType());
                 replacer = replacer.replace(NAME, trp);
             }else {
-                @SuppressWarnings("deprecation")
 				String translated = translationSection.get(item.getDurability());
                 if (translated != null) {
                     replacer = replacer.replace(NAME, translated);

@@ -1,21 +1,23 @@
 package me.dadus33.chatitem.api;
 
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.json.JSONManipulator;
-import me.dadus33.chatitem.json.Translator;
-import me.dadus33.chatitem.listeners.ChatPacketListener;
-import me.dadus33.chatitem.utils.ProtocolVersion;
-import me.dadus33.chatitem.utils.Storage;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.json.JSONManipulator;
+import me.dadus33.chatitem.json.Translator;
+import me.dadus33.chatitem.listeners.ChatPacketListenerV2;
+import me.dadus33.chatitem.utils.ProtocolVersion;
+import me.dadus33.chatitem.utils.Storage;
 
 public class APIImplementation implements ChatItemAPI {
 
@@ -45,7 +47,7 @@ public class APIImplementation implements ChatItemAPI {
     public String getJSONFromItem(ItemStack item) {
         JSONManipulator manipulator = ChatItem.getManipulator();
         try {
-            return manipulator.parse(DEFAULT_JSON, DEFAULT_REPLACEMENT, item, ChatPacketListener.styleItem(item, c), ProtocolVersion.getServerVersion().MAX_VER);
+            return manipulator.parse(DEFAULT_JSON, DEFAULT_REPLACEMENT, item, ChatPacketListenerV2.styleItem(item, c), ProtocolVersion.getServerVersion().MAX_VER);
         } catch (Exception e){
             logger.log(Level.SEVERE, "An unexpected exception was caught while running an API method from ChatItem. Please contact the developer immediately, providing him with the following stack-trace:");
             e.printStackTrace();
@@ -69,7 +71,7 @@ public class APIImplementation implements ChatItemAPI {
     public String getJSONFromItem(ItemStack item, Player client) {
         JSONManipulator manipulator = ChatItem.getManipulator();
         try {
-            return manipulator.parse(DEFAULT_JSON, DEFAULT_REPLACEMENT, item, ChatPacketListener.styleItem(item, c), ProtocolVersion.getClientVersion(client));
+            return manipulator.parse(DEFAULT_JSON, DEFAULT_REPLACEMENT, item, ChatPacketListenerV2.styleItem(item, c), ProtocolVersion.getClientVersion(client));
         } catch (Exception e){
             logger.log(Level.SEVERE, "An unexpected exception was caught while running an API method from ChatItem. Please contact the developer immediately, providing him with the following stack-trace:");
             e.printStackTrace();
@@ -99,7 +101,7 @@ public class APIImplementation implements ChatItemAPI {
         for(int i = 0; i < items.length; ++i){
             JSONManipulator manipulator = ChatItem.getManipulator();
             ItemStack item = items[i];
-            String style = ChatPacketListener.styleItem(item, c);
+            String style = ChatPacketListenerV2.styleItem(item, c);
             List<String> replacements = Collections.singletonList("%_"+i);
             try {
                 main = manipulator.parse(main, replacements, item, style, version);
@@ -144,7 +146,7 @@ public class APIImplementation implements ChatItemAPI {
         for(int i = 0; i < items.length; ++i){
             JSONManipulator manipulator = ChatItem.getManipulator();
             ItemStack item = items[i];
-            String style = ChatPacketListener.styleItem(item, c);
+            String style = ChatPacketListenerV2.styleItem(item, c);
             List<String> replacements = Collections.singletonList("%_"+i);
             try {
                 main = manipulator.parse(main, replacements, item, style, version);
