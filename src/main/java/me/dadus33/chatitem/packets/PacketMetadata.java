@@ -18,4 +18,8 @@ public class PacketMetadata {
 	public <T> T getMeta(String key, T def) {
 		return (T) metas.getOrDefault(key, def);
 	}
+	
+	public HashMap<String, Object> getMetas() {
+		return metas;
+	}
 }

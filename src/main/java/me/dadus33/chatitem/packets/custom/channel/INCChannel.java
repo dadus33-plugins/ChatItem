@@ -13,11 +13,14 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
+import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.packets.ChatItemPacket;
 import me.dadus33.chatitem.packets.PacketContent;
 import me.dadus33.chatitem.packets.PacketType;
 import me.dadus33.chatitem.packets.custom.CustomPacketManager;
+import me.dadus33.chatitem.playerversion.hooks.DefaultVersionHook;
 import me.dadus33.chatitem.utils.PacketUtils;
+import me.dadus33.chatitem.utils.ProtocolVersion;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 
 @SuppressWarnings("unchecked")
@@ -55,6 +58,10 @@ public class INCChannel extends ChannelAbstract {
 				Channel channel = getChannel(player);
 				// Managing outgoing packet (to the player)
 				channel.pipeline().addAfter(KEY_HANDLER_SERVER, KEY_SERVER + endChannelName, new ChannelHandlerSent(player));
+			
+				ChatItemPacket pa = ChannelInboundHandler.TMP.remove(channel);
+				if(pa != null)
+					DefaultVersionHook.PROTOCOL_PER_UUID.put(player.getUniqueId(), pa.getContent().getIntegers().readSafely(0, ProtocolVersion.getServerVersion().MAX_VER));
 			} catch (NoSuchElementException e) {
 				// appear when the player's channel isn't accessible because of reload.
 				getPacketManager().getPlugin().getLogger().warning("Please, don't use reload, this can produce some problem. Currently, " + player.getName() + " isn't fully checked because of that. More details: " + e.getMessage() + " (NoSuchElementException)");
@@ -78,7 +85,9 @@ public class INCChannel extends ChannelAbstract {
 				
 				if(channel.pipeline().get(KEY_SERVER + endChannelName) != null)
 					channel.pipeline().remove(KEY_SERVER + endChannelName);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				ChatItem.getInstance().getLogger().warning("Failed to remove channel for " + player.getName() + ". Reason: " + e.getMessage() + " (" + e.getStackTrace()[0].toString() + ")");
+			}
 		});
 	}
 
@@ -96,13 +105,18 @@ public class INCChannel extends ChannelAbstract {
 		public ChannelHandlerSent(Player player) {
 			this.owner = player;
 		}
-
+		
 		@Override
 		public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
-			ChatItemPacket nextPacket = getPacketManager().onPacketSent(PacketType.getType(packet.getClass().getSimpleName()), owner, packet);
-			if(nextPacket != null && nextPacket.isCancelled())
-				return;
-			super.write(ctx, packet, promise);
+			try {
+				ChatItemPacket nextPacket = getPacketManager().onPacketSent(PacketType.getType(packet.getClass().getSimpleName()), owner, packet);
+				if(nextPacket != null && nextPacket.isCancelled())
+					return;
+				super.write(ctx, packet, promise);
+			} catch (Exception e) {
+				e.printStackTrace();
+				super.write(ctx, packet, promise);
+			}
 		}
 	}
 }

@@ -81,12 +81,15 @@ public class ChatPacketListenerV2 extends PacketHandler {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onSend(ChatItemPacket e) {
-    	if(!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT))
+    	if(!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT)) {
     		return;
-		final PacketContent packet = e.getContent();
+    	}
+    	final PacketContent packet = e.getContent();
 		final PacketMetadata meta = e.getMetaData();
 		if (!meta.hasMeta("parse")) { // First we check if the packet validator has validated this packet to be parsed
 										// by us
+			ChatItem.debug("Can't parse : " + e.getPacket());
+			meta.getMetas().forEach((s, o) -> ChatItem.debug("metaData: " + s + " > " + o));
 			return;
 		}
 		boolean usesBaseComponents = meta.getMeta("base-component", false); // The packet validator should also tell if this
@@ -97,6 +100,7 @@ public class ChatPacketListenerV2 extends PacketHandler {
 		Bukkit.getScheduler().runTaskAsynchronously(ChatItem.getInstance(), () -> {
 			String json = (String) meta.getMeta("json", ""); // The packet validator got the json for us, so no need to
 																// get it again
+
 			int topIndex = -1;
 			String name = null;
 			for (Player p : Bukkit.getOnlinePlayers()) {
@@ -112,6 +116,7 @@ public class ChatPacketListenerV2 extends PacketHandler {
 			}
 			if (name == null) { // something went really bad, so we run away and hide (AKA the player left or is
 								// on another server)
+				ChatItem.debug("Name null for " + json);
 				return;
 			}
 

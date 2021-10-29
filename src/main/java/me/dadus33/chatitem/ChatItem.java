@@ -139,4 +139,9 @@ public class ChatItem extends JavaPlugin {
         return new JSONManipulatorCurrent();
         //We just return a new one whenever requested for the moment, should implement a cache of some sort some time though
     }
+    
+    public static void debug(String msg) {
+    	if(getInstance().getConfig().getBoolean("debug", false))
+    		getInstance().getLogger().info(msg);
+    }
 }

@@ -86,6 +86,7 @@ public class ChatPacketValidatorV2 extends PacketHandler {
             return; //then it's just a normal message without placeholders, so we leave it alone
         }
         if(json.lastIndexOf("\\u0007") == -1){ //if the message doesn't contain the BELL separator, then it's certainly NOT a message we want to parse
+        	ChatItem.debug("Not containb bell " + json);
             return;
         }
         PacketMetadata meta = e.getMetaData();

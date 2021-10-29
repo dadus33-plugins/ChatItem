@@ -12,6 +12,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
+import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.packets.ChatItemPacket;
 import me.dadus33.chatitem.packets.PacketType;
 import me.dadus33.chatitem.packets.custom.CustomPacketManager;
@@ -71,7 +72,9 @@ public class INC2Channel extends ChannelAbstract {
 				final Channel channel = getChannel(player);
 				if(channel.pipeline().get(KEY_SERVER + endChannelName) != null)
 					channel.pipeline().remove(KEY_SERVER + endChannelName);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				ChatItem.getInstance().getLogger().warning("Failed to remove channel for " + player.getName() + ". Reason: " + e.getMessage() + " (" + e.getStackTrace()[0].toString() + ")");
+			}
 		});
 	}
 
