@@ -13,8 +13,7 @@ import me.dadus33.chatitem.filters.Log4jFilter;
 import me.dadus33.chatitem.json.JSONManipulator;
 import me.dadus33.chatitem.json.JSONManipulatorCurrent;
 import me.dadus33.chatitem.listeners.ChatEventListener;
-import me.dadus33.chatitem.listeners.ChatPacketListenerV2;
-import me.dadus33.chatitem.listeners.ChatPacketValidatorV2;
+import me.dadus33.chatitem.listeners.ChatListener;
 import me.dadus33.chatitem.packets.ChatItemPacketManager;
 import me.dadus33.chatitem.playerversion.IPlayerVersion;
 import me.dadus33.chatitem.playerversion.hooks.DefaultVersionHook;
@@ -72,8 +71,8 @@ public class ChatItem extends JavaPlugin {
 
         //Packet listeners
         packetManager = new ChatItemPacketManager(this);
-        packetManager.getPacketManager().addHandler(new ChatPacketValidatorV2(storage));
-        packetManager.getPacketManager().addHandler(new ChatPacketListenerV2(storage));
+        //packetManager.getPacketManager().addHandler(new ChatPacketValidatorV2(storage));
+        //packetManager.getPacketManager().addHandler(new ChatPacketListenerV2(storage));
         /*packetListener = new ChatPacketListener(this, ListenerPriority.LOW, storage, PacketType.Play.Server.CHAT);
         packetValidator = new ChatPacketValidator(this, ListenerPriority.LOWEST, storage, PacketType.Play.Server.CHAT);
         pm.addPacketListener(packetValidator);
@@ -100,7 +99,8 @@ public class ChatItem extends JavaPlugin {
 
         //Bukkit API listeners
         chatEventListener = new ChatEventListener(storage);
-        Bukkit.getPluginManager().registerEvents(chatEventListener, this);
+        //Bukkit.getPluginManager().registerEvents(chatEventListener, this);
+        Bukkit.getPluginManager().registerEvents(new ChatListener(storage), this);
 
         //Check for existence of BaseComponent class (only on spigot)
         try {
