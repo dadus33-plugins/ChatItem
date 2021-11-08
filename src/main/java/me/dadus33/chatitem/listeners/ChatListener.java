@@ -25,9 +25,13 @@ public class ChatListener implements Listener {
 
     private final static String LEFT = "{remaining}";
     private final HashMap<String, Long> COOLDOWNS = new HashMap<>();
-	private final Storage c;
+	private Storage c;
 	
 	public ChatListener(Storage c) {
+		this.c = c;
+	}
+	
+	public void setStorage(Storage c) {
 		this.c = c;
 	}
 

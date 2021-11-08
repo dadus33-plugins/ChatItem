@@ -26,6 +26,7 @@ public class ChatItem extends JavaPlugin {
     public final static int CFG_VER = 12;
     private static ChatItem instance;
     private ChatEventListener chatEventListener;
+    private ChatListener chatListener;
     private Log4jFilter filter;
     private Storage storage;
     private static boolean baseComponentAvailable = true;
@@ -41,6 +42,7 @@ public class ChatItem extends JavaPlugin {
         //obj.packetListener.setStorage(obj.storage);
         //obj.packetValidator.setStorage(obj.storage);
         obj.chatEventListener.setStorage(obj.storage);
+        obj.chatListener.setStorage(obj.storage);
         obj.filter.setStorage(obj.storage);
         APIImplementation api = (APIImplementation) Bukkit.getServicesManager().getRegistration(ChatItemAPI.class).getProvider();
         api.setStorage(obj.storage);
@@ -94,13 +96,12 @@ public class ChatItem extends JavaPlugin {
         }*/
 
         //Commands
-        CIReload rld = new CIReload();
-        Bukkit.getPluginCommand("cireload").setExecutor(rld);
+        Bukkit.getPluginCommand("cireload").setExecutor(new CIReload());
 
         //Bukkit API listeners
         chatEventListener = new ChatEventListener(storage);
         //Bukkit.getPluginManager().registerEvents(chatEventListener, this);
-        Bukkit.getPluginManager().registerEvents(new ChatListener(storage), this);
+        Bukkit.getPluginManager().registerEvents(chatListener = new ChatListener(storage), this);
 
         //Check for existence of BaseComponent class (only on spigot)
         try {
@@ -112,6 +113,10 @@ public class ChatItem extends JavaPlugin {
         //Initialize Log4J filter (remove ugly console messages)
         filter = new Log4jFilter(storage);
     }
+    
+    public Storage getStorage() {
+		return storage;
+	}
     
     public IPlayerVersion getPlayerVersionAdapter() {
 		return playerVersionAdapter;
