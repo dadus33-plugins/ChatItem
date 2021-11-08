@@ -14,6 +14,10 @@ public class PacketMetadata {
 		return metas.containsKey(key);
 	}
 	
+	public void removeMeta(String key) {
+		metas.remove(key);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public <T> T getMeta(String key, T def) {
 		return (T) metas.getOrDefault(key, def);

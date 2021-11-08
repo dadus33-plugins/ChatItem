@@ -92,6 +92,7 @@ public class ChatPacketListenerV2 extends PacketHandler {
 			meta.getMetas().forEach((s, o) -> ChatItem.debug("metaData: " + s + " > " + o));
 			return;
 		}
+		meta.removeMeta("parse");
 		boolean usesBaseComponents = meta.getMeta("base-component", false); // The packet validator should also tell if this
 																							// packet uses base
 																							// components
