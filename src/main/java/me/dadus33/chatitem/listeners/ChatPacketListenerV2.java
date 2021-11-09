@@ -3,6 +3,7 @@ package me.dadus33.chatitem.listeners;
 import java.util.Collections;
 import java.util.HashMap;
 
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -40,8 +41,10 @@ public class ChatPacketListenerV2 extends PacketHandler {
 	private static String materialToName(Material m) {
 		if (m.equals(Material.TNT)) {
 			return "TNT";
+		} else {
+			return WordUtils.capitalize(m.name().replaceAll("_", " ").toLowerCase());
 		}
-		String orig = m.toString().toLowerCase();
+		/*String orig = m.toString().toLowerCase();
 		String[] splits = orig.split("_");
 		StringBuilder sb = new StringBuilder(orig.length());
 		int pos = 0;
@@ -57,7 +60,7 @@ public class ChatPacketListenerV2 extends PacketHandler {
 			++pos;
 		}
 
-		return sb.toString();
+		return sb.toString();*/
 	}
 
 	private void stripData(ItemStack i) {

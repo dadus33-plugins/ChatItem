@@ -2,7 +2,6 @@ package me.dadus33.chatitem.listeners;
 
 import java.util.HashMap;
 
-import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -129,16 +128,20 @@ public class ChatListener implements Listener {
 		for (String args : msg.split(" ")) {
 			if (c.PLACEHOLDERS.contains(args)) {
 				if(meta != null) {
-					String name = meta.hasDisplayName() ? meta.getDisplayName() : WordUtils.capitalize(item.getType().name().replaceAll("_", " ").toLowerCase());
-					String amountFormat = c.AMOUNT_FORMAT.replace("{times}",  String.valueOf(item.getAmount()));
-					TextComponent itemComponent = new TextComponent(c.NAME_FORMAT.replace("{name}", name).replace("{amount}", amountFormat));
+					//String name = meta.hasDisplayName() ? meta.getDisplayName() : WordUtils.capitalize(item.getType().name().replaceAll("_", " ").toLowerCase());
+					//String amountFormat = c.AMOUNT_FORMAT.replace("{times}",  String.valueOf(item.getAmount()));
+					//TextComponent itemComponent = new TextComponent(c.NAME_FORMAT.replace("{name}", name).replace("{amount}", amountFormat));
+					TextComponent itemComponent = new TextComponent(ChatPacketListenerV2.styleItem(item, c).replaceAll("  ", " "));
 					String itemJson = convertItemStackToJson(item);
 					itemComponent.setHoverEvent(
 							new HoverEvent(Action.SHOW_ITEM, new BaseComponent[] { new TextComponent(itemJson) }));
 					//itemComponent.addExtra(ChatColor.RESET + " x" + item.getAmount() + " " + ChatColor.COLOR_CHAR + code);
 					component.addExtra(itemComponent);
 				} else {
-					component.addExtra(c.HAND_NAME.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName()));
+					if(c.HAND_DISABLED)
+						component.addExtra(color + args);
+					else
+						component.addExtra(c.HAND_NAME.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName()));
 				}
 			} else {
 				component.addExtra(color + args);

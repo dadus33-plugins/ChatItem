@@ -10,7 +10,6 @@ import me.dadus33.chatitem.api.APIImplementation;
 import me.dadus33.chatitem.api.ChatItemAPI;
 import me.dadus33.chatitem.commands.CIReload;
 import me.dadus33.chatitem.filters.Log4jFilter;
-import me.dadus33.chatitem.json.JSONManipulator;
 import me.dadus33.chatitem.json.JSONManipulatorCurrent;
 import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatListener;
@@ -136,7 +135,7 @@ public class ChatItem extends JavaPlugin {
         return baseComponentAvailable;
     }
 
-    public static JSONManipulator getManipulator(){
+    public static JSONManipulatorCurrent getManipulator(){
         /*
             We used to have 2 kinds of JSONManipulators because of my bad understanding of the 1.7 way of parsing JSON chat
             The interface should however stay as there might be great changes in future versions in JSON parsing (most likely 1.13)
