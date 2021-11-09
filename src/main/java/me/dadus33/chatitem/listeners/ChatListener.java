@@ -66,6 +66,17 @@ public class ChatListener implements Listener {
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onChat(AsyncPlayerChatEvent e) {
+        boolean found = false;
+
+        for (String rep : c.PLACEHOLDERS)
+            if (e.getMessage().contains(rep)) {
+                found = true;
+                break;
+            }
+
+        if (!found) {
+            return;
+        }
 		Player p = e.getPlayer();
         if (!p.hasPermission("chatitem.use")) {
             if(!c.LET_MESSAGE_THROUGH) {
@@ -105,17 +116,6 @@ public class ChatListener implements Listener {
                     return;
                 }
             }
-        }
-        boolean found = false;
-
-        for (String rep : c.PLACEHOLDERS)
-            if (e.getMessage().contains(rep)) {
-                found = true;
-                break;
-            }
-
-        if (!found) {
-            return;
         }
 		e.setCancelled(true);
 		String msg = e.getMessage();
