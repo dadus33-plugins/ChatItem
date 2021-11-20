@@ -165,7 +165,7 @@ public class ChatListener implements Listener {
 	 */
 	public String convertItemStackToJson(ItemStack itemStack) {
 		try {
-			Class<?> nbtTag = PacketUtils.getNmsClass("NBTTagCompound", "");
+			Class<?> nbtTag = PacketUtils.getNmsClass("NBTTagCompound", "nbt.");
 			Class<?> craftItemClass = PacketUtils.getObcClass("inventory.CraftItemStack");
 			Object nmsNbtTagCompoundObj = nbtTag.newInstance();
 			Object nmsItemStackObj = craftItemClass.getMethod("asNMSCopy", ItemStack.class).invoke(null, itemStack);
