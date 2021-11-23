@@ -1,11 +1,6 @@
 package me.dadus33.chatitem.utils;
 
-import java.net.InetSocketAddress;
-
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
-import me.dadus33.chatitem.ChatItem;
 
 public enum ProtocolVersion {
 	
@@ -45,10 +40,6 @@ public enum ProtocolVersion {
 		this.MAX_VER = max;
 		this.index = index;
 	}
-
-	public boolean isNewerThan(ProtocolVersion other) {
-		return index > other.index;
-	}
 	
 	public boolean isNewerOrEquals(ProtocolVersion other) {
 		return index >= other.index;
@@ -61,39 +52,8 @@ public enum ProtocolVersion {
 		return HIGHER;
 	}
 
-	public static ProtocolVersion getVersion(int protocolVersion) {
-		for (ProtocolVersion ver : ProtocolVersion.values()) {
-			if (protocolVersion >= ver.MIN_VER && protocolVersion <= ver.MAX_VER) {
-				return ver;
-			}
-		}
-		return HIGHER;
-	}
-
 	public static ProtocolVersion getServerVersion() {
 		return SERVER_VERSION;
-	}
-
-	public static void remapIds(int server, int player, Item item) {
-		if (areIdsCompatible(server, player)) {
-			return;
-		}
-		if ((server >= V1_9.MIN_VER && player <= V1_8.MAX_VER) || (player >= V1_9.MIN_VER && server <= V1_8.MAX_VER)) {
-			if ((server >= V1_9.MIN_VER && player <= V1_8.MAX_VER)) {
-				ItemRewriter_1_9_TO_1_8.reversedToClient(item);
-				return;
-			}
-			ItemRewriter_1_9_TO_1_8.toClient(item);
-			return;
-		}
-		if ((server <= V1_10.MAX_VER && player >= V1_11.MIN_VER)
-				|| (player <= V1_10.MAX_VER && server >= V1_11.MIN_VER)) {
-			if (server <= V1_10.MAX_VER && player >= V1_11.MIN_VER) {
-				ItemRewriter_1_11_TO_1_10.toClient(item);
-			} else {
-				ItemRewriter_1_11_TO_1_10.reverseToClient(item);
-			}
-		}
 	}
 
 	public static boolean areIdsCompatible(int version1, int version2) {
@@ -106,16 +66,6 @@ public enum ProtocolVersion {
 			return false;
 		}
 		return true;
-	}
-	
-	public static int getClientVersion(Player p) {
-		return ChatItem.getInstance().getPlayerVersionAdapter().getProtocolVersion(p);
-	}
-
-	public static String stringifyAdress(InetSocketAddress address) {
-		String port = String.valueOf(address.getPort());
-		String ip = address.getAddress().getHostAddress();
-		return ip + ":" + port;
 	}
 
 }

@@ -2,6 +2,7 @@ package me.dadus33.chatitem.listeners;
 
 import java.util.HashMap;
 
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -22,6 +23,9 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class ChatListener implements Listener {
 
+	private final static String NAME = "{name}";
+	private final static String AMOUNT = "{amount}";
+	private final static String TIMES = "{times}";
     private final static String LEFT = "{remaining}";
     private final HashMap<String, Long> COOLDOWNS = new HashMap<>();
 	private Storage c;
@@ -131,7 +135,7 @@ public class ChatListener implements Listener {
 					//String name = meta.hasDisplayName() ? meta.getDisplayName() : WordUtils.capitalize(item.getType().name().replaceAll("_", " ").toLowerCase());
 					//String amountFormat = c.AMOUNT_FORMAT.replace("{times}",  String.valueOf(item.getAmount()));
 					//TextComponent itemComponent = new TextComponent(c.NAME_FORMAT.replace("{name}", name).replace("{amount}", amountFormat));
-					TextComponent itemComponent = new TextComponent(ChatPacketListenerV2.styleItem(item, c).replaceAll("  ", " "));
+					TextComponent itemComponent = new TextComponent(ChatListener.styleItem(item, c).replaceAll("  ", " "));
 					String itemJson = convertItemStackToJson(item);
 					itemComponent.setHoverEvent(
 							new HoverEvent(Action.SHOW_ITEM, new BaseComponent[] { new TextComponent(itemJson) }));
@@ -197,5 +201,55 @@ public class ChatListener implements Listener {
 			}
 		}
 		return 'r';
+	}
+
+
+	public static String styleItem(ItemStack item, Storage c) {
+		String replacer = c.NAME_FORMAT;
+		String amount = c.AMOUNT_FORMAT;
+		boolean dname = item.hasItemMeta() ? item.getItemMeta().hasDisplayName() : false;
+
+		if (item.getAmount() == 1) {
+			if (c.FORCE_ADD_AMOUNT) {
+				amount = amount.replace(TIMES, "1");
+				replacer = replacer.replace(AMOUNT, amount);
+			} else {
+				replacer = replacer.replace(AMOUNT, "");
+			}
+		} else {
+			amount = amount.replace(TIMES, String.valueOf(item.getAmount()));
+			replacer = replacer.replace(AMOUNT, amount);
+		}
+		if (dname) {
+			String trp = item.getItemMeta().getDisplayName();
+			if (c.COLOR_IF_ALREADY_COLORED) {
+				replacer = replacer.replace(NAME, ChatColor.stripColor(trp));
+			} else {
+				replacer = replacer.replace(NAME, trp);
+			}
+		} else {
+			HashMap<Short, String> translationSection = c.TRANSLATIONS.get(item.getType().name());
+			if (translationSection == null) {
+				String trp = materialToName(item.getType());
+				replacer = replacer.replace(NAME, trp);
+			} else {
+				@SuppressWarnings("deprecation")
+				String translated = translationSection.get(item.getDurability());
+				if (translated != null) {
+					replacer = replacer.replace(NAME, translated);
+				} else {
+					replacer = replacer.replace(NAME, materialToName(item.getType()));
+				}
+			}
+		}
+		return replacer;
+	}
+
+	private static String materialToName(Material m) {
+		if (m.equals(Material.TNT)) {
+			return "TNT";
+		} else {
+			return WordUtils.capitalize(m.name().replaceAll("_", " ").toLowerCase());
+		}
 	}
 }
