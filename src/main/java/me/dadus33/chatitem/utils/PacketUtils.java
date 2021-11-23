@@ -11,7 +11,7 @@ public class PacketUtils {
 			.split(",")[3];
 	public static final String NMS_PREFIX;
 	public static final String OBC_PREFIX;
-
+	public static final boolean IS_THERMOS;
 	public static final Class<?> CRAFT_PLAYER_CLASS, CRAFT_SERVER_CLASS;
 	
 	/**
@@ -21,7 +21,8 @@ public class PacketUtils {
 	
 	static {
 		ALL_CLASS = new HashMap<>();
-		NMS_PREFIX = ProtocolVersion.getServerVersion().isNewerOrEquals(ProtocolVersion.V1_17) ? "net.minecraft." : "net.minecraft.server." + VERSION + ".";
+		IS_THERMOS = isClassExist("thermos.Thermos");
+		NMS_PREFIX = Version.getVersion().isNewerOrEquals(Version.V1_17) || IS_THERMOS ? "net.minecraft." : "net.minecraft.server." + VERSION + ".";
 		OBC_PREFIX = "org.bukkit.craftbukkit." + VERSION + ".";
 		CRAFT_PLAYER_CLASS = getObcClass("entity.CraftPlayer");
 		CRAFT_SERVER_CLASS = getObcClass("CraftServer");
@@ -35,7 +36,7 @@ public class PacketUtils {
 	 */
 	public static Class<?> getNmsClass(String name, String packagePrefix, String... alias){
 		return ALL_CLASS.computeIfAbsent(name, (a) -> {
-			String fullPrefix = NMS_PREFIX + (ProtocolVersion.getServerVersion().isNewerOrEquals(ProtocolVersion.V1_17) ? packagePrefix : "");
+			String fullPrefix = NMS_PREFIX + (Version.getVersion().isNewerOrEquals(Version.V1_17) || IS_THERMOS ? packagePrefix : "");
 			try {
 				Class<?> clazz = Class.forName(fullPrefix + name);
 				if(clazz != null)
@@ -101,7 +102,7 @@ public class PacketUtils {
 	public static Object getPlayerConnection(Player p) {
 		try {
 			Object entityPlayer = getEntityPlayer(p);
-			if(ProtocolVersion.getServerVersion().isNewerOrEquals(ProtocolVersion.V1_17))
+			if(Version.getVersion().isNewerOrEquals(Version.V1_17))
 				return entityPlayer.getClass().getField("b").get(entityPlayer);
 			else
 				return entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
@@ -124,6 +125,15 @@ public class PacketUtils {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+	
+	public static boolean isClassExist(String name) {
+		try {
+			Class.forName(name);
+			return true;
+		} catch (Exception e) {
+			return false;
 		}
 	}
 }

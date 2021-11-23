@@ -2,7 +2,7 @@ package me.dadus33.chatitem.utils;
 
 import org.bukkit.Bukkit;
 
-public enum ProtocolVersion {
+public enum Version {
 	
 	// http://wiki.vg/Protocol_version_numbers
 	V1_7(0, 5, 0),
@@ -27,7 +27,7 @@ public enum ProtocolVersion {
 	public final int MAX_VER;
 	public final int index; // Represents how new the version is (0 - extremely old)
 
-	private static final ProtocolVersion SERVER_VERSION;
+	private static final Version SERVER_VERSION;
 	public static final String BUKKIT_VERSION;
 
 	static {
@@ -35,24 +35,24 @@ public enum ProtocolVersion {
 		SERVER_VERSION = getVersionByName(BUKKIT_VERSION);
 	}
 
-	ProtocolVersion(int min, int max, int index) {
+	Version(int min, int max, int index) {
 		this.MIN_VER = min;
 		this.MAX_VER = max;
 		this.index = index;
 	}
 	
-	public boolean isNewerOrEquals(ProtocolVersion other) {
+	public boolean isNewerOrEquals(Version other) {
 		return index >= other.index;
 	}
 
-	public static ProtocolVersion getVersionByName(String name) {
-		for (ProtocolVersion v : ProtocolVersion.values())
+	public static Version getVersionByName(String name) {
+		for (Version v : Version.values())
 			if (name.toLowerCase().startsWith(v.name().toLowerCase()))
 				return v;
 		return HIGHER;
 	}
 
-	public static ProtocolVersion getServerVersion() {
+	public static Version getVersion() {
 		return SERVER_VERSION;
 	}
 
