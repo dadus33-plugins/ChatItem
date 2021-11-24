@@ -1,7 +1,7 @@
 package me.dadus33.chatitem.filters;
 
-import me.dadus33.chatitem.listeners.ChatEventListener;
-import me.dadus33.chatitem.utils.Storage;
+import static org.apache.logging.log4j.core.Filter.Result.NEUTRAL;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Marker;
@@ -12,7 +12,8 @@ import org.apache.logging.log4j.message.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import static org.apache.logging.log4j.core.Filter.Result.NEUTRAL;
+import me.dadus33.chatitem.listeners.ChatListener;
+import me.dadus33.chatitem.utils.Storage;
 
 
 public class Log4jFilter implements Filter {
@@ -62,7 +63,7 @@ public class Log4jFilter implements Filter {
         for(String placeholder : c.PLACEHOLDERS){
             if(msg.contains(placeholder)){
                 for(Player p : Bukkit.getOnlinePlayers()){
-                    if(msg.contains(ChatEventListener.SEPARATOR +p.getName())){
+                    if(msg.contains(ChatListener.SEPARATOR +p.getName())){
                         return Result.DENY;
                     }
                 }

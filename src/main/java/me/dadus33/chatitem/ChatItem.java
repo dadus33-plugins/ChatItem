@@ -7,7 +7,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import me.dadus33.chatitem.commands.CIReload;
 import me.dadus33.chatitem.filters.Log4jFilter;
-import me.dadus33.chatitem.listeners.ChatEventListener;
 import me.dadus33.chatitem.listeners.ChatListener;
 import me.dadus33.chatitem.utils.Storage;
 
@@ -15,7 +14,6 @@ public class ChatItem extends JavaPlugin {
 
     public final static int CFG_VER = 12;
     private static ChatItem instance;
-    private ChatEventListener chatEventListener;
     private ChatListener chatListener;
     private Log4jFilter filter;
     private Storage storage;
@@ -25,7 +23,6 @@ public class ChatItem extends JavaPlugin {
         obj.saveDefaultConfig();
         obj.reloadConfig();
         obj.storage = new Storage(obj.getConfig());
-        obj.chatEventListener.setStorage(obj.storage);
         obj.chatListener.setStorage(obj.storage);
         obj.filter.setStorage(obj.storage);
         if (!obj.storage.RELOAD_MESSAGE.isEmpty())
@@ -57,10 +54,8 @@ public class ChatItem extends JavaPlugin {
 
         //Commands
         Bukkit.getPluginCommand("cireload").setExecutor(new CIReload());
-
-        //Bukkit API listeners
-        chatEventListener = new ChatEventListener(storage);
-        //Bukkit.getPluginManager().registerEvents(chatEventListener, this);
+        
+        // events
         Bukkit.getPluginManager().registerEvents(chatListener = new ChatListener(storage), this);
 
         //Initialize Log4J filter (remove ugly console messages)

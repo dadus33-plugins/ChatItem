@@ -25,6 +25,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class ChatListener implements Listener {
 
+    public final static char SEPARATOR = ((char)0x0007);
 	private final static String NAME = "{name}";
 	private final static String AMOUNT = "{amount}";
 	private final static String TIMES = "{times}";
