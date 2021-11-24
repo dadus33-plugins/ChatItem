@@ -14,10 +14,6 @@
 
     <repositories>
         <repository>
-            <id>dmulloy2-repo</id>
-            <url>http://repo.dmulloy2.net/nexus/repository/public/</url>
-        </repository>
-        <repository>
             <id>Bungeecord</id>
             <url>https://repo.md-5.net/content/groups/public/</url>
         </repository>
@@ -28,10 +24,6 @@
         <repository>
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </repository>
-        <repository>
-            <id>viaversion-repo</id>
-            <url>https://repo.viaversion.com</url>
         </repository>
         <repository>
 		    <id>jitpack.io</id>
@@ -59,18 +51,6 @@
 	        <scope>provided</scope>
 	    </dependency>
         <dependency>
-            <groupId>com.comphenix.protocol</groupId>
-            <artifactId>ProtocolLib</artifactId>
-            <version>4.7.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.7</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
             <version>2.14.1</version>
@@ -81,30 +61,6 @@
             <version>2.14.1</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>us.myles</groupId>
-            <artifactId>viaversion</artifactId>
-            <version>3.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.ProtocolSupport</groupId>
-            <artifactId>ProtocolSupport</artifactId>
-            <version>f34959c331</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.GeyserMC</groupId>
-            <artifactId>opennbt</artifactId>
-            <version>1.4</version>
-            <scope>compile</scope>
-        </dependency>
-	    <dependency>
-	        <groupId>io.netty</groupId>
-	        <artifactId>netty-all</artifactId>
-	        <version>4.1.53.Final</version>
-	        <scope>compile</scope>
-	    </dependency>
 	    <dependency>
 		    <groupId>com.meowj</groupId>
 		    <artifactId>LangUtils</artifactId>
@@ -157,20 +113,6 @@
                         </goals>
                         <configuration>
                             <minimizeJar>true</minimizeJar>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.bstats</pattern>
-                                    <shadedPattern>me.dadus33.libs.bstats</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.google.gson</pattern>
-                                    <shadedPattern>me.dadus33.libs.gson</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>com.github.GeyserMC</pattern>
-                                    <shadedPattern>me.dadus33.libs.opennbt</shadedPattern>
-                                </relocation>
-                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
