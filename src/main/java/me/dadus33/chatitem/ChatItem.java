@@ -19,16 +19,12 @@ public class ChatItem extends JavaPlugin {
     private ChatListener chatListener;
     private Log4jFilter filter;
     private Storage storage;
-    private static boolean baseComponentAvailable = true;
 
     public static void reload(CommandSender sender) {
         ChatItem obj = getInstance();
-        //obj.pm = ProtocolLibrary.getProtocolManager();
         obj.saveDefaultConfig();
         obj.reloadConfig();
         obj.storage = new Storage(obj.getConfig());
-        //obj.packetListener.setStorage(obj.storage);
-        //obj.packetValidator.setStorage(obj.storage);
         obj.chatEventListener.setStorage(obj.storage);
         obj.chatListener.setStorage(obj.storage);
         obj.filter.setStorage(obj.storage);
@@ -67,13 +63,6 @@ public class ChatItem extends JavaPlugin {
         //Bukkit.getPluginManager().registerEvents(chatEventListener, this);
         Bukkit.getPluginManager().registerEvents(chatListener = new ChatListener(storage), this);
 
-        //Check for existence of BaseComponent class (only on spigot)
-        try {
-            Class.forName("net.md_5.bungee.api.chat.BaseComponent");
-        } catch (ClassNotFoundException e) {
-            baseComponentAvailable = false;
-        }
-
         //Initialize Log4J filter (remove ugly console messages)
         filter = new Log4jFilter(storage);
     }
@@ -86,10 +75,6 @@ public class ChatItem extends JavaPlugin {
         final String packageName = server.getClass().getPackage().getName();
 
         return packageName.substring(packageName.lastIndexOf('.') + 1);
-    }
-
-    public static boolean supportsChatComponentApi(){
-        return baseComponentAvailable;
     }
     
     public static void debug(String msg) {

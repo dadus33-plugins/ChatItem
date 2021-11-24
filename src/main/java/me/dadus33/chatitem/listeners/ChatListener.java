@@ -1,5 +1,6 @@
 package me.dadus33.chatitem.listeners;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 
 import org.apache.commons.lang.WordUtils;
@@ -13,6 +14,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Utils;
@@ -29,9 +31,28 @@ public class ChatListener implements Listener {
     private final static String LEFT = "{remaining}";
     private final HashMap<String, Long> COOLDOWNS = new HashMap<>();
 	private Storage c;
+	private Method saveMethod;
 	
 	public ChatListener(Storage c) {
 		this.c = c;
+		
+		try {
+			Class<?> nbtTag = PacketUtils.getNmsClass("NBTTagCompound", "nbt.");
+			Class<?> itemClass = PacketUtils.getNmsClass("ItemStack", "item.");
+    		for(Method m : itemClass.getDeclaredMethods()) {
+    			if(m.getParameterTypes().length == 1) {
+    				if(m.getParameterTypes()[0].equals(nbtTag) && m.getReturnType().equals(nbtTag)) {
+    					saveMethod = m;
+    				}
+    			}
+    		}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(saveMethod == null)
+			ChatItem.getInstance().getLogger().info("Failed to find save method. Using default system...");
+		else
+			ChatItem.getInstance().getLogger().info("Save method founded: " + saveMethod.getName() + ".");
 	}
 	
 	public void setStorage(Storage c) {
@@ -65,7 +86,6 @@ public class ChatListener implements Listener {
         }
         return builder.toString();
     }
-
 	
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -172,10 +192,13 @@ public class ChatListener implements Listener {
 			Class<?> nbtTag = PacketUtils.getNmsClass("NBTTagCompound", "nbt.");
 			Class<?> craftItemClass = PacketUtils.getObcClass("inventory.CraftItemStack");
 			Object nmsNbtTagCompoundObj = nbtTag.newInstance();
-			Object nmsItemStackObj = craftItemClass.getMethod("asNMSCopy", ItemStack.class).invoke(null, itemStack);
-
-			return nmsItemStackObj.getClass().getMethod("save", nbtTag).invoke(nmsItemStackObj, nmsNbtTagCompoundObj).toString();
-			
+			if(saveMethod == null) {
+				Object nmsItemStackObj = craftItemClass.getMethod("asNMSCopy", ItemStack.class).invoke(null, itemStack);
+				return nmsItemStackObj.getClass().getMethod("save", nbtTag).invoke(nmsItemStackObj, nmsNbtTagCompoundObj).toString();
+			} else {
+				Object nmsItemStackObj = craftItemClass.getMethod("asNMSCopy", ItemStack.class).invoke(null, itemStack);
+				return saveMethod.invoke(nmsItemStackObj, nmsNbtTagCompoundObj).toString();
+			}
 			/*NBTTagCompound nmsNbtTagCompoundObj = new NBTTagCompound();
 			net.minecraft.server.v1_8_R3.ItemStack nmsItemStackObj = CraftItemStack.asNMSCopy(itemStack);
 			return nmsItemStackObj.save(nmsNbtTagCompoundObj).toString();*/
