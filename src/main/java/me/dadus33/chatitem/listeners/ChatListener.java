@@ -3,7 +3,6 @@ package me.dadus33.chatitem.listeners;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
-import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -149,36 +148,39 @@ public class ChatListener implements Listener {
 		ItemMeta meta = item == null ? null : item.getItemMeta();
 		//String[] codeSplitted = p.getDisplayName().split(ChatColor.COLOR_CHAR + "");
 		//char code = codeSplitted.length == 0 || !codeSplitted[0].isEmpty() ? codeSplitted[0].charAt(0) : codeSplitted[1].charAt(0);
-		TextComponent component = new TextComponent(String.format(e.getFormat(), p.getDisplayName(), ""));
-		ChatColor color = ChatColor.getByChar(getColorChat(e.getFormat()));
-		for (String args : msg.split(" ")) {
-			if (c.PLACEHOLDERS.contains(args)) {
-				if(meta != null) {
-					//String name = meta.hasDisplayName() ? meta.getDisplayName() : WordUtils.capitalize(item.getType().name().replaceAll("_", " ").toLowerCase());
-					//String amountFormat = c.AMOUNT_FORMAT.replace("{times}",  String.valueOf(item.getAmount()));
-					//TextComponent itemComponent = new TextComponent(c.NAME_FORMAT.replace("{name}", name).replace("{amount}", amountFormat));
-					TextComponent itemComponent = new TextComponent(ChatListener.styleItem(item, c));
-					String itemJson = convertItemStackToJson(item);
-					itemComponent.setHoverEvent(
-							new HoverEvent(Action.SHOW_ITEM, new BaseComponent[] { new TextComponent(itemJson) }));
-					//itemComponent.addExtra(ChatColor.RESET + " x" + item.getAmount() + " " + ChatColor.COLOR_CHAR + code);
-					component.addExtra(itemComponent);
+		Utils.getOnlinePlayers().forEach((pl) -> {
+			TextComponent component = new TextComponent(String.format(e.getFormat(), p.getDisplayName(), ""));
+			ChatColor color = ChatColor.getByChar(getColorChat(e.getFormat()));
+			for (String args : msg.split(" ")) {
+				if (c.PLACEHOLDERS.contains(args)) {
+					if(meta != null) {
+						//String name = meta.hasDisplayName() ? meta.getDisplayName() : WordUtils.capitalize(item.getType().name().replaceAll("_", " ").toLowerCase());
+						//String amountFormat = c.AMOUNT_FORMAT.replace("{times}",  String.valueOf(item.getAmount()));
+						//TextComponent itemComponent = new TextComponent(c.NAME_FORMAT.replace("{name}", name).replace("{amount}", amountFormat));
+						TextComponent itemComponent = new TextComponent(ChatListener.styleItem(pl, item, c));
+						String itemJson = convertItemStackToJson(item);
+						itemComponent.setHoverEvent(
+								new HoverEvent(Action.SHOW_ITEM, new BaseComponent[] { new TextComponent(itemJson) }));
+						//itemComponent.addExtra(ChatColor.RESET + " x" + item.getAmount() + " " + ChatColor.COLOR_CHAR + code);
+						component.addExtra(itemComponent);
+					} else {
+						if(c.HAND_DISABLED)
+							component.addExtra(color + args);
+						else
+							component.addExtra(c.HAND_NAME.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName()));
+					}
 				} else {
-					if(c.HAND_DISABLED)
-						component.addExtra(color + args);
-					else
-						component.addExtra(c.HAND_NAME.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName()));
+					component.addExtra(color + args);
 				}
-			} else {
-				component.addExtra(color + args);
+				component.addExtra(" ");
+				char maybeNextCode = getColorChat(args);
+				if(maybeNextCode != 'r') {
+					color = ChatColor.getByChar(maybeNextCode);
+				}
 			}
-			component.addExtra(" ");
-			char maybeNextCode = getColorChat(args);
-			if(maybeNextCode != 'r') {
-				color = ChatColor.getByChar(maybeNextCode);
-			}
-		}
-		Utils.getOnlinePlayers().forEach((pl) -> pl.spigot().sendMessage(component));
+			pl.spigot().sendMessage(component);
+		});
+		//Utils.getOnlinePlayers().forEach((pl) -> pl.spigot().sendMessage(component));
 	}
 
 	/**
@@ -229,7 +231,7 @@ public class ChatListener implements Listener {
 	}
 
 
-	public static String styleItem(ItemStack item, Storage c) {
+	public static String styleItem(Player p, ItemStack item, Storage c) {
 		String replacer = c.NAME_FORMAT;
 		String amount = c.AMOUNT_FORMAT;
 		
@@ -244,16 +246,7 @@ public class ChatListener implements Listener {
 			amount = amount.replace(TIMES, String.valueOf(item.getAmount()));
 			replacer = replacer.replace(AMOUNT, amount);
 		}
-		replacer = replacer.replace(NAME, NamerManager.getName(item, c));
+		replacer = replacer.replace(NAME, NamerManager.getName(p, item, c));
 		return replacer;
 	}
-
-	public static String materialToName(Material m) {
-		if (m.equals(Material.TNT)) {
-			return "TNT";
-		} else {
-			return WordUtils.capitalize(m.name().replaceAll("_", " ").toLowerCase());
-		}
-	}
-
 }

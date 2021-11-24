@@ -2,6 +2,7 @@ package me.dadus33.chatitem.namer.hook;
 
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.namer.INamer;
@@ -15,7 +16,7 @@ public class DefaultNamer implements INamer {
 	}
 
 	@Override
-	public String getName(ItemStack item, Storage storage) {
+	public String getName(Player p, ItemStack item, Storage storage) {
 		Material m = item.getType();
 		return m.equals(Material.TNT) ? "TNT" : WordUtils.capitalize(m.name().replaceAll("_", " ").toLowerCase());
 	}

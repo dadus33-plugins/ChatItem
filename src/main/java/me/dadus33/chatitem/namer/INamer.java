@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.utils.Storage;
@@ -27,7 +28,7 @@ public interface INamer {
 	 * @param storage the actual config
 	 * @return the name or null if can't find a name
 	 */
-	String getName(ItemStack item, Storage storage);
+	String getName(Player p, ItemStack item, Storage storage);
 	
 	public static enum Priority {
 		MAJOR(4),

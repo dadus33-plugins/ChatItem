@@ -2,6 +2,7 @@ package me.dadus33.chatitem.namer.hook;
 
 import java.util.HashMap;
 
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.namer.INamer;
@@ -15,7 +16,7 @@ public class ChatItemTranslationNamer implements INamer {
 	}
 
 	@Override
-	public String getName(ItemStack item, Storage storage) {
+	public String getName(Player p, ItemStack item, Storage storage) {
 		HashMap<Short, String> translationSection = storage.TRANSLATIONS.get(item.getType().name());
 		if (translationSection != null) {
 			@SuppressWarnings("deprecation")

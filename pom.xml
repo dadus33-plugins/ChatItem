@@ -37,6 +37,10 @@
 		    <id>jitpack.io</id>
 		    <url>https://jitpack.io</url>
 		</repository>
+		<repository>
+		    <id>lang-utils-repo</id>
+		    <url>https://raw.github.com/MascusJeoraly/LanguageUtils/mvn-repo/</url>
+		</repository>
     </repositories>
 
 
@@ -100,6 +104,11 @@
 	        <artifactId>netty-all</artifactId>
 	        <version>4.1.53.Final</version>
 	        <scope>compile</scope>
+	    </dependency>
+	    <dependency>
+		    <groupId>com.meowj</groupId>
+		    <artifactId>LangUtils</artifactId>
+		    <version>1.9</version>
 	    </dependency>
     </dependencies>
 

@@ -1,26 +1,23 @@
 package me.dadus33.chatitem.namer.hook;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import com.meowj.langutils.lang.LanguageHelper;
 
 import me.dadus33.chatitem.namer.INamer;
 import me.dadus33.chatitem.utils.Storage;
 
-public class ItemDisplayNamer implements INamer {
+public class LangUtilsNamer implements INamer {
 
 	@Override
 	public Priority getPriority() {
-		return Priority.MEDIUM;
+		return Priority.IMPORTANT;
 	}
 
 	@Override
 	public String getName(Player p, ItemStack item, Storage storage) {
-		if(item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-			String name = item.getItemMeta().getDisplayName();
-			return storage.COLOR_IF_ALREADY_COLORED ? ChatColor.stripColor(name) : name;
-		}
-		return null;
+		return LanguageHelper.getItemName(item, p);
 	}
 
 }
