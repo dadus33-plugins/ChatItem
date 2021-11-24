@@ -39,7 +39,7 @@ public class ChatListener implements Listener {
 		
 		try {
 			Class<?> nbtTag = PacketUtils.getNmsClass("NBTTagCompound", "nbt.");
-			Class<?> itemClass = PacketUtils.getNmsClass("ItemStack", "item.");
+			Class<?> itemClass = PacketUtils.getNmsClass("ItemStack", "world.item.");
     		for(Method m : itemClass.getDeclaredMethods()) {
     			if(m.getParameterTypes().length == 1) {
     				if(m.getParameterTypes()[0].equals(nbtTag) && m.getReturnType().equals(nbtTag)) {
@@ -48,7 +48,7 @@ public class ChatListener implements Listener {
     			}
     		}
 		} catch (Exception e) {
-			e.printStackTrace();
+			
 		}
 		if(saveMethod == null)
 			ChatItem.getInstance().getLogger().info("Failed to find save method. Using default system...");
