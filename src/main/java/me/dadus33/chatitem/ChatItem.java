@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import me.dadus33.chatitem.commands.CIReload;
 import me.dadus33.chatitem.filters.Log4jFilter;
 import me.dadus33.chatitem.listeners.ChatListener;
+import me.dadus33.chatitem.namer.NamerManager;
 import me.dadus33.chatitem.utils.Storage;
 
 public class ChatItem extends JavaPlugin {
@@ -25,6 +26,7 @@ public class ChatItem extends JavaPlugin {
         obj.storage = new Storage(obj.getConfig());
         obj.chatListener.setStorage(obj.storage);
         obj.filter.setStorage(obj.storage);
+        NamerManager.load(obj);
         if (!obj.storage.RELOAD_MESSAGE.isEmpty())
             sender.sendMessage(obj.storage.RELOAD_MESSAGE);
     }
@@ -60,6 +62,8 @@ public class ChatItem extends JavaPlugin {
 
         //Initialize Log4J filter (remove ugly console messages)
         filter = new Log4jFilter(storage);
+        
+        NamerManager.load(this);
     }
     
     public Storage getStorage() {
