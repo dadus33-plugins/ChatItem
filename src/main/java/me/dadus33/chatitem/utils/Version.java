@@ -56,16 +56,4 @@ public enum Version {
 		return SERVER_VERSION;
 	}
 
-	public static boolean areIdsCompatible(int version1, int version2) {
-		if ((version1 >= V1_9.MIN_VER && version2 <= V1_8.MAX_VER)
-				|| (version2 >= V1_9.MIN_VER && version1 <= V1_8.MAX_VER)) {
-			return false;
-		}
-		if ((version1 <= V1_10.MAX_VER && version2 >= V1_11.MIN_VER)
-				|| (version1 <= V1_10.MAX_VER && version2 >= V1_11.MIN_VER)) {
-			return false;
-		}
-		return true;
-	}
-
 }

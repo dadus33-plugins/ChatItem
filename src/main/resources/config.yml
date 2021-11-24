@@ -63,9 +63,6 @@ General:
   show-no-permission-message:
     normal: true
     command: false
-  #  Here you can set the limit on how many placeholders a user is allowed to use inside a message.
-  # Allowing too many placeholders can result in client crashes.
-  limit: 8
   #  The cooldown, in seconds, between allowing players to send messages with items. Setting this to 0
   # will remove the cooldown entirely.
   cooldown: 60

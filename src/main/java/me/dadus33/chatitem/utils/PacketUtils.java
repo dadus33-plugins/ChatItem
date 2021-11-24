@@ -12,10 +12,10 @@ public class PacketUtils {
 	public static final String NMS_PREFIX;
 	public static final String OBC_PREFIX;
 	public static final boolean IS_THERMOS;
-	public static final Class<?> CRAFT_PLAYER_CLASS, CRAFT_SERVER_CLASS;
+	public static final Class<?> CRAFT_PLAYER_CLASS;
 	
 	/**
-	 * This Map is to reduce Reflection action which take more ressources than just RAM action
+	 * This Map is to reduce Reflection action which take more resources than just RAM action
 	 */
 	private static final HashMap<String, Class<?>> ALL_CLASS;
 	
@@ -25,7 +25,6 @@ public class PacketUtils {
 		NMS_PREFIX = Version.getVersion().isNewerOrEquals(Version.V1_17) || IS_THERMOS ? "net.minecraft." : "net.minecraft.server." + VERSION + ".";
 		OBC_PREFIX = "org.bukkit.craftbukkit." + VERSION + ".";
 		CRAFT_PLAYER_CLASS = getObcClass("entity.CraftPlayer");
-		CRAFT_SERVER_CLASS = getObcClass("CraftServer");
 	}
 	
 	/**
@@ -91,25 +90,6 @@ public class PacketUtils {
 			}
 			return null;
 		});
-	}
-
-	/**
-	 * Get NMS player connection of specified player
-	 * 
-	 * @param p Player of which we want to get the player connection
-	 * @return the NMS player connection
-	 */
-	public static Object getPlayerConnection(Player p) {
-		try {
-			Object entityPlayer = getEntityPlayer(p);
-			if(Version.getVersion().isNewerOrEquals(Version.V1_17))
-				return entityPlayer.getClass().getField("b").get(entityPlayer);
-			else
-				return entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
 	}
 	
 	/**

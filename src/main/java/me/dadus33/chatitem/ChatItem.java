@@ -1,7 +1,6 @@
 package me.dadus33.chatitem;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -69,12 +68,6 @@ public class ChatItem extends JavaPlugin {
     public Storage getStorage() {
 		return storage;
 	}
-
-    public static String getVersion(Server server) {
-        final String packageName = server.getClass().getPackage().getName();
-
-        return packageName.substring(packageName.lastIndexOf('.') + 1);
-    }
     
     public static void debug(String msg) {
     	if(getInstance().getConfig().getBoolean("debug", false))

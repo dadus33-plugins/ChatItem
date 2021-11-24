@@ -24,13 +24,11 @@ public class Storage {
     public final Boolean DENY_IF_NO_ITEM;
     public final Boolean HAND_DISABLED;
     public final Boolean SHOW_NO_PERM_NORMAL;
-    public final Boolean SHOW_NO_PERM_COMMAND;
     public final String HAND_NAME;
     public final String NAME_FORMAT;
     public final String AMOUNT_FORMAT;
     public final String NO_PERMISSION_MESSAGE;
     public final String DENY_MESSAGE;
-    public final String LIMIT_MESSAGE;
     public final String RELOAD_MESSAGE;
     public final String COOLDOWN_MESSAGE;
     public final String SECONDS;
@@ -38,7 +36,6 @@ public class Storage {
     public final String HOURS;
     private final Integer CONFIG_VERSION;
     public final Long COOLDOWN;
-    public final Integer LIMIT;
     public final List<Command> ALLOWED_PLUGIN_COMMANDS = new ArrayList<>();
     public final List<String> ALLOWED_DEFAULT_COMMANDS = new ArrayList<>();
     public final List<String> PLACEHOLDERS;
@@ -60,7 +57,6 @@ public class Storage {
             TRANSLATIONS.put(key, entry);
         }
         COOLDOWN = conf.getLong("General.cooldown");
-        LIMIT = conf.getInt("General.limit");
         List<String> added = conf.getStringList("General.placeholders");
         PLACEHOLDERS = ImmutableList.copyOf(added);
         NAME_FORMAT = color(conf.getString("General.name-format"));
@@ -71,10 +67,8 @@ public class Storage {
         DENY_IF_NO_ITEM = conf.getBoolean("General.deny-if-no-item");
         HAND_DISABLED = conf.getBoolean("General.hand.disabled");
         SHOW_NO_PERM_NORMAL = conf.getBoolean("General.show-no-permission-message.normal");
-        SHOW_NO_PERM_COMMAND = conf.getBoolean("General.show-no-permission-message.command");
         DENY_MESSAGE = color(conf.getString("Messages.deny-message"));
         HAND_NAME = color(conf.getString("General.hand.name"));
-        LIMIT_MESSAGE = color(conf.getString("Messages.limit-message"));
         RELOAD_MESSAGE = color(conf.getString("Messages.reload-success"));
         NO_PERMISSION_MESSAGE = color(conf.getString("Messages.no-permission"));
         COOLDOWN_MESSAGE = color(conf.getString("Messages.cooldown-message"));

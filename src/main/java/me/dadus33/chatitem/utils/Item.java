@@ -1,6 +1,5 @@
 package me.dadus33.chatitem.utils;
 
-
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 
 public class Item {
