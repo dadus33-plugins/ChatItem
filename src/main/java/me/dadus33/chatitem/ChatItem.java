@@ -1,7 +1,7 @@
 package me.dadus33.chatitem;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.base.Strings;
@@ -9,6 +9,7 @@ import com.google.common.base.Strings;
 import me.dadus33.chatitem.commands.CIReload;
 import me.dadus33.chatitem.filters.Log4jFilter;
 import me.dadus33.chatitem.listeners.ChatListener;
+import me.dadus33.chatitem.listeners.JoinListener;
 import me.dadus33.chatitem.namer.NamerManager;
 import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Utils;
@@ -58,10 +59,12 @@ public class ChatItem extends JavaPlugin {
         }*/
 
         //Commands
-        Bukkit.getPluginCommand("cireload").setExecutor(new CIReload());
+        getCommand("cireload").setExecutor(new CIReload());
         
         // events
-        Bukkit.getPluginManager().registerEvents(chatListener = new ChatListener(storage), this);
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(chatListener = new ChatListener(storage), this);
+        pm.registerEvents(new JoinListener(), this);
 
         //Initialize Log4J filter (remove ugly console messages)
         filter = new Log4jFilter(storage);

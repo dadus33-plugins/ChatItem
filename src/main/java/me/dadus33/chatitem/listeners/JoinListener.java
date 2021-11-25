@@ -2,6 +2,7 @@ package me.dadus33.chatitem.listeners;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import me.dadus33.chatitem.ChatItem;
@@ -10,7 +11,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class JoinListener {
+public class JoinListener implements Listener {
 
 	@SuppressWarnings("deprecation")
 	@EventHandler
