@@ -77,8 +77,6 @@ Messages:
   deny-message: "&c&lYou have no item in hand!"
   #  The message you will get after reloading the plugin using /cireload.
   reload-success: "&b&lSuccessful reload!"
-  #  The message a player will get when attempting to send a message with more placeholders then the allowed limit.
-  limit-message: "&c&lYou can only add 8 item placeholders per message!"
   #  The message to display players when they can't display items in chat due to the cooldown
   cooldown-message: "&c&lYou can only use items in chat once a minute! You have {remaining} left!"
   #  The no permission message to be showed to players who don't have the required permission to use the placeholder
