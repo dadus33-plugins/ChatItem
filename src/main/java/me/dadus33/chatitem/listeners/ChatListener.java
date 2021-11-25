@@ -143,13 +143,13 @@ public class ChatListener implements Listener {
             }
         }
 		e.setCancelled(true);
-		String msg = e.getMessage();
+		String msg = e.getFormat();
 		ItemStack item = p.getItemInHand();
 		ItemMeta meta = item == null ? null : item.getItemMeta();
 		//String[] codeSplitted = p.getDisplayName().split(ChatColor.COLOR_CHAR + "");
 		//char code = codeSplitted.length == 0 || !codeSplitted[0].isEmpty() ? codeSplitted[0].charAt(0) : codeSplitted[1].charAt(0);
 		Utils.getOnlinePlayers().forEach((pl) -> {
-			TextComponent component = new TextComponent(String.format(e.getFormat(), p.getDisplayName(), ""));
+			TextComponent component = new TextComponent("");
 			ChatColor color = ChatColor.getByChar(getColorChat(e.getFormat()));
 			for (String args : msg.split(" ")) {
 				if (c.PLACEHOLDERS.contains(args)) {

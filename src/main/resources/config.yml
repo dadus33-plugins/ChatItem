@@ -66,6 +66,8 @@ General:
   #  The cooldown, in seconds, between allowing players to send messages with items. Setting this to 0
   # will remove the cooldown entirely.
   cooldown: 60
+  # Check if the plugin have update
+  check-update: true
 
 
 #  Messages section. You can disable any of them by simply leaving them empty, like this: ""
@@ -81,6 +83,10 @@ Messages:
   cooldown-message: "&c&lYou can only use items in chat once a minute! You have {remaining} left!"
   #  The no permission message to be showed to players who don't have the required permission to use the placeholder
   no-permission: "&c&lI'm sorry, but you are not allowed to use the placeholder in chat!"
+  # All message about the update of the plugin
+  join-update:
+    message: "&cA new version of ChatItem is available. &aClick here to download."
+    hover: "&6Click to go to spigot page !"
   #  All the fields bellow shold be translated in your own language. Those will be used in the {remaining} format of the cooldown message.
   # You should leave a space as a PREFIX as we will add a number in front of them
   seconds: " seconds"

@@ -4,11 +4,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.google.common.base.Strings;
+
 import me.dadus33.chatitem.commands.CIReload;
 import me.dadus33.chatitem.filters.Log4jFilter;
 import me.dadus33.chatitem.listeners.ChatListener;
 import me.dadus33.chatitem.namer.NamerManager;
 import me.dadus33.chatitem.utils.Storage;
+import me.dadus33.chatitem.utils.Utils;
 
 public class ChatItem extends JavaPlugin {
 
@@ -17,6 +20,7 @@ public class ChatItem extends JavaPlugin {
     private ChatListener chatListener;
     private Log4jFilter filter;
     private Storage storage;
+    private boolean hasNewVersion = false;
 
     public static void reload(CommandSender sender) {
         ChatItem obj = getInstance();
@@ -63,10 +67,27 @@ public class ChatItem extends JavaPlugin {
         filter = new Log4jFilter(storage);
         
         NamerManager.load(this);
+        
+        if(storage.CHECK_UPDATE) {
+	        getServer().getScheduler().runTaskAsynchronously(this, () -> {
+				String urlName = "https://api.spigotmc.org/legacy/update.php?resource=19064";
+				String content = Utils.getFromURL(urlName);
+				if(!Strings.isNullOrEmpty(content)) {
+	    			hasNewVersion = !content.equalsIgnoreCase(getDescription().getVersion());
+	    			if(hasNewVersion) {
+	    				getLogger().info(storage.JOIN_UPDATE_MESSAGE);
+	    			}
+				}
+	        });
+        }
     }
     
     public Storage getStorage() {
 		return storage;
+	}
+    
+    public boolean isHasNewVersion() {
+		return hasNewVersion;
 	}
     
     public static void debug(String msg) {

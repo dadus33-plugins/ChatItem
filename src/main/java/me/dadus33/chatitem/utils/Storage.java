@@ -24,6 +24,7 @@ public class Storage {
     public final Boolean DENY_IF_NO_ITEM;
     public final Boolean HAND_DISABLED;
     public final Boolean SHOW_NO_PERM_NORMAL;
+    public final Boolean CHECK_UPDATE;
     public final String HAND_NAME;
     public final String NAME_FORMAT;
     public final String AMOUNT_FORMAT;
@@ -34,6 +35,8 @@ public class Storage {
     public final String SECONDS;
     public final String MINUTES;
     public final String HOURS;
+    public final String JOIN_UPDATE_MESSAGE;
+    public final String JOIN_UPDATE_HOVER;
     private final Integer CONFIG_VERSION;
     public final Long COOLDOWN;
     public final List<Command> ALLOWED_PLUGIN_COMMANDS = new ArrayList<>();
@@ -69,9 +72,13 @@ public class Storage {
         SHOW_NO_PERM_NORMAL = conf.getBoolean("General.show-no-permission-message.normal");
         DENY_MESSAGE = color(conf.getString("Messages.deny-message"));
         HAND_NAME = color(conf.getString("General.hand.name"));
+        CHECK_UPDATE = conf.getBoolean("General.check-update");
         RELOAD_MESSAGE = color(conf.getString("Messages.reload-success"));
         NO_PERMISSION_MESSAGE = color(conf.getString("Messages.no-permission"));
         COOLDOWN_MESSAGE = color(conf.getString("Messages.cooldown-message"));
+        JOIN_UPDATE_MESSAGE = color(conf.getString("Messages.join-update.message"));
+        JOIN_UPDATE_HOVER = color(conf.getString("Messages.join-update.hover"));
+        
         SECONDS = color(conf.getString("Messages.seconds"));
         MINUTES = color(conf.getString("Messages.minutes"));
         HOURS = color(conf.getString("Messages.hours"));
@@ -83,8 +90,7 @@ public class Storage {
                 Command c = Bukkit.getPluginCommand(s);
                 if(c!=null) {
                     ALLOWED_PLUGIN_COMMANDS.add(c);
-                }
-                else {
+                } else {
                     ALLOWED_DEFAULT_COMMANDS.add(s);
                 }
             }
