@@ -91,6 +91,8 @@ public class ChatListener implements Listener {
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onChat(AsyncPlayerChatEvent e) {
+		if(e.isCancelled())
+			return;
         boolean found = false;
 
         for (String rep : c.PLACEHOLDERS)
@@ -130,7 +132,7 @@ public class ChatListener implements Listener {
                 long elapsed = current - start;
                 if(elapsed >= c.COOLDOWN){
                     COOLDOWNS.remove(p.getName());
-                }else{
+                } else {
                     if(!c.LET_MESSAGE_THROUGH) {
                         e.setCancelled(true);
                     }
@@ -143,7 +145,15 @@ public class ChatListener implements Listener {
             }
         }
 		e.setCancelled(true);
-		String msg = e.getFormat();
+		String format = e.getFormat(), defMsg = e.getMessage();
+		boolean isAlreadyParsed = false;
+		if(format.contains("%1$s") && format.contains("%2$s")) // message not parsed but not default way
+			isAlreadyParsed = false;
+		if(format.equalsIgnoreCase(defMsg)) // is message already parsed
+			isAlreadyParsed = true;
+		if(format.equalsIgnoreCase("<%1$s> %2$s")) // default MC message
+			isAlreadyParsed = false;
+		String msg = isAlreadyParsed ? format : String.format(format, p.getDisplayName(), defMsg);
 		ItemStack item = p.getItemInHand();
 		ItemMeta meta = item == null ? null : item.getItemMeta();
 		//String[] codeSplitted = p.getDisplayName().split(ChatColor.COLOR_CHAR + "");
