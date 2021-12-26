@@ -1,17 +1,18 @@
 package me.dadus33.chatitem.utils;
 
-import com.google.common.collect.ImmutableList;
-import me.dadus33.chatitem.ChatItem;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
+import com.google.common.collect.ImmutableList;
+
+import me.dadus33.chatitem.ChatItem;
 
 public class Storage {
 
@@ -94,11 +95,12 @@ public class Storage {
 	private void checkConfigVersion() {
 		int latestVersion = ChatItem.CFG_VER;
 		if (latestVersion != CONFIG_VERSION) {
-			Bukkit.getLogger().log(Level.WARNING, ChatColor.RED
+			ChatItem pl = ChatItem.getInstance();
+			pl.getLogger().warning(ChatColor.RED
 					+ "ChatItem detected an older or invalid configuration file. Replacing it with the default config...");
 			performOverwrite();
-			conf = ChatItem.getInstance().getConfig();
-			Bukkit.getLogger().log(Level.WARNING, ChatColor.RED + "Replacement complete!");
+			conf = pl.getConfig();
+			pl.getLogger().warning(ChatColor.RED + "Replacement complete!");
 		}
 	}
 

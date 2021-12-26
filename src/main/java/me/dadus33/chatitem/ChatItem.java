@@ -86,7 +86,7 @@ public class ChatItem extends JavaPlugin {
             	this.chatManager = new ChatListenerChatManager(this);
             }
         }
-        getLogger().info("Manager choosed: " + chatManager.getName() + "(" + chatManager.getId() + ")");
+        getLogger().info("Manager choosed: " + chatManager.getName() + " (" + chatManager.getId() + ")");
         this.chatManager.load(this, getStorage());
 
         //Initialize Log4J filter (remove ugly console messages)
