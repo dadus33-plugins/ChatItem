@@ -155,22 +155,16 @@ public class ChatListener implements Listener {
 		String msg = isAlreadyParsed ? format : String.format(format, p.getDisplayName(), defMsg);
 		ItemStack item = p.getItemInHand();
 		ItemMeta meta = item == null ? null : item.getItemMeta();
-		//String[] codeSplitted = p.getDisplayName().split(ChatColor.COLOR_CHAR + "");
-		//char code = codeSplitted.length == 0 || !codeSplitted[0].isEmpty() ? codeSplitted[0].charAt(0) : codeSplitted[1].charAt(0);
 		e.getRecipients().forEach((pl) -> {
 			TextComponent component = new TextComponent("");
 			ChatColor color = ChatColor.getByChar(getColorChat(e.getFormat()));
 			for (String args : msg.split(" ")) {
 				if (c.PLACEHOLDERS.contains(args)) {
 					if(meta != null) {
-						//String name = meta.hasDisplayName() ? meta.getDisplayName() : WordUtils.capitalize(item.getType().name().replaceAll("_", " ").toLowerCase());
-						//String amountFormat = c.AMOUNT_FORMAT.replace("{times}",  String.valueOf(item.getAmount()));
-						//TextComponent itemComponent = new TextComponent(c.NAME_FORMAT.replace("{name}", name).replace("{amount}", amountFormat));
 						TextComponent itemComponent = new TextComponent(ChatListener.styleItem(pl, item, c));
 						String itemJson = convertItemStackToJson(item);
 						itemComponent.setHoverEvent(
 								new HoverEvent(Action.SHOW_ITEM, new BaseComponent[] { new TextComponent(itemJson) }));
-						//itemComponent.addExtra(ChatColor.RESET + " x" + item.getAmount() + " " + ChatColor.COLOR_CHAR + code);
 						component.addExtra(itemComponent);
 					} else {
 						if(c.HAND_DISABLED)
@@ -212,9 +206,6 @@ public class ChatListener implements Listener {
 				Object nmsItemStackObj = craftItemClass.getMethod("asNMSCopy", ItemStack.class).invoke(null, itemStack);
 				return saveMethod.invoke(nmsItemStackObj, nmsNbtTagCompoundObj).toString();
 			}
-			/*NBTTagCompound nmsNbtTagCompoundObj = new NBTTagCompound();
-			net.minecraft.server.v1_8_R3.ItemStack nmsItemStackObj = CraftItemStack.asNMSCopy(itemStack);
-			return nmsItemStackObj.save(nmsNbtTagCompoundObj).toString();*/
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
