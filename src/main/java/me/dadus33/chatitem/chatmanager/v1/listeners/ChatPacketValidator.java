@@ -15,12 +15,12 @@ import me.dadus33.chatitem.utils.Storage;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-public class ChatPacketValidatorV2 extends PacketHandler {
+public class ChatPacketValidator extends PacketHandler {
 
     private Method serializerGetJson;
 	private PacketEditingChatManager manager;
 
-    public ChatPacketValidatorV2(PacketEditingChatManager manager) {
+    public ChatPacketValidator(PacketEditingChatManager manager) {
 		this.manager = manager;
         try {
         	for(Method m : PacketUtils.CHAT_SERIALIZER.getDeclaredMethods()) {

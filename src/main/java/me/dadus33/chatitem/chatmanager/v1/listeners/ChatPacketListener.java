@@ -25,7 +25,7 @@ import me.dadus33.chatitem.utils.Storage;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-public class ChatPacketListenerV2 extends PacketHandler {
+public class ChatPacketListener extends PacketHandler {
 
 	private final static String NAME = "{name}";
 	private final static String AMOUNT = "{amount}";
@@ -33,7 +33,7 @@ public class ChatPacketListenerV2 extends PacketHandler {
 
 	private PacketEditingChatManager manager;
 
-	public ChatPacketListenerV2(PacketEditingChatManager manager) {
+	public ChatPacketListener(PacketEditingChatManager manager) {
 		this.manager = manager;
 	}
 
