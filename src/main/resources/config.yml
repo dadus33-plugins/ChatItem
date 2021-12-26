@@ -1,14 +1,23 @@
-#Config for ChatItem
-#For info visit
-#https://www.spigotmc.org/resources/chatitem.19064/
+# Config for ChatItem
+# For info visit
+# Spigotmc: https://www.spigotmc.org/resources/chatitem.19064/
+# Discord: https://discord.gg/ttA5CjMhk7
 
-#Version info, DON'T TOUCH
+# Version info, DON'T TOUCH
 config-version: 13
 
+# By default, it's in "auto" mode. This mode choosed according to your other plugins such as DeluxeChat.
+# You can also use :
+# - "packet" : The working system for 1.4's ChatItem version (and older)
+#        It was working with lot of others chat plugin, specially those who made hover text
+# - "chat" : New system which works without other chat plugin, which is simpler and with lower
+#        amount of possible issues.
+# You can replace 'auto' by another mode that should correspond to what you want.
+# If you don't know which one use, come on discord (link at begin of config or in spigotmc)
 manager: "auto"
 
 #General configuration
-General:
+general:
   #The placeholders you want to use for the item. You can add as many as you want.
   placeholders:
     - "[i]"
@@ -73,7 +82,7 @@ General:
 
 
 #  Messages section. You can disable any of them by simply leaving them empty, like this: ""
-Messages:
+messages:
   #  The message users will get upon attempting to use the placeholder without any item in hand.
   # Only works if 'General.deny-if-no-item' is set to true!
   deny-message: "&c&lYou have no item in hand!"
@@ -96,7 +105,7 @@ Messages:
 
 #  Translations
 # Below you can find a set of default values for all items in Minecraft 1.8.
-Translations:
+translations:
 ## Blocks ##
   STONE:
     1: "Granite"
