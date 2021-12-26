@@ -8,7 +8,7 @@ import com.google.common.base.Strings;
 
 import me.dadus33.chatitem.commands.CIReload;
 import me.dadus33.chatitem.filters.Log4jFilter;
-import me.dadus33.chatitem.listeners.ChatListener;
+import me.dadus33.chatitem.hook.ChatListener;
 import me.dadus33.chatitem.listeners.JoinListener;
 import me.dadus33.chatitem.namer.NamerManager;
 import me.dadus33.chatitem.utils.Storage;
@@ -16,7 +16,7 @@ import me.dadus33.chatitem.utils.Utils;
 
 public class ChatItem extends JavaPlugin {
 
-    public final static int CFG_VER = 12;
+    public final static int CFG_VER = 13;
     private static ChatItem instance;
     private ChatListener chatListener;
     private Log4jFilter filter;

@@ -1,4 +1,4 @@
-package me.dadus33.chatitem.listeners;
+package me.dadus33.chatitem.hook;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

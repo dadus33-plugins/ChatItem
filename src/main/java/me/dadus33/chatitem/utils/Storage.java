@@ -32,7 +32,7 @@ public class Storage {
 
     public Storage(FileConfiguration cnf) {
         this.conf = cnf;
-        CONFIG_VERSION = conf.getInt("config-version", 12);
+        CONFIG_VERSION = conf.getInt("config-version", 13);
         checkConfigVersion();
         Set<String> keys = conf.getConfigurationSection("Translations").getKeys(false);
         for (String key : keys) {

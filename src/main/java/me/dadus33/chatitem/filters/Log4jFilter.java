@@ -12,7 +12,7 @@ import org.apache.logging.log4j.message.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import me.dadus33.chatitem.listeners.ChatListener;
+import me.dadus33.chatitem.hook.ChatListener;
 import me.dadus33.chatitem.utils.Storage;
 
 
