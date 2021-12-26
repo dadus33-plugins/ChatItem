@@ -53,7 +53,7 @@ public class Storage {
 		LET_MESSAGE_THROUGH = conf.getBoolean("general.let-message-through", true);
 		FORCE_ADD_AMOUNT = conf.getBoolean("general.force-add-amount", true);
 		DENY_IF_NO_ITEM = conf.getBoolean("general.deny-if-no-item", false);
-        LIMIT = conf.getInt("general.limit");
+        LIMIT = conf.getInt("general.limit", 8);
 		COOLDOWN = conf.getLong("general.cooldown", 60);
 		SHOW_NO_PERM_NORMAL = conf.getBoolean("general.show-no-permission-message.normal", true);
         SHOW_NO_PERM_COMMAND = conf.getBoolean("general.show-no-permission-message.command", false);
