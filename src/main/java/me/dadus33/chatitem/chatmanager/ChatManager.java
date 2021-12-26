@@ -11,6 +11,10 @@ public abstract class ChatManager {
 		
 	}
 	
+	public abstract String getName();
+	
+	public abstract String getId();
+	
 	public Storage getStorage() {
 		return s;
 	}

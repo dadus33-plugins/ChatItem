@@ -34,7 +34,7 @@ public class Storage {
         this.conf = cnf;
         CONFIG_VERSION = conf.getInt("config-version", 13);
         checkConfigVersion();
-        this.MANAGER = conf.getString("manager", "chat");
+        this.MANAGER = conf.getString("manager", "auto");
         Set<String> keys = conf.getConfigurationSection("Translations").getKeys(false);
         for (String key : keys) {
             HashMap<Short, String> entry = new HashMap<>();

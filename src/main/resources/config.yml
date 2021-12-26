@@ -5,6 +5,8 @@
 #Version info, DON'T TOUCH
 config-version: 13
 
+manager: "auto"
+
 #General configuration
 General:
   #The placeholders you want to use for the item. You can add as many as you want.

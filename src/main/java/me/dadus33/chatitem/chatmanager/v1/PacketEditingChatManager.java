@@ -35,11 +35,23 @@ public class PacketEditingChatManager extends ChatManager {
 
         if(Bukkit.getPluginManager().getPlugin("ViaVersion") != null){
         	playerVersionAdapter = new ViaVersionHook();
+        	pl.getLogger().info("Loading ViaVersion support ...");
         } else if(Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null){
         	playerVersionAdapter = new ProtocolSupportHook();
+        	pl.getLogger().info("Loading ProtocolSupport support ...");
         } else {
         	playerVersionAdapter = new DefaultVersionHook();
         }
+	}
+	
+	@Override
+	public String getName() {
+		return "PacketEditing";
+	}
+	
+	@Override
+	public String getId() {
+		return "packet";
 	}
 	
     public JSONManipulator getManipulator(){

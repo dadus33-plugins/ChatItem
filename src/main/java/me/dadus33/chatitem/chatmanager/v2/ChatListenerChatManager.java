@@ -25,6 +25,16 @@ public class ChatListenerChatManager extends ChatManager {
         }
 	}
 	
+	@Override
+	public String getName() {
+		return "ChatListener";
+	}
+	
+	@Override
+	public String getId() {
+		return "chat";
+	}
+	
     public JSONManipulator getManipulator(){
         /*
             We used to have 2 kinds of JSONManipulators because of my bad understanding of the 1.7 way of parsing JSON chat

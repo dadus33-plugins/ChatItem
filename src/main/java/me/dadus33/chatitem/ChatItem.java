@@ -67,18 +67,26 @@ public class ChatItem extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new JoinListener(), this);
         
-        if(pm.getPlugin("DeluxeChat") != null || getStorage().MANAGER.equalsIgnoreCase("packet"))
-        	this.chatManager = new PacketEditingChatManager(this);
-        else if(getStorage().MANAGER.equalsIgnoreCase("chat"))
-        	this.chatManager = new ChatListenerChatManager(this);
-        else {
-        	getLogger().severe("----- WARN -----");
-        	getLogger().severe("Failed to find manager: " + getStorage().MANAGER + ".");
-        	getLogger().severe("Please reset your config and/or check wiki for more informations");
-        	getLogger().severe("----- WARN -----");
-        	this.chatManager = new ChatListenerChatManager(this);
-        	
+        String managerName = getStorage().MANAGER;
+        if(managerName.equalsIgnoreCase("auto")) {
+            if(pm.getPlugin("DeluxeChat") != null)
+            	this.chatManager = new PacketEditingChatManager(this);
+            else
+            	this.chatManager = new ChatListenerChatManager(this);
+        } else {
+            if(managerName.equalsIgnoreCase("packet"))
+            	this.chatManager = new PacketEditingChatManager(this);
+            else if(managerName.equalsIgnoreCase("chat"))
+            	this.chatManager = new ChatListenerChatManager(this);
+            else {
+            	getLogger().severe("----- WARN -----");
+            	getLogger().severe("Failed to find manager: " + managerName + ".");
+            	getLogger().severe("Please reset your config and/or check wiki for more informations");
+            	getLogger().severe("----- WARN -----");
+            	this.chatManager = new ChatListenerChatManager(this);
+            }
         }
+        getLogger().info("Manager choosed: " + chatManager.getName() + "(" + chatManager.getId() + ")");
         this.chatManager.load(this, getStorage());
 
         //Initialize Log4J filter (remove ugly console messages)
