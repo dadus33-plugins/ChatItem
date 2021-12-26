@@ -17,7 +17,6 @@ import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.namer.NamerManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
-import me.dadus33.chatitem.utils.Utils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
@@ -158,7 +157,7 @@ public class ChatListener implements Listener {
 		ItemMeta meta = item == null ? null : item.getItemMeta();
 		//String[] codeSplitted = p.getDisplayName().split(ChatColor.COLOR_CHAR + "");
 		//char code = codeSplitted.length == 0 || !codeSplitted[0].isEmpty() ? codeSplitted[0].charAt(0) : codeSplitted[1].charAt(0);
-		Utils.getOnlinePlayers().forEach((pl) -> {
+		e.getRecipients().forEach((pl) -> {
 			TextComponent component = new TextComponent("");
 			ChatColor color = ChatColor.getByChar(getColorChat(e.getFormat()));
 			for (String args : msg.split(" ")) {
