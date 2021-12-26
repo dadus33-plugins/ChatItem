@@ -19,7 +19,7 @@ public class Storage {
     private FileConfiguration conf;
     public final HashMap<String, HashMap<Short, String>> TRANSLATIONS = new HashMap<>();
     public final boolean COLOR_IF_ALREADY_COLORED, FORCE_ADD_AMOUNT, LET_MESSAGE_THROUGH, DENY_IF_NO_ITEM, HAND_DISABLED, SHOW_NO_PERM_NORMAL, CHECK_UPDATE;
-    public final String HAND_NAME, NAME_FORMAT, AMOUNT_FORMAT;
+    public final String HAND_NAME, NAME_FORMAT, AMOUNT_FORMAT, MANAGER;
     public final String NO_PERMISSION_MESSAGE, DENY_MESSAGE, RELOAD_MESSAGE, COOLDOWN_MESSAGE;
     public final String SECONDS, MINUTES, HOURS;
     public final String JOIN_UPDATE_MESSAGE, JOIN_UPDATE_HOVER;
@@ -34,6 +34,7 @@ public class Storage {
         this.conf = cnf;
         CONFIG_VERSION = conf.getInt("config-version", 13);
         checkConfigVersion();
+        this.MANAGER = conf.getString("manager", "chat");
         Set<String> keys = conf.getConfigurationSection("Translations").getKeys(false);
         for (String key : keys) {
             HashMap<Short, String> entry = new HashMap<>();

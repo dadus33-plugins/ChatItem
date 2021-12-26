@@ -1,4 +1,4 @@
-package me.dadus33.chatitem.hook;
+package me.dadus33.chatitem.chatmanager.v2;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -30,11 +30,11 @@ public class ChatListener implements Listener {
 	private final static String TIMES = "{times}";
     private final static String LEFT = "{remaining}";
     private final HashMap<String, Long> COOLDOWNS = new HashMap<>();
-	private Storage c;
+	private ChatListenerChatManager manage;
 	private Method saveMethod;
 	
-	public ChatListener(Storage c) {
-		this.c = c;
+	public ChatListener(ChatListenerChatManager manage) {
+		this.manage = manage;
 		
 		try {
 			Class<?> nbtTag = PacketUtils.getNmsClass("NBTTagCompound", "nbt.");
@@ -55,34 +55,34 @@ public class ChatListener implements Listener {
 			ChatItem.getInstance().getLogger().info("Save method founded: " + saveMethod.getName() + ".");
 	}
 	
-	public void setStorage(Storage c) {
-		this.c = c;
+	public Storage getStorage() {
+		return manage.getStorage();
 	}
 
     private String calculateTime(long seconds){
         if(seconds < 60){
-            return seconds+c.SECONDS;
+            return seconds+getStorage().SECONDS;
         }
         if(seconds < 3600){
             StringBuilder builder = new StringBuilder();
             int minutes = (int) seconds / 60;
-            builder.append(minutes).append(c.MINUTES);
+            builder.append(minutes).append(getStorage().MINUTES);
             int secs = (int) seconds - minutes*60;
             if(secs != 0){
-                builder.append(" ").append(secs).append(c.SECONDS);
+                builder.append(" ").append(secs).append(getStorage().SECONDS);
             }
             return builder.toString();
         }
         StringBuilder builder = new StringBuilder();
         int hours = (int) seconds / 3600;
-        builder.append(hours).append(c.HOURS);
+        builder.append(hours).append(getStorage().HOURS);
         int minutes = (int) (seconds/60) - (hours*60);
         if(minutes != 0){
-            builder.append(" ").append(minutes).append(c.MINUTES);
+            builder.append(" ").append(minutes).append(getStorage().MINUTES);
         }
         int secs = (int) (seconds - ((seconds/60)*60));
         if(secs != 0){
-            builder.append(" ").append(secs).append(c.SECONDS);
+            builder.append(" ").append(secs).append(getStorage().SECONDS);
         }
         return builder.toString();
     }
@@ -94,7 +94,7 @@ public class ChatListener implements Listener {
 			return;
         boolean found = false;
 
-        for (String rep : c.PLACEHOLDERS)
+        for (String rep : getStorage().PLACEHOLDERS)
             if (e.getMessage().contains(rep)) {
                 found = true;
                 break;
@@ -105,39 +105,39 @@ public class ChatListener implements Listener {
         }
 		Player p = e.getPlayer();
         if (!p.hasPermission("chatitem.use")) {
-            if(!c.LET_MESSAGE_THROUGH) {
+            if(!getStorage().LET_MESSAGE_THROUGH) {
                 e.setCancelled(true);
             }
-            if(!c.NO_PERMISSION_MESSAGE.isEmpty() && c.SHOW_NO_PERM_NORMAL){
-                p.sendMessage(c.NO_PERMISSION_MESSAGE);
+            if(!getStorage().NO_PERMISSION_MESSAGE.isEmpty() && getStorage().SHOW_NO_PERM_NORMAL){
+                p.sendMessage(getStorage().NO_PERMISSION_MESSAGE);
             }
             return;
         }
         if (p.getItemInHand().getType().equals(Material.AIR)) {
-            if (c.DENY_IF_NO_ITEM) {
+            if (getStorage().DENY_IF_NO_ITEM) {
                 e.setCancelled(true);
-                if (!c.DENY_MESSAGE.isEmpty())
-                    e.getPlayer().sendMessage(c.DENY_MESSAGE);
+                if (!getStorage().DENY_MESSAGE.isEmpty())
+                    e.getPlayer().sendMessage(getStorage().DENY_MESSAGE);
                 return;
             }
-            if(c.HAND_DISABLED) {
+            if(getStorage().HAND_DISABLED) {
                 return;
             }
         }
-        if(c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")){
+        if(getStorage().COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")){
             if(COOLDOWNS.containsKey(p.getName())){
                 long start = COOLDOWNS.get(p.getName());
                 long current = System.currentTimeMillis()/1000;
                 long elapsed = current - start;
-                if(elapsed >= c.COOLDOWN){
+                if(elapsed >= getStorage().COOLDOWN){
                     COOLDOWNS.remove(p.getName());
                 } else {
-                    if(!c.LET_MESSAGE_THROUGH) {
+                    if(!getStorage().LET_MESSAGE_THROUGH) {
                         e.setCancelled(true);
                     }
-                    if(!c.COOLDOWN_MESSAGE.isEmpty()){
-                        long left = (start + c.COOLDOWN) - current;
-                        p.sendMessage(c.COOLDOWN_MESSAGE.replace(LEFT, calculateTime(left)));
+                    if(!getStorage().COOLDOWN_MESSAGE.isEmpty()){
+                        long left = (start + getStorage().COOLDOWN) - current;
+                        p.sendMessage(getStorage().COOLDOWN_MESSAGE.replace(LEFT, calculateTime(left)));
                     }
                     return;
                 }
@@ -159,18 +159,18 @@ public class ChatListener implements Listener {
 			TextComponent component = new TextComponent("");
 			ChatColor color = ChatColor.getByChar(getColorChat(e.getFormat()));
 			for (String args : msg.split(" ")) {
-				if (c.PLACEHOLDERS.contains(args)) {
+				if (getStorage().PLACEHOLDERS.contains(args)) {
 					if(meta != null) {
-						TextComponent itemComponent = new TextComponent(ChatListener.styleItem(pl, item, c));
+						TextComponent itemComponent = new TextComponent(ChatListener.styleItem(pl, item, getStorage()));
 						String itemJson = convertItemStackToJson(item);
 						itemComponent.setHoverEvent(
 								new HoverEvent(Action.SHOW_ITEM, new BaseComponent[] { new TextComponent(itemJson) }));
 						component.addExtra(itemComponent);
 					} else {
-						if(c.HAND_DISABLED)
+						if(getStorage().HAND_DISABLED)
 							component.addExtra(color + args);
 						else
-							component.addExtra(c.HAND_NAME.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName()));
+							component.addExtra(getStorage().HAND_NAME.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName()));
 					}
 				} else {
 					component.addExtra(color + args);

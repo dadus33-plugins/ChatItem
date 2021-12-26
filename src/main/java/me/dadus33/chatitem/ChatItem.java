@@ -6,9 +6,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.base.Strings;
 
+import me.dadus33.chatitem.chatmanager.ChatManager;
+import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
+import me.dadus33.chatitem.chatmanager.v2.ChatListenerChatManager;
 import me.dadus33.chatitem.commands.CIReload;
 import me.dadus33.chatitem.filters.Log4jFilter;
-import me.dadus33.chatitem.hook.ChatListener;
 import me.dadus33.chatitem.listeners.JoinListener;
 import me.dadus33.chatitem.namer.NamerManager;
 import me.dadus33.chatitem.utils.Storage;
@@ -18,17 +20,17 @@ public class ChatItem extends JavaPlugin {
 
     public final static int CFG_VER = 13;
     private static ChatItem instance;
-    private ChatListener chatListener;
     private Log4jFilter filter;
     private Storage storage;
     private boolean hasNewVersion = false;
+    private ChatManager chatManager;
 
     public static void reload(CommandSender sender) {
         ChatItem obj = getInstance();
         obj.saveDefaultConfig();
         obj.reloadConfig();
         obj.storage = new Storage(obj.getConfig());
-        obj.chatListener.setStorage(obj.storage);
+        obj.chatManager.load(obj, obj.storage);
         obj.filter.setStorage(obj.storage);
         NamerManager.load(obj);
         if (!obj.storage.RELOAD_MESSAGE.isEmpty())
@@ -63,8 +65,21 @@ public class ChatItem extends JavaPlugin {
         
         // events
         PluginManager pm = getServer().getPluginManager();
-        pm.registerEvents(chatListener = new ChatListener(storage), this);
         pm.registerEvents(new JoinListener(), this);
+        
+        if(pm.getPlugin("DeluxeChat") != null || getStorage().MANAGER.equalsIgnoreCase("packet"))
+        	this.chatManager = new PacketEditingChatManager(this);
+        else if(getStorage().MANAGER.equalsIgnoreCase("chat"))
+        	this.chatManager = new ChatListenerChatManager(this);
+        else {
+        	getLogger().severe("----- WARN -----");
+        	getLogger().severe("Failed to find manager: " + getStorage().MANAGER + ".");
+        	getLogger().severe("Please reset your config and/or check wiki for more informations");
+        	getLogger().severe("----- WARN -----");
+        	this.chatManager = new ChatListenerChatManager(this);
+        	
+        }
+        this.chatManager.load(this, getStorage());
 
         //Initialize Log4J filter (remove ugly console messages)
         filter = new Log4jFilter(storage);
@@ -87,6 +102,10 @@ public class ChatItem extends JavaPlugin {
     
     public Storage getStorage() {
 		return storage;
+	}
+    
+    public ChatManager getChatManager() {
+		return chatManager;
 	}
     
     public boolean isHasNewVersion() {
