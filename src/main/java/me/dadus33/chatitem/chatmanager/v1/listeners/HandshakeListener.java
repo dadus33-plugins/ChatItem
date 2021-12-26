@@ -1,4 +1,4 @@
-package me.dadus33.chatitem.chatmanager.v1;
+package me.dadus33.chatitem.chatmanager.v1.listeners;
 
 import org.bukkit.Bukkit;
 

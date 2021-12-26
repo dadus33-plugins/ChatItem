@@ -12,7 +12,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 
-import me.dadus33.chatitem.chatmanager.v1.HandshakeListener;
+import me.dadus33.chatitem.chatmanager.v1.listeners.HandshakeListener;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;

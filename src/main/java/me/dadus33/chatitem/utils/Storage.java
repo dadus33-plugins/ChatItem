@@ -19,17 +19,16 @@ public class Storage {
 	private FileConfiguration conf;
 	public final HashMap<String, HashMap<Short, String>> TRANSLATIONS = new HashMap<>();
 	public final boolean COLOR_IF_ALREADY_COLORED, FORCE_ADD_AMOUNT, LET_MESSAGE_THROUGH, DENY_IF_NO_ITEM,
-			HAND_DISABLED, SHOW_NO_PERM_NORMAL, CHECK_UPDATE;
+			HAND_DISABLED, SHOW_NO_PERM_NORMAL, CHECK_UPDATE, SHOW_NO_PERM_COMMAND;
 	public final String HAND_NAME, NAME_FORMAT, AMOUNT_FORMAT, MANAGER;
-	public final String NO_PERMISSION_MESSAGE, DENY_MESSAGE, RELOAD_MESSAGE, COOLDOWN_MESSAGE;
+	public final String NO_PERMISSION_MESSAGE, DENY_MESSAGE, RELOAD_MESSAGE, COOLDOWN_MESSAGE, LIMIT_MESSAGE;
 	public final String SECONDS, MINUTES, HOURS;
 	public final String JOIN_UPDATE_MESSAGE, JOIN_UPDATE_HOVER;
-	private final int CONFIG_VERSION;
+	public final int CONFIG_VERSION, LIMIT;
 	public final long COOLDOWN;
 	public final List<Command> ALLOWED_PLUGIN_COMMANDS = new ArrayList<>();
 	public final List<String> ALLOWED_DEFAULT_COMMANDS = new ArrayList<>();
-	public final List<String> PLACEHOLDERS;
-	public final List<String> HAND_TOOLTIP;
+	public final List<String> PLACEHOLDERS, HAND_TOOLTIP;
 
 	public Storage(FileConfiguration cnf) {
 		this.conf = cnf;
@@ -54,8 +53,10 @@ public class Storage {
 		LET_MESSAGE_THROUGH = conf.getBoolean("general.let-message-through", true);
 		FORCE_ADD_AMOUNT = conf.getBoolean("general.force-add-amount", true);
 		DENY_IF_NO_ITEM = conf.getBoolean("general.deny-if-no-item", false);
+        LIMIT = conf.getInt("general.limit");
 		COOLDOWN = conf.getLong("general.cooldown", 60);
 		SHOW_NO_PERM_NORMAL = conf.getBoolean("general.show-no-permission-message.normal", true);
+        SHOW_NO_PERM_COMMAND = conf.getBoolean("general.show-no-permission-message.command", false);
 		HAND_DISABLED = conf.getBoolean("general.hand.disabled", false);
 		HAND_NAME = color(conf.getString("general.hand.name", "&b&l&o{display-name}&b&l&o's hand"));
 		HAND_TOOLTIP = conf.getStringList("general.hand.tooltip");
@@ -69,6 +70,7 @@ public class Storage {
 		JOIN_UPDATE_MESSAGE = color(conf.getString("messages.join-update.message",
 				"&cA new version of ChatItem is available. &aClick here to download."));
 		JOIN_UPDATE_HOVER = color(conf.getString("messages.join-update.hover", "&6Click to go to spigot page !"));
+        LIMIT_MESSAGE = color(conf.getString("messages.limit-message"));
 
 		SECONDS = color(conf.getString("messages.seconds", " seconds"));
 		MINUTES = color(conf.getString("messages.minutes", " minutes"));

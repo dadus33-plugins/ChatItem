@@ -1,4 +1,4 @@
-package me.dadus33.chatitem.chatmanager.v1;
+package me.dadus33.chatitem.chatmanager.v1.listeners;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +14,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketHandler;

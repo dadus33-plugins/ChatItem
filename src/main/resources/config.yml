@@ -92,6 +92,8 @@ messages:
   cooldown-message: "&c&lYou can only use items in chat once a minute! You have {remaining} left!"
   #  The no permission message to be showed to players who don't have the required permission to use the placeholder
   no-permission: "&c&lI'm sorry, but you are not allowed to use the placeholder in chat!"
+  #  The message a player will get when attempting to send a message with more placeholders then the allowed limit.
+  limit-message: "&c&lYou can only add 8 item placeholders per message!"
   # All message about the update of the plugin
   join-update:
     message: "&cA new version of ChatItem is available. &aClick here to download."

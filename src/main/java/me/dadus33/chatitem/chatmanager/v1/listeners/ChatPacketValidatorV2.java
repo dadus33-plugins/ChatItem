@@ -1,8 +1,9 @@
-package me.dadus33.chatitem.chatmanager.v1;
+package me.dadus33.chatitem.chatmanager.v1.listeners;
 
 import java.lang.reflect.Method;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketHandler;

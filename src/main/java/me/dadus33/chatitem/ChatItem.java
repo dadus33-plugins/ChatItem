@@ -1,5 +1,6 @@
 package me.dadus33.chatitem;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -29,12 +30,15 @@ public class ChatItem extends JavaPlugin {
         ChatItem obj = getInstance();
         obj.saveDefaultConfig();
         obj.reloadConfig();
+        String oldChatManager = obj.storage.MANAGER;
         obj.storage = new Storage(obj.getConfig());
         obj.chatManager.load(obj, obj.storage);
         obj.filter.setStorage(obj.storage);
         NamerManager.load(obj);
         if (!obj.storage.RELOAD_MESSAGE.isEmpty())
             sender.sendMessage(obj.storage.RELOAD_MESSAGE);
+        if(!oldChatManager.equalsIgnoreCase(obj.storage.MANAGER))
+        	sender.sendMessage(ChatColor.RED + "A simple reload CAN'T change the manager. Sorry, it's not available yet.");
     }
 
     public static ChatItem getInstance() {
