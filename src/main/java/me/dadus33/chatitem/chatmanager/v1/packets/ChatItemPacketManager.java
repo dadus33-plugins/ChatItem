@@ -22,8 +22,10 @@ public class ChatItemPacketManager {
 				pl.getLogger().warning("Fallback to default Packet system ...");
 				packetManager = new CustomPacketManager(pl);
 			}
-		} else
+		} else {
+			pl.getLogger().info("Loading own packet system.");
 			packetManager = new CustomPacketManager(pl);
+		}
 	}
 	
 	public PacketManager getPacketManager() {

@@ -108,15 +108,10 @@ public class INCChannel extends ChannelAbstract {
 		
 		@Override
 		public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
-			try {
-				ChatItemPacket nextPacket = getPacketManager().onPacketSent(PacketType.getType(packet.getClass().getSimpleName()), owner, packet);
-				if(nextPacket != null && nextPacket.isCancelled())
-					return;
-				super.write(ctx, packet, promise);
-			} catch (Exception e) {
-				e.printStackTrace();
-				super.write(ctx, packet, promise);
-			}
+			ChatItemPacket nextPacket = getPacketManager().onPacketSent(PacketType.getType(packet.getClass().getSimpleName()), owner, packet);
+			if(nextPacket != null && nextPacket.isCancelled())
+				return;
+			super.write(ctx, packet, promise);
 		}
 	}
 }
