@@ -57,10 +57,8 @@ public class ChatPacketManager extends PacketHandler {
 	@Override
 	public void onSend(ChatItemPacket e) {
 		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT)) {
-			ChatItem.debug("Packet: " + e.getPacketType().getFullName() + ", player: " + e.getPlayername());
 			return;
 		}
-		ChatItem.debug("Checking for " + e.getPlayername());
 		ProtocolVersion version = ProtocolVersion.getServerVersion();
 		if (version.isNewerOrEquals(ProtocolVersion.V1_8)) { // only if action bar messages are supported in this
 																// version of minecraft

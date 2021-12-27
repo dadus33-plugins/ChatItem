@@ -87,7 +87,7 @@ public class CustomPacketManager extends PacketManager implements Listener {
 
 	public ChatItemPacket onPacketSent(PacketType type, Player sender, Object packet) {
 		if(type == null) {
-			ChatItem.getInstance().getLogger().warning("Failed to find packet type for " + packet.getClass().getSimpleName());
+			ChatItem.debug("Failed to find packet type for " + packet.getClass().getSimpleName());
 			return null;
 		}
 		ChatItemPacket customPacket = new ChatItemPacket(type, packet, sender);

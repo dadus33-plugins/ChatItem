@@ -13,7 +13,7 @@ import me.dadus33.chatitem.chatmanager.v1.playerversion.hooks.DefaultVersionHook
 public abstract class ChannelAbstract {
 
 	private ExecutorService addChannelExecutor, removeChannelExecutor;
-	static final String KEY_HANDSHAKE = "packet_handshake_negativity", KEY_HANDLER_SERVER = "packet_handler", KEY_SERVER = "packet_server_negativity";
+	static final String KEY_HANDSHAKE = "packet_handshake_chatitem", KEY_HANDLER_SERVER = "packet_handler", KEY_SERVER = "packet_server_chatitem";
 
 	private CustomPacketManager customPacketManager;
 	private HashSet<UUID> players = new HashSet<>();

@@ -58,7 +58,7 @@ public class INCChannel extends ChannelAbstract {
 				Channel channel = getChannel(player);
 				// Managing outgoing packet (to the player)
 				channel.pipeline().addAfter(KEY_HANDLER_SERVER, KEY_SERVER + endChannelName, new ChannelHandlerSent(player));
-			
+
 				ChatItemPacket pa = ChannelInboundHandler.TMP.remove(channel);
 				if(pa != null)
 					DefaultVersionHook.PROTOCOL_PER_UUID.put(player.getUniqueId(), pa.getContent().getIntegers().readSafely(0, ProtocolVersion.getServerVersion().MAX_VER));
