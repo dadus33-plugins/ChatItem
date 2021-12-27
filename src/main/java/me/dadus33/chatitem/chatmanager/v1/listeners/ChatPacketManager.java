@@ -26,7 +26,7 @@ import me.dadus33.chatitem.utils.Storage;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-public class ChatPacketValidator extends PacketHandler {
+public class ChatPacketManager extends PacketHandler {
 
 	private final static String NAME = "{name}";
 	private final static String AMOUNT = "{amount}";
@@ -35,7 +35,7 @@ public class ChatPacketValidator extends PacketHandler {
 	private Method serializerGetJson;
 	private PacketEditingChatManager manager;
 
-	public ChatPacketValidator(PacketEditingChatManager manager) {
+	public ChatPacketManager(PacketEditingChatManager manager) {
 		this.manager = manager;
 		try {
 			for (Method m : PacketUtils.CHAT_SERIALIZER.getDeclaredMethods()) {
@@ -56,8 +56,11 @@ public class ChatPacketValidator extends PacketHandler {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onSend(ChatItemPacket e) {
-		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT))
+		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT)) {
+			ChatItem.debug("Packet: " + e.getPacketType().getFullName() + ", player: " + e.getPlayername());
 			return;
+		}
+		ChatItem.debug("Checking for " + e.getPlayername());
 		ProtocolVersion version = ProtocolVersion.getServerVersion();
 		if (version.isNewerOrEquals(ProtocolVersion.V1_8)) { // only if action bar messages are supported in this
 																// version of minecraft
@@ -85,6 +88,7 @@ public class ChatPacketValidator extends PacketHandler {
 						// we shouldn't mess with anyways
 			BaseComponent[] components = packet.getSpecificModifier(BaseComponent[].class).readSafely(0);
 			if (components == null) {
+				ChatItem.debug("No base components");
 				return;
 			}
 			json = ComponentSerializer.toString(components);
@@ -106,6 +110,7 @@ public class ChatPacketValidator extends PacketHandler {
 			}
 		}
 		if (!found) {
+			ChatItem.debug("No placeholders founded");
 			return; // then it's just a normal message without placeholders, so we leave it alone
 		}
 		if (json.lastIndexOf("\\u0007") == -1) { // if the message doesn't contain the BELL separator, then it's
