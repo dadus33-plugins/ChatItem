@@ -5,8 +5,6 @@ import java.util.HashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import me.dadus33.chatitem.chatmanager.v1.utils.ProtocolVersion;
-
 public class PacketUtils {
 
 	public static final String VERSION = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",")

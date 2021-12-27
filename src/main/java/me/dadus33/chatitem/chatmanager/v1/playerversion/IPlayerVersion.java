@@ -2,7 +2,7 @@ package me.dadus33.chatitem.chatmanager.v1.playerversion;
 
 import org.bukkit.entity.Player;
 
-import me.dadus33.chatitem.chatmanager.v1.utils.ProtocolVersion;
+import me.dadus33.chatitem.utils.ProtocolVersion;
 
 public interface IPlayerVersion {
 	

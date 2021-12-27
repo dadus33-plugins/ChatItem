@@ -9,7 +9,7 @@ import com.comphenix.protocol.events.PacketEvent;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.v1.playerversion.hooks.DefaultVersionHook;
-import me.dadus33.chatitem.chatmanager.v1.utils.ProtocolVersion;
+import me.dadus33.chatitem.utils.ProtocolVersion;
 
 public class HandshakeListener extends PacketAdapter{
 

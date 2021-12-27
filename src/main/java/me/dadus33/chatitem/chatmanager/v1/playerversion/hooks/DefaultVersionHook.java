@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 
 import me.dadus33.chatitem.chatmanager.v1.playerversion.IPlayerVersion;
-import me.dadus33.chatitem.chatmanager.v1.utils.ProtocolVersion;
+import me.dadus33.chatitem.utils.ProtocolVersion;
 
 public class DefaultVersionHook implements IPlayerVersion {
 

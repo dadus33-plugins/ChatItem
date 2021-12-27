@@ -19,8 +19,8 @@ import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.CustomPacketManager;
 import me.dadus33.chatitem.chatmanager.v1.playerversion.hooks.DefaultVersionHook;
-import me.dadus33.chatitem.chatmanager.v1.utils.ProtocolVersion;
 import me.dadus33.chatitem.utils.PacketUtils;
+import me.dadus33.chatitem.utils.ProtocolVersion;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 
 @SuppressWarnings("unchecked")

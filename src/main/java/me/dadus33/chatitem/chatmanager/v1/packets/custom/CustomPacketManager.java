@@ -17,7 +17,7 @@ import me.dadus33.chatitem.chatmanager.v1.packets.custom.channel.ChannelAbstract
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.channel.INC2Channel;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.channel.INCChannel;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.channel.NMUChannel;
-import me.dadus33.chatitem.chatmanager.v1.utils.ProtocolVersion;
+import me.dadus33.chatitem.utils.ProtocolVersion;
 import me.dadus33.chatitem.utils.Utils;
 
 public class CustomPacketManager extends PacketManager implements Listener {

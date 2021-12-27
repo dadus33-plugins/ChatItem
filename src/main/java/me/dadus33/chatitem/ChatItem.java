@@ -14,6 +14,7 @@ import me.dadus33.chatitem.commands.CIReload;
 import me.dadus33.chatitem.filters.Log4jFilter;
 import me.dadus33.chatitem.listeners.JoinListener;
 import me.dadus33.chatitem.namer.NamerManager;
+import me.dadus33.chatitem.utils.ProtocolVersion;
 import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Utils;
 
@@ -73,7 +74,7 @@ public class ChatItem extends JavaPlugin {
         
         String managerName = getStorage().MANAGER;
         if(managerName.equalsIgnoreCase("auto")) {
-            if(pm.getPlugin("DeluxeChat") != null)
+            if(pm.getPlugin("DeluxeChat") != null && ProtocolVersion.getServerVersion().isNewerThan(ProtocolVersion.V1_7))
             	this.chatManager = new PacketEditingChatManager(this);
             else
             	this.chatManager = new ChatListenerChatManager(this);

@@ -7,7 +7,6 @@ import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulatorCurrent;
 import me.dadus33.chatitem.chatmanager.v1.listeners.ChatEventListener;
-import me.dadus33.chatitem.chatmanager.v1.listeners.ChatPacketListener;
 import me.dadus33.chatitem.chatmanager.v1.listeners.ChatPacketValidator;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacketManager;
 import me.dadus33.chatitem.chatmanager.v1.playerversion.IPlayerVersion;
@@ -27,7 +26,6 @@ public class PacketEditingChatManager extends ChatManager {
 
         packetManager = new ChatItemPacketManager(pl);
         packetManager.getPacketManager().addHandler(new ChatPacketValidator(this));
-        packetManager.getPacketManager().addHandler(new ChatPacketListener(this));
         Bukkit.getPluginManager().registerEvents(new ChatEventListener(this), pl);
 
         //Check for existence of BaseComponent class (only on spigot)
