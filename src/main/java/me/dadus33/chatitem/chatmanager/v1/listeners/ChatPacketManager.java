@@ -189,7 +189,7 @@ public class ChatPacketManager extends PacketHandler {
 					packet.getSpecificModifier(BaseComponent[].class).write(0, ComponentSerializer.parse(message));
 				}
 			}
-			PacketUtils.sendPacket(p, e.getPacket());
+			PacketUtils.sendPacket(e.getPlayer(), e.getPacket());
 		});
 	}
 	private Object jsonToChatComponent(String json) {
