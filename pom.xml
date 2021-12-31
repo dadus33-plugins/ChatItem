@@ -34,8 +34,8 @@
 		    <url>https://raw.github.com/MascusJeoraly/LanguageUtils/mvn-repo/</url>
 		</repository>
         <repository>
-            <id>elikill-repo</id>
-            <url>http://repo.eliapp.fr:8080/repository/internal/</url>
+            <id>protocollib-repo</id>
+            <url>https://repo.dmulloy2.net/nexus/repository/public/</url>
         </repository>
         <repository>
             <id>viaversion-repo</id>
