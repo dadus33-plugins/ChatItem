@@ -41,6 +41,10 @@
             <id>viaversion-repo</id>
             <url>https://repo.viaversion.com</url>
         </repository>
+        <repository>
+            <id>elikill-repo</id>
+            <url>https://repo.eliapp.fr:8081/repository/internal/</url>
+        </repository>
     </repositories>
 
 
@@ -104,6 +108,12 @@
             <artifactId>opennbt</artifactId>
             <version>1.4</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>dev.majek</groupId>
+            <artifactId>HexNicks</artifactId>
+            <version>2.2.1</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
