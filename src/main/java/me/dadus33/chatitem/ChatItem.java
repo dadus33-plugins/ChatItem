@@ -12,8 +12,9 @@ import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v2.ChatListenerChatManager;
 import me.dadus33.chatitem.commands.CIReload;
 import me.dadus33.chatitem.filters.Log4jFilter;
+import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.listeners.JoinListener;
-import me.dadus33.chatitem.namer.NamerManager;
+import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.ProtocolVersion;
 import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Utils;
@@ -99,8 +100,9 @@ public class ChatItem extends JavaPlugin {
 
         //Initialize Log4J filter (remove ugly console messages)
         filter = new Log4jFilter(storage);
-        
+
         NamerManager.load(this);
+        PlayerNamerManager.load(this);
         
         if(storage.CHECK_UPDATE) {
 	        getServer().getScheduler().runTaskAsynchronously(this, () -> {

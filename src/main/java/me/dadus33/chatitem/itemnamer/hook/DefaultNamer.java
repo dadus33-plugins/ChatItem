@@ -1,11 +1,11 @@
-package me.dadus33.chatitem.namer.hook;
+package me.dadus33.chatitem.itemnamer.hook;
 
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import me.dadus33.chatitem.namer.INamer;
+import me.dadus33.chatitem.itemnamer.INamer;
 import me.dadus33.chatitem.utils.Storage;
 
 public class DefaultNamer implements INamer {

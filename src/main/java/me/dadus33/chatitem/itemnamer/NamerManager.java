@@ -1,4 +1,4 @@
-package me.dadus33.chatitem.namer;
+package me.dadus33.chatitem.itemnamer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,11 +11,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.namer.INamer.Priority;
-import me.dadus33.chatitem.namer.hook.ChatItemTranslationNamer;
-import me.dadus33.chatitem.namer.hook.DefaultNamer;
-import me.dadus33.chatitem.namer.hook.ItemDisplayNamer;
-import me.dadus33.chatitem.namer.hook.LangUtilsNamer;
+import me.dadus33.chatitem.itemnamer.INamer.Priority;
+import me.dadus33.chatitem.itemnamer.hook.ChatItemTranslationNamer;
+import me.dadus33.chatitem.itemnamer.hook.DefaultNamer;
+import me.dadus33.chatitem.itemnamer.hook.ItemDisplayNamer;
+import me.dadus33.chatitem.itemnamer.hook.LangUtilsNamer;
 import me.dadus33.chatitem.utils.Storage;
 
 public class NamerManager {

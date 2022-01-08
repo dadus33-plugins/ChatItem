@@ -1,4 +1,4 @@
-package me.dadus33.chatitem.namer;
+package me.dadus33.chatitem.itemnamer;
 
 import java.util.Arrays;
 import java.util.List;

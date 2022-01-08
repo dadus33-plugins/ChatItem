@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.namer.NamerManager;
+import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
 import net.md_5.bungee.api.chat.BaseComponent;
