@@ -12,11 +12,14 @@ public class PlayerNamerManager {
 	public static IPlayerNamer getPlayerNamer() {
 		return playerNamer;
 	}
+	public static void setPlayerNamer(IPlayerNamer playerNamer) {
+		PlayerNamerManager.playerNamer = playerNamer;
+	}
 	
 	public static void load(ChatItem pl) {
 		if(Bukkit.getPluginManager().getPlugin("HexNicks") != null) {
-			playerNamer = new HexNicksPlayerNamer();
+			setPlayerNamer(new HexNicksPlayerNamer());
 		} else
-			playerNamer = new DefaultPlayerNamer();
+			setPlayerNamer(new DefaultPlayerNamer());
 	}
 }
