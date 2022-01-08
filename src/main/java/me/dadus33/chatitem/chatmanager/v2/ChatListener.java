@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.itemnamer.NamerManager;
+import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -169,8 +170,18 @@ public class ChatListener implements Listener {
 					} else {
 						if(getStorage().HAND_DISABLED)
 							component.addExtra(color + args);
-						else
-							component.addExtra(getStorage().HAND_NAME.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName()));
+						else {
+							String handName = getStorage().HAND_NAME;
+							if(handName.contains("{name}")) {
+								String[] splitted = handName.split("{name}");
+								for(int i = 0; i < (splitted.length - 1); i++) {
+									component.addExtra(new TextComponent(splitted[i]));
+									component.addExtra(PlayerNamerManager.getPlayerNamer().getName(p));
+								}
+								component.addExtra(new TextComponent(splitted[splitted.length - 1]));
+							} else
+								component.addExtra(handName.replace("{display-name}", p.getDisplayName()));
+						}
 					}
 				} else {
 					component.addExtra(color + args);

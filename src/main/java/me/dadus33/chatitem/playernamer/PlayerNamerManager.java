@@ -19,7 +19,10 @@ public class PlayerNamerManager {
 	public static void load(ChatItem pl) {
 		if(Bukkit.getPluginManager().getPlugin("HexNicks") != null) {
 			setPlayerNamer(new HexNicksPlayerNamer());
-		} else
+			pl.getLogger().info("Enable support for HexNicks plugin !");
+		} else {
 			setPlayerNamer(new DefaultPlayerNamer());
+			pl.getLogger().info("Use default player namer.");
+		}
 	}
 }
