@@ -119,6 +119,7 @@
             <groupId>net.kyori</groupId>
             <artifactId>adventure-api</artifactId>
             <version>4.9.3</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

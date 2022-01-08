@@ -55,6 +55,10 @@ public class Log4jFilter implements Filter {
     public Result filter(LogEvent logEvent) {
         return checkMessage(logEvent.getMessage().getFormattedMessage());
     }
+    
+    public void stop() {
+    	// seems to be required
+    }
 
     private Result checkMessage(String msg){
         if(msg==null){
