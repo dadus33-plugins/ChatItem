@@ -70,8 +70,8 @@ public class PacketEditingChatManager extends ChatManager {
 	@Override
 	public void unload(ChatItem pl) {
 		HandlerList.unregisterAll(chatEventListener);
-		packetManager.getPacketManager().stop();
         packetManager.getPacketManager().removeHandler(chatPacketManager);
+		packetManager.getPacketManager().stop();
 	}
 	
     public JSONManipulator getManipulator(){

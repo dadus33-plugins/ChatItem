@@ -40,14 +40,11 @@ public class CustomPacketManager extends PacketManager implements Listener {
 		pl.getServer().getPluginManager().registerEvents(this, pl);
 		
 		// we wait the start server
-		Bukkit.getScheduler().runTaskLater(pl, new Runnable() {
-			@Override
-			public void run() {
-				isStarted = true;
-				for(Player p : Utils.getOnlinePlayers())
-					addPlayer(p);
-			}
-		}, 40);
+		Bukkit.getScheduler().runTaskLater(pl, () -> {
+			isStarted = true;
+			for(Player p : Utils.getOnlinePlayers())
+				addPlayer(p);
+		}, 20);
 	}
 	
 	public Plugin getPlugin() {

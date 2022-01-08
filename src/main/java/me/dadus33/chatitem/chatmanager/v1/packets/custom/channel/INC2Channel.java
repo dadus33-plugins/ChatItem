@@ -11,6 +11,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
@@ -23,18 +24,28 @@ import me.dadus33.chatitem.utils.ReflectionUtils;
 
 public class INC2Channel extends ChannelAbstract {
 	
+	private final ChannelInboundHandler boundHandler;
+	private ChannelPipeline pipeline;
+	
 	@SuppressWarnings("unchecked")
 	public INC2Channel(CustomPacketManager customPacketManager) {
 		super(customPacketManager);
+		boundHandler = new ChannelInboundHandler(customPacketManager);
 		try {
 			Object mcServer = ReflectionUtils.callMethod(PacketUtils.getCraftServer(), "getServer");
 			Object co = ReflectionUtils.getFirstWith(mcServer, PacketUtils.getNmsClass("MinecraftServer", "server."), PacketUtils.getNmsClass("ServerConnection", "server.network."));
 			((List<ChannelFuture>) ReflectionUtils.getField(co, "f")).forEach((channelFuture) -> {
-				channelFuture.channel().pipeline().addFirst(new ChannelInboundHandler(customPacketManager));
+				pipeline = channelFuture.channel().pipeline();
+				pipeline.addFirst(boundHandler);
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	protected void stopPipelines() {
+		pipeline.remove(boundHandler);
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
@@ -26,10 +27,15 @@ import me.dadus33.chatitem.utils.ReflectionUtils;
 @SuppressWarnings("unchecked")
 public class INCChannel extends ChannelAbstract {
 	
+	private final ChannelInboundHandler boundHandler;
+	private ChannelPipeline pipeline;
+	
 	public INCChannel(CustomPacketManager customPacketManager) {
 		super(customPacketManager);
+		boundHandler = new ChannelInboundHandler(customPacketManager);
 		getFuturChannel().forEach((channelFuture) -> {
-			channelFuture.channel().pipeline().addFirst(new ChannelInboundHandler(customPacketManager));
+			pipeline = channelFuture.channel().pipeline();
+			pipeline.addFirst(boundHandler);
 		});
 	}
 
@@ -47,6 +53,11 @@ public class INCChannel extends ChannelAbstract {
 			e.printStackTrace();
 			return new ArrayList<>();
 		}
+	}
+	
+	@Override
+	protected void stopPipelines() {
+		pipeline.remove(boundHandler);
 	}
 
 	@Override

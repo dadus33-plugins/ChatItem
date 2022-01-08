@@ -33,7 +33,7 @@ public abstract class ChannelAbstract {
 	}
 	
 	public ExecutorService getOrCreateAddChannelExecutor() {
-		if(addChannelExecutor == null)
+		if(addChannelExecutor == null || addChannelExecutor.isTerminated())
 			addChannelExecutor = Executors.newSingleThreadExecutor();
 		return addChannelExecutor;
 	}
@@ -43,7 +43,7 @@ public abstract class ChannelAbstract {
 	}
 	
 	public ExecutorService getOrCreateRemoveChannelExecutor() {
-		if(removeChannelExecutor == null)
+		if(removeChannelExecutor == null || removeChannelExecutor.isTerminated())
 			removeChannelExecutor = Executors.newSingleThreadExecutor();
 		return removeChannelExecutor;
 	}
@@ -74,6 +74,8 @@ public abstract class ChannelAbstract {
 		});
 		players.clear();
 	}
+	
+	protected abstract void stopPipelines();
 	
 	public abstract void addChannel(Player player, String endChannelName);
 

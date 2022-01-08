@@ -22,10 +22,14 @@ import net.minecraft.util.io.netty.channel.ChannelHandlerContext;
 import net.minecraft.util.io.netty.channel.ChannelInboundHandlerAdapter;
 import net.minecraft.util.io.netty.channel.ChannelInitializer;
 import net.minecraft.util.io.netty.channel.ChannelOutboundHandlerAdapter;
+import net.minecraft.util.io.netty.channel.ChannelPipeline;
 import net.minecraft.util.io.netty.channel.ChannelPromise;
 
 public class NMUChannel extends ChannelAbstract {
 
+	private ChannelInboundHandlerAdapter boundHandler;
+	private ChannelPipeline pipeline;
+	
 	public NMUChannel(CustomPacketManager customPacketManager) {
 		super(customPacketManager);
 		try {
@@ -35,7 +39,8 @@ public class NMUChannel extends ChannelAbstract {
 			@SuppressWarnings("unchecked")
 			List<ChannelFuture> g = (List<ChannelFuture>) ReflectionUtils.getField(co, "g");
 			g.forEach((channelFuture) -> {
-				channelFuture.channel().pipeline().addFirst(new ChannelInboundHandlerAdapter() {
+				pipeline = channelFuture.channel().pipeline();
+				pipeline.addFirst(boundHandler = new ChannelInboundHandlerAdapter() {
 					@Override
 					public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 						((Channel) msg).pipeline().addFirst(new ChannelInitializer<Channel>() {
@@ -68,6 +73,11 @@ public class NMUChannel extends ChannelAbstract {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	protected void stopPipelines() {
+		pipeline.remove(boundHandler);
 	}
 
 	@Override
