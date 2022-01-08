@@ -94,12 +94,17 @@ public class ChatListener implements Listener {
 		if(e.isCancelled())
 			return;
         boolean found = false;
-
-        for (String rep : getStorage().PLACEHOLDERS)
-            if (e.getMessage().contains(rep)) {
-                found = true;
-                break;
+        
+        for(String key : e.getMessage().split(" ")) {
+        	if(found)
+        		break;
+            for (String rep : getStorage().PLACEHOLDERS) {
+                if (key.equalsIgnoreCase(rep)) {
+                    found = true;
+                    break;
+                }
             }
+        }
 
         if (!found) {
             return;
