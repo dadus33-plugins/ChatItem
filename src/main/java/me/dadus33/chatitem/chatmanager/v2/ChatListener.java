@@ -3,6 +3,7 @@ package me.dadus33.chatitem.chatmanager.v2;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -151,6 +152,7 @@ public class ChatListener implements Listener {
         }
 		e.setCancelled(true);
 		String format = e.getFormat(), defMsg = e.getMessage();
+		Bukkit.getConsoleSender().sendMessage(String.format(e.getFormat(), e.getPlayer().getDisplayName(), defMsg)); // show in log
 		boolean isAlreadyParsed = false;
 		if(format.contains("%1$s") && format.contains("%2$s")) // message not parsed but not default way
 			isAlreadyParsed = false;
