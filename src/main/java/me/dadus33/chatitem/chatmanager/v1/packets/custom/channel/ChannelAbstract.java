@@ -1,10 +1,12 @@
 package me.dadus33.chatitem.chatmanager.v1.packets.custom.channel;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.CustomPacketManager;
@@ -62,6 +64,15 @@ public abstract class ChannelAbstract {
 	public void removePlayer(Player p) {
 		if(players.remove(p.getUniqueId()))
 			removeChannel(p, p.getUniqueId().toString());
+	}
+	
+	public void removeAllPlayers() {
+		new ArrayList<>(players).forEach((uuid) -> {
+			Player p = Bukkit.getPlayer(uuid);
+			if(p != null) // player don't left
+				removeChannel(Bukkit.getPlayer(uuid), uuid.toString());
+		});
+		players.clear();
 	}
 	
 	public abstract void addChannel(Player player, String endChannelName);

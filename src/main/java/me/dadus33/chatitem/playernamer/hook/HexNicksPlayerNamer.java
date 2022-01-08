@@ -11,7 +11,8 @@ public class HexNicksPlayerNamer implements IPlayerNamer {
 
 	@Override
 	public TextComponent getName(Player p) {
-		return new TextComponent(BukkitComponentSerializer.legacy().serialize(Nicks.api().getStoredNick(p).join()));
+		return new TextComponent(BukkitComponentSerializer.legacy().toBuilder().hexColors()
+				.useUnusualXRepeatedCharacterHexFormat().build().serialize(Nicks.api().getStoredNick(p).join()));
 	}
 
 }

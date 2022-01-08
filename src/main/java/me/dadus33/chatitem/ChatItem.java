@@ -1,8 +1,10 @@
 package me.dadus33.chatitem;
 
-import org.bukkit.ChatColor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
+
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.base.Strings;
@@ -26,21 +28,56 @@ public class ChatItem extends JavaPlugin {
     private Log4jFilter filter;
     private Storage storage;
     private boolean hasNewVersion = false;
-    private ChatManager chatManager;
+    private List<ChatManager> chatManager = new ArrayList<>();
 
+    private void chooseManagers() {
+    	this.chatManager.forEach((cm) -> cm.unload(this));
+    	this.chatManager.clear();
+        String managerName = getStorage().MANAGER;
+        if(managerName.equalsIgnoreCase("both")) {
+        	this.chatManager.add(new PacketEditingChatManager(this));
+	        this.chatManager.add(new ChatListenerChatManager(this));
+            getLogger().info("Manager automatically choosed: " + getVisualChatManagers());
+        } else if(managerName.equalsIgnoreCase("auto")) {
+            if(getServer().getPluginManager().getPlugin("DeluxeChat") != null && ProtocolVersion.getServerVersion().isNewerThan(ProtocolVersion.V1_7))
+            	this.chatManager.add(new PacketEditingChatManager(this));
+            else
+            	this.chatManager.add(new ChatListenerChatManager(this));
+            getLogger().info("Manager automatically choosed: " + getVisualChatManagers());
+        } else {
+            if(managerName.equalsIgnoreCase("packet")) {
+            	this.chatManager.add(new PacketEditingChatManager(this));
+                getLogger().info("Manager choosed: " + getVisualChatManagers());
+            } else if(managerName.equalsIgnoreCase("chat")) {
+            	this.chatManager.add(new ChatListenerChatManager(this));
+                getLogger().info("Manager choosed: " + getVisualChatManagers());
+            } else {
+            	getLogger().severe("----- WARN -----");
+            	getLogger().severe("Failed to find manager: " + managerName + ".");
+            	getLogger().severe("Please reset your config and/or check wiki for more informations");
+            	getLogger().severe("Using default manager: chat.");
+            	getLogger().severe("----- WARN -----");
+            	this.chatManager.add(new ChatListenerChatManager(this));
+            }
+        }
+        this.chatManager.forEach((cm) -> cm.load(this, getStorage()));
+
+        NamerManager.load(this);
+        PlayerNamerManager.load(this);
+    }
+    
     public static void reload(CommandSender sender) {
-        ChatItem obj = getInstance();
-        obj.saveDefaultConfig();
-        obj.reloadConfig();
-        String oldChatManager = obj.storage.MANAGER;
-        obj.storage = new Storage(obj.getConfig());
-        obj.chatManager.load(obj, obj.storage);
-        obj.filter.setStorage(obj.storage);
-        NamerManager.load(obj);
-        if (!obj.storage.RELOAD_MESSAGE.isEmpty())
-            sender.sendMessage(obj.storage.RELOAD_MESSAGE);
-        if(!oldChatManager.equalsIgnoreCase(obj.storage.MANAGER))
-        	sender.sendMessage(ChatColor.RED + "A simple reload CAN'T change the manager. Sorry, it's not available yet.");
+        ChatItem pl = getInstance();
+        pl.saveDefaultConfig();
+        pl.reloadConfig();
+        //String oldChatManager = pl.storage.MANAGER;
+        pl.storage = new Storage(pl.getConfig());
+        pl.chooseManagers();
+        pl.filter.setStorage(pl.storage);
+        if (!pl.storage.RELOAD_MESSAGE.isEmpty())
+            sender.sendMessage(pl.storage.RELOAD_MESSAGE);
+        /*if(!oldChatManager.equalsIgnoreCase(pl.storage.MANAGER))
+        	sender.sendMessage(ChatColor.RED + "A simple reload CAN'T change the manager. Sorry, it's not available yet.");*/
     }
 
     public static ChatItem getInstance() {
@@ -70,39 +107,12 @@ public class ChatItem extends JavaPlugin {
         getCommand("cireload").setExecutor(new CIReload());
         
         // events
-        PluginManager pm = getServer().getPluginManager();
-        pm.registerEvents(new JoinListener(), this);
+        getServer().getPluginManager().registerEvents(new JoinListener(), this);
         
-        String managerName = getStorage().MANAGER;
-        if(managerName.equalsIgnoreCase("auto")) {
-            if(pm.getPlugin("DeluxeChat") != null && ProtocolVersion.getServerVersion().isNewerThan(ProtocolVersion.V1_7))
-            	this.chatManager = new PacketEditingChatManager(this);
-            else
-            	this.chatManager = new ChatListenerChatManager(this);
-            getLogger().info("Manager automatically choosed: " + chatManager.getName() + " (" + chatManager.getId() + ")");
-        } else {
-            if(managerName.equalsIgnoreCase("packet")) {
-            	this.chatManager = new PacketEditingChatManager(this);
-                getLogger().info("Manager choosed: " + chatManager.getName() + " (" + chatManager.getId() + ")");
-            } else if(managerName.equalsIgnoreCase("chat")) {
-            	this.chatManager = new ChatListenerChatManager(this);
-                getLogger().info("Manager choosed: " + chatManager.getName() + " (" + chatManager.getId() + ")");
-            } else {
-            	getLogger().severe("----- WARN -----");
-            	getLogger().severe("Failed to find manager: " + managerName + ".");
-            	getLogger().severe("Please reset your config and/or check wiki for more informations");
-            	getLogger().severe("Using default manager: chat.");
-            	getLogger().severe("----- WARN -----");
-            	this.chatManager = new ChatListenerChatManager(this);
-            }
-        }
-        this.chatManager.load(this, getStorage());
+        chooseManagers();
 
         //Initialize Log4J filter (remove ugly console messages)
         filter = new Log4jFilter(storage);
-
-        NamerManager.load(this);
-        PlayerNamerManager.load(this);
         
         if(storage.CHECK_UPDATE) {
 	        getServer().getScheduler().runTaskAsynchronously(this, () -> {
@@ -122,9 +132,17 @@ public class ChatItem extends JavaPlugin {
 		return storage;
 	}
     
-    public ChatManager getChatManager() {
+    public List<ChatManager> getChatManager() {
 		return chatManager;
 	}
+    
+    public String getVisualChatManagers() {
+    	StringJoiner sj = new StringJoiner(", ");
+    	for(ChatManager cm : chatManager) {
+    		sj.add(cm.getName() + " (" + cm.getId() + ")");
+    	}
+    	return sj.toString();
+    }
     
     public boolean isHasNewVersion() {
 		return hasNewVersion;

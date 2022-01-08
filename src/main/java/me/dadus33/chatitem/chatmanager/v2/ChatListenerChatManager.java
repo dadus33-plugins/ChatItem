@@ -1,21 +1,23 @@
 package me.dadus33.chatitem.chatmanager.v2;
 
 import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulatorCurrent;
+import me.dadus33.chatitem.utils.Storage;
 
 public class ChatListenerChatManager extends ChatManager {
 
 	private final JSONManipulatorCurrent jsonManipulator;
+	private final ChatListener chatListener;
 	private boolean baseComponentAvailable = true;
 	
 	public ChatListenerChatManager(ChatItem pl) {
 		jsonManipulator = new JSONManipulatorCurrent();
-
-		Bukkit.getPluginManager().registerEvents(new ChatListener(this), pl);
+		chatListener = new ChatListener(this);
 
         //Check for existence of BaseComponent class (only on spigot)
         try {
@@ -33,6 +35,18 @@ public class ChatListenerChatManager extends ChatManager {
 	@Override
 	public String getId() {
 		return "chat";
+	}
+	
+	@Override
+	public void load(ChatItem pl, Storage s) {
+		super.load(pl, s);
+
+		Bukkit.getPluginManager().registerEvents(chatListener, pl);
+	}
+	
+	@Override
+	public void unload(ChatItem pl) {
+		HandlerList.unregisterAll(chatListener);
 	}
 	
     public JSONManipulator getManipulator(){

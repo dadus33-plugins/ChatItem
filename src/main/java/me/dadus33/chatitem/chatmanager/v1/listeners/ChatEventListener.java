@@ -154,7 +154,6 @@ public class ChatEventListener implements Listener {
 		StringBuilder sb = new StringBuilder(oldmsg);
 		sb.append(SEPARATOR).append(e.getPlayer().getName());
 		e.setMessage(sb.toString());
-		Bukkit.getConsoleSender().sendMessage(String.format(e.getFormat(), e.getPlayer().getDisplayName(), oldmsg));
 		if (!p.hasPermission("chatitem.ignore-cooldown")) {
 			COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
 		}

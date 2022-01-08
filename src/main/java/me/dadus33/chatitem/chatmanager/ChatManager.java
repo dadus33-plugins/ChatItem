@@ -23,4 +23,5 @@ public abstract class ChatManager {
 		this.s = s;
 	}
 	
+	public abstract void unload(ChatItem pl);
 }

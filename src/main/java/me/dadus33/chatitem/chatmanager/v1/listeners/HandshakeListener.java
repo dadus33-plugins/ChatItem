@@ -11,10 +11,10 @@ import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.v1.playerversion.hooks.DefaultVersionHook;
 import me.dadus33.chatitem.utils.ProtocolVersion;
 
-public class HandshakeListener extends PacketAdapter{
+public class HandshakeListener extends PacketAdapter {
 
-    public HandshakeListener() {
-        super(ChatItem.getInstance(), ListenerPriority.MONITOR, PacketType.Handshake.Client.SET_PROTOCOL);
+    public HandshakeListener(ChatItem pl) {
+        super(pl, ListenerPriority.MONITOR, PacketType.Handshake.Client.SET_PROTOCOL);
     }
 
     @Override

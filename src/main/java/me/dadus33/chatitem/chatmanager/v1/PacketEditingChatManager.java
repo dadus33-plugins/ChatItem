@@ -1,6 +1,7 @@
 package me.dadus33.chatitem.chatmanager.v1;
 
 import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
@@ -13,27 +14,47 @@ import me.dadus33.chatitem.chatmanager.v1.playerversion.IPlayerVersion;
 import me.dadus33.chatitem.chatmanager.v1.playerversion.hooks.DefaultVersionHook;
 import me.dadus33.chatitem.chatmanager.v1.playerversion.hooks.ProtocolSupportHook;
 import me.dadus33.chatitem.chatmanager.v1.playerversion.hooks.ViaVersionHook;
+import me.dadus33.chatitem.utils.Storage;
 
 public class PacketEditingChatManager extends ChatManager {
 
 	private final JSONManipulatorCurrent jsonManipulator;
 	private boolean baseComponentAvailable = true;
 	private final ChatItemPacketManager packetManager;
+	private final ChatEventListener chatEventListener;
+	private final ChatPacketManager chatPacketManager;
     private IPlayerVersion playerVersionAdapter;
 	
 	public PacketEditingChatManager(ChatItem pl) {
 		jsonManipulator = new JSONManipulatorCurrent();
-
+		chatEventListener = new ChatEventListener(this);
         packetManager = new ChatItemPacketManager(pl);
-        packetManager.getPacketManager().addHandler(new ChatPacketManager(this));
-        Bukkit.getPluginManager().registerEvents(new ChatEventListener(this), pl);
-
+        chatPacketManager = new ChatPacketManager(this);
+        
         //Check for existence of BaseComponent class (only on spigot)
         try {
             Class.forName("net.md_5.bungee.api.chat.BaseComponent");
         } catch (ClassNotFoundException e) {
             baseComponentAvailable = false;
         }
+	}
+	
+	@Override
+	public String getName() {
+		return "PacketEditing";
+	}
+	
+	@Override
+	public String getId() {
+		return "packet";
+	}
+	
+	@Override
+	public void load(ChatItem pl, Storage s) {
+		super.load(pl, s);
+
+        Bukkit.getPluginManager().registerEvents(chatEventListener, pl);
+        packetManager.getPacketManager().addHandler(chatPacketManager);
 
         if(Bukkit.getPluginManager().getPlugin("ViaVersion") != null){
         	playerVersionAdapter = new ViaVersionHook();
@@ -47,13 +68,10 @@ public class PacketEditingChatManager extends ChatManager {
 	}
 	
 	@Override
-	public String getName() {
-		return "PacketEditing";
-	}
-	
-	@Override
-	public String getId() {
-		return "packet";
+	public void unload(ChatItem pl) {
+		HandlerList.unregisterAll(chatEventListener);
+		packetManager.getPacketManager().stop();
+        packetManager.getPacketManager().removeHandler(chatPacketManager);
 	}
 	
     public JSONManipulator getManipulator(){

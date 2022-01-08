@@ -6,15 +6,18 @@
 # Version info, DON'T TOUCH
 config-version: 13
 
-# By default, it's in "auto" mode. This mode choosed according to your other plugins such as DeluxeChat.
-# You can also use :
+# By default, it's in "both" mode.
+#
+# Available mode :
+# - "both" : Prevent chat editing with multiple plugins by using all ways possible to edit the chat.
+# - "auto" : Choose automatically between all available according to actual plugins.
 # - "packet" : The working system for 1.4's ChatItem version (and older)
-#        It was working with lot of others chat plugin, specially those who made hover text
+#        It was working with lot of others chat plugin, specially those who made hover text.
 # - "chat" : New system which works without other chat plugin, which is simpler and with lower
 #        amount of possible issues.
-# You can replace 'auto' by another mode that should correspond to what you want.
+# You can replace 'both' by another mode that should correspond to what you want.
 # If you don't know which one use, come on discord (link at begin of config or in spigotmc)
-manager: "auto"
+manager: "both"
 
 #General configuration
 general:

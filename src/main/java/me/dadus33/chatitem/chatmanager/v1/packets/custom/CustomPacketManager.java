@@ -76,7 +76,7 @@ public class CustomPacketManager extends PacketManager implements Listener {
 	}
 
 	@Override
-	public void clear() {
+	public void stop() {
 		for(Player player : Utils.getOnlinePlayers())
 			removePlayer(player);
 		if(channel.getAddChannelExecutor() != null)

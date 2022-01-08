@@ -6,9 +6,9 @@ import org.bukkit.entity.Player;
 
 public abstract class PacketManager {
 
-	public abstract void addPlayer(Player p);
-	public abstract void removePlayer(Player p);
-	public abstract void clear();
+	public void addPlayer(Player p) {}
+	public void removePlayer(Player p) {}
+	public abstract void stop();
 
 	private final ArrayList<PacketHandler> handlers = new ArrayList<>();
 	public boolean addHandler(PacketHandler handler) {
