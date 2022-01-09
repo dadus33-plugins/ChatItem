@@ -16,6 +16,19 @@ public class Reflect {
             return null;
         }
     }
+    
+    public static Method getMethod(Class<?> clazz, Class<?> returned, Class<?>... params) {
+        try {
+        	for(Method m : clazz.getDeclaredMethods()) {
+        		if(returned == m.getReturnType() && m.getParameterTypes().equals(params)) {
+        			return m;
+        		}
+        	}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public static Field getField(Class<?> clazz, String... fieldNames){
     	for(String field : fieldNames) {
