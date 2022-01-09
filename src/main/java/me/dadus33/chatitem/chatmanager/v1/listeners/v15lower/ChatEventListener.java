@@ -1,4 +1,6 @@
-package me.dadus33.chatitem.chatmanager.v1.listeners;
+package me.dadus33.chatitem.chatmanager.v1.listeners.v15lower;
+
+import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
 
 import java.util.HashMap;
 
@@ -12,12 +14,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
+import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.utils.Storage;
 
 public class ChatEventListener implements Listener {
 
-	public final static char SEPARATOR = ((char) 0x0007);
 	private final static String LEFT = "{remaining}";
 	private final HashMap<String, Long> COOLDOWNS = new HashMap<>();
 	private final PacketEditingChatManager manage;
@@ -78,8 +80,10 @@ public class ChatEventListener implements Listener {
 																			// to get to the event before DeluxeChat or
 																			// other plugins do
 	public void onChat(final AsyncPlayerChatEvent e) {
+		ChatItem.debug("(v1) Check for v1 system. Cancelled: " + e.isCancelled());
 		if (e.getMessage().indexOf(SEPARATOR) != -1) { // If the BELL character is found, we have to remove it
 			String msg = e.getMessage().replace(Character.toString(SEPARATOR), "");
+			ChatItem.debug("Already bell in message: " + e.getMessage());
 			e.setMessage(msg);
 		}
 		boolean found = false;
@@ -91,6 +95,7 @@ public class ChatEventListener implements Listener {
 			}
 
 		if (!found) {
+			ChatItem.debug("(v1) not found placeholders in: " + e.getMessage());
 			return;
 		}
 
@@ -103,6 +108,7 @@ public class ChatEventListener implements Listener {
 			if (!getStorage().NO_PERMISSION_MESSAGE.isEmpty() && getStorage().SHOW_NO_PERM_NORMAL) {
 				p.sendMessage(getStorage().NO_PERMISSION_MESSAGE);
 			}
+			ChatItem.debug("(v1) Don't have permission");
 			return;
 		}
 		if (p.getItemInHand().getType().equals(Material.AIR)) {
@@ -110,9 +116,11 @@ public class ChatEventListener implements Listener {
 				e.setCancelled(true);
 				if (!getStorage().DENY_MESSAGE.isEmpty())
 					e.getPlayer().sendMessage(getStorage().DENY_MESSAGE);
+				ChatItem.debug("(v1) No item and must deny");
 				return;
 			}
 			if (getStorage().HAND_DISABLED) {
+				ChatItem.debug("(v1) Hand disabled");
 				return;
 			}
 		}
@@ -131,6 +139,7 @@ public class ChatEventListener implements Listener {
 						long left = (start + getStorage().COOLDOWN) - current;
 						p.sendMessage(getStorage().COOLDOWN_MESSAGE.replace(LEFT, calculateTime(left)));
 					}
+					ChatItem.debug("(v1) Cooldown");
 					return;
 				}
 			}
@@ -143,6 +152,7 @@ public class ChatEventListener implements Listener {
 
 		if (occurrences > getStorage().LIMIT) {
 			e.setCancelled(true);
+			ChatItem.debug("(v1) Reach message limit");
 			if (getStorage().LIMIT_MESSAGE.isEmpty()) {
 				return;
 			}
@@ -154,6 +164,7 @@ public class ChatEventListener implements Listener {
 		StringBuilder sb = new StringBuilder(oldmsg);
 		sb.append(SEPARATOR).append(e.getPlayer().getName());
 		e.setMessage(sb.toString());
+		ChatItem.debug("(v1) Set placeholder: " + e.getMessage());
 		if (!p.hasPermission("chatitem.ignore-cooldown")) {
 			COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
 		}

@@ -17,9 +17,9 @@ import me.dadus33.chatitem.filters.Log4jFilter;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.listeners.JoinListener;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
-import me.dadus33.chatitem.utils.ProtocolVersion;
 import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Utils;
+import me.dadus33.chatitem.utils.Version;
 
 public class ChatItem extends JavaPlugin {
 
@@ -39,7 +39,7 @@ public class ChatItem extends JavaPlugin {
 	        this.chatManager.add(new ChatListenerChatManager(this));
             getLogger().info("Manager automatically choosed: " + getVisualChatManagers());
         } else if(managerName.equalsIgnoreCase("auto")) {
-            if(getServer().getPluginManager().getPlugin("DeluxeChat") != null && ProtocolVersion.getServerVersion().isNewerThan(ProtocolVersion.V1_7))
+            if(getServer().getPluginManager().getPlugin("DeluxeChat") != null && Version.getVersion().isNewerThan(Version.V1_7))
             	this.chatManager.add(new PacketEditingChatManager(this));
             else
             	this.chatManager.add(new ChatListenerChatManager(this));

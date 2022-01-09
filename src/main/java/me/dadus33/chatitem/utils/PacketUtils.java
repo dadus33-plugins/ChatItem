@@ -129,7 +129,7 @@ public class PacketUtils {
 	public static Object getPlayerConnection(Player p) {
 		try {
 			Object entityPlayer = getEntityPlayer(p);
-			if(ProtocolVersion.getServerVersion().isNewerOrEquals(ProtocolVersion.V1_17))
+			if(Version.getVersion().isNewerOrEquals(Version.V1_17))
 				return entityPlayer.getClass().getField("b").get(entityPlayer);
 			else
 				return entityPlayer.getClass().getField("playerConnection").get(entityPlayer);

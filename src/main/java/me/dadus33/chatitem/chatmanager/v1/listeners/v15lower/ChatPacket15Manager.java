@@ -1,8 +1,11 @@
-package me.dadus33.chatitem.chatmanager.v1.listeners;
+package me.dadus33.chatitem.chatmanager.v1.listeners.v15lower;
+
+import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,12 +24,12 @@ import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketHandler;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
 import me.dadus33.chatitem.utils.PacketUtils;
-import me.dadus33.chatitem.utils.ProtocolVersion;
 import me.dadus33.chatitem.utils.Storage;
+import me.dadus33.chatitem.utils.Version;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-public class ChatPacketManager extends PacketHandler {
+public class ChatPacket15Manager extends PacketHandler {
 
 	private final static String NAME = "{name}";
 	private final static String AMOUNT = "{amount}";
@@ -35,7 +38,7 @@ public class ChatPacketManager extends PacketHandler {
 	private Method serializerGetJson;
 	private PacketEditingChatManager manager;
 
-	public ChatPacketManager(PacketEditingChatManager manager) {
+	public ChatPacket15Manager(PacketEditingChatManager manager) {
 		this.manager = manager;
 		try {
 			for (Method m : PacketUtils.CHAT_SERIALIZER.getDeclaredMethods()) {
@@ -59,10 +62,10 @@ public class ChatPacketManager extends PacketHandler {
 		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT)) {
 			return;
 		}
-		ProtocolVersion version = ProtocolVersion.getServerVersion();
-		if (version.isNewerOrEquals(ProtocolVersion.V1_8)) { // only if action bar messages are supported in this
+		Version version = Version.getVersion();
+		if (version.isNewerOrEquals(Version.V1_8)) { // only if action bar messages are supported in this
 																// version of minecraft
-			if (version.isNewerOrEquals(ProtocolVersion.V1_12)) {
+			if (version.isNewerOrEquals(Version.V1_12)) {
 				try {
 					if (((Enum<?>) e.getContent()
 							.getSpecificModifier(PacketUtils.getNmsClass("ChatMessageType", "network.chat.")).read(0))
@@ -76,6 +79,7 @@ public class ChatPacketManager extends PacketHandler {
 				return; // It means it's an actionbar message, and we ain't intercepting those
 			}
 		}
+		ChatItem.debug("UUID: " + e.getContent().getSpecificModifier(UUID.class).readSafely(0, null));
 		boolean usesBaseComponents = false;
 		PacketContent packet = e.getContent();
 		String json;
@@ -111,7 +115,7 @@ public class ChatPacketManager extends PacketHandler {
 			ChatItem.debug("No placeholders founded");
 			return; // then it's just a normal message without placeholders, so we leave it alone
 		}
-		if (json.lastIndexOf("\\u0007") == -1) { // if the message doesn't contain the BELL separator, then it's
+		if (json.lastIndexOf(SEPARATOR) == -1) { // if the message doesn't contain the BELL separator, then it's
 													// certainly NOT a message we want to parse
 			ChatItem.debug("Not contains bell " + json);
 			return;
@@ -126,14 +130,14 @@ public class ChatPacketManager extends PacketHandler {
 			int topIndex = -1;
 			String name = null;
 			for (Player p : Bukkit.getOnlinePlayers()) {
-				String pname = "\\u0007" + p.getName();
+				String pname = SEPARATOR + p.getName();
 				if (!fjson.contains(pname)) {
 					continue;
 				}
 				int index = fjson.lastIndexOf(pname) + pname.length();
 				if (index > topIndex) {
 					topIndex = index;
-					name = pname.replace("\\u0007", "");
+					name = pname.replace(SEPARATOR + "", "");
 				}
 			}
 			if (name == null) { // something went really bad, so we run away and hide (AKA the player left or is

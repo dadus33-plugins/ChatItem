@@ -40,8 +40,8 @@ import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.v1.utils.Item;
 import me.dadus33.chatitem.chatmanager.v1.utils.ItemRewriter;
 import me.dadus33.chatitem.utils.PacketUtils;
-import me.dadus33.chatitem.utils.ProtocolVersion;
 import me.dadus33.chatitem.utils.Reflect;
+import me.dadus33.chatitem.utils.Version;
 
 @SuppressWarnings("unchecked")
 public class JSONManipulatorCurrent implements JSONManipulator {
@@ -64,7 +64,7 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 	// feel free to submit a pull request to add tags from your plugins
 	private static final List<String> IGNORED = Arrays.asList("horsetag", "phorse", "iscnameviz", "cname");
 
-	private static final ConcurrentHashMap<Map.Entry<ProtocolVersion, ItemStack>, JsonObject> STACKS = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<Map.Entry<Version, ItemStack>, JsonObject> STACKS = new ConcurrentHashMap<>();
 
 	static {
 		NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagByte", "nbt."));
@@ -102,7 +102,7 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 
 	private List<String> replaces;
 	private String rgx;
-	private ProtocolVersion protocolVersion;
+	private Version protocolVersion;
 	private JsonObject itemTooltip;
 	private JsonArray classicTooltip;
 	private final JsonParser PARSER = new JsonParser();
@@ -130,8 +130,8 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 		}
 		rgx = regex;
 		JsonArray rep = new JsonArray();
-		final AbstractMap.SimpleEntry<ProtocolVersion, ItemStack> p = new AbstractMap.SimpleEntry<>(
-				protocolVersion = ProtocolVersion.getVersion(protocol), item);
+		final AbstractMap.SimpleEntry<Version, ItemStack> p = new AbstractMap.SimpleEntry<>(
+				protocolVersion = Version.getVersion(protocol), item);
 
 		if ((itemTooltip = STACKS.get(p)) == null) {
 			JsonArray use = Translator.toJson(replacement); // We get the json representation of the old color
@@ -826,7 +826,7 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 
 	private String stringifyItem(ItemStack stack) throws Exception {
 		Item item = toItem(stack);
-		ItemRewriter.remapIds(ProtocolVersion.getServerVersion().MAX_VER, protocolVersion.MAX_VER, item);
+		ItemRewriter.remapIds(Version.getVersion().MAX_VER, protocolVersion.MAX_VER, item);
 		StringBuilder sb = new StringBuilder("{id:");
 		sb.append("\"").append(item.getId()).append("\"").append(","); // Append the id
 		sb.append("Count:").append(item.getAmount()).append("b,"); // Append the amount
@@ -898,7 +898,7 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 					if (!first) {
 						sb.append(",");
 					}
-					if (protocolVersion.MAX_VER <= ProtocolVersion.V1_11.MAX_VER) { // it's before 1.12
+					if (protocolVersion.MAX_VER <= Version.V1_11.MAX_VER) { // it's before 1.12
 						sb.append(index).append(":").append(value);
 					} else {
 						sb.append(value);

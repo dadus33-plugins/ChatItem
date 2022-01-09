@@ -1,9 +1,9 @@
 package me.dadus33.chatitem.chatmanager.v1.utils;
 
-import static me.dadus33.chatitem.utils.ProtocolVersion.V1_10;
-import static me.dadus33.chatitem.utils.ProtocolVersion.V1_11;
-import static me.dadus33.chatitem.utils.ProtocolVersion.V1_8;
-import static me.dadus33.chatitem.utils.ProtocolVersion.V1_9;
+import static me.dadus33.chatitem.utils.Version.V1_10;
+import static me.dadus33.chatitem.utils.Version.V1_11;
+import static me.dadus33.chatitem.utils.Version.V1_8;
+import static me.dadus33.chatitem.utils.Version.V1_9;
 
 public class ItemRewriter {
 

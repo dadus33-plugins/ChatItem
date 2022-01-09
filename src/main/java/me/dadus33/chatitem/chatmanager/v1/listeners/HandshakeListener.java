@@ -9,7 +9,7 @@ import com.comphenix.protocol.events.PacketEvent;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.v1.playerversion.hooks.DefaultVersionHook;
-import me.dadus33.chatitem.utils.ProtocolVersion;
+import me.dadus33.chatitem.utils.Version;
 
 public class HandshakeListener extends PacketAdapter {
 
@@ -26,6 +26,6 @@ public class HandshakeListener extends PacketAdapter {
         final int version = e.getPacket().getIntegers().readSafely(0);
         //Delay the mapping to make sure the true address of the player was received when using bungeecord or other types of proxies
         Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), () ->
-        DefaultVersionHook.PROTOCOL_PER_ADDRESS.put(ProtocolVersion.stringifyAdress(e.getPlayer().getAddress()), version), 10L);
+        DefaultVersionHook.PROTOCOL_PER_ADDRESS.put(Version.stringifyAdress(e.getPlayer().getAddress()), version), 10L);
     }
 }

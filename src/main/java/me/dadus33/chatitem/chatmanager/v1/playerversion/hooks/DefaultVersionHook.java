@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 
 import me.dadus33.chatitem.chatmanager.v1.playerversion.IPlayerVersion;
-import me.dadus33.chatitem.utils.ProtocolVersion;
+import me.dadus33.chatitem.utils.Version;
 
 public class DefaultVersionHook implements IPlayerVersion {
 
@@ -17,6 +17,6 @@ public class DefaultVersionHook implements IPlayerVersion {
 	public int getProtocolVersion(Player p) {
 		if(PROTOCOL_PER_UUID.containsKey(p.getUniqueId()))
 			return PROTOCOL_PER_UUID.get(p.getUniqueId());
-		return PROTOCOL_PER_ADDRESS.getOrDefault(ProtocolVersion.stringifyAdress(p.getAddress()), ProtocolVersion.getServerVersion().MAX_VER);
+		return PROTOCOL_PER_ADDRESS.getOrDefault(Version.stringifyAdress(p.getAddress()), Version.getVersion().MAX_VER);
 	}
 }

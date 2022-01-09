@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.PacketUtils;
@@ -94,6 +95,12 @@ public class ChatListener implements Listener {
 	public void onChat(AsyncPlayerChatEvent e) {
 		if(e.isCancelled())
 			return;
+		Player p = e.getPlayer();
+        for (String rep : getStorage().PLACEHOLDERS) {
+            if (e.getMessage().contains(rep + ChatManager.SEPARATOR + p.getName())) { // already managed by v1
+                return;
+            }
+        }
         boolean found = false;
         
         for(String key : e.getMessage().split(" ")) {
@@ -110,7 +117,6 @@ public class ChatListener implements Listener {
         if (!found) {
             return;
         }
-		Player p = e.getPlayer();
         if (!p.hasPermission("chatitem.use")) {
             if(!getStorage().LET_MESSAGE_THROUGH) {
                 e.setCancelled(true);

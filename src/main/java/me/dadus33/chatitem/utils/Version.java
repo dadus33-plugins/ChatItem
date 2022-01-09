@@ -1,5 +1,7 @@
 package me.dadus33.chatitem.utils;
 
+import java.net.InetSocketAddress;
+
 import org.bukkit.Bukkit;
 
 public enum Version {
@@ -45,6 +47,10 @@ public enum Version {
 		return index >= other.index;
 	}
 
+	public boolean isNewerThan(Version other) {
+		return index > other.index;
+	}
+
 	public static Version getVersionByName(String name) {
 		for (Version v : Version.values())
 			if (name.toLowerCase().startsWith(v.name().toLowerCase()))
@@ -52,8 +58,22 @@ public enum Version {
 		return HIGHER;
 	}
 
+	public static Version getVersion(int protocolVersion) {
+		for (Version ver : Version.values()) {
+			if (protocolVersion >= ver.MIN_VER && protocolVersion <= ver.MAX_VER) {
+				return ver;
+			}
+		}
+		return HIGHER;
+	}
+
 	public static Version getVersion() {
 		return SERVER_VERSION;
 	}
 
+	public static String stringifyAdress(InetSocketAddress address) {
+		String port = String.valueOf(address.getPort());
+		String ip = address.getAddress().getHostAddress();
+		return ip + ":" + port;
+	}
 }

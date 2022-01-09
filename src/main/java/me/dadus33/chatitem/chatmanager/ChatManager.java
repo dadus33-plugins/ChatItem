@@ -5,6 +5,8 @@ import me.dadus33.chatitem.utils.Storage;
 
 public abstract class ChatManager {
 
+	public final static char SEPARATOR = ((char) 0x0007);
+	
 	protected Storage s;
 	
 	public ChatManager() {
