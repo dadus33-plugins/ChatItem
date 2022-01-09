@@ -55,7 +55,6 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 	private static final Class<?> NMS_ITEM_STACK_CLASS = PacketUtils.getNmsClass("ItemStack", "world.item.");
 	private static final Method AS_NMS_COPY = Reflect.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
 	private static final Class<?> NBT_TAG_COMPOUND = PacketUtils.getNmsClass("NBTTagCompound", "nbt.");
-	public static final Method SAVE_NMS_ITEM_STACK_METHOD_OLD = null;//Reflect.getMethod(NMS_ITEM_STACK_CLASS, "save", NBT_TAG_COMPOUND);
 	private static final Method SAVE_NMS_ITEM_STACK_METHOD = Reflect.getMethod(NMS_ITEM_STACK_CLASS, NBT_TAG_COMPOUND,
 			NBT_TAG_COMPOUND);
 	private static final Field MAP = Reflect.getField(NBT_TAG_COMPOUND, "map", "x");
