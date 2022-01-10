@@ -13,7 +13,8 @@ import com.google.common.base.Strings;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v2.ChatListenerChatManager;
-import me.dadus33.chatitem.commands.CIReload;
+import me.dadus33.chatitem.commands.CIReloadCommand;
+import me.dadus33.chatitem.commands.ChatItemCommand;
 import me.dadus33.chatitem.filters.Log4jFilter;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.listeners.JoinListener;
@@ -105,7 +106,8 @@ public class ChatItem extends JavaPlugin {
         }*/
 
         //Commands
-        getCommand("cireload").setExecutor(new CIReload());
+        getCommand("cireload").setExecutor(new CIReloadCommand());
+        getCommand("chatitem").setExecutor(new ChatItemCommand());
         
         // events
         getServer().getPluginManager().registerEvents(new JoinListener(), this);

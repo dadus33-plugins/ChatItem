@@ -104,6 +104,36 @@ messages:
   join-update:
     message: "&cA new version of ChatItem is available. &aClick here to download."
     hover: "&6Click to go to spigot page !"
+  # For all commands ran by console by reserved to player
+  only-players: "&cOnly players can run this command"
+  # All messages for the /chatitem command
+  chatitem-cmd:
+    help:
+    - "&6/chatitem admin : &7Manage some options"
+    - "&6/chatitem links : &7See all links which are usefull"
+    links:
+      begin: "&aAll usefull links: "
+      list:
+        1:
+          message: "\n&7- &eSpigotmc updates"
+          hover: "&6Click to go to spigot page !"
+          link: "https://www.spigotmc.org/resources/19064/"
+        2:
+          message: " "
+        3:
+          message: "&7(Original author: &aDadus33"
+          hover: "&6See &aDadus33&6's profile"
+          link: "https://www.spigotmc.org/members/10224/"
+        4:
+          message: "&7, "
+        5:
+          message: "&7Maintainer: &aElikill58&7)"
+          hover: "&6See &aElikill58&6's profile"
+          link: "https://www.spigotmc.org/members/310762/"
+        6:
+          message: "\n&7- &6Support on discord"
+          hover: "&6Click to open discord !"
+          link: "https://discord.gg/ttA5CjMhk7"
   #  All the fields bellow shold be translated in your own language. Those will be used in the {remaining} format of the cooldown message.
   # You should leave a space as a PREFIX as we will add a number in front of them
   seconds: " seconds"

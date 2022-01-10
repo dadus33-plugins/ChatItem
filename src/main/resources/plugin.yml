@@ -11,6 +11,9 @@ commands:
     description: Reload the ChatItem config.
     aliases: [chatitemreload, citemreload, cir]
     permission: chatitem.reload
+  chatitem:
+    description: See and edit ChatItem informations
+    permission: chatitem.reload
 permissions:
   chatitem.reload:
     description: Allows reloading the config
