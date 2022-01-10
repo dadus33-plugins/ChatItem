@@ -164,7 +164,7 @@ public class PacketUtils {
 	public static void sendPacket(Player p, Object packet) {
 		try {
 			Object playerConnection = getPlayerConnection(p);
-			playerConnection.getClass().getMethod("sendPacket", getNmsClass("Packet", "network.protocol.")).invoke(playerConnection, packet);
+			playerConnection.getClass().getMethod(Version.getVersion().isNewerOrEquals(Version.V1_18) ? "a" : "sendPacket", getNmsClass("Packet", "network.protocol.")).invoke(playerConnection, packet);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

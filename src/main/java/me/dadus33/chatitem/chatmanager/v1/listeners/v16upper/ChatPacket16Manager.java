@@ -1,7 +1,5 @@
 package me.dadus33.chatitem.chatmanager.v1.listeners.v16upper;
 
-import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
-
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,13 +64,24 @@ public class ChatPacket16Manager extends PacketHandler {
 			return;
 		ChatItem.debug("UUID: " + sender);
 		PacketContent packet = e.getContent();
-		BaseComponent[] components = packet.getSpecificModifier(BaseComponent[].class).readSafely(0);
-		if (components == null) {
-			ChatItem.debug("No base components");
-			return;
+		String nfJson;
+		Object possibleChatComponent = packet.getChatComponents().readSafely(0);
+		if (possibleChatComponent == null) {
+			BaseComponent[] components = packet.getSpecificModifier(BaseComponent[].class).readSafely(0);
+			if (components == null) {
+				ChatItem.debug("No base components");
+				return;
+			}
+			nfJson = ComponentSerializer.toString(components);
+		} else {
+			try {
+				nfJson = (String) serializerGetJson.invoke(null, possibleChatComponent);
+			} catch (Exception exc) {
+				exc.printStackTrace();
+				nfJson = "{}";
+			}
 		}
-		String json = ComponentSerializer.toString(components);
-
+		String json = nfJson;
 		boolean found = false;
 		for (String rep : getStorage().PLACEHOLDERS) {
 			if (json.contains(rep)) {
@@ -84,60 +93,56 @@ public class ChatPacket16Manager extends PacketHandler {
 			ChatItem.debug("No placeholders founded");
 			return; // then it's just a normal message without placeholders, so we leave it alone
 		}
-		if (json.lastIndexOf(SEPARATOR) == -1) { // if the message doesn't contain the BELL separator, then it's
-													// certainly NOT a message we want to parse
-			ChatItem.debug("Not contains bell " + json);
-			return;
-		}
-		ChatItem.debug("Add packet meta");
-		e.setCancelled(true); // We cancel the packet as we're going to resend it anyways (ignoring listeners
-		// this time)
-		Bukkit.getScheduler().runTaskAsynchronously(ChatItem.getInstance(), () -> {
-
-			Player p = Bukkit.getPlayer(sender);
-			StringBuilder builder = new StringBuilder(json);
-			// from the json string
-			String localJson = builder.toString();
-
-			String message = null;
-			try {
-				if (!p.getItemInHand().getType().equals(Material.AIR)) {
-					ItemStack copy = p.getItemInHand().clone();
-					if (copy.getType().name().contains("_BOOK")) { // filtering written books
-						BookMeta bm = (BookMeta) copy.getItemMeta();
-						bm.setPages(Collections.emptyList());
-						copy.setItemMeta(bm);
-					} else {
-						if (copy.getType().name().contains("SHULKER_BOX")) { // if it's shulker
-							if (copy.hasItemMeta()) {
-								BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
-								if (bsm.hasBlockState()) {
-									ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
-									for (ItemStack item : sb.getInventory()) {
-										stripData(item);
-									}
-									bsm.setBlockState(sb);
+		Player p = Bukkit.getPlayer(sender);
+		String message = null;
+		try {
+			if (!p.getItemInHand().getType().equals(Material.AIR)) {
+				ItemStack copy = p.getItemInHand().clone();
+				if (copy.getType().name().contains("_BOOK")) { // filtering written books
+					BookMeta bm = (BookMeta) copy.getItemMeta();
+					bm.setPages(Collections.emptyList());
+					copy.setItemMeta(bm);
+				} else {
+					if (copy.getType().name().contains("SHULKER_BOX")) { // if it's shulker
+						if (copy.hasItemMeta()) {
+							BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
+							if (bsm.hasBlockState()) {
+								ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
+								for (ItemStack item : sb.getInventory()) {
+									stripData(item);
 								}
-								copy.setItemMeta(bsm);
+								bsm.setBlockState(sb);
 							}
+							copy.setItemMeta(bsm);
 						}
 					}
-					message = manager.getManipulator().parse(localJson, getStorage().PLACEHOLDERS, copy,
-							styleItem(copy, getStorage()), manager.getPlayerVersionAdapter().getProtocolVersion(p));
-				} else {
-					if (!getStorage().HAND_DISABLED) {
-						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,
-								getStorage().HAND_NAME, getStorage().HAND_TOOLTIP, p);
-					}
 				}
-			} catch (Exception e1) {
-				e1.printStackTrace();
+				message = manager.getManipulator().parse(json, getStorage().PLACEHOLDERS, copy,
+						styleItem(copy, getStorage()), manager.getPlayerVersionAdapter().getProtocolVersion(p));
+			} else {
+				if (!getStorage().HAND_DISABLED) {
+					message = manager.getManipulator().parseEmpty(json, getStorage().PLACEHOLDERS,
+							getStorage().HAND_NAME, getStorage().HAND_TOOLTIP, p);
+				}
 			}
-			if (message != null) {
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		if (message != null) {
+			if (json.equalsIgnoreCase("{}")) {
+				packet.getChatComponents().write(0, jsonToChatComponent(message));
+			} else {
 				packet.getSpecificModifier(BaseComponent[].class).write(0, ComponentSerializer.parse(message));
 			}
-			PacketUtils.sendPacket(e.getPlayer(), e.getPacket());
-		});
+		}
+	}
+	private Object jsonToChatComponent(String json) {
+		try {
+			return PacketUtils.CHAT_SERIALIZER.getMethod("a", String.class).invoke(null, json);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static String styleItem(ItemStack item, Storage c) {

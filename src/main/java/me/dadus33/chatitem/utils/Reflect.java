@@ -20,14 +20,23 @@ public class Reflect {
     public static Method getMethod(Class<?> clazz, Class<?> returned, Class<?>... params) {
         try {
         	for(Method m : clazz.getDeclaredMethods()) {
-        		if(returned == m.getReturnType() && m.getParameterTypes().equals(params)) {
+        		if(returned.equals(m.getReturnType()) && areParamsEquals(m.getParameterTypes(), params))
         			return m;
-        		}
         	}
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+    
+    private static boolean areParamsEquals(Class<?>[] p1, Class<?>[] p2) {
+		if(p1.length != p2.length)
+			return false;
+		for(int i = 0; i < p1.length; i++) {
+			if(!p1[i].equals(p2[i]))
+				return false;
+		}
+		return true;
     }
 
     public static Field getField(Class<?> clazz, String... fieldNames){
