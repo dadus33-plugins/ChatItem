@@ -17,6 +17,7 @@ import me.dadus33.chatitem.commands.CIReloadCommand;
 import me.dadus33.chatitem.commands.ChatItemCommand;
 import me.dadus33.chatitem.filters.Log4jFilter;
 import me.dadus33.chatitem.itemnamer.NamerManager;
+import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.listeners.JoinListener;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.Storage;
@@ -111,6 +112,7 @@ public class ChatItem extends JavaPlugin {
         
         // events
         getServer().getPluginManager().registerEvents(new JoinListener(), this);
+        getServer().getPluginManager().registerEvents(new InventoryListener(), this);
         
         chooseManagers();
 

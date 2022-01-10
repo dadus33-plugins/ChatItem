@@ -7,6 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.utils.Storage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -27,8 +28,7 @@ public class ChatItemCommand implements CommandExecutor {
     	if(args.length == 0) {
     		c.CI_HELP.forEach(p::sendMessage);
     	} else if(args[0].equalsIgnoreCase("admin")) {
-    		// here open inventory
-    		p.sendMessage("admin soon");
+    		InventoryListener.open(p);
     	} else if(args[0].equalsIgnoreCase("reload")) {
     		ChatItem.reload(sender);
     	} else if(args[0].equalsIgnoreCase("link") || args[0].equalsIgnoreCase("links")) {
