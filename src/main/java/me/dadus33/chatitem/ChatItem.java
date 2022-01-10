@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -70,14 +71,14 @@ public class ChatItem extends JavaPlugin {
         ChatItem pl = getInstance();
         pl.saveDefaultConfig();
         pl.reloadConfig();
-        //String oldChatManager = pl.storage.MANAGER;
+        String oldChatManager = pl.storage.MANAGER;
         pl.storage = new Storage(pl.getConfig());
         pl.chooseManagers();
         pl.filter.setStorage(pl.storage);
         if (!pl.storage.RELOAD_MESSAGE.isEmpty())
             sender.sendMessage(pl.storage.RELOAD_MESSAGE);
-        /*if(!oldChatManager.equalsIgnoreCase(pl.storage.MANAGER))
-        	sender.sendMessage(ChatColor.RED + "A simple reload CAN'T change the manager. Sorry, it's not available yet.");*/
+        if(!oldChatManager.equalsIgnoreCase(pl.storage.MANAGER))
+        	sender.sendMessage(ChatColor.GOLD + "Changing the manager with command reloading CAN produce issue. It's mostly suggested to restart after finding the better manager for you.");
     }
 
     public static ChatItem getInstance() {
