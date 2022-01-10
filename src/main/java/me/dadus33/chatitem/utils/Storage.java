@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,14 +21,14 @@ public class Storage {
 	public final boolean COLOR_IF_ALREADY_COLORED, FORCE_ADD_AMOUNT, LET_MESSAGE_THROUGH, DENY_IF_NO_ITEM,
 			HAND_DISABLED, SHOW_NO_PERM_NORMAL, CHECK_UPDATE, SHOW_NO_PERM_COMMAND;
 	public final String HAND_NAME, NAME_FORMAT, AMOUNT_FORMAT, MANAGER;
-	public final String NO_PERMISSION_MESSAGE, DENY_MESSAGE, RELOAD_MESSAGE, COOLDOWN_MESSAGE, LIMIT_MESSAGE, ONLY_PLAYERS;
+	public final String NO_PERMISSION_MESSAGE, DENY_MESSAGE, RELOAD_MESSAGE, COOLDOWN_MESSAGE, LIMIT_MESSAGE;
 	public final String SECONDS, MINUTES, HOURS;
 	public final String JOIN_UPDATE_MESSAGE, JOIN_UPDATE_HOVER;
 	public final int CONFIG_VERSION, LIMIT;
 	public final long COOLDOWN;
 	public final List<Command> ALLOWED_PLUGIN_COMMANDS = new ArrayList<>();
 	public final List<String> ALLOWED_DEFAULT_COMMANDS = new ArrayList<>();
-	public final List<String> PLACEHOLDERS, HAND_TOOLTIP, CI_HELP;
+	public final List<String> PLACEHOLDERS, HAND_TOOLTIP;
 
 	public Storage(FileConfiguration cnf) {
 		this.conf = cnf;
@@ -72,8 +71,6 @@ public class Storage {
 				"&cA new version of ChatItem is available. &aClick here to download."));
 		JOIN_UPDATE_HOVER = color(conf.getString("messages.join-update.hover", "&6Click to go to spigot page !"));
         LIMIT_MESSAGE = color(conf.getString("messages.limit-message"));
-        ONLY_PLAYERS = color(conf.getString("messages.only-players"));
-        CI_HELP = conf.getStringList("messages.chatitem-cmd.help").stream().map(Storage::color).collect(Collectors.toList());
 
 		SECONDS = color(conf.getString("messages.seconds", " seconds"));
 		MINUTES = color(conf.getString("messages.minutes", " minutes"));

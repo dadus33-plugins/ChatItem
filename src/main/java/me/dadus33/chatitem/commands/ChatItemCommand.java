@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.listeners.InventoryListener;
+import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.Storage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -19,14 +20,13 @@ public class ChatItemCommand implements CommandExecutor {
     @SuppressWarnings("deprecation")
 	@Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-    	Storage c = ChatItem.getInstance().getStorage();
     	if(!(sender instanceof Player)) {
-    		sender.sendMessage(c.ONLY_PLAYERS);
+    		Messages.sendMessage(sender, "only-players");
     		return false;
     	}
     	Player p = (Player) sender;
     	if(args.length == 0) {
-    		c.CI_HELP.forEach(p::sendMessage);
+    		Messages.sendMessage(p, "chatitem-cmd.help");
     	} else if(args[0].equalsIgnoreCase("admin")) {
     		InventoryListener.open(p);
     	} else if(args[0].equalsIgnoreCase("reload")) {
@@ -47,7 +47,7 @@ public class ChatItemCommand implements CommandExecutor {
     		}
     		p.spigot().sendMessage(text);
     	} else {
-    		c.CI_HELP.forEach(p::sendMessage);
+    		Messages.sendMessage(p, "chatitem-cmd.help");
     	}
         return false;
     }
