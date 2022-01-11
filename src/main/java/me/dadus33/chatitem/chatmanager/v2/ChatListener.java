@@ -21,6 +21,7 @@ import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -185,15 +186,26 @@ public class ChatListener implements Listener {
 							component.addExtra(color + args);
 						else {
 							String handName = getStorage().HAND_NAME;
+							TextComponent handComp = new TextComponent("");
+							ComponentBuilder handTooltip = new ComponentBuilder();
+							int stay = getStorage().HAND_TOOLTIP.size();
+							for(String line : getStorage().HAND_TOOLTIP) {
+								stay--;
+								handTooltip.append(line.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName()));
+								if(stay > 0)
+									handTooltip.append("\n");
+							}
+							handComp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,handTooltip.create()));
 							if(handName.contains("{name}")) {
 								String[] splitted = handName.split("{name}");
 								for(int i = 0; i < (splitted.length - 1); i++) {
-									component.addExtra(new TextComponent(splitted[i]));
-									component.addExtra(PlayerNamerManager.getPlayerNamer().getName(p));
+									handComp.addExtra(new TextComponent(splitted[i]));
+									handComp.addExtra(PlayerNamerManager.getPlayerNamer().getName(p));
 								}
-								component.addExtra(new TextComponent(splitted[splitted.length - 1]));
+								handComp.addExtra(new TextComponent(splitted[splitted.length - 1]));
 							} else
-								component.addExtra(handName.replace("{display-name}", p.getDisplayName()));
+								handComp.addExtra(handName.replace("{display-name}", p.getDisplayName()));
+							component.addExtra(handComp);
 						}
 					}
 				} else {
