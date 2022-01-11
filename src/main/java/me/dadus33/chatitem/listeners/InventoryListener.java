@@ -76,7 +76,7 @@ public class InventoryListener implements Listener {
 			holder.keyBySlot.put(slot, manager);
 			inv.setItem(slot++, getManagerItem(manager));
 		}
-		inv.setItem(slot + 2, getManagerItem("actual", "%manager%", Messages.getMessage("admin-inv.manager." + c.MANAGER + ".name")));
+		inv.setItem(slot + 1, getManagerItem("actual", "%manager%", Messages.getMessage("admin-inv.manager." + c.MANAGER + ".name")));
 
 		inv.setItem(18, getBoolChangeItem(Material.INK_SAC, "color-if-already-colored", c.COLOR_IF_ALREADY_COLORED));
 		inv.setItem(19, getBoolChangeItem(Material.REDSTONE, "deny-no-item", c.DENY_IF_NO_ITEM));

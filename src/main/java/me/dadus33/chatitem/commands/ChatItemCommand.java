@@ -1,8 +1,14 @@
 package me.dadus33.chatitem.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -15,7 +21,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class ChatItemCommand implements CommandExecutor {
+public class ChatItemCommand implements CommandExecutor, TabExecutor {
 
     @SuppressWarnings("deprecation")
 	@Override
@@ -51,4 +57,14 @@ public class ChatItemCommand implements CommandExecutor {
     	}
         return false;
     }
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] arg) {
+		List<String> list = new ArrayList<>();
+		String prefix = arg[arg.length - 1].toLowerCase(Locale.ROOT);
+		for(String s : Arrays.asList("help", "admin", "reload"))
+			if(prefix.isEmpty() || s.startsWith(prefix))
+				list.add(s);
+		return list.isEmpty() ? null : list;
+	}
 }

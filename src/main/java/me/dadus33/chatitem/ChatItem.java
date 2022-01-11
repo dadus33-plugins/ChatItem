@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.StringJoiner;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.base.Strings;
@@ -108,8 +111,8 @@ public class ChatItem extends JavaPlugin {
         }*/
 
         //Commands
-        getCommand("cireload").setExecutor(new CIReloadCommand());
-        getCommand("chatitem").setExecutor(new ChatItemCommand());
+        loadCommand(getCommand("cireload"), new CIReloadCommand());
+        loadCommand(getCommand("chatitem"), new ChatItemCommand());
         
         // events
         getServer().getPluginManager().registerEvents(new JoinListener(), this);
@@ -133,6 +136,13 @@ public class ChatItem extends JavaPlugin {
 	        });
         }
     }
+	
+	public void loadCommand(PluginCommand cmd, Object obj) {
+		if(obj instanceof CommandExecutor)
+			cmd.setExecutor((CommandExecutor) obj);
+		if(obj instanceof TabCompleter)
+			cmd.setTabCompleter((TabCompleter) obj);
+	}
     
     public Storage getStorage() {
 		return storage;
