@@ -18,14 +18,13 @@ public class Storage {
 
 	private FileConfiguration conf;
 	public final HashMap<String, HashMap<Short, String>> TRANSLATIONS = new HashMap<>();
-	public final boolean COLOR_IF_ALREADY_COLORED, FORCE_ADD_AMOUNT, LET_MESSAGE_THROUGH, DENY_IF_NO_ITEM,
+	public boolean COLOR_IF_ALREADY_COLORED, FORCE_ADD_AMOUNT, LET_MESSAGE_THROUGH, DENY_IF_NO_ITEM,
 			HAND_DISABLED, SHOW_NO_PERM_NORMAL, CHECK_UPDATE, SHOW_NO_PERM_COMMAND;
 	public final String HAND_NAME, NAME_FORMAT, AMOUNT_FORMAT, MANAGER;
 	public final String NO_PERMISSION_MESSAGE, DENY_MESSAGE, RELOAD_MESSAGE, COOLDOWN_MESSAGE, LIMIT_MESSAGE;
 	public final String SECONDS, MINUTES, HOURS;
 	public final String JOIN_UPDATE_MESSAGE, JOIN_UPDATE_HOVER;
-	public final int CONFIG_VERSION, LIMIT;
-	public final long COOLDOWN;
+	public int CONFIG_VERSION, LIMIT, COOLDOWN;
 	public final List<Command> ALLOWED_PLUGIN_COMMANDS = new ArrayList<>();
 	public final List<String> ALLOWED_DEFAULT_COMMANDS = new ArrayList<>();
 	public final List<String> PLACEHOLDERS, HAND_TOOLTIP;
@@ -54,7 +53,7 @@ public class Storage {
 		FORCE_ADD_AMOUNT = conf.getBoolean("general.force-add-amount", true);
 		DENY_IF_NO_ITEM = conf.getBoolean("general.deny-if-no-item", false);
         LIMIT = conf.getInt("general.limit", 8);
-		COOLDOWN = conf.getLong("general.cooldown", 60);
+		COOLDOWN = conf.getInt("general.cooldown", 60);
 		SHOW_NO_PERM_NORMAL = conf.getBoolean("general.show-no-permission-message.normal", true);
         SHOW_NO_PERM_COMMAND = conf.getBoolean("general.show-no-permission-message.command", false);
 		HAND_DISABLED = conf.getBoolean("general.hand.disabled", false);

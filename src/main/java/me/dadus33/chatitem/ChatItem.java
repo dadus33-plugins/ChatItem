@@ -71,7 +71,8 @@ public class ChatItem extends JavaPlugin {
     
     public static void reload(CommandSender sender) {
         ChatItem pl = getInstance();
-        pl.saveDefaultConfig();
+        if(pl.getConfig() == null || pl.getConfig().getKeys(false).isEmpty())
+        	pl.saveDefaultConfig();
         pl.reloadConfig();
         String oldChatManager = pl.storage.MANAGER;
         pl.storage = new Storage(pl.getConfig());

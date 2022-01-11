@@ -1,6 +1,7 @@
 package me.dadus33.chatitem.utils;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -10,10 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class ItemUtils {
 
-	public static final Material MATERIAL_CLOSE = getMaterialWithCompatibility("BARRIER", "REDSTONE");
-	
-	public static final Material SKELETON_SKULL = getMaterialWithCompatibility("SKELETON_SKULL", "SKULL_ITEM");
-	public static final Material PLAYER_HEAD = getMaterialWithCompatibility("PLAYER_HEAD", "SKULL_ITEM");
+	public static final Material MATERIAL_CLOSE = getMaterialWithCompatibility("BARRIER", "REDSTONE_BLOCK");
 	
 	// items
 	public static final Material EMPTY_MAP = getMaterialWithCompatibility("EMPTY_MAP", "MAP");
@@ -25,7 +23,7 @@ public class ItemUtils {
 	
 	// colored items
 	public static final Material GRAY_STAINED_GLASS_PANE = getMaterialWithCompatibility("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE");
-	public static final Material WHITE_STAINED_GLASS = getMaterialWithCompatibility("STAINED_GLASS_PANE", "WHITE_STAINED_GLASS");
+	public static final Material WHITE_STAINED_GLASS = getMaterialWithCompatibility("STAINED_GLASS_PANE", "WHITE_STAINED_GLASS_PANE");
 	
 	public static Material getMaterialWithCompatibility(String... tempMat) {
 		for(String s : tempMat) {
@@ -37,9 +35,6 @@ public class ItemUtils {
 				e2.printStackTrace();
 			} catch (NoSuchFieldException e) {}
 		}
-		String temp = "";
-		for(String s : tempMat)
-			temp = temp + (temp.equalsIgnoreCase("") ? "" : ", ") + s;
 		return null;
 	}
 
@@ -52,6 +47,19 @@ public class ItemUtils {
 		ItemMeta meta = (ItemMeta) item.getItemMeta();
 		meta.setDisplayName(ChatColor.RESET + name);
 		meta.setLore(Arrays.asList(lore));
+		item.setItemMeta(meta);
+		return item;
+	}
+
+	public static ItemStack createItem(Material m, String name, List<String> lore) {
+		return createItem(m, name, 1, lore);
+	}
+
+	public static ItemStack createItem(Material m, String name, int quantite, List<String> lore) {
+		ItemStack item = new ItemStack(m, quantite);
+		ItemMeta meta = (ItemMeta) item.getItemMeta();
+		meta.setDisplayName(ChatColor.RESET + name);
+		meta.setLore(lore);
 		item.setItemMeta(meta);
 		return item;
 	}

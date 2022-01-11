@@ -134,6 +134,59 @@ messages:
           message: "\n&7- &6Support on discord"
           hover: "&6Click to open discord !"
           link: "https://discord.gg/ttA5CjMhk7"
+  # All messages in admin inventory
+  admin-inv:
+    name: "ChatItem - Admin"
+    close: "Close"
+    # Generic lores for options items
+    amount-lore:
+    - "&aLeft-click: &6+1"
+    - "&aRight-click: &6-1"
+    bool-lore:
+    - "&7Click to enable/disable"
+    # Name of options items
+    color-if-already-colored: "&6Color if already colored: %state%"
+    deny-no-item: "&6Deny without item: %state%"
+    hand-disabled: "&6Hand disabled: %state%"
+    limit-per-message: "&6Limit per message: &a%state%"
+    cooldown: "&6Cooldown: &a%state%"
+    # Change name and lore of all managers
+    manager:
+      both:
+        name: "&6Use both manager&7: &aPacket & Chat"
+        lore:
+        - "&aTry both manager. Very usefull when you have lot of plugins"
+        - "&eIt enable to use ChatItem for all type of messages"
+        - ""
+        - "&7Since ChatItem v2.1"
+      auto:
+        name: "&6Choose automatically"
+        lore:
+        - "&aChoose automatically between managers available"
+        - "&aaccording to actuals plugins."
+        - "&eThis is better when you are not using own plugin."
+        - ""
+        - "&7Since ChatItem v2.1"
+      packet:
+        name: "&6Intercept packets"
+        lore:
+        - "&aChange message sent directly by intercepting packet"
+        - "&aCan use &6ProtocolLib &aif present."
+        - "&cCan have error with &e/cir &c!"
+        - ""
+        - "&7Originally made until ChatItem v1.4"
+      chat:
+        name: "&6Change basic message"
+        lore:
+        - "&aVery quick and usefull for server without plugin message !"
+        - "&aIt enable to use ChatItem without packet reading."
+        - "&eIt's more optimized than others manager"
+        - ""
+        - "&7Since ChatItem v2.0"
+      # The item that show the actual manager
+      actual:
+        name: '&6Actual manager: %manager%'
+        lore: []
   #  All the fields bellow shold be translated in your own language. Those will be used in the {remaining} format of the cooldown message.
   # You should leave a space as a PREFIX as we will add a number in front of them
   seconds: " seconds"

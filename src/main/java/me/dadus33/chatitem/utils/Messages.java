@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 
 import me.dadus33.chatitem.ChatItem;
 
@@ -21,8 +20,7 @@ public class Messages {
 	
 	@SuppressWarnings("unchecked")
 	public static List<String> getMessageList(String key, Object... placeholders) {
-		ConfigurationSection config = ChatItem.getInstance().getConfig().getConfigurationSection("messages");
-		Object obj = config.get(key);
+		Object obj = ChatItem.getInstance().getConfig().get("messages." + key);
 		if(obj == null)
 			return Arrays.asList(key);
 		if(obj instanceof List) {
@@ -39,6 +37,6 @@ public class Messages {
 		for (int index = 0; index <= placeholders.length - 1; index += 2) {
 			msg = msg.replace(String.valueOf(placeholders[index]), String.valueOf(placeholders[index + 1]));
 		}
-		return msg;
+		return Storage.color(msg);
 	}
 }
