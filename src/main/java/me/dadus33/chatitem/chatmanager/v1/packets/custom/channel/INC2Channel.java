@@ -46,6 +46,7 @@ public class INC2Channel extends ChannelAbstract {
 	@Override
 	protected void stopPipelines() {
 		pipeline.remove(boundHandler);
+		boundHandler.clean();
 	}
 
 	@Override

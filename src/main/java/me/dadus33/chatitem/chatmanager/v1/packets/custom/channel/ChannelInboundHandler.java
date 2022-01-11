@@ -1,6 +1,8 @@
 package me.dadus33.chatitem.chatmanager.v1.packets.custom.channel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 
 import io.netty.channel.Channel;
@@ -8,6 +10,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
@@ -17,15 +20,23 @@ public class ChannelInboundHandler extends ChannelInboundHandlerAdapter {
 
 	public static final HashMap<Channel, ChatItemPacket> TMP = new HashMap<>();
 	private CustomPacketManager packetManager;
+	private List<ChannelPipeline> pipelines = new ArrayList<>();
 	
 	public ChannelInboundHandler(CustomPacketManager packetManager) {
 		this.packetManager = packetManager;
 	}
 	
+	public void clean() {
+		pipelines.forEach(ChannelPipeline::removeFirst);
+		pipelines.clear();
+	}
+	
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		ctx.fireChannelRead(msg);
-		((Channel) msg).pipeline().addFirst(new ChannelInitializer<Channel>() {
+		ChannelPipeline pipe = ((Channel) msg).pipeline();
+		pipelines.add(pipe);
+		pipe.addFirst(new ChannelInitializer<Channel>() {
 			@Override
 			protected void initChannel(Channel channel) {
 				try {
