@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -50,9 +51,17 @@ public class InventoryListener implements Listener {
 			setInConfig("general.hand.disabled", c.HAND_DISABLED = !c.HAND_DISABLED);
 			open(p);
 		} else if(type.equals(Material.IRON_DOOR)) {
+			if(e.getClick().equals(ClickType.RIGHT))
+				c.LIMIT--;
+			else if(e.getClick().equals(ClickType.LEFT))
+				c.LIMIT++;
 			setInConfig("general.limit-per-message", c.LIMIT);
 			open(p);
 		} else if(type.equals(Material.APPLE)) {
+			if(e.getClick().equals(ClickType.RIGHT))
+				c.COOLDOWN--;
+			else if(e.getClick().equals(ClickType.LEFT))
+				c.COOLDOWN++;
 			setInConfig("general.cooldown", c.COOLDOWN);
 			open(p);
 		}
