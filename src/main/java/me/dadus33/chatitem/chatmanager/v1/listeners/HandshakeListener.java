@@ -19,6 +19,8 @@ public class HandshakeListener extends PacketAdapter {
 
     @Override
     public void onPacketReceiving(final PacketEvent e){
+    	if(e.isPlayerTemporary() || e.getPlayer() == null)
+    		return;
         PacketType.Protocol p = e.getPacket().getProtocols().read(0);
         if(p == PacketType.Protocol.STATUS || p == PacketType.Protocol.LEGACY){
             return;

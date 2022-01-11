@@ -2,7 +2,6 @@ package me.dadus33.chatitem.chatmanager.v1.json;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,7 +50,8 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 	private static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
 	private static final Class<?> NBT_STRING = PacketUtils.getNmsClass("NBTTagString", "nbt.");
 	private static final Class<?> NBT_LIST = PacketUtils.getNmsClass("NBTTagList", "nbt.");
-	private static final Map<Type, Tag> TYPES_TO_OPEN_NBT_TAGS = new HashMap<>();
+	private static final Map<Class<?>, BiFunction<String, Object, Tag>> TYPES_TO_MC_NBT_TAGS = new HashMap<>();
+	private static final Map<Class<?>, Function<String, Tag>> TYPES_TO_OPEN_NBT_TAGS = new HashMap<>();
 	private static final List<Class<?>> NBT_BASE_CLASSES = new ArrayList<>();
 	private static final List<Field> NBT_BASE_DATA_FIELD = new ArrayList<>();
 	private static final Class<?> NMS_ITEM_STACK_CLASS = PacketUtils.getNmsClass("ItemStack", "world.item.");
@@ -79,24 +81,34 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 		for (Class<?> NBT_BASE_CLASS : NBT_BASE_CLASSES) {
 			NBT_BASE_DATA_FIELD.add(Reflect.getField(NBT_BASE_CLASS, "data", "c", "x"));
 		}
-
-		TYPES_TO_OPEN_NBT_TAGS.put(Byte.class, new ByteTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(Byte[].class, new ByteArrayTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(Double.class, new DoubleTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(Float.class, new FloatTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(Integer.class, new IntTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(Integer[].class, new IntArrayTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(Long.class, new LongTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(Short.class, new ShortTag(""));
+		
+		// include NBT tags
+		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagByte", "nbt."), (name, obj) -> new ByteTag(name, NBTUtils.get(obj, "h")));
+		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagByteArray", "nbt."), (name, obj) -> new ByteArrayTag(name, NBTUtils.get(obj, "d")));
+		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagDouble", "nbt."), (name, obj) -> new DoubleTag(name, NBTUtils.get(obj, "i")));
+		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagFloat", "nbt."), (name, obj) -> new FloatTag(name, NBTUtils.get(obj, "j")));
+		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagInt", "nbt."), (name, obj) -> new IntTag(name, NBTUtils.get(obj, "f")));
+		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagIntArray", "nbt."), (name, obj) -> new IntArrayTag(name, NBTUtils.get(obj, "c")));
+		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagLong", "nbt."), (name, obj) -> new LongTag(name, NBTUtils.get(obj, "e")));
+		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagShort", "nbt."), (name, obj) -> new ShortTag(name, NBTUtils.get(obj, "g")));
+		// now basic types
+		TYPES_TO_OPEN_NBT_TAGS.put(Byte.class, ByteTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(Byte[].class, ByteArrayTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(Double.class, DoubleTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(Float.class, FloatTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(Integer.class, IntTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(Integer[].class, IntArrayTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(Long.class, LongTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(Short.class, ShortTag::new);
 		// Add the primitive types too, just in case
-		TYPES_TO_OPEN_NBT_TAGS.put(byte.class, new ByteTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(byte[].class, new ByteArrayTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(double.class, new DoubleTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(float.class, new FloatTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(int.class, new IntTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(int[].class, new IntArrayTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(long.class, new LongTag(""));
-		TYPES_TO_OPEN_NBT_TAGS.put(short.class, new ShortTag(""));
+		TYPES_TO_OPEN_NBT_TAGS.put(byte.class, ByteTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(byte[].class, ByteArrayTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(double.class, DoubleTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(float.class, FloatTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(int.class, IntTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(int[].class, IntArrayTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(long.class, LongTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(short.class, ShortTag::new);
 
 	}
 
@@ -136,21 +148,8 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 		if ((itemTooltip = STACKS.get(p)) == null) {
 			JsonArray use = Translator.toJson(replacement); // We get the json representation of the old color
 															// formatting method
-
-			JsonObject hover = PARSER.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject(); // There's
-																												// no
-																												// public
-																												// clone
-																												// method
-																												// for
-																												// JSONObjects
-																												// so we
-																												// need
-																												// to
-																												// parse
-																												// them
-																												// every
-																												// time
+			// There's no public clone method for JSONObjects so we need to parse them every time
+			JsonObject hover = PARSER.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
 
 			String jsonRep = stringifyItem(item); // Get the JSON representation of the item (well, not really JSON, but
 													// rather a string representation of NBT data)
@@ -164,17 +163,8 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 			itemTooltip = wrapper; // Save the tooltip for later use when we encounter a placeholder
 			STACKS.put(p, itemTooltip); // Save it in the cache too so when parsing other packets with the same item
 										// (and client version) we no longer have to create it again
-			Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), () -> STACKS.remove(p), 100L); // We
-																													// remove
-																													// it
-																													// later
-																													// when
-																													// no
-																													// longer
-																													// needed
-																													// to
-																													// save
-																													// memory
+			// We remove it later when no longer needed to save memory
+			Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), () -> STACKS.remove(p), 100L);
 		}
 
 		for (int i = 0; i < array.size(); ++i) {
@@ -780,44 +770,35 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 				Class<?> c = NBT_BASE_CLASSES.get(i);
 				if (c.isInstance(nmsTag)) {
 					Object value = NBT_BASE_DATA_FIELD.get(i).get(nmsTag);
-
-					Tag t = TYPES_TO_OPEN_NBT_TAGS.get(value.getClass()).getClass().getConstructor(String.class)
-							.newInstance(name);
-
-					if (t instanceof ByteTag) {
-						((ByteTag) t).setValue((byte) value);
-						((ByteTag) t).setValue((byte) value);
-						return t;
+					if(value.getClass().getSimpleName().startsWith("NBTTag")) {
+						if(!TYPES_TO_MC_NBT_TAGS.containsKey(value.getClass())) {
+							ChatItem.getInstance().getLogger().warning("Failed to find NBT tag for class: " + value.getClass().getSimpleName());
+							continue;
+						}
+						return TYPES_TO_MC_NBT_TAGS.get(value.getClass()).apply(name, value);
+					} else {
+						Tag t = TYPES_TO_OPEN_NBT_TAGS.get(value.getClass()).apply(name);
+						if (t instanceof ByteTag) {
+							((ByteTag) t).setValue((byte) value);
+							((ByteTag) t).setValue((byte) value);
+						} else if (t instanceof ByteArrayTag)
+							((ByteArrayTag) t).setValue((byte[]) value);
+						else if (t instanceof DoubleTag)
+							((DoubleTag) t).setValue((double) value);
+						else if (t instanceof FloatTag)
+							((FloatTag) t).setValue((float) value);
+						else if (t instanceof IntTag)
+							((IntTag) t).setValue((int) value);
+						else if (t instanceof IntArrayTag)
+							((IntArrayTag) t).setValue((int[]) value);
+						else if (t instanceof LongTag)
+							((LongTag) t).setValue((long) value);
+						else if (t instanceof ShortTag)
+							((ShortTag) t).setValue((short) value);
+						else
+							ChatItem.getInstance().getLogger().warning("Failed to find Open tag for class: " + t.getClass().getSimpleName());
+						return t; // Should never happen
 					}
-					if (t instanceof ByteArrayTag) {
-						((ByteArrayTag) t).setValue((byte[]) value);
-						return t;
-					}
-					if (t instanceof DoubleTag) {
-						((DoubleTag) t).setValue((double) value);
-						return t;
-					}
-					if (t instanceof FloatTag) {
-						((FloatTag) t).setValue((float) value);
-						return t;
-					}
-					if (t instanceof IntTag) {
-						((IntTag) t).setValue((int) value);
-						return t;
-					}
-					if (t instanceof IntArrayTag) {
-						((IntArrayTag) t).setValue((int[]) value);
-						return t;
-					}
-					if (t instanceof LongTag) {
-						((LongTag) t).setValue((long) value);
-						return t;
-					}
-					if (t instanceof ShortTag) {
-						((ShortTag) t).setValue((short) value);
-						return t;
-					}
-					return null; // Should never happen
 				}
 			}
 			return null; // Should never happen
