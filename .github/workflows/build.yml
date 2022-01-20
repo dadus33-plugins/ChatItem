@@ -35,4 +35,4 @@ jobs:
       env:
         DISCORD_WEBHOOK: https://discord.com/api/webhooks/933523632712454154/Wr10jXlGkKC5WZSRGe0b-U25iEzH4XHxyIMHaq_1YjY-VnPzmPP9KkTKBnmYlkiLjtyN
       with:
-        args: ChatItem.jar
+        args: target/ChatItem-*.jar
