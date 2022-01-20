@@ -23,6 +23,7 @@ import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.listeners.JoinListener;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
+import me.dadus33.chatitem.utils.SemVer;
 import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Utils;
 import me.dadus33.chatitem.utils.Version;
@@ -127,7 +128,13 @@ public class ChatItem extends JavaPlugin {
 	        getServer().getScheduler().runTaskAsynchronously(this, () -> {
 				String urlName = "https://api.spigotmc.org/legacy/update.php?resource=19064";
 				String content = Utils.getFromURL(urlName);
-				if(!Strings.isNullOrEmpty(content)) {
+				if(Strings.isNullOrEmpty(content))
+					return;
+				SemVer currentVersion = SemVer.parse(getDescription().getVersion());
+				if (currentVersion == null)
+					return;
+				SemVer latestVersion = SemVer.parse(content);
+				if (latestVersion != null  && latestVersion.isNewerThan(currentVersion)) {
 	    			hasNewVersion = !content.equalsIgnoreCase(getDescription().getVersion());
 	    			if(hasNewVersion) {
 	    				getLogger().info(storage.JOIN_UPDATE_MESSAGE);
