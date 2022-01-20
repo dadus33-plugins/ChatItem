@@ -33,6 +33,6 @@ jobs:
     - name: Send file README.md to discord channel
       uses: sinshutu/upload-to-discord@master
       env:
-        DISCORD_WEBHOOK: https://discord.com/api/webhooks/933523632712454154/Wr10jXlGkKC5WZSRGe0b-U25iEzH4XHxyIMHaq_1YjY-VnPzmPP9KkTKBnmYlkiLjtyN
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       with:
         args: target/ChatItem-*.jar
