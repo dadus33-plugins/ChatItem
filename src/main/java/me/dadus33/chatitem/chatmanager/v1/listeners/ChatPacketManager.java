@@ -1,4 +1,4 @@
-package me.dadus33.chatitem.chatmanager.v1.listeners.v15lower;
+package me.dadus33.chatitem.chatmanager.v1.listeners;
 
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
 
@@ -29,7 +29,7 @@ import me.dadus33.chatitem.utils.Version;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-public class ChatPacket15Manager extends PacketHandler {
+public class ChatPacketManager extends PacketHandler {
 
 	private final static String NAME = "{name}";
 	private final static String AMOUNT = "{amount}";
@@ -38,7 +38,7 @@ public class ChatPacket15Manager extends PacketHandler {
 	private Method serializerGetJson;
 	private PacketEditingChatManager manager;
 
-	public ChatPacket15Manager(PacketEditingChatManager manager) {
+	public ChatPacketManager(PacketEditingChatManager manager) {
 		this.manager = manager;
 		try {
 			for (Method m : PacketUtils.CHAT_SERIALIZER.getDeclaredMethods()) {

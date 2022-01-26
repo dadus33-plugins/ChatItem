@@ -7,17 +7,14 @@ import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulatorCurrent;
-import me.dadus33.chatitem.chatmanager.v1.listeners.v15lower.ChatEventListener;
-import me.dadus33.chatitem.chatmanager.v1.listeners.v15lower.ChatPacket15Manager;
-import me.dadus33.chatitem.chatmanager.v1.listeners.v16upper.ChatPacket16Manager;
+import me.dadus33.chatitem.chatmanager.v1.listeners.ChatEventListener;
+import me.dadus33.chatitem.chatmanager.v1.listeners.ChatPacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacketManager;
-import me.dadus33.chatitem.chatmanager.v1.packets.PacketHandler;
 import me.dadus33.chatitem.chatmanager.v1.playerversion.IPlayerVersion;
 import me.dadus33.chatitem.chatmanager.v1.playerversion.hooks.DefaultVersionHook;
 import me.dadus33.chatitem.chatmanager.v1.playerversion.hooks.ProtocolSupportHook;
 import me.dadus33.chatitem.chatmanager.v1.playerversion.hooks.ViaVersionHook;
 import me.dadus33.chatitem.utils.Storage;
-import me.dadus33.chatitem.utils.Version;
 
 public class PacketEditingChatManager extends ChatManager {
 
@@ -25,19 +22,14 @@ public class PacketEditingChatManager extends ChatManager {
 	private boolean baseComponentAvailable = true;
 	private final ChatItemPacketManager packetManager;
 	private final ChatEventListener chatEventListener;
-	private final PacketHandler chatPacketManager;
+	private final ChatPacketManager chatPacketManager;
     private IPlayerVersion playerVersionAdapter;
 	
 	public PacketEditingChatManager(ChatItem pl) {
 		jsonManipulator = new JSONManipulatorCurrent();
         packetManager = new ChatItemPacketManager(pl);
-        if(Version.getVersion().isNewerOrEquals(Version.V1_16)) {
-            chatPacketManager = new ChatPacket16Manager(this);
-    		chatEventListener = null;
-        } else {
-    		chatEventListener = new ChatEventListener(this);
-            chatPacketManager = new ChatPacket15Manager(this);
-        }
+		chatEventListener = new ChatEventListener(this);
+        chatPacketManager = new ChatPacketManager(this);
         
         //Check for existence of BaseComponent class (only on spigot)
         try {

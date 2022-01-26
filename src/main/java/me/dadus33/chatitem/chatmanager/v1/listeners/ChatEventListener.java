@@ -1,4 +1,4 @@
-package me.dadus33.chatitem.chatmanager.v1.listeners.v15lower;
+package me.dadus33.chatitem.chatmanager.v1.listeners;
 
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
 
