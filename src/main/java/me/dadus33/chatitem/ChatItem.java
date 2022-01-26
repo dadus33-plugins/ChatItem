@@ -1,7 +1,9 @@
 package me.dadus33.chatitem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 import org.bukkit.ChatColor;
@@ -9,6 +11,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.base.Strings;
@@ -40,13 +43,14 @@ public class ChatItem extends JavaPlugin {
     private void chooseManagers() {
     	this.chatManager.forEach((cm) -> cm.unload(this));
     	this.chatManager.clear();
+    	PluginManager pm = getServer().getPluginManager();
         String managerName = getStorage().MANAGER;
         if(managerName.equalsIgnoreCase("both")) {
         	this.chatManager.add(new PacketEditingChatManager(this));
 	        this.chatManager.add(new ChatListenerChatManager(this));
             getLogger().info("Manager automatically choosed: " + getVisualChatManagers());
         } else if(managerName.equalsIgnoreCase("auto")) {
-            if(getServer().getPluginManager().getPlugin("DeluxeChat") != null && Version.getVersion().isNewerThan(Version.V1_7))
+            if(getPluginThatRequirePacket().stream().map(pm::getPlugin).filter(Objects::nonNull).count() > 0 && Version.getVersion().isNewerThan(Version.V1_7))
             	this.chatManager.add(new PacketEditingChatManager(this));
             else
             	this.chatManager.add(new ChatListenerChatManager(this));
@@ -71,6 +75,10 @@ public class ChatItem extends JavaPlugin {
 
         NamerManager.load(this);
         PlayerNamerManager.load(this);
+    }
+    
+    private List<String> getPluginThatRequirePacket(){
+    	return Arrays.asList("DeluxeChat", "HexNicks", "VentureChat");
     }
     
     public static void reload(CommandSender sender) {

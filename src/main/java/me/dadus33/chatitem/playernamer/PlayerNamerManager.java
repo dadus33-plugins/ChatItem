@@ -22,7 +22,6 @@ public class PlayerNamerManager {
 			pl.getLogger().info("Enable support for HexNicks plugin !");
 		} else {
 			setPlayerNamer(new DefaultPlayerNamer());
-			pl.getLogger().info("Use default player namer.");
 		}
 	}
 }
