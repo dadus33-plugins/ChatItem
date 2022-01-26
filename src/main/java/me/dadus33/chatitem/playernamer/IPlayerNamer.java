@@ -2,10 +2,10 @@ package me.dadus33.chatitem.playernamer;
 
 import org.bukkit.entity.Player;
 
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.BaseComponent;
 
 public interface IPlayerNamer {
 
-	public TextComponent getName(Player p);
+	public BaseComponent[] getName(Player p);
 	
 }

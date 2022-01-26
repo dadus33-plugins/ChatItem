@@ -3,6 +3,7 @@ package me.dadus33.chatitem.chatmanager.v1.listeners;
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
 
 import java.util.HashMap;
+import java.util.StringJoiner;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -79,7 +80,7 @@ public class ChatEventListener implements Listener {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST) // We need to have lowest priority in order
 																			// to get to the event before DeluxeChat or
 																			// other plugins do
-	public void onChat(final AsyncPlayerChatEvent e) {
+	public void onChat(AsyncPlayerChatEvent e) {
 		ChatItem.debug("(v1) Check for v1 system. Cancelled: " + e.isCancelled());
 		if (e.getMessage().indexOf(SEPARATOR) != -1) { // If the BELL character is found, we have to remove it
 			String msg = e.getMessage().replace(Character.toString(SEPARATOR), "");
@@ -87,9 +88,9 @@ public class ChatEventListener implements Listener {
 			e.setMessage(msg);
 		}
 		boolean found = false;
-
+		final String oldMsg = e.getMessage();
 		for (String rep : getStorage().PLACEHOLDERS)
-			if (e.getMessage().contains(rep)) {
+			if (oldMsg.contains(rep)) {
 				found = true;
 				break;
 			}
@@ -124,6 +125,7 @@ public class ChatEventListener implements Listener {
 				return;
 			}
 		}
+		ChatItem.debug("(v1) Checking cooldown " + e.getMessage());
 		if (getStorage().COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
 			if (COOLDOWNS.containsKey(p.getName())) {
 				long start = COOLDOWNS.get(p.getName());
@@ -144,11 +146,11 @@ public class ChatEventListener implements Listener {
 				}
 			}
 		}
-		String s = e.getMessage();
+		String s = e.getMessage(), firstPlaceholder = getStorage().PLACEHOLDERS.get(0);
 		for (String placeholder : getStorage().PLACEHOLDERS) {
-			s = s.replace(placeholder, getStorage().PLACEHOLDERS.get(0));
+			s = s.replace(placeholder, firstPlaceholder);
 		}
-		int occurrences = countOccurrences(getStorage().PLACEHOLDERS.get(0), s);
+		int occurrences = countOccurrences(firstPlaceholder, s);
 
 		if (occurrences > getStorage().LIMIT) {
 			e.setCancelled(true);
@@ -160,11 +162,21 @@ public class ChatEventListener implements Listener {
 			return;
 		}
 
-		String oldmsg = e.getMessage();
-		StringBuilder sb = new StringBuilder(oldmsg);
-		sb.append(SEPARATOR).append(e.getPlayer().getName());
-		e.setMessage(sb.toString());
 		ChatItem.debug("(v1) Set placeholder: " + e.getMessage());
+		try {
+			StringJoiner msg = new StringJoiner(" ");
+			for(String part : e.getMessage().split(" ")) {
+				if(part.equalsIgnoreCase(firstPlaceholder)) {
+					msg.add(firstPlaceholder + Character.toString(SEPARATOR) + p.getName());
+				} else {
+					msg.add(part);
+				}
+			}
+			e.setMessage(msg.toString());
+			e.setFormat(e.getFormat().replace(oldMsg, e.getMessage())); // set own message for plugin that already put the message into the format
+		} catch (Exception exc) {
+			exc.printStackTrace();
+		}
 		if (!p.hasPermission("chatitem.ignore-cooldown")) {
 			COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
 		}

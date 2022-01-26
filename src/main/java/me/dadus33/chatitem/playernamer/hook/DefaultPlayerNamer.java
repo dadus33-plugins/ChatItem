@@ -3,12 +3,13 @@ package me.dadus33.chatitem.playernamer.hook;
 import org.bukkit.entity.Player;
 
 import me.dadus33.chatitem.playernamer.IPlayerNamer;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class DefaultPlayerNamer implements IPlayerNamer {
 
 	@Override
-	public TextComponent getName(Player p) {
-		return new TextComponent(p.getName());
+	public BaseComponent[] getName(Player p) {
+		return new ComponentBuilder(p.getName()).create();
 	}
 }

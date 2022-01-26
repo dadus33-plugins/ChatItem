@@ -173,6 +173,6 @@ public class ChatItem extends JavaPlugin {
     
     public static void debug(String msg) {
     	if(getInstance().getConfig().getBoolean("debug", false))
-    		getInstance().getLogger().info(msg);
+    		getInstance().getLogger().info("[Debug] " + msg);
     }
 }
