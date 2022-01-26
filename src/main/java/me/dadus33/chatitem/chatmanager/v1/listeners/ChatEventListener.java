@@ -167,7 +167,7 @@ public class ChatEventListener implements Listener {
 			StringJoiner msg = new StringJoiner(" ");
 			for(String part : e.getMessage().split(" ")) {
 				if(part.equalsIgnoreCase(firstPlaceholder)) {
-					msg.add(firstPlaceholder + Character.toString(SEPARATOR) + p.getName());
+					msg.add(firstPlaceholder + SEPARATOR + p.getName());
 				} else {
 					msg.add(part);
 				}

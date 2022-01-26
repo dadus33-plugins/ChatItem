@@ -1,6 +1,7 @@
 package me.dadus33.chatitem.chatmanager.v1.listeners;
 
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
+import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR_STR;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -115,13 +116,17 @@ public class ChatPacketManager extends PacketHandler {
 			ChatItem.debug("No placeholders founded");
 			return; // then it's just a normal message without placeholders, so we leave it alone
 		}
-		if (json.lastIndexOf(SEPARATOR) == -1) { // if the message doesn't contain the BELL separator, then it's
-													// certainly NOT a message we want to parse
+		Object toReplace = null;
+		if(json.lastIndexOf(SEPARATOR) != -1)
+			toReplace = SEPARATOR;
+		if(json.lastIndexOf(SEPARATOR_STR) != -1)
+			toReplace = SEPARATOR_STR;
+		if (toReplace == null) { // if the message doesn't contain the BELL separator, then it's certainly NOT a message we want to parse
 			ChatItem.debug("Not contains bell " + json);
 			return;
 		}
 		ChatItem.debug("Add packet meta");
-		String fjson = json;
+		String fjson = json, toReplaceStr = toReplace.toString();
 		boolean bUsesBaseComponents = usesBaseComponents;
 		e.setCancelled(true); // We cancel the packet as we're going to resend it anyways (ignoring listeners
 		// this time)
@@ -130,14 +135,14 @@ public class ChatPacketManager extends PacketHandler {
 			int topIndex = -1;
 			String name = null;
 			for (Player p : Bukkit.getOnlinePlayers()) {
-				String pname = SEPARATOR + p.getName();
+				String pname = toReplaceStr + p.getName();
 				if (!fjson.contains(pname)) {
 					continue;
 				}
 				int index = fjson.lastIndexOf(pname) + pname.length();
 				if (index > topIndex) {
 					topIndex = index;
-					name = pname.replace(SEPARATOR + "", "");
+					name = pname.replace(toReplaceStr, "");
 				}
 			}
 			if (name == null) { // something went really bad, so we run away and hide (AKA the player left or is
