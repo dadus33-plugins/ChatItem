@@ -53,8 +53,7 @@ public class PacketEditingChatManager extends ChatManager {
 	public void load(ChatItem pl, Storage s) {
 		super.load(pl, s);
 
-		if(chatEventListener != null)
-			Bukkit.getPluginManager().registerEvents(chatEventListener, pl);
+		Bukkit.getPluginManager().registerEvents(chatEventListener, pl);
         packetManager.getPacketManager().addHandler(chatPacketManager);
 
         if(Bukkit.getPluginManager().getPlugin("ViaVersion") != null){
@@ -70,8 +69,7 @@ public class PacketEditingChatManager extends ChatManager {
 	
 	@Override
 	public void unload(ChatItem pl) {
-		if(chatEventListener != null)
-			HandlerList.unregisterAll(chatEventListener);
+		HandlerList.unregisterAll(chatEventListener);
         packetManager.getPacketManager().removeHandler(chatPacketManager);
 		packetManager.getPacketManager().stop();
 	}

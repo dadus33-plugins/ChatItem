@@ -92,10 +92,21 @@ public class ChatListener implements Listener {
     }
 	
 	@SuppressWarnings("deprecation")
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onChat(AsyncPlayerChatEvent e) {
-		if(e.isCancelled())
+		if(e.isCancelled()) {
+			if(ChatItem.getInstance().getChatManager().size() == 1) { // only chat
+				String msg = e.getMessage().toLowerCase();
+	            for (String rep : getStorage().PLACEHOLDERS) {
+	                if (msg.contains(rep)) {
+	    				ChatItem.debug("You choose 'chat' manager but it seems to don't be the good choice. More informations here: https://github.com/dadus33-plugins/ChatItem/wiki");
+	                    return;
+	                }
+	            }
+			}
+			ChatItem.debug("Chat cancelled for " + e.getPlayer().getName());
 			return;
+		}
 		Player p = e.getPlayer();
         for (String rep : getStorage().PLACEHOLDERS) {
             if (e.getMessage().contains(rep + ChatManager.SEPARATOR + p.getName())) { // already managed by v1
