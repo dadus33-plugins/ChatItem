@@ -41,7 +41,7 @@ public class InventoryListener implements Listener {
 				p.closeInventory();
 				ChatItem.reload(p);
 			}
-		} else if(type.equals(Material.INK_SAC)) {
+		} else if(type.equals(ItemUtils.INK_SAC)) {
 			setInConfig("general.color-if-already-colored", c.COLOR_IF_ALREADY_COLORED = !c.COLOR_IF_ALREADY_COLORED);
 			open(p);
 		} else if(type.equals(Material.REDSTONE)) {
@@ -87,7 +87,7 @@ public class InventoryListener implements Listener {
 		}
 		inv.setItem(slot + 1, getManagerItem("actual", "%manager%", Messages.getMessage("admin-inv.manager." + c.MANAGER + ".name")));
 
-		inv.setItem(18, getBoolChangeItem(Material.INK_SAC, "color-if-already-colored", c.COLOR_IF_ALREADY_COLORED));
+		inv.setItem(18, getBoolChangeItem(ItemUtils.INK_SAC, "color-if-already-colored", c.COLOR_IF_ALREADY_COLORED));
 		inv.setItem(19, getBoolChangeItem(Material.REDSTONE, "deny-no-item", c.DENY_IF_NO_ITEM));
 		inv.setItem(20, getBoolChangeItem(Material.STICK, "hand-disabled", c.HAND_DISABLED));
 		inv.setItem(21, getAmountChangeItem(Material.IRON_DOOR, "limit-per-message", c.LIMIT));
