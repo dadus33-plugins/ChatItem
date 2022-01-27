@@ -18,7 +18,7 @@ public class ItemUtils {
 	public static final Material BOOK_AND_QUILL = getMaterialWithCompatibility("BOOK_AND_QUILL", "WRITTEN_BOOK");
 	public static final Material WEB = getMaterialWithCompatibility("WEB", "COBWEB");
 	public static final Material FIREBALL = getMaterialWithCompatibility("FIREBALL", "FIRE_CHARGE");
-	public static final Material INK_SAC = getMaterialWithCompatibility("INK_SAC", "DYE", "GRAY_DYE");
+	public static final Material INK_SAC = getMaterialWithCompatibility("INK_SAC", "INK_SACK", "DYE", "GRAY_DYE");
 
 	public static final Material BIRCH_WOOD_STAIRS = getMaterialWithCompatibility("BIRCH_WOOD_STAIRS", "BIRCH_STAIRS");
 	
