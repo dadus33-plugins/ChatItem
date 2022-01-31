@@ -20,10 +20,12 @@ import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
+import me.dadus33.chatitem.utils.Version;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 
+@SuppressWarnings("deprecation")
 public class ChatListener implements Listener {
 
 	public final static char SEPARATOR = ((char) 0x0007);
@@ -89,7 +91,6 @@ public class ChatListener implements Listener {
 		return builder.toString();
 	}
 
-	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onChat(AsyncPlayerChatEvent e) {
 		if (e.isCancelled()) {
@@ -182,57 +183,107 @@ public class ChatListener implements Listener {
 		String msg = isAlreadyParsed ? format : String.format(format, p.getDisplayName(), defMsg);
 		ItemStack item = p.getItemInHand();
 		ItemMeta meta = item == null ? null : item.getItemMeta();
-		e.getRecipients().forEach((pl) -> {
-			ComponentBuilder component = new ComponentBuilder();
-			ChatColor color = ChatColor.getByChar(getColorChat(e.getFormat()));
-			for (String args : msg.split(" ")) {
-				if (getStorage().PLACEHOLDERS.contains(args)) {
-					if (meta != null) {
-						ComponentBuilder itemComponent = new ComponentBuilder(
-								ChatListener.styleItem(pl, item, getStorage()));
-						String itemJson = convertItemStackToJson(item);
-						itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
-						component.append(itemComponent.create());
-					} else {
-						if (getStorage().HAND_DISABLED)
-							component.append(color + args);
-						else {
-							String handName = getStorage().HAND_NAME;
-							ComponentBuilder handComp = new ComponentBuilder();
-							ComponentBuilder handTooltip = new ComponentBuilder();
-							int stay = getStorage().HAND_TOOLTIP.size();
-							for (String line : getStorage().HAND_TOOLTIP) {
-								stay--;
-								handTooltip.append(line.replace("{name}", p.getName()).replace("{display-name}",
-										p.getDisplayName()));
-								if (stay > 0)
-									handTooltip.append("\n");
-							}
-							handComp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, handTooltip.create()));
-							if (handName.contains("{name}")) {
-								String[] splitted = handName.split("{name}");
-								for (int i = 0; i < (splitted.length - 1); i++) {
-									handComp.append(new ComponentBuilder(splitted[i]).create());
-									handComp.append(PlayerNamerManager.getPlayerNamer().getName(p));
-								}
-								handComp.append(new ComponentBuilder(splitted[splitted.length - 1]).create());
-							} else
-								handComp.append(handName.replace("{display-name}", p.getDisplayName()));
-							component.append(handComp.create());
-						}
-					}
+		if(Version.getVersion().isNewerOrEquals(Version.V1_16))
+			e.getRecipients().forEach((pl) -> showWithHex(pl, p, item, meta, format, msg));
+		else
+			e.getRecipients().forEach((pl) -> showWithoutHex(pl, p, item, meta, format, msg));
+	}
+	
+	private void showWithoutHex(Player to, Player origin, ItemStack item, ItemMeta meta, String format, String msg) {
+		ComponentBuilder component = new ComponentBuilder();
+		ChatColor color = ChatColor.getByChar(getColorChat(format));
+		for (String args : msg.split(" ")) {
+			if (getStorage().PLACEHOLDERS.contains(args)) {
+				if (meta != null) {
+					ComponentBuilder itemComponent = new ComponentBuilder(
+							ChatListener.styleItem(to, item, getStorage()));
+					String itemJson = convertItemStackToJson(item);
+					itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
+					component.append(itemComponent.create());
 				} else {
-					component.append(color + args);
+					if (getStorage().HAND_DISABLED)
+						component.append(color + args);
+					else {
+						String handName = getStorage().HAND_NAME;
+						ComponentBuilder handComp = new ComponentBuilder();
+						ComponentBuilder handTooltip = new ComponentBuilder();
+						int stay = getStorage().HAND_TOOLTIP.size();
+						for (String line : getStorage().HAND_TOOLTIP) {
+							stay--;
+							handTooltip.append(line.replace("{name}", origin.getName()).replace("{display-name}",
+									origin.getDisplayName()));
+							if (stay > 0)
+								handTooltip.append("\n");
+						}
+						handComp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, handTooltip.create()));
+						if (handName.contains("{name}")) {
+							String[] splitted = handName.split("{name}");
+							for (int i = 0; i < (splitted.length - 1); i++) {
+								handComp.append(new ComponentBuilder(splitted[i]).create());
+								handComp.append(PlayerNamerManager.getPlayerNamer().getName(origin));
+							}
+							handComp.append(new ComponentBuilder(splitted[splitted.length - 1]).create());
+						} else
+							handComp.append(handName.replace("{display-name}", origin.getDisplayName()));
+						component.append(handComp.create());
+					}
 				}
-				component.append(" ");
-				char maybeNextCode = getColorChat(args);
-				if (maybeNextCode != 'r') {
-					color = ChatColor.getByChar(maybeNextCode);
-				}
+			} else {
+				component.append(color + args);
 			}
-			pl.spigot().sendMessage(component.create());
-		});
-		// Utils.getOnlinePlayers().forEach((pl) -> pl.spigot().sendMessage(component));
+			component.append(" ");
+			char maybeNextCode = getColorChat(args);
+			if (maybeNextCode != 'r') {
+				color = ChatColor.getByChar(maybeNextCode);
+			}
+		}
+		to.spigot().sendMessage(component.create());
+	}
+
+	private void showWithHex(Player to, Player origin, ItemStack item, ItemMeta meta, String format, String msg) {
+		ComponentBuilder component = new ComponentBuilder();
+		for (String args : msg.split(" ")) {
+			if (getStorage().PLACEHOLDERS.contains(args)) {
+				if (meta != null) {
+					ComponentBuilder itemComponent = new ComponentBuilder(
+							ChatListener.styleItem(to, item, getStorage()));
+					String itemJson = convertItemStackToJson(item);
+					itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
+					component.append(itemComponent.create());
+				} else {
+					if (getStorage().HAND_DISABLED)
+						component.append(args);
+					else {
+						String handName = getStorage().HAND_NAME;
+						ComponentBuilder handComp = new ComponentBuilder();
+						ComponentBuilder handTooltip = new ComponentBuilder();
+						int stay = getStorage().HAND_TOOLTIP.size();
+						for (String line : getStorage().HAND_TOOLTIP) {
+							stay--;
+							handTooltip.append(line.replace("{name}", origin.getName()).replace("{display-name}",
+									origin.getDisplayName()));
+							if (stay > 0)
+								handTooltip.append("\n");
+						}
+						handComp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, handTooltip.create()));
+						if (handName.contains("{name}")) {
+							String[] splitted = handName.split("{name}");
+							for (int i = 0; i < (splitted.length - 1); i++) {
+								handComp.append(new ComponentBuilder(splitted[i]).create());
+								handComp.append(PlayerNamerManager.getPlayerNamer().getName(origin));
+							}
+							handComp.append(new ComponentBuilder(splitted[splitted.length - 1]).create());
+						} else
+							handComp.append(handName.replace("{display-name}", origin.getDisplayName()));
+						component.append(handComp.create());
+					}
+				}
+			} else {
+				component.append(args);
+			}
+			component.append(" ");
+		}
+		to.spigot().sendMessage(component.create());
 	}
 
 	/**

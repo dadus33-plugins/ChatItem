@@ -1,5 +1,7 @@
 package me.dadus33.chatitem.chatmanager.v1.json;
 
+import static me.dadus33.chatitem.utils.PacketUtils.getNmsClass;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.AbstractMap;
@@ -48,15 +50,15 @@ import me.dadus33.chatitem.utils.Version;
 public class JSONManipulatorCurrent implements JSONManipulator {
 
 	private static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
-	private static final Class<?> NBT_STRING = PacketUtils.getNmsClass("NBTTagString", "nbt.");
-	private static final Class<?> NBT_LIST = PacketUtils.getNmsClass("NBTTagList", "nbt.");
+	private static final Class<?> NBT_STRING = getNmsClass("NBTTagString", "nbt.");
+	private static final Class<?> NBT_LIST = getNmsClass("NBTTagList", "nbt.");
 	private static final Map<Class<?>, BiFunction<String, Object, Tag>> TYPES_TO_MC_NBT_TAGS = new HashMap<>();
 	private static final Map<Class<?>, Function<String, Tag>> TYPES_TO_OPEN_NBT_TAGS = new HashMap<>();
 	private static final List<Class<?>> NBT_BASE_CLASSES = new ArrayList<>();
 	private static final List<Field> NBT_BASE_DATA_FIELD = new ArrayList<>();
-	private static final Class<?> NMS_ITEM_STACK_CLASS = PacketUtils.getNmsClass("ItemStack", "world.item.");
+	private static final Class<?> NMS_ITEM_STACK_CLASS = getNmsClass("ItemStack", "world.item.");
 	private static final Method AS_NMS_COPY = Reflect.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
-	private static final Class<?> NBT_TAG_COMPOUND = PacketUtils.getNmsClass("NBTTagCompound", "nbt.");
+	private static final Class<?> NBT_TAG_COMPOUND = getNmsClass("NBTTagCompound", "nbt.");
 	private static final Method SAVE_NMS_ITEM_STACK_METHOD = Reflect.getMethod(NMS_ITEM_STACK_CLASS, NBT_TAG_COMPOUND,
 			NBT_TAG_COMPOUND);
 	private static final Field MAP = Reflect.getField(NBT_TAG_COMPOUND, "map", "x");
@@ -69,28 +71,28 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 	private static final ConcurrentHashMap<Map.Entry<Version, ItemStack>, JsonObject> STACKS = new ConcurrentHashMap<>();
 
 	static {
-		NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagByte", "nbt."));
-		NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagByteArray", "nbt."));
-		NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagDouble", "nbt."));
-		NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagFloat", "nbt."));
-		NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagInt", "nbt."));
-		NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagIntArray", "nbt."));
-		NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagLong", "nbt."));
-		NBT_BASE_CLASSES.add(PacketUtils.getNmsClass("NBTTagShort", "nbt."));
+		NBT_BASE_CLASSES.add(getNmsClass("NBTTagByte", "nbt."));
+		NBT_BASE_CLASSES.add(getNmsClass("NBTTagByteArray", "nbt."));
+		NBT_BASE_CLASSES.add(getNmsClass("NBTTagDouble", "nbt."));
+		NBT_BASE_CLASSES.add(getNmsClass("NBTTagFloat", "nbt."));
+		NBT_BASE_CLASSES.add(getNmsClass("NBTTagInt", "nbt."));
+		NBT_BASE_CLASSES.add(getNmsClass("NBTTagIntArray", "nbt."));
+		NBT_BASE_CLASSES.add(getNmsClass("NBTTagLong", "nbt."));
+		NBT_BASE_CLASSES.add(getNmsClass("NBTTagShort", "nbt."));
 
 		for (Class<?> NBT_BASE_CLASS : NBT_BASE_CLASSES) {
 			NBT_BASE_DATA_FIELD.add(Reflect.getField(NBT_BASE_CLASS, "data", "c", "x"));
 		}
 		
 		// include NBT tags
-		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagByte", "nbt."), (name, obj) -> new ByteTag(name, NBTUtils.get(obj, "h")));
-		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagByteArray", "nbt."), (name, obj) -> new ByteArrayTag(name, NBTUtils.get(obj, "d")));
-		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagDouble", "nbt."), (name, obj) -> new DoubleTag(name, NBTUtils.get(obj, "i")));
-		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagFloat", "nbt."), (name, obj) -> new FloatTag(name, NBTUtils.get(obj, "j")));
-		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagInt", "nbt."), (name, obj) -> new IntTag(name, NBTUtils.get(obj, "f")));
-		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagIntArray", "nbt."), (name, obj) -> new IntArrayTag(name, NBTUtils.get(obj, "c")));
-		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagLong", "nbt."), (name, obj) -> new LongTag(name, NBTUtils.get(obj, "e")));
-		TYPES_TO_MC_NBT_TAGS.put(PacketUtils.getNmsClass("NBTTagShort", "nbt."), (name, obj) -> new ShortTag(name, NBTUtils.get(obj, "g")));
+		TYPES_TO_MC_NBT_TAGS.put(getNmsClass("NBTTagByte", "nbt."), (name, obj) -> new ByteTag(name, get(obj, "h")));
+		TYPES_TO_MC_NBT_TAGS.put(getNmsClass("NBTTagByteArray", "nbt."), (name, obj) -> new ByteArrayTag(name, get(obj, "d")));
+		TYPES_TO_MC_NBT_TAGS.put(getNmsClass("NBTTagDouble", "nbt."), (name, obj) -> new DoubleTag(name, get(obj, "i")));
+		TYPES_TO_MC_NBT_TAGS.put(getNmsClass("NBTTagFloat", "nbt."), (name, obj) -> new FloatTag(name, get(obj, "j")));
+		TYPES_TO_MC_NBT_TAGS.put(getNmsClass("NBTTagInt", "nbt."), (name, obj) -> new IntTag(name, get(obj, "f")));
+		TYPES_TO_MC_NBT_TAGS.put(getNmsClass("NBTTagIntArray", "nbt."), (name, obj) -> new IntArrayTag(name, get(obj, "c")));
+		TYPES_TO_MC_NBT_TAGS.put(getNmsClass("NBTTagLong", "nbt."), (name, obj) -> new LongTag(name, get(obj, "e")));
+		TYPES_TO_MC_NBT_TAGS.put(getNmsClass("NBTTagShort", "nbt."), (name, obj) -> new ShortTag(name, get(obj, "g")));
 		// now basic types
 		TYPES_TO_OPEN_NBT_TAGS.put(Byte.class, ByteTag::new);
 		TYPES_TO_OPEN_NBT_TAGS.put(Byte[].class, ByteArrayTag::new);
@@ -112,6 +114,15 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 
 	}
 
+	public static <T> T get(Object obj, String methodName){
+		try {
+			return (T) obj.getClass().getDeclaredMethod(methodName).invoke(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	private List<String> replaces;
 	private String rgx;
 	private Version protocolVersion;
@@ -758,10 +769,10 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 			if (NBT_LIST.isInstance(nmsTag)) {
 				List<Object> nmsNBTBaseList = (List<Object>) LIST_FIELD.get(nmsTag);
 				List<Tag> list = new ArrayList<>();
-				int i = 0;
+				//int i = 0;
 				for (Object baseTag : nmsNBTBaseList) {
-					list.add(toOpenTag(baseTag, String.valueOf(i)));
-					++i;
+					list.add(toOpenTag(baseTag, ""));
+					//++i;
 				}
 				return new ListTag(name, list);
 			}
