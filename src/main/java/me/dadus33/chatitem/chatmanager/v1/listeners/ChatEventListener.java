@@ -102,7 +102,7 @@ public class ChatEventListener implements Listener {
 
 		Player p = e.getPlayer();
 
-		if (!p.hasPermission("chatitem.use")) {
+		if (getStorage().PERMISSION_ENABLED && !p.hasPermission(getStorage().PERMISSION_NAME)) {
 			if (!getStorage().LET_MESSAGE_THROUGH) {
 				e.setCancelled(true);
 			}

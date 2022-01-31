@@ -65,6 +65,10 @@ general:
   show-no-permission-message:
     normal: true
     command: false
+  # Manage permission to use placeholders
+  permission:
+    enabled: false
+    name: "chatitem.use"
   #  Here you can set the limit on how many placeholders a user is allowed to use inside a message.
   # Allowing too many placeholders can result in client crashes.
   limit: 8
