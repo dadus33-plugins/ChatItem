@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,9 +17,11 @@ import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
+import me.dadus33.chatitem.utils.ColorManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Version;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
@@ -252,7 +253,7 @@ public class ChatListener implements Listener {
 					component.append(itemComponent.create());
 				} else {
 					if (getStorage().HAND_DISABLED)
-						component.append(args);
+						component.append(ColorManager.getChatWithHex(args));
 					else {
 						String handName = getStorage().HAND_NAME;
 						ComponentBuilder handComp = new ComponentBuilder();
@@ -279,7 +280,7 @@ public class ChatListener implements Listener {
 					}
 				}
 			} else {
-				component.append(args);
+				component.append(ColorManager.getChatWithHex(args));
 			}
 			component.append(" ");
 		}
