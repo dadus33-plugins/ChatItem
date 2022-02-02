@@ -1,6 +1,8 @@
 package me.dadus33.chatitem.utils;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -17,10 +19,9 @@ public class PacketUtils {
 	/**
 	 * This Map is to reduce Reflection action which take more resources than just RAM action
 	 */
-	private static final HashMap<String, Class<?>> ALL_CLASS;
+	private static final Map<String, Class<?>> ALL_CLASS = Collections.synchronizedMap(new HashMap<String, Class<?>>());
 	
 	static {
-		ALL_CLASS = new HashMap<>();
 		IS_THERMOS = isClassExist("thermos.Thermos");
 		NMS_PREFIX = Version.getVersion().isNewerOrEquals(Version.V1_17) || IS_THERMOS ? "net.minecraft." : "net.minecraft.server." + VERSION + ".";
 		OBC_PREFIX = "org.bukkit.craftbukkit." + VERSION + ".";
