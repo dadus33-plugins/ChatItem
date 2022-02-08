@@ -23,7 +23,7 @@ public class ColorManager {
 				
 				waiting = true; // waiting for color code
 			} else if(waiting) { // if waiting for code and valid str
-				if(String.valueOf(c).matches("-?[0-9a-fA-F]+")) { // if it's hexademical value
+				if(String.valueOf(c).matches("-?[0-9a-fA-F]+") && colorCode.length() <= 5) { // if it's hexademical value and with enough space for full color
 					colorCode += c; // add char to it
 					waiting = false;
 				} else {
