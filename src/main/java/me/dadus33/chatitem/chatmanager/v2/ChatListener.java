@@ -191,7 +191,7 @@ public class ChatListener implements Listener {
 	}
 	
 	private void showWithoutHex(Player to, Player origin, ItemStack item, ItemMeta meta, String format, String msg) {
-		ComponentBuilder component = new ComponentBuilder();
+		ComponentBuilder component = new ComponentBuilder("");
 		ChatColor color = ChatColor.getByChar(getColorChat(format));
 		for (String args : msg.split(" ")) {
 			if (getStorage().PLACEHOLDERS.contains(args)) {
@@ -206,8 +206,8 @@ public class ChatListener implements Listener {
 						component.append(color + args);
 					else {
 						String handName = getStorage().HAND_NAME;
-						ComponentBuilder handComp = new ComponentBuilder();
-						ComponentBuilder handTooltip = new ComponentBuilder();
+						ComponentBuilder handComp = new ComponentBuilder("");
+						ComponentBuilder handTooltip = new ComponentBuilder("");
 						int stay = getStorage().HAND_TOOLTIP.size();
 						for (String line : getStorage().HAND_TOOLTIP) {
 							stay--;
@@ -242,7 +242,7 @@ public class ChatListener implements Listener {
 	}
 
 	private void showWithHex(Player to, Player origin, ItemStack item, ItemMeta meta, String format, String msg) {
-		ComponentBuilder component = new ComponentBuilder();
+		ComponentBuilder component = new ComponentBuilder("");
 		for (String args : msg.split(" ")) {
 			if (getStorage().PLACEHOLDERS.contains(args)) {
 				if (meta != null) {
@@ -256,8 +256,8 @@ public class ChatListener implements Listener {
 						component.append(ColorManager.getChatWithHex(args));
 					else {
 						String handName = getStorage().HAND_NAME;
-						ComponentBuilder handComp = new ComponentBuilder();
-						ComponentBuilder handTooltip = new ComponentBuilder();
+						ComponentBuilder handComp = new ComponentBuilder("");
+						ComponentBuilder handTooltip = new ComponentBuilder("");
 						int stay = getStorage().HAND_TOOLTIP.size();
 						for (String line : getStorage().HAND_TOOLTIP) {
 							stay--;

@@ -9,7 +9,7 @@ public class ColorManager {
 
 	public static BaseComponent[] getChatWithHex(String msg) {
 		ChatItem.debug("Converting " + msg);
-		ComponentBuilder builder = new ComponentBuilder();
+		ComponentBuilder builder = new ComponentBuilder("");
 		ChatColor color = ChatColor.WHITE;
 		String colorCode = "", text = "";
 		boolean waiting = false;
