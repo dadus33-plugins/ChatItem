@@ -2,10 +2,10 @@
 # For info visit
 # Spigotmc: https://www.spigotmc.org/resources/chatitem.19064/
 # Discord: https://discord.gg/ttA5CjMhk7
-
+ 
 # Version info, DON'T TOUCH
 config-version: 13
-
+ 
 # By default, it's in "both" mode.
 #
 # Available mode :
@@ -18,7 +18,7 @@ config-version: 13
 # You can replace 'both' by another mode that should correspond to what you want.
 # If you don't know which one use, come on discord (link at begin of config or in spigotmc)
 manager: "both"
-
+ 
 #General configuration
 general:
   # The placeholders to display an item in chat.
@@ -50,7 +50,7 @@ general:
     tooltip:
       - "&7Nothing to see here"
       - "&7Just the empty hand of {display-name}."
-
+ 
   #  Here you can choose which commands will the plugin attempt to parse. Console commands will all be ignored,
   # however player commands will be taken into consideration. To add a command, simply add an element to the list
   # bellow containing an alias (or name) for that command.
@@ -77,8 +77,8 @@ general:
   cooldown: 60
   # Check if the plugin have update
   check-update: true
-
-
+ 
+ 
 #  Messages section. You can disable any of them by simply leaving them empty, like this: ""
 messages:
   # The message sent if showing off hands is disabled and the user isn't holding an item.
@@ -184,14 +184,12 @@ messages:
   seconds: " seconds"
   minutes: " minutes"
   hours: " hours"
-
-
+ 
+ 
 #  Translations
 # This is used to display prettier names in chat for items/blocks. Modifying this is usually unnecessary unless you know what you're doing.
 translations:
 ## Blocks ##
-  STONE:
-    1: "Granite"
   STONE:
     0: "Stone"
     1: "Granite"
@@ -784,8 +782,8 @@ translations:
   STONE_PICKAXE:
     0: "Stone Pickaxe"
   STONE_AXE:
-    0: "Stone Axe
-  DIAMOND_SWORD: "
+    0: "Stone Axe"
+  DIAMOND_SWORD:
     0: "Diamond Sword"
   DIAMOND_SPADE:
     0: "Diamond Shovel"
@@ -938,8 +936,6 @@ translations:
     2: "Clownfish"
     3: "Pufferfish"
   COOKED_FISH:
-    0: "Cooked Fish"
-  COOKED_FISH:
     0: "Cooked Salmon"
   INK_SACK:
     0: "Ink Sac"
@@ -1070,9 +1066,6 @@ translations:
     16394: "Splash Potion of Slowness"
     16426: "Splash Potion of Slowness II"
     16458: "Extended Splash Potion of Slowness"
-    16395: "Splash Potion of Leaping"
-    16427: "Splash Potion of Leaping II"
-    16459: "Extended Splash Potion of Leaping"
     16396: "Splash Potion of Harming"
     16428: "Splash Potion of Harming II"
     16460: "Extended Splash Potion of Harming"
@@ -1153,8 +1146,8 @@ translations:
   POISONOUS_POTATO:
     0: "Poisonous Potato"
   EMPTY_MAP:
-    0: "Empty Map
-  GOLDEN_CARROT: "
+    0: "Empty Map"
+  GOLDEN_CARROT:
     0: "Golden Carrot"
   SKULL_ITEM:
     0: "Skeleton Head"
