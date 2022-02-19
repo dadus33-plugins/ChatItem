@@ -190,7 +190,7 @@ public class ChatListener implements Listener {
 			}
 			msg = format.replace(e.getMessage(), defMsg);
 		}
-		ChatItem.debug("msg: " + msg + ", format: " + format);
+		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format);
 		ItemStack item = p.getItemInHand();
 		if(Version.getVersion().isNewerOrEquals(Version.V1_16))
 			e.getRecipients().forEach((pl) -> showWithHex(pl, p, item, msg));
@@ -224,6 +224,7 @@ public class ChatListener implements Listener {
 					waiting = false;
 				} else {
 					color = ChatColor.getByChar(args); // a color by itself
+					text += color;
 					colorCode = ""; // clean actual code, it's only to prevent some kind of issue
 					waiting = false;
 				}
@@ -231,7 +232,7 @@ public class ChatListener implements Listener {
 				if(!colorCode.isEmpty()) {
 					color = ColorManager.getColor(colorCode);
 					colorCode = ""; // clean actual code
-					builder.append(color.toString());
+					text += color;
 				}
 				// basic text, not waiting for code after '§'
 				text += args;
