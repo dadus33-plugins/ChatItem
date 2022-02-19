@@ -3,6 +3,7 @@ package me.dadus33.chatitem.chatmanager.v1.listeners;
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR_STR;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
@@ -83,7 +84,10 @@ public class ChatPacketManager extends PacketHandler {
 		ChatItem.debug("UUID: " + e.getContent().getSpecificModifier(UUID.class).readSafely(0, null));
 		boolean usesBaseComponents = false;
 		PacketContent packet = e.getContent();
-		String json;
+		for(Field f : e.getPacket().getClass().getDeclaredFields()) {
+			ChatItem.debug("Field " + f.getName() + ", " + f.getType().getSimpleName());
+		}
+		String json = "{}";
 		if (packet.getChatComponents().readSafely(0) == null) { // null check for some cases of messages sent using
 																// spigot's Chat Component API or other means
 			if (!manager.supportsChatComponentApi()) // only if the API is supported in this server distribution
@@ -91,25 +95,29 @@ public class ChatPacketManager extends PacketHandler {
 						// we shouldn't mess with anyways
 			BaseComponent[] components = packet.getSpecificModifier(BaseComponent[].class).readSafely(0);
 			if (components == null) {
-				Class<?> chatBaseCompClass = PacketUtils.getNmsClass("IChatBaseComponent", "network.chat.");
-				Object chatBaseComp = packet.getSpecificModifier(chatBaseCompClass).readSafely(0);
-				if(chatBaseComp == null)
+				Object chatBaseComp = packet.getSpecificModifier(PacketUtils.COMPONENT_CLASS).readSafely(0);
+				if(chatBaseComp == null) {
 					ChatItem.debug("No base components, without chat base comp");
-				else
+					return;
+				} else {
 					ChatItem.debug("No base components, with chatbasecomp: " + chatBaseComp);
-				return;
-			}
-			json = ComponentSerializer.toString(components);
+					try {
+						json = PacketUtils.CHAT_SERIALIZER.getMethod("a", PacketUtils.COMPONENT_CLASS).invoke(null, e.getPacket()).toString();
+					} catch (Exception exc) {
+						exc.printStackTrace();
+					}
+				}
+			} else
+				json = ComponentSerializer.toString(components);
 			usesBaseComponents = true;
 		} else {
 			try {
 				json = (String) serializerGetJson.invoke(null, packet.getChatComponents().readSafely(0));
 			} catch (Exception exc) {
 				exc.printStackTrace();
-				json = "{}";
 			}
 		}
-
+		
 		boolean found = false;
 		for (String rep : getStorage().PLACEHOLDERS) {
 			if (json.contains(rep)) {
@@ -206,6 +214,7 @@ public class ChatPacketManager extends PacketHandler {
 			PacketUtils.sendPacket(e.getPlayer(), e.getPacket());
 		});
 	}
+	
 	private Object jsonToChatComponent(String json) {
 		try {
 			return PacketUtils.CHAT_SERIALIZER.getMethod("a", String.class).invoke(null, json);
