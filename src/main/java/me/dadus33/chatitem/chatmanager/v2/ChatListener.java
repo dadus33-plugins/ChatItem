@@ -22,7 +22,6 @@ import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.ColorManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
-import me.dadus33.chatitem.utils.Version;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -192,28 +191,27 @@ public class ChatListener implements Listener {
 		}
 		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format);
 		ItemStack item = p.getItemInHand();
-		if(Version.getVersion().isNewerOrEquals(Version.V1_16))
-			e.getRecipients().forEach((pl) -> showWithHex(pl, p, item, msg));
-		else
-			e.getRecipients().forEach((pl) -> showWithoutHex(pl, p, item, msg));
+		e.getRecipients().forEach((pl) -> showItem(pl, p, item, msg));
 		Bukkit.getConsoleSender().sendMessage(msg); // show in log
 	}
 	
-	private void showWithoutHex(Player to, Player origin, ItemStack item, String msg) {
+	private void showItem(Player to, Player origin, ItemStack item, String msg) {
 		ComponentBuilder builder = new ComponentBuilder("");
-		ChatColor color = ChatColor.WHITE;
 		String colorCode = "", text = "";
 		boolean waiting = false;
 		for(char args : msg.toCharArray()) {
 			if(args == ChatManager.SEPARATOR && (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
 				// here put the item
+				if(shouldUseAppendMethod)
+					builder.append(text);
 				addItem(builder, to, origin, item);
-				builder.append(text);
+				if(!shouldUseAppendMethod)
+					builder.append(text);
 				text = "";
 			} else  if(args == '§') { // begin of color
 				if(colorCode.isEmpty() && !text.isEmpty()) { // text before this char
 					ChatItem.debug("Append " + text);
-					builder.append(new ComponentBuilder(text).color(color).create());
+					builder.append(text);
 					text = "";
 				}
 				
@@ -223,60 +221,16 @@ public class ChatListener implements Listener {
 					colorCode += args; // add char to it
 					waiting = false;
 				} else {
-					color = ChatColor.getByChar(args); // a color by itself
-					text += color;
+					if(!colorCode.isEmpty())
+						text += ColorManager.getColor(colorCode);
+					text += ChatColor.getByChar(args); // a color by itself
 					colorCode = ""; // clean actual code, it's only to prevent some kind of issue
 					waiting = false;
 				}
 			} else {
 				if(!colorCode.isEmpty()) {
-					color = ColorManager.getColor(colorCode);
+					text += ColorManager.getColor(colorCode);
 					colorCode = ""; // clean actual code
-					text += color;
-				}
-				// basic text, not waiting for code after '§'
-				text += args;
-				ChatItem.debug("arg: " + args);
-				waiting = false;
-			}
-		}
-		builder.append(text);
-		to.spigot().sendMessage(builder.create());
-	}
-
-	private void showWithHex(Player to, Player origin, ItemStack item, String msg) {
-		ComponentBuilder builder = new ComponentBuilder("");
-		ChatColor color = ChatColor.WHITE;
-		String colorCode = "", text = "";
-		boolean waiting = false;
-		for(char args : msg.toCharArray()) {
-			if(args == ChatManager.SEPARATOR && (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
-				builder.append(text);
-				text = "";
-				// here put the item
-				addItem(builder, to, origin, item);
-			} else  if(args == '§') { // begin of color
-				if(colorCode.isEmpty() && !text.isEmpty()) { // text before this char
-					ChatItem.debug("Append " + text);
-					builder.append(new ComponentBuilder(text).color(color).create());
-					text = "";
-				}
-				
-				waiting = true; // waiting for color code
-			} else if(waiting) { // if waiting for code and valid str
-				if(String.valueOf(args).matches("-?[0-9a-fA-F]+") && colorCode.length() <= 5) { // if it's hexademical value and with enough space for full color
-					colorCode += args; // add char to it
-					waiting = false;
-				} else {
-					color = ChatColor.getByChar(args); // a color by itself
-					colorCode = ""; // clean actual code, it's only to prevent some kind of issue
-					waiting = false;
-				}
-			} else {
-				if(!colorCode.isEmpty()) {
-					color = ColorManager.getColor(colorCode);
-					colorCode = ""; // clean actual code
-					builder.append(color.toString());
 				}
 				// basic text, not waiting for code after '§'
 				text += args;
@@ -315,7 +269,7 @@ public class ChatListener implements Listener {
 	}
 
 	public void addItem(ComponentBuilder builder, Player to, Player origin, ItemStack item) {
-		if (item != null && item.hasItemMeta()) {
+		if (item != null && !item.getType().equals(Material.AIR)) {
 			ComponentBuilder itemComponent = new ComponentBuilder(
 					ChatListener.styleItem(to, item, getStorage()));
 			String itemJson = convertItemStackToJson(item);

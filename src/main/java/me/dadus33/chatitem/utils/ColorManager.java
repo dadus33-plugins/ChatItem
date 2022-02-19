@@ -49,7 +49,7 @@ public class ColorManager {
 	public static ChatColor getColor(String input) {
 		if(input == null || input.isEmpty())
 			return ChatColor.RESET;
-		if(input.length() == 6)
+		if(input.length() == 6 && Version.getVersion().isNewerOrEquals(Version.V1_16))
 			return ChatColor.of("#" + input);
 		return ChatColor.getByChar(input.charAt(0));
 	}
