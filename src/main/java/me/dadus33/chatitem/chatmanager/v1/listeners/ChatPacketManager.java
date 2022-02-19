@@ -91,7 +91,12 @@ public class ChatPacketManager extends PacketHandler {
 						// we shouldn't mess with anyways
 			BaseComponent[] components = packet.getSpecificModifier(BaseComponent[].class).readSafely(0);
 			if (components == null) {
-				ChatItem.debug("No base components");
+				Class<?> chatBaseCompClass = PacketUtils.getNmsClass("IChatBaseComponent", "network.chat.");
+				Object chatBaseComp = packet.getSpecificModifier(chatBaseCompClass).readSafely(0);
+				if(chatBaseComp == null)
+					ChatItem.debug("No base components, without chat base comp");
+				else
+					ChatItem.debug("No base components, with chatbasecomp: " + chatBaseComp);
 				return;
 			}
 			json = ComponentSerializer.toString(components);
