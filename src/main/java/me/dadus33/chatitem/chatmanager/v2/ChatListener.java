@@ -168,7 +168,7 @@ public class ChatListener implements Listener {
 			String defMsg = e.getMessage();
 			ChatItem.debug("Begin def msg: " + defMsg + "");
 			for (String rep : getStorage().PLACEHOLDERS) {
-				defMsg = defMsg.replace(rep, ChatManager.SEPARATOR_STR);
+				defMsg = defMsg.replace(rep, ChatManager.SEPARATOR + "");
 			}
 			msg = (format.contains("%2$s") ? String.format(format, p.getDisplayName(), defMsg) : String.format(format, p.getDisplayName()));
 		} else {
@@ -195,6 +195,7 @@ public class ChatListener implements Listener {
 		for(char args : msg.toCharArray()) {
 			if(args == ChatManager.SEPARATOR && (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
 				builder.append(text);
+				text = "";
 				// here put the item
 				addItem(builder, to, origin, item);
 			} else  if(args == '§') { // begin of color
@@ -238,6 +239,7 @@ public class ChatListener implements Listener {
 		for(char args : msg.toCharArray()) {
 			if(args == ChatManager.SEPARATOR && (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
 				builder.append(text);
+				text = "";
 				// here put the item
 				addItem(builder, to, origin, item);
 			} else  if(args == '§') { // begin of color
