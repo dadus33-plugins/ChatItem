@@ -163,21 +163,14 @@ public class ChatListener implements Listener {
 		}
 		e.setCancelled(true);
 		String format = e.getFormat();
-		boolean isAlreadyParsed = false;
-		if (format.contains("%1$s") && format.contains("%2$s")) // message not parsed but not default way
-			isAlreadyParsed = false;
-		if (format.equalsIgnoreCase(e.getMessage())) // is message already parsed
-			isAlreadyParsed = true;
-		if (format.equalsIgnoreCase("<%1$s> %2$s")) // default MC message
-			isAlreadyParsed = false;
 		String msg;
-		if(isAlreadyParsed) {
+		if(format.contains("%1$s") || format.contains("%2$s")) {
 			String defMsg = e.getMessage();
 			ChatItem.debug("Begin def msg: " + defMsg + "");
 			for (String rep : getStorage().PLACEHOLDERS) {
 				defMsg = defMsg.replace(rep, ChatManager.SEPARATOR_STR);
 			}
-			msg = String.format(format, p.getDisplayName(), defMsg);
+			msg = (format.contains("%2$s") ? String.format(format, p.getDisplayName(), defMsg) : String.format(format, p.getDisplayName()));
 		} else {
 			String defMsg = e.getMessage();
 			for (String rep : getStorage().PLACEHOLDERS) {
