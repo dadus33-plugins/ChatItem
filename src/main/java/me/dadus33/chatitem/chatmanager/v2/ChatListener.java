@@ -1,7 +1,10 @@
 package me.dadus33.chatitem.chatmanager.v2;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -21,6 +24,7 @@ import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Version;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
@@ -35,6 +39,7 @@ public class ChatListener implements Listener {
 	private final HashMap<String, Long> COOLDOWNS = new HashMap<>();
 	private ChatListenerChatManager manage;
 	private Method saveMethod;
+	private boolean shouldUseAppendMethod = false;
 
 	public ChatListener(ChatListenerChatManager manage) {
 		this.manage = manage;
@@ -49,13 +54,20 @@ public class ChatListener implements Listener {
 					}
 				}
 			}
+			try {
+				ComponentBuilder.class.getDeclaredMethod("append", BaseComponent[].class);
+				shouldUseAppendMethod = true;
+			} catch (Exception e) {
+				shouldUseAppendMethod = false;
+			}
 		} catch (Exception e) {
 
 		}
+		String appendMethodMsg = shouldUseAppendMethod ? "Use ComponentBuilder's method." : "Use own ComponentBuilder append method.";
 		if (saveMethod == null)
-			ChatItem.getInstance().getLogger().info("Failed to find save method. Using default system...");
+			ChatItem.getInstance().getLogger().info("Failed to find save method. Using default system. " + appendMethodMsg);
 		else
-			ChatItem.getInstance().getLogger().info("Save method founded: " + saveMethod.getName() + ".");
+			ChatItem.getInstance().getLogger().info("Save method founded: " + saveMethod.getName() + ". " + appendMethodMsg);
 	}
 
 	public Storage getStorage() {
@@ -194,10 +206,10 @@ public class ChatListener implements Listener {
 		boolean waiting = false;
 		for(char args : msg.toCharArray()) {
 			if(args == ChatManager.SEPARATOR && (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
-				builder.append(text);
-				text = "";
 				// here put the item
 				addItem(builder, to, origin, item);
+				builder.append(text);
+				text = "";
 			} else  if(args == '§') { // begin of color
 				if(colorCode.isEmpty() && !text.isEmpty()) { // text before this char
 					ChatItem.debug("Append " + text);
@@ -307,7 +319,7 @@ public class ChatListener implements Listener {
 					ChatListener.styleItem(to, item, getStorage()));
 			String itemJson = convertItemStackToJson(item);
 			itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
-			builder.append(itemComponent.create());
+			appendToComponentBuilder(builder, itemComponent.create());
 		} else {
 			String handName = getStorage().HAND_NAME;
 			ComponentBuilder handComp = new ComponentBuilder("");
@@ -322,15 +334,15 @@ public class ChatListener implements Listener {
 			}
 			handComp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, handTooltip.create()));
 			if (handName.contains("{name}")) {
-				String[] splitted = handName.split("{name}");
+				String[] splitted = handName.split("\\{name\\}");
 				for (int i = 0; i < (splitted.length - 1); i++) {
-					handComp.append(new ComponentBuilder(splitted[i]).create());
-					handComp.append(PlayerNamerManager.getPlayerNamer().getName(origin));
+					handComp.append(splitted[i]);
+					appendToComponentBuilder(handComp, PlayerNamerManager.getPlayerNamer().getName(origin));
 				}
-				handComp.append(new ComponentBuilder(splitted[splitted.length - 1]).create());
+				handComp.append(splitted[splitted.length - 1]);
 			} else
 				handComp.append(handName.replace("{display-name}", origin.getDisplayName()));
-			builder.append(handComp.create());
+			appendToComponentBuilder(builder, handComp.create());
 		}
 	}
 
@@ -351,5 +363,25 @@ public class ChatListener implements Listener {
 		}
 		replacer = replacer.replace(NAME, NamerManager.getName(p, item, c));
 		return replacer;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void appendToComponentBuilder(ComponentBuilder builder, BaseComponent[] comps) {
+		if(shouldUseAppendMethod) {
+			try {
+				builder.append(comps);
+			} catch (Exception e) {
+				ChatItem.getInstance().getLogger().severe("This should NEVER append. The ComponentBuilder#append(BaseComponent[]) was found but it's NOT. Using own next time.");
+				shouldUseAppendMethod = false;
+			}
+		} else {
+			try {
+				Field partField = ComponentBuilder.class.getDeclaredField("parts"); // get field
+				partField.setAccessible(true); // make it accessible
+				((List<BaseComponent>) partField.get(builder)).addAll(Arrays.asList(comps)); // add fields to list
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }
