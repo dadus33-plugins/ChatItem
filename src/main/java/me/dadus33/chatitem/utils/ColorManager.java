@@ -46,7 +46,11 @@ public class ColorManager {
 		return builder.create();
 	}
 	
-	private static ChatColor getColor(String input) {
-		return input.isEmpty() ? ChatColor.WHITE : (input.length() == 1 ? ChatColor.getByChar(input.charAt(0)) : ChatColor.of("#" + input));
+	public static ChatColor getColor(String input) {
+		if(input == null || input.isEmpty())
+			return ChatColor.RESET;
+		if(input.length() == 6)
+			return ChatColor.of("#" + input);
+		return ChatColor.getByChar(input.charAt(0));
 	}
 }

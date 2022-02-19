@@ -11,7 +11,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
@@ -29,7 +28,6 @@ import net.md_5.bungee.api.chat.HoverEvent.Action;
 @SuppressWarnings("deprecation")
 public class ChatListener implements Listener {
 
-	public final static char SEPARATOR = ((char) 0x0007);
 	private final static String NAME = "{name}";
 	private final static String AMOUNT = "{amount}";
 	private final static String TIMES = "{times}";
@@ -92,7 +90,7 @@ public class ChatListener implements Listener {
 		return builder.toString();
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onChat(AsyncPlayerChatEvent e) {
 		if (e.isCancelled()) {
 			if (ChatItem.getInstance().getChatManager().size() == 1) { // only chat
@@ -109,21 +107,14 @@ public class ChatListener implements Listener {
 			return;
 		}
 		Player p = e.getPlayer();
-		for (String rep : getStorage().PLACEHOLDERS) {
-			if (e.getMessage().contains(rep + ChatManager.SEPARATOR + p.getName())) { // already managed by v1
-				return;
-			}
-		}
 		boolean found = false;
 
-		for (String key : e.getMessage().split(" ")) {
-			if (found)
+		for (String rep : getStorage().PLACEHOLDERS) {
+			if (e.getMessage().contains(rep + ChatManager.SEPARATOR + p.getName())) // already managed by v1
+				return;
+			if (e.getMessage().contains(rep)) {
+				found = true;
 				break;
-			for (String rep : getStorage().PLACEHOLDERS) {
-				if (key.equalsIgnoreCase(rep)) {
-					found = true;
-					break;
-				}
 			}
 		}
 
@@ -150,7 +141,7 @@ public class ChatListener implements Listener {
 				return;
 			}
 		}
-		if (getStorage().COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
+		if (getStorage().COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) { // use cooldown
 			if (COOLDOWNS.containsKey(p.getName())) {
 				long start = COOLDOWNS.get(p.getName());
 				long current = System.currentTimeMillis() / 1000;
@@ -168,123 +159,125 @@ public class ChatListener implements Listener {
 					return;
 				}
 			}
+			COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
 		}
 		e.setCancelled(true);
-		String format = e.getFormat(), defMsg = e.getMessage();
-		Bukkit.getConsoleSender().sendMessage(String.format(e.getFormat(), e.getPlayer().getDisplayName(), defMsg)); // show
-																														// in
-																														// log
+		String format = e.getFormat();
 		boolean isAlreadyParsed = false;
 		if (format.contains("%1$s") && format.contains("%2$s")) // message not parsed but not default way
 			isAlreadyParsed = false;
-		if (format.equalsIgnoreCase(defMsg)) // is message already parsed
+		if (format.equalsIgnoreCase(e.getMessage())) // is message already parsed
 			isAlreadyParsed = true;
 		if (format.equalsIgnoreCase("<%1$s> %2$s")) // default MC message
 			isAlreadyParsed = false;
-		String msg = isAlreadyParsed ? format : String.format(format, p.getDisplayName(), defMsg);
+		String msg;
+		if(isAlreadyParsed) {
+			String defMsg = e.getMessage();
+			ChatItem.debug("Begin def msg: " + defMsg + "");
+			for (String rep : getStorage().PLACEHOLDERS) {
+				defMsg = defMsg.replace(rep, ChatManager.SEPARATOR_STR);
+			}
+			msg = String.format(format, p.getDisplayName(), defMsg);
+		} else {
+			String defMsg = e.getMessage();
+			for (String rep : getStorage().PLACEHOLDERS) {
+				defMsg = defMsg.replace(rep, ChatManager.SEPARATOR + "");
+			}
+			msg = format.replace(e.getMessage(), defMsg);
+		}
+		ChatItem.debug("msg: " + msg + ", format: " + format);
 		ItemStack item = p.getItemInHand();
-		ItemMeta meta = item == null ? null : item.getItemMeta();
 		if(Version.getVersion().isNewerOrEquals(Version.V1_16))
-			e.getRecipients().forEach((pl) -> showWithHex(pl, p, item, meta, format, msg));
+			e.getRecipients().forEach((pl) -> showWithHex(pl, p, item, msg));
 		else
-			e.getRecipients().forEach((pl) -> showWithoutHex(pl, p, item, meta, format, msg));
+			e.getRecipients().forEach((pl) -> showWithoutHex(pl, p, item, msg));
+		Bukkit.getConsoleSender().sendMessage(msg); // show in log
 	}
 	
-	private void showWithoutHex(Player to, Player origin, ItemStack item, ItemMeta meta, String format, String msg) {
-		ComponentBuilder component = new ComponentBuilder("");
-		ChatColor color = ChatColor.getByChar(getColorChat(format));
-		for (String args : msg.split(" ")) {
-			if (getStorage().PLACEHOLDERS.contains(args)) {
-				if (meta != null) {
-					ComponentBuilder itemComponent = new ComponentBuilder(
-							ChatListener.styleItem(to, item, getStorage()));
-					String itemJson = convertItemStackToJson(item);
-					itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
-					component.append(itemComponent.create());
+	private void showWithoutHex(Player to, Player origin, ItemStack item, String msg) {
+		ComponentBuilder builder = new ComponentBuilder("");
+		ChatColor color = ChatColor.WHITE;
+		String colorCode = "", text = "";
+		boolean waiting = false;
+		for(char args : msg.toCharArray()) {
+			if(args == ChatManager.SEPARATOR && (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
+				builder.append(text);
+				// here put the item
+				addItem(builder, to, origin, item);
+			} else  if(args == '§') { // begin of color
+				if(colorCode.isEmpty() && !text.isEmpty()) { // text before this char
+					ChatItem.debug("Append " + text);
+					builder.append(new ComponentBuilder(text).color(color).create());
+					text = "";
+				}
+				
+				waiting = true; // waiting for color code
+			} else if(waiting) { // if waiting for code and valid str
+				if(String.valueOf(args).matches("-?[0-9a-fA-F]+") && colorCode.length() <= 5) { // if it's hexademical value and with enough space for full color
+					colorCode += args; // add char to it
+					waiting = false;
 				} else {
-					if (getStorage().HAND_DISABLED)
-						component.append(color + args);
-					else {
-						String handName = getStorage().HAND_NAME;
-						ComponentBuilder handComp = new ComponentBuilder("");
-						ComponentBuilder handTooltip = new ComponentBuilder("");
-						int stay = getStorage().HAND_TOOLTIP.size();
-						for (String line : getStorage().HAND_TOOLTIP) {
-							stay--;
-							handTooltip.append(line.replace("{name}", origin.getName()).replace("{display-name}",
-									origin.getDisplayName()));
-							if (stay > 0)
-								handTooltip.append("\n");
-						}
-						handComp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, handTooltip.create()));
-						if (handName.contains("{name}")) {
-							String[] splitted = handName.split("{name}");
-							for (int i = 0; i < (splitted.length - 1); i++) {
-								handComp.append(new ComponentBuilder(splitted[i]).create());
-								handComp.append(PlayerNamerManager.getPlayerNamer().getName(origin));
-							}
-							handComp.append(new ComponentBuilder(splitted[splitted.length - 1]).create());
-						} else
-							handComp.append(handName.replace("{display-name}", origin.getDisplayName()));
-						component.append(handComp.create());
-					}
+					color = ChatColor.getByChar(args); // a color by itself
+					colorCode = ""; // clean actual code, it's only to prevent some kind of issue
+					waiting = false;
 				}
 			} else {
-				component.append(color + args);
-			}
-			component.append(" ");
-			char maybeNextCode = getColorChat(args);
-			if (maybeNextCode != 'r') {
-				color = ChatColor.getByChar(maybeNextCode);
+				if(!colorCode.isEmpty()) {
+					color = ColorManager.getColor(colorCode);
+					colorCode = ""; // clean actual code
+					builder.append(color.toString());
+				}
+				// basic text, not waiting for code after '§'
+				text += args;
+				ChatItem.debug("arg: " + args);
+				waiting = false;
 			}
 		}
-		to.spigot().sendMessage(component.create());
+		builder.append(text);
+		to.spigot().sendMessage(builder.create());
 	}
 
-	private void showWithHex(Player to, Player origin, ItemStack item, ItemMeta meta, String format, String msg) {
-		ComponentBuilder component = new ComponentBuilder("");
-		for (String args : msg.split(" ")) {
-			if (getStorage().PLACEHOLDERS.contains(args)) {
-				if (meta != null) {
-					ComponentBuilder itemComponent = new ComponentBuilder(
-							ChatListener.styleItem(to, item, getStorage()));
-					String itemJson = convertItemStackToJson(item);
-					itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
-					component.append(itemComponent.create());
+	private void showWithHex(Player to, Player origin, ItemStack item, String msg) {
+		ComponentBuilder builder = new ComponentBuilder("");
+		ChatColor color = ChatColor.WHITE;
+		String colorCode = "", text = "";
+		boolean waiting = false;
+		for(char args : msg.toCharArray()) {
+			if(args == ChatManager.SEPARATOR && (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
+				builder.append(text);
+				// here put the item
+				addItem(builder, to, origin, item);
+			} else  if(args == '§') { // begin of color
+				if(colorCode.isEmpty() && !text.isEmpty()) { // text before this char
+					ChatItem.debug("Append " + text);
+					builder.append(new ComponentBuilder(text).color(color).create());
+					text = "";
+				}
+				
+				waiting = true; // waiting for color code
+			} else if(waiting) { // if waiting for code and valid str
+				if(String.valueOf(args).matches("-?[0-9a-fA-F]+") && colorCode.length() <= 5) { // if it's hexademical value and with enough space for full color
+					colorCode += args; // add char to it
+					waiting = false;
 				} else {
-					if (getStorage().HAND_DISABLED)
-						component.append(ColorManager.getChatWithHex(args));
-					else {
-						String handName = getStorage().HAND_NAME;
-						ComponentBuilder handComp = new ComponentBuilder("");
-						ComponentBuilder handTooltip = new ComponentBuilder("");
-						int stay = getStorage().HAND_TOOLTIP.size();
-						for (String line : getStorage().HAND_TOOLTIP) {
-							stay--;
-							handTooltip.append(line.replace("{name}", origin.getName()).replace("{display-name}",
-									origin.getDisplayName()));
-							if (stay > 0)
-								handTooltip.append("\n");
-						}
-						handComp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, handTooltip.create()));
-						if (handName.contains("{name}")) {
-							String[] splitted = handName.split("{name}");
-							for (int i = 0; i < (splitted.length - 1); i++) {
-								handComp.append(new ComponentBuilder(splitted[i]).create());
-								handComp.append(PlayerNamerManager.getPlayerNamer().getName(origin));
-							}
-							handComp.append(new ComponentBuilder(splitted[splitted.length - 1]).create());
-						} else
-							handComp.append(handName.replace("{display-name}", origin.getDisplayName()));
-						component.append(handComp.create());
-					}
+					color = ChatColor.getByChar(args); // a color by itself
+					colorCode = ""; // clean actual code, it's only to prevent some kind of issue
+					waiting = false;
 				}
 			} else {
-				component.append(ColorManager.getChatWithHex(args));
+				if(!colorCode.isEmpty()) {
+					color = ColorManager.getColor(colorCode);
+					colorCode = ""; // clean actual code
+					builder.append(color.toString());
+				}
+				// basic text, not waiting for code after '§'
+				text += args;
+				ChatItem.debug("arg: " + args);
+				waiting = false;
 			}
-			component.append(" ");
 		}
-		to.spigot().sendMessage(component.create());
+		builder.append(text);
+		to.spigot().sendMessage(builder.create());
 	}
 
 	/**
@@ -313,22 +306,37 @@ public class ChatListener implements Listener {
 		}
 	}
 
-	/**
-	 * Get the latest color chat
-	 * 
-	 * @param msg the message that contains color
-	 * @return the char of the color or 'r' if nothing found
-	 */
-	private char getColorChat(String msg) {
-		if (msg.length() < 2)
-			return 'r';
-		for (int i = msg.length() - 2; i > 0; i--) {
-			char s = msg.charAt(i);
-			if (ChatColor.COLOR_CHAR == s) {
-				return msg.charAt(i + 1);
+	public void addItem(ComponentBuilder builder, Player to, Player origin, ItemStack item) {
+		if (item != null && item.hasItemMeta()) {
+			ComponentBuilder itemComponent = new ComponentBuilder(
+					ChatListener.styleItem(to, item, getStorage()));
+			String itemJson = convertItemStackToJson(item);
+			itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
+			builder.append(itemComponent.create());
+		} else {
+			String handName = getStorage().HAND_NAME;
+			ComponentBuilder handComp = new ComponentBuilder("");
+			ComponentBuilder handTooltip = new ComponentBuilder("");
+			int stay = getStorage().HAND_TOOLTIP.size();
+			for (String line : getStorage().HAND_TOOLTIP) {
+				stay--;
+				handTooltip.append(line.replace("{name}", origin.getName()).replace("{display-name}",
+						origin.getDisplayName()));
+				if (stay > 0)
+					handTooltip.append("\n");
 			}
+			handComp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, handTooltip.create()));
+			if (handName.contains("{name}")) {
+				String[] splitted = handName.split("{name}");
+				for (int i = 0; i < (splitted.length - 1); i++) {
+					handComp.append(new ComponentBuilder(splitted[i]).create());
+					handComp.append(PlayerNamerManager.getPlayerNamer().getName(origin));
+				}
+				handComp.append(new ComponentBuilder(splitted[splitted.length - 1]).create());
+			} else
+				handComp.append(handName.replace("{display-name}", origin.getDisplayName()));
+			builder.append(handComp.create());
 		}
-		return 'r';
 	}
 
 	public static String styleItem(Player p, ItemStack item, Storage c) {
