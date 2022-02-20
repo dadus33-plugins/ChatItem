@@ -62,11 +62,14 @@ public class ChatListener implements Listener {
 		} catch (Exception e) {
 
 		}
-		String appendMethodMsg = shouldUseAppendMethod ? "Use ComponentBuilder's method." : "Use own ComponentBuilder append method.";
+		String appendMethodMsg = shouldUseAppendMethod ? "Use ComponentBuilder's method."
+				: "Use own ComponentBuilder append method.";
 		if (saveMethod == null)
-			ChatItem.getInstance().getLogger().info("Failed to find save method. Using default system. " + appendMethodMsg);
+			ChatItem.getInstance().getLogger()
+					.info("Failed to find save method. Using default system. " + appendMethodMsg);
 		else
-			ChatItem.getInstance().getLogger().info("Save method founded: " + saveMethod.getName() + ". " + appendMethodMsg);
+			ChatItem.getInstance().getLogger()
+					.info("Save method founded: " + saveMethod.getName() + ". " + appendMethodMsg);
 	}
 
 	public Storage getStorage() {
@@ -118,11 +121,16 @@ public class ChatListener implements Listener {
 			return;
 		}
 		Player p = e.getPlayer();
-		boolean found = false;
+		boolean found = false, hasv1 = false;
 
 		for (String rep : getStorage().PLACEHOLDERS) {
-			if (e.getMessage().contains(rep + ChatManager.SEPARATOR + p.getName())) // already managed by v1
-				return;
+			// v1 try to manage it, but the message have not been changed by another plugin
+			if (e.getMessage().contains(rep + ChatManager.SEPARATOR + p.getName())) {
+				hasv1 = true;
+				found = true;
+				ChatItem.debug("Found v1 placeholders in v2");
+				break;
+			}
 			if (e.getMessage().contains(rep)) {
 				found = true;
 				break;
@@ -174,19 +182,18 @@ public class ChatListener implements Listener {
 		}
 		e.setCancelled(true);
 		String format = e.getFormat();
-		String msg;
-		if(format.contains("%1$s") || format.contains("%2$s")) {
-			String defMsg = e.getMessage();
+		String msg, defMsg = e.getMessage();
+		for (String rep : getStorage().PLACEHOLDERS) {
+			if(hasv1)
+				defMsg = defMsg.replace(rep + ChatManager.SEPARATOR + p.getName(), ChatManager.SEPARATOR + ""); // remove v1 char
+			else
+				defMsg = defMsg.replace(rep, ChatManager.SEPARATOR + "");
+		}
+		if (format.contains("%1$s") || format.contains("%2$s")) {
 			ChatItem.debug("Begin def msg: " + defMsg + "");
-			for (String rep : getStorage().PLACEHOLDERS) {
-				defMsg = defMsg.replace(rep, ChatManager.SEPARATOR + "");
-			}
-			msg = (format.contains("%2$s") ? String.format(format, p.getDisplayName(), defMsg) : String.format(format, p.getDisplayName()));
+			msg = (format.contains("%2$s") ? String.format(format, p.getDisplayName(), defMsg)
+					: String.format(format, p.getDisplayName()));
 		} else {
-			String defMsg = e.getMessage();
-			for (String rep : getStorage().PLACEHOLDERS) {
-				defMsg = defMsg.replace(rep, ChatManager.SEPARATOR + "");
-			}
 			msg = format.replace(e.getMessage(), defMsg);
 		}
 		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format);
@@ -194,47 +201,50 @@ public class ChatListener implements Listener {
 		e.getRecipients().forEach((pl) -> showItem(pl, p, item, msg));
 		Bukkit.getConsoleSender().sendMessage(msg); // show in log
 	}
-	
+
 	private void showItem(Player to, Player origin, ItemStack item, String msg) {
 		ComponentBuilder builder = new ComponentBuilder("");
 		String colorCode = "", text = "";
 		boolean waiting = false;
-		for(char args : msg.toCharArray()) {
-			if(args == ChatManager.SEPARATOR && (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
+		for (char args : msg.toCharArray()) {
+			if (args == ChatManager.SEPARATOR
+					&& (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
 				// here put the item
-				if(shouldUseAppendMethod)
+				if (shouldUseAppendMethod)
 					builder.append(text);
 				addItem(builder, to, origin, item);
-				if(!shouldUseAppendMethod)
+				if (!shouldUseAppendMethod)
 					builder.append(text);
 				text = "";
-			} else  if(args == '§') { // begin of color
-				if(colorCode.isEmpty() && !text.isEmpty()) { // text before this char
+			} else if (args == '§') { // begin of color
+				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
 					ChatItem.debug("Append " + text);
 					builder.append(text);
 					text = "";
 				}
-				
+
 				waiting = true; // waiting for color code
-			} else if(waiting) { // if waiting for code and valid str
-				if(String.valueOf(args).matches("-?[0-9a-fA-F]+") && colorCode.length() <= 5) { // if it's hexademical value and with enough space for full color
+			} else if (waiting) { // if waiting for code and valid str
+				if (String.valueOf(args).matches("-?[0-9a-fA-F]+") && colorCode.length() <= 5) { // if it's hexademical
+																									// value and with
+																									// enough space for
+																									// full color
 					colorCode += args; // add char to it
 					waiting = false;
 				} else {
-					if(!colorCode.isEmpty())
+					if (!colorCode.isEmpty())
 						text += ColorManager.getColor(colorCode);
 					text += ChatColor.getByChar(args); // a color by itself
 					colorCode = ""; // clean actual code, it's only to prevent some kind of issue
 					waiting = false;
 				}
 			} else {
-				if(!colorCode.isEmpty()) {
+				if (!colorCode.isEmpty()) {
 					text += ColorManager.getColor(colorCode);
 					colorCode = ""; // clean actual code
 				}
 				// basic text, not waiting for code after '§'
 				text += args;
-				ChatItem.debug("arg: " + args);
 				waiting = false;
 			}
 		}
@@ -270,8 +280,7 @@ public class ChatListener implements Listener {
 
 	public void addItem(ComponentBuilder builder, Player to, Player origin, ItemStack item) {
 		if (item != null && !item.getType().equals(Material.AIR)) {
-			ComponentBuilder itemComponent = new ComponentBuilder(
-					ChatListener.styleItem(to, item, getStorage()));
+			ComponentBuilder itemComponent = new ComponentBuilder(ChatListener.styleItem(to, item, getStorage()));
 			String itemJson = convertItemStackToJson(item);
 			itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
 			appendToComponentBuilder(builder, itemComponent.create());
@@ -282,8 +291,8 @@ public class ChatListener implements Listener {
 			int stay = getStorage().HAND_TOOLTIP.size();
 			for (String line : getStorage().HAND_TOOLTIP) {
 				stay--;
-				handTooltip.append(line.replace("{name}", origin.getName()).replace("{display-name}",
-						origin.getDisplayName()));
+				handTooltip.append(
+						line.replace("{name}", origin.getName()).replace("{display-name}", origin.getDisplayName()));
 				if (stay > 0)
 					handTooltip.append("\n");
 			}
@@ -322,11 +331,12 @@ public class ChatListener implements Listener {
 
 	@SuppressWarnings("unchecked")
 	public void appendToComponentBuilder(ComponentBuilder builder, BaseComponent[] comps) {
-		if(shouldUseAppendMethod) {
+		if (shouldUseAppendMethod) {
 			try {
 				builder.append(comps);
 			} catch (Exception e) {
-				ChatItem.getInstance().getLogger().severe("This should NEVER append. The ComponentBuilder#append(BaseComponent[]) was found but it's NOT. Using own next time.");
+				ChatItem.getInstance().getLogger().severe(
+						"This should NEVER append. The ComponentBuilder#append(BaseComponent[]) was found but it's NOT. Using own next time.");
 				shouldUseAppendMethod = false;
 			}
 		} else {

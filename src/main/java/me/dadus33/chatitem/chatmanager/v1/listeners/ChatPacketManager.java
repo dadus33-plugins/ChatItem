@@ -3,11 +3,9 @@ package me.dadus33.chatitem.chatmanager.v1.listeners;
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR_STR;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -81,12 +79,8 @@ public class ChatPacketManager extends PacketHandler {
 				return; // It means it's an actionbar message, and we ain't intercepting those
 			}
 		}
-		ChatItem.debug("UUID: " + e.getContent().getSpecificModifier(UUID.class).readSafely(0, null));
 		boolean usesBaseComponents = false;
 		PacketContent packet = e.getContent();
-		for(Field f : e.getPacket().getClass().getDeclaredFields()) {
-			ChatItem.debug("Field " + f.getName() + ", " + f.getType().getSimpleName());
-		}
 		String json = "{}";
 		if (packet.getChatComponents().readSafely(0) == null) { // null check for some cases of messages sent using
 																// spigot's Chat Component API or other means
