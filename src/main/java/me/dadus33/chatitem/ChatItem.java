@@ -105,20 +105,10 @@ public class ChatItem extends JavaPlugin {
         //Save the instance (we're basically a singleton)
         instance = this;
 
-        //Load ProtocolManager
-        //pm = ProtocolLibrary.getProtocolManager();
-
         //Load config
         saveDefaultConfig();
         storage = new Storage(getConfig());
         
-        //We halt the use of this system for now, until we can solve the infamous getProtocolVersion issue
-        //Till then, users of both ViaVersion and ProtocolSupport should do just fine
-        /*if(!protocolSupport && !viaVersion) {
-            //We only implement our own way of getting protocol versions if we have no other choice
-            pm.addPacketListener(new HandshakeListener(this, ListenerPriority.MONITOR, PacketType.Handshake.Client.SET_PROTOCOL));
-        }*/
-
         //Commands
         loadCommand(getCommand("cireload"), new CIReloadCommand());
         loadCommand(getCommand("chatitem"), new ChatItemCommand());
@@ -180,7 +170,7 @@ public class ChatItem extends JavaPlugin {
 	}
     
     public static void debug(String msg) {
-    	if(getInstance().getConfig().getBoolean("debug", false))
+    	if(getInstance().getStorage().DEBUG)
     		getInstance().getLogger().info("[Debug] " + msg);
     }
 }

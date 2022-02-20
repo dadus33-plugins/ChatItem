@@ -18,7 +18,7 @@ config-version: 13
 # You can replace 'both' by another mode that should correspond to what you want.
 # If you don't know which one use, come on discord (link at begin of config or in spigotmc)
 manager: "both"
- 
+
 #General configuration
 general:
   # The placeholders to display an item in chat.
@@ -142,6 +142,7 @@ messages:
     hand-disabled: "&6Hand disabled: %state%"
     limit-per-message: "&6Limit per message: &a%state%"
     cooldown: "&6Cooldown: &a%state%"
+    debug: "&6Debug: &a%state%"
     # Change name and lore of all managers
     manager:
       both:
@@ -184,6 +185,8 @@ messages:
   seconds: " seconds"
   minutes: " minutes"
   hours: " hours"
+  enabled: "&aEnabled"
+  disabled: "&cDisabled"
  
  
 #  Translations

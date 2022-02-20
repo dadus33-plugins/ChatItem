@@ -18,7 +18,7 @@ public class Storage {
 
 	private FileConfiguration conf;
 	public final HashMap<String, HashMap<Short, String>> TRANSLATIONS = new HashMap<>();
-	public boolean COLOR_IF_ALREADY_COLORED, FORCE_ADD_AMOUNT, LET_MESSAGE_THROUGH, DENY_IF_NO_ITEM,
+	public boolean COLOR_IF_ALREADY_COLORED, FORCE_ADD_AMOUNT, LET_MESSAGE_THROUGH, DENY_IF_NO_ITEM, DEBUG,
 			HAND_DISABLED, SHOW_NO_PERM_NORMAL, CHECK_UPDATE, SHOW_NO_PERM_COMMAND, PERMISSION_ENABLED;
 	public final String HAND_NAME, NAME_FORMAT, AMOUNT_FORMAT, MANAGER, PERMISSION_NAME;
 	public final String NO_PERMISSION_MESSAGE, DENY_MESSAGE, RELOAD_MESSAGE, COOLDOWN_MESSAGE, LIMIT_MESSAGE;
@@ -45,6 +45,7 @@ public class Storage {
 
 			TRANSLATIONS.put(key, entry);
 		}
+		DEBUG = conf.getBoolean("debug", false);
 		PLACEHOLDERS = ImmutableList.copyOf(conf.getStringList("general.placeholders"));
 		NAME_FORMAT = color(conf.getString("general.name-format", "&b&l&o{name} {amount}&r"));
 		AMOUNT_FORMAT = color(conf.getString("general.amount-format", "x{times}"));
