@@ -50,7 +50,7 @@ public class InventoryListener implements Listener {
 		} else if(type.equals(Material.STICK)) {
 			setInConfig("general.hand.disabled", c.HAND_DISABLED = !c.HAND_DISABLED);
 			open(p);
-		} else if(type.equals(Material.FIRE_CHARGE)) {
+		} else if(type.equals(ItemUtils.FIREWORK_CHARGE)) {
 			setInConfig("debug", c.DEBUG = !c.DEBUG);
 			open(p);
 		} else if(type.equals(Material.IRON_DOOR)) {
@@ -90,7 +90,7 @@ public class InventoryListener implements Listener {
 		}
 		inv.setItem(slot + 1, getManagerItem("actual", "%manager%", Messages.getMessage("admin-inv.manager." + c.MANAGER + ".name")));
 		
-		inv.setItem(8, getBoolChangeItem(Material.FIRE_CHARGE, "debug", c.DEBUG));
+		inv.setItem(8, getBoolChangeItem(ItemUtils.FIREWORK_CHARGE, "debug", c.DEBUG));
 
 		inv.setItem(18, getBoolChangeItem(ItemUtils.INK_SAC, "color-if-already-colored", c.COLOR_IF_ALREADY_COLORED));
 		inv.setItem(19, getBoolChangeItem(Material.REDSTONE, "deny-no-item", c.DENY_IF_NO_ITEM));
