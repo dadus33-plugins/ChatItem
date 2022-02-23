@@ -112,7 +112,6 @@ public class ChatPacketManager extends PacketHandler {
 				exc.printStackTrace();
 			}
 		}
-		
 		boolean found = false;
 		for (String rep : getStorage().PLACEHOLDERS) {
 			if (json.contains(rep)) {

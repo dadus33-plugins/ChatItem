@@ -143,6 +143,7 @@ public class ChatListener implements Listener {
 		}
 
 		if (!found) {
+			ChatItem.debug("(v2) Can't found placeholder in: " + e.getMessage() + " > " + PlayerNamerManager.getPlayerNamer().getName(p));
 			return;
 		}
 		if (c.PERMISSION_ENABLED && !p.hasPermission(c.PERMISSION_NAME)) {
@@ -217,49 +218,48 @@ public class ChatListener implements Listener {
 
 	private void showItem(Player to, Player origin, ItemStack item, String msg) {
 		ComponentBuilder builder = new ComponentBuilder("");
+		ChatColor color = ChatColor.RESET;
 		String colorCode = "", text = "";
-		boolean waiting = false;
+		boolean waiting = false, isHex = false;
 		for (char args : msg.toCharArray()) {
-			if (args == ChatManager.SEPARATOR
-					&& (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
-				// here put the item
-				if (!text.isEmpty())
-					builder.append(text);
-				addItem(builder, to, origin, item);
-				/*
-				 * if (!shouldUseAppendMethod) builder.append(text);
-				 */
-				text = "";
-			} else if (args == '§') { // begin of color
+			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
 					ChatItem.debug("Append " + text);
-					builder.append(text);
+					appendToComponentBuilder(builder, new ComponentBuilder(text).color(color).create());
 					text = "";
 				}
-
 				waiting = true; // waiting for color code
 			} else if (waiting) { // if waiting for code and valid str
 				// if it's hexademical value and with enough space for full color
-				if (String.valueOf(args).matches("-?[0-9a-fA-F]+") && colorCode.length() <= 5) {
-					colorCode += args; // add char to it
-				} else {
-					if (!colorCode.isEmpty())
-						text += ColorManager.getColorString(colorCode);
-					text += ChatColor.getByChar(args); // a color by itself
-					colorCode = ""; // clean actual code, it's only to prevent some kind of issue
-				}
 				waiting = false;
+				if(args == 'x' && colorCode.isEmpty())
+					isHex = true;
+				colorCode += args; // a color by itself
 			} else {
-				if (!colorCode.isEmpty()) {
-					text += ColorManager.getColorString(colorCode);
-					colorCode = ""; // clean actual code
-				}
-				// basic text, not waiting for code after '§'
-				text += args;
 				waiting = false;
+				if(!colorCode.isEmpty()) {
+					if(isHex && colorCode.length() >= 7)
+						color = ColorManager.getColor(colorCode);
+					else if(colorCode.length() == 1) // if only one color code
+						color = ColorManager.getColor(colorCode);
+					else
+						text += ColorManager.getColorString(colorCode);
+					colorCode = "";
+				}
+				if (args == ChatManager.SEPARATOR
+						&& (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
+					// here put the item
+					appendToComponentBuilder(builder, new ComponentBuilder(text).color(color).create());
+					addItem(builder, to, origin, item);
+					text = "";
+				} else {
+					// basic text, not waiting for code after '§'
+					text += args;
+				}
 			}
 		}
-		builder.append(text);
+		if(!text.isEmpty())
+			appendToComponentBuilder(builder, new ComponentBuilder(text).color(color).create());
 		to.spigot().sendMessage(builder.create());
 	}
 
