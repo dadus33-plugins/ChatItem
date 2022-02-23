@@ -23,6 +23,7 @@ import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketHandler;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
+import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Version;
@@ -166,7 +167,7 @@ public class ChatPacketManager extends PacketHandler {
 
 			String message = null;
 			try {
-				if (!p.getItemInHand().getType().equals(Material.AIR)) {
+				if (!ItemUtils.isEmpty(p.getItemInHand())) {
 					ItemStack copy = p.getItemInHand().clone();
 					if (copy.getType().name().contains("_BOOK")) { // filtering written books
 						BookMeta bm = (BookMeta) copy.getItemMeta();

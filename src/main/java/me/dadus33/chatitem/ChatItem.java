@@ -37,7 +37,7 @@ public class ChatItem extends JavaPlugin {
     private static ChatItem instance;
     private Log4jFilter filter;
     private Storage storage;
-    private boolean hasNewVersion = false;
+    public static boolean discordSrvSupport = false, hasNewVersion = false;
     private List<ChatManager> chatManager = new ArrayList<>();
 
     private void chooseManagers() {
@@ -114,13 +114,19 @@ public class ChatItem extends JavaPlugin {
         loadCommand(getCommand("chatitem"), new ChatItemCommand());
         
         // events
-        getServer().getPluginManager().registerEvents(new JoinListener(), this);
-        getServer().getPluginManager().registerEvents(new InventoryListener(), this);
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(new JoinListener(), this);
+        pm.registerEvents(new InventoryListener(), this);
         
         chooseManagers();
 
         //Initialize Log4J filter (remove ugly console messages)
         filter = new Log4jFilter(storage);
+        
+        if(pm.getPlugin("DiscordSRV") != null) {
+        	discordSrvSupport = true;
+        	getLogger().info("Load DiscordSRV support.");
+        }
         
         if(storage.CHECK_UPDATE) {
 	        getServer().getScheduler().runTaskAsynchronously(this, () -> {

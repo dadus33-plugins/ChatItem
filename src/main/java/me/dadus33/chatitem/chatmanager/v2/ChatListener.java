@@ -17,9 +17,11 @@ import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
+import me.dadus33.chatitem.hook.DiscordSrvSupport;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.ColorManager;
+import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.Storage;
@@ -108,10 +110,11 @@ public class ChatListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onChat(AsyncPlayerChatEvent e) {
+		Storage c = getStorage();
 		if (e.isCancelled()) {
 			if (ChatItem.getInstance().getChatManager().size() == 1) { // only chat
 				String msg = e.getMessage().toLowerCase();
-				for (String rep : getStorage().PLACEHOLDERS) {
+				for (String rep : c.PLACEHOLDERS) {
 					if (msg.contains(rep)) {
 						ChatItem.debug(
 								"You choose 'chat' manager but it seems to don't be the good choice. More informations here: https://github.com/dadus33-plugins/ChatItem/wiki");
@@ -125,7 +128,7 @@ public class ChatListener implements Listener {
 		Player p = e.getPlayer();
 		boolean found = false, hasv1 = false;
 
-		for (String rep : getStorage().PLACEHOLDERS) {
+		for (String rep : c.PLACEHOLDERS) {
 			// v1 try to manage it, but the message have not been changed by another plugin
 			if (e.getMessage().contains(rep + ChatManager.SEPARATOR + p.getName())) {
 				hasv1 = true;
@@ -142,27 +145,27 @@ public class ChatListener implements Listener {
 		if (!found) {
 			return;
 		}
-		if (getStorage().PERMISSION_ENABLED && !p.hasPermission(getStorage().PERMISSION_NAME)) {
+		if (c.PERMISSION_ENABLED && !p.hasPermission(c.PERMISSION_NAME)) {
 			if (!getStorage().LET_MESSAGE_THROUGH) {
 				e.setCancelled(true);
 			}
-			if (!getStorage().NO_PERMISSION_MESSAGE.isEmpty() && getStorage().SHOW_NO_PERM_NORMAL) {
-				p.sendMessage(getStorage().NO_PERMISSION_MESSAGE);
+			if (!c.NO_PERMISSION_MESSAGE.isEmpty() && c.SHOW_NO_PERM_NORMAL) {
+				p.sendMessage(c.NO_PERMISSION_MESSAGE);
 			}
 			return;
 		}
 		if (p.getItemInHand().getType().equals(Material.AIR)) {
-			if (getStorage().DENY_IF_NO_ITEM) {
+			if (c.DENY_IF_NO_ITEM) {
 				e.setCancelled(true);
-				if (!getStorage().DENY_MESSAGE.isEmpty())
-					e.getPlayer().sendMessage(getStorage().DENY_MESSAGE);
+				if (!c.DENY_MESSAGE.isEmpty())
+					e.getPlayer().sendMessage(c.DENY_MESSAGE);
 				return;
 			}
-			if (getStorage().HAND_DISABLED) {
+			if (c.HAND_DISABLED) {
 				return;
 			}
 		}
-		if (getStorage().COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) { // use cooldown
+		if (c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) { // use cooldown
 			if (COOLDOWNS.containsKey(p.getName())) {
 				long start = COOLDOWNS.get(p.getName());
 				long current = System.currentTimeMillis() / 1000;
@@ -170,12 +173,12 @@ public class ChatListener implements Listener {
 				if (elapsed >= getStorage().COOLDOWN) {
 					COOLDOWNS.remove(p.getName());
 				} else {
-					if (!getStorage().LET_MESSAGE_THROUGH) {
+					if (!c.LET_MESSAGE_THROUGH) {
 						e.setCancelled(true);
 					}
-					if (!getStorage().COOLDOWN_MESSAGE.isEmpty()) {
-						long left = (start + getStorage().COOLDOWN) - current;
-						p.sendMessage(getStorage().COOLDOWN_MESSAGE.replace(LEFT, calculateTime(left)));
+					if (!c.COOLDOWN_MESSAGE.isEmpty()) {
+						long left = (start + c.COOLDOWN) - current;
+						p.sendMessage(c.COOLDOWN_MESSAGE.replace(LEFT, calculateTime(left)));
 					}
 					return;
 				}
@@ -185,9 +188,11 @@ public class ChatListener implements Listener {
 		e.setCancelled(true);
 		String format = e.getFormat();
 		String msg, defMsg = e.getMessage();
-		for (String rep : getStorage().PLACEHOLDERS) {
-			if(hasv1)
-				defMsg = defMsg.replace(rep + ChatManager.SEPARATOR + p.getName(), ChatManager.SEPARATOR + ""); // remove v1 char
+		for (String rep : c.PLACEHOLDERS) {
+			if (hasv1)
+				defMsg = defMsg.replace(rep + ChatManager.SEPARATOR + p.getName(), ChatManager.SEPARATOR + ""); // remove
+																												// v1
+																												// char
 			else
 				defMsg = defMsg.replace(rep, ChatManager.SEPARATOR + "");
 		}
@@ -198,10 +203,16 @@ public class ChatListener implements Listener {
 		} else {
 			msg = format.replace(e.getMessage(), defMsg);
 		}
-		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format);
 		ItemStack item = p.getItemInHand();
+		String itemName = ItemUtils.isEmpty(item) ? (c.HAND_DISABLED ? c.PLACEHOLDERS.get(0) : c.HAND_NAME)
+				: styleItem(p, item, c);
+		String loggedMessage = msg.replace(ChatManager.SEPARATOR + "", itemName).replace("{name}", p.getName())
+				.replace("{display-name}", p.getDisplayName());
+		Bukkit.getConsoleSender().sendMessage(loggedMessage); // show in log
+		if (ChatItem.discordSrvSupport)
+			DiscordSrvSupport.sendchatMessage(p, loggedMessage);
+		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format);
 		e.getRecipients().forEach((pl) -> showItem(pl, p, item, msg));
-		Bukkit.getConsoleSender().sendMessage(msg); // show in log
 	}
 
 	private void showItem(Player to, Player origin, ItemStack item, String msg) {
@@ -212,11 +223,12 @@ public class ChatListener implements Listener {
 			if (args == ChatManager.SEPARATOR
 					&& (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
 				// here put the item
-				if(!text.isEmpty())
+				if (!text.isEmpty())
 					builder.append(text);
 				addItem(builder, to, origin, item);
-				/*if (!shouldUseAppendMethod)
-					builder.append(text);*/
+				/*
+				 * if (!shouldUseAppendMethod) builder.append(text);
+				 */
 				text = "";
 			} else if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
@@ -227,7 +239,7 @@ public class ChatListener implements Listener {
 
 				waiting = true; // waiting for color code
 			} else if (waiting) { // if waiting for code and valid str
-				 // if it's hexademical value and with enough space for full color
+				// if it's hexademical value and with enough space for full color
 				if (String.valueOf(args).matches("-?[0-9a-fA-F]+") && colorCode.length() <= 5) {
 					colorCode += args; // add char to it
 				} else {
@@ -278,7 +290,7 @@ public class ChatListener implements Listener {
 	}
 
 	public void addItem(ComponentBuilder builder, Player to, Player origin, ItemStack item) {
-		if (item != null && !item.getType().equals(Material.AIR)) {
+		if (!ItemUtils.isEmpty(item)) {
 			ComponentBuilder itemComponent = new ComponentBuilder(ChatListener.styleItem(to, item, getStorage()));
 			String itemJson = convertItemStackToJson(item);
 			itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));

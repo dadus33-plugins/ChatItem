@@ -85,4 +85,8 @@ public class ItemUtils {
 		}
 		return stack;
 	}
+	
+	public static boolean isEmpty(ItemStack item) {
+		return item == null || item.getType().equals(Material.AIR);
+	}
 }

@@ -46,7 +46,7 @@ import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Reflect;
 import me.dadus33.chatitem.utils.Version;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "deprecation"})
 public class JSONManipulatorCurrent implements JSONManipulator {
 
 	private static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
@@ -712,7 +712,6 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 		return replacer;
 	}
 
-	@SuppressWarnings("deprecation")
 	private Item toItem(ItemStack is) throws Exception {
 		CompoundTag tag = new CompoundTag("tag");
 

@@ -45,6 +45,15 @@
             <id>elikill-repo</id>
             <url>https://repo.eliapp.fr:8081/repository/internal/</url>
         </repository>
+        <repository>
+            <id>dv8tion</id>
+            <name>m2-dv8tion</name>
+            <url>https://m2.dv8tion.net/releases</url>
+        </repository>
+        <repository>
+            <id>Scarsz-Nexus</id>
+            <url>https://nexus.scarsz.me/content/groups/public/</url>
+        </repository>  
     </repositories>
 
 
@@ -125,7 +134,13 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-api</artifactId>
-            <version>4.9.3</version>
+            <version>4.9.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.discordsrv</groupId>
+            <artifactId>discordsrv</artifactId>
+            <version>1.24.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
