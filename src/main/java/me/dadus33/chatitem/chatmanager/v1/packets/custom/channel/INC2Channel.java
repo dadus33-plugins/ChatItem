@@ -34,7 +34,7 @@ public class INC2Channel extends ChannelAbstract {
 		try {
 			Object mcServer = ReflectionUtils.callMethod(PacketUtils.getCraftServer(), Version.getVersion().equals(Version.V1_17) ? "getServer" : "b");
 			Object co = ReflectionUtils.getFirstWith(mcServer, PacketUtils.getNmsClass("MinecraftServer", "server."), PacketUtils.getNmsClass("ServerConnection", "server.network."));
-			((List<ChannelFuture>) ReflectionUtils.getField(co, "f")).forEach((channelFuture) -> {
+			((List<ChannelFuture>) ReflectionUtils.getObject(co, "f")).forEach((channelFuture) -> {
 				pipeline = channelFuture.channel().pipeline();
 				pipeline.addFirst(boundHandler);
 			});

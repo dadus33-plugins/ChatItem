@@ -21,12 +21,14 @@ import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.ColorManager;
 import me.dadus33.chatitem.utils.PacketUtils;
+import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.Storage;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
+import net.md_5.bungee.api.chat.TextComponent;
 
 @SuppressWarnings("deprecation")
 public class ChatListener implements Listener {
@@ -210,11 +212,11 @@ public class ChatListener implements Listener {
 			if (args == ChatManager.SEPARATOR
 					&& (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
 				// here put the item
-				if (shouldUseAppendMethod)
+				if(!text.isEmpty())
 					builder.append(text);
 				addItem(builder, to, origin, item);
-				if (!shouldUseAppendMethod)
-					builder.append(text);
+				/*if (!shouldUseAppendMethod)
+					builder.append(text);*/
 				text = "";
 			} else if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
@@ -326,7 +328,7 @@ public class ChatListener implements Listener {
 		return replacer;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked" })
 	public void appendToComponentBuilder(ComponentBuilder builder, BaseComponent[] comps) {
 		if (shouldUseAppendMethod) {
 			try {
@@ -338,9 +340,11 @@ public class ChatListener implements Listener {
 			}
 		} else {
 			try {
-				Field partField = ComponentBuilder.class.getDeclaredField("parts"); // get field
-				partField.setAccessible(true); // make it accessible
-				((List<BaseComponent>) partField.get(builder)).addAll(Arrays.asList(comps)); // add fields to list
+				Field currentField = ReflectionUtils.getField(builder, "current");
+				List<BaseComponent> parts = (List<BaseComponent>) ReflectionUtils.getObject(builder, "parts");
+				parts.add(new TextComponent((TextComponent) currentField.get(builder)));
+				parts.addAll(Arrays.asList(comps));
+				currentField.set(builder, new TextComponent(""));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

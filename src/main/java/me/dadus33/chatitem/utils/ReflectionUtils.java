@@ -26,13 +26,31 @@ public class ReflectionUtils {
 	 * 
 	 * @param source where we will find the field
 	 * @param field the name of the field
-	 * @return the requested field
+	 * @return the requested object of the field
 	 */
-	public static Object getField(Object source, String field) {
+	public static Object getObject(Object source, String field) {
 		try {
 			Field f = source.getClass().getDeclaredField(field);
 			f.setAccessible(true);
 			return f.get(source);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/**
+	 * Get the specified field name in the object source
+	 * 
+	 * @param source where we will find the field
+	 * @param field the name of the field
+	 * @return the requested field
+	 */
+	public static Field getField(Object source, String field) {
+		try {
+			Field f = source.getClass().getDeclaredField(field);
+			f.setAccessible(true);
+			return f;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

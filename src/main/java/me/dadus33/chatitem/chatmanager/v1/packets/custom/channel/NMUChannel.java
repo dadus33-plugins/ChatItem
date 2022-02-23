@@ -37,7 +37,7 @@ public class NMUChannel extends ChannelAbstract {
 			Object mcServer = dedicatedSrv.getClass().getMethod("getServer").invoke(dedicatedSrv);
 			Object co = ReflectionUtils.getFirstWith(mcServer, PacketUtils.getNmsClass("MinecraftServer", "server."), PacketUtils.getNmsClass("ServerConnection", "network."));
 			@SuppressWarnings("unchecked")
-			List<ChannelFuture> g = (List<ChannelFuture>) ReflectionUtils.getField(co, "g");
+			List<ChannelFuture> g = (List<ChannelFuture>) ReflectionUtils.getObject(co, "g");
 			g.forEach((channelFuture) -> {
 				pipeline = channelFuture.channel().pipeline();
 				pipeline.addFirst(boundHandler = new ChannelInboundHandlerAdapter() {
