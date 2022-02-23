@@ -53,4 +53,15 @@ public class ColorManager {
 			return ChatColor.of("#" + input);
 		return ChatColor.getByChar(input.charAt(0));
 	}
+	
+	public static String getColorString(String input) {
+		if(input == null || input.isEmpty())
+			return "";
+		if(input.length() == 6 && Version.getVersion().isNewerOrEquals(Version.V1_16))
+			return String.valueOf(ChatColor.of("#" + input));
+		String str = "";
+		for(char c : input.toCharArray())
+			str += ChatColor.getByChar(c);
+		return str;
+	}
 }

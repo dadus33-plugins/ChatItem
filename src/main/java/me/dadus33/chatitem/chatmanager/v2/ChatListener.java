@@ -225,22 +225,19 @@ public class ChatListener implements Listener {
 
 				waiting = true; // waiting for color code
 			} else if (waiting) { // if waiting for code and valid str
-				if (String.valueOf(args).matches("-?[0-9a-fA-F]+") && colorCode.length() <= 5) { // if it's hexademical
-																									// value and with
-																									// enough space for
-																									// full color
+				 // if it's hexademical value and with enough space for full color
+				if (String.valueOf(args).matches("-?[0-9a-fA-F]+") && colorCode.length() <= 5) {
 					colorCode += args; // add char to it
-					waiting = false;
 				} else {
 					if (!colorCode.isEmpty())
-						text += ColorManager.getColor(colorCode);
+						text += ColorManager.getColorString(colorCode);
 					text += ChatColor.getByChar(args); // a color by itself
 					colorCode = ""; // clean actual code, it's only to prevent some kind of issue
-					waiting = false;
 				}
+				waiting = false;
 			} else {
 				if (!colorCode.isEmpty()) {
-					text += ColorManager.getColor(colorCode);
+					text += ColorManager.getColorString(colorCode);
 					colorCode = ""; // clean actual code
 				}
 				// basic text, not waiting for code after '§'
