@@ -232,6 +232,10 @@ public class ChatListener implements Listener {
 			} else if (waiting) { // if waiting for code and valid str
 				// if it's hexademical value and with enough space for full color
 				waiting = false;
+				if(args == 'r' && colorCode.isEmpty()) {
+					color = ChatColor.RESET;
+					continue;
+				}
 				if(args == 'x' && colorCode.isEmpty())
 					isHex = true;
 				colorCode += args; // a color by itself
