@@ -40,6 +40,11 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.v1.json.custom.BooleanTag;
+import me.dadus33.chatitem.chatmanager.v1.json.custom.ListMultiTypesTag;
+import me.dadus33.chatitem.chatmanager.v1.json.quick.JSONArray;
+import me.dadus33.chatitem.chatmanager.v1.json.quick.JSONObject;
+import me.dadus33.chatitem.chatmanager.v1.json.quick.parser.JSONParser;
 import me.dadus33.chatitem.chatmanager.v1.utils.Item;
 import me.dadus33.chatitem.chatmanager.v1.utils.ItemRewriter;
 import me.dadus33.chatitem.utils.PacketUtils;
@@ -49,26 +54,26 @@ import me.dadus33.chatitem.utils.Version;
 @SuppressWarnings({"unchecked", "deprecation"})
 public class JSONManipulatorCurrent implements JSONManipulator {
 
-	private static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
-	private static final Class<?> NBT_STRING = getNmsClass("NBTTagString", "nbt.");
-	private static final Class<?> NBT_LIST = getNmsClass("NBTTagList", "nbt.");
-	private static final Map<Class<?>, BiFunction<String, Object, Tag>> TYPES_TO_MC_NBT_TAGS = new HashMap<>();
-	private static final Map<Class<?>, Function<String, Tag>> TYPES_TO_OPEN_NBT_TAGS = new HashMap<>();
-	private static final List<Class<?>> NBT_BASE_CLASSES = new ArrayList<>();
-	private static final List<Field> NBT_BASE_DATA_FIELD = new ArrayList<>();
-	private static final Class<?> NMS_ITEM_STACK_CLASS = getNmsClass("ItemStack", "world.item.");
-	private static final Method AS_NMS_COPY = Reflect.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
-	private static final Class<?> NBT_TAG_COMPOUND = getNmsClass("NBTTagCompound", "nbt.");
-	private static final Method SAVE_NMS_ITEM_STACK_METHOD = Reflect.getMethod(NMS_ITEM_STACK_CLASS, NBT_TAG_COMPOUND,
+	public static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
+	public static final Class<?> NBT_STRING = getNmsClass("NBTTagString", "nbt.");
+	public static final Class<?> NBT_LIST = getNmsClass("NBTTagList", "nbt.");
+	public static final Map<Class<?>, BiFunction<String, Object, Tag>> TYPES_TO_MC_NBT_TAGS = new HashMap<>();
+	public static final Map<Class<?>, Function<String, Tag>> TYPES_TO_OPEN_NBT_TAGS = new HashMap<>();
+	public static final List<Class<?>> NBT_BASE_CLASSES = new ArrayList<>();
+	public static final List<Field> NBT_BASE_DATA_FIELD = new ArrayList<>();
+	public static final Class<?> NMS_ITEM_STACK_CLASS = getNmsClass("ItemStack", "world.item.");
+	public static final Method AS_NMS_COPY = Reflect.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
+	public static final Class<?> NBT_TAG_COMPOUND = getNmsClass("NBTTagCompound", "nbt.");
+	public static final Method SAVE_NMS_ITEM_STACK_METHOD = Reflect.getMethod(NMS_ITEM_STACK_CLASS, NBT_TAG_COMPOUND,
 			NBT_TAG_COMPOUND);
-	private static final Field MAP = Reflect.getField(NBT_TAG_COMPOUND, "map", "x");
-	private static final Field LIST_FIELD = Reflect.getField(NBT_LIST, "list", "c");
+	public static final Field MAP = Reflect.getField(NBT_TAG_COMPOUND, "map", "x");
+	public static final Field LIST_FIELD = Reflect.getField(NBT_LIST, "list", "c");
 
 	// Tags to be ignored. Currently it only contains tags from PortableHorses, but
 	// feel free to submit a pull request to add tags from your plugins
-	private static final List<String> IGNORED = Arrays.asList("horsetag", "phorse", "iscnameviz", "cname");
+	public static final List<String> IGNORED = Arrays.asList("horsetag", "phorse", "iscnameviz", "cname");
 
-	private static final ConcurrentHashMap<Map.Entry<Version, ItemStack>, JsonObject> STACKS = new ConcurrentHashMap<>();
+	public static final ConcurrentHashMap<Map.Entry<Version, ItemStack>, JsonObject> STACKS = new ConcurrentHashMap<>();
 
 	static {
 		NBT_BASE_CLASSES.add(getNmsClass("NBTTagByte", "nbt."));
@@ -94,6 +99,9 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 		TYPES_TO_MC_NBT_TAGS.put(getNmsClass("NBTTagLong", "nbt."), (name, obj) -> new LongTag(name, get(obj, "e")));
 		TYPES_TO_MC_NBT_TAGS.put(getNmsClass("NBTTagShort", "nbt."), (name, obj) -> new ShortTag(name, get(obj, "g")));
 		// now basic types
+		
+		TYPES_TO_OPEN_NBT_TAGS.put(String.class, StringTag::new);
+		TYPES_TO_OPEN_NBT_TAGS.put(Boolean.class, BooleanTag::new);
 		TYPES_TO_OPEN_NBT_TAGS.put(Byte.class, ByteTag::new);
 		TYPES_TO_OPEN_NBT_TAGS.put(Byte[].class, ByteArrayTag::new);
 		TYPES_TO_OPEN_NBT_TAGS.put(Double.class, DoubleTag::new);
@@ -103,6 +111,7 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 		TYPES_TO_OPEN_NBT_TAGS.put(Long.class, LongTag::new);
 		TYPES_TO_OPEN_NBT_TAGS.put(Short.class, ShortTag::new);
 		// Add the primitive types too, just in case
+		TYPES_TO_OPEN_NBT_TAGS.put(boolean.class, BooleanTag::new);
 		TYPES_TO_OPEN_NBT_TAGS.put(byte.class, ByteTag::new);
 		TYPES_TO_OPEN_NBT_TAGS.put(byte[].class, ByteArrayTag::new);
 		TYPES_TO_OPEN_NBT_TAGS.put(double.class, DoubleTag::new);
@@ -128,11 +137,10 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 	private Version protocolVersion;
 	private JsonObject itemTooltip;
 	private JsonArray classicTooltip;
-	private final JsonParser PARSER = new JsonParser();
 
 	public String parse(String json, List<String> replacements, ItemStack item, String replacement, int protocol)
 			throws Exception {
-		JsonObject obj = PARSER.parse(json).getAsJsonObject();
+		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		JsonArray array = obj.getAsJsonArray("extra");
 		replaces = replacements;
 		String regex = "";
@@ -160,9 +168,9 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 			JsonArray use = Translator.toJson(replacement); // We get the json representation of the old color
 															// formatting method
 			// There's no public clone method for JSONObjects so we need to parse them every time
-			JsonObject hover = PARSER.parse("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
+			JsonObject hover = JsonParser.parseString("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
 
-			String jsonRep = stringifyItem(item); // Get the JSON representation of the item (well, not really JSON, but
+			String jsonRep =  JsonTester.stringifyItem2(this, item);// stringifyItem(item); // Get the JSON representation of the item (well, not really JSON, but
 													// rather a string representation of NBT data)
 			hover.addProperty("value", jsonRep);
 
@@ -239,7 +247,7 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 						boolean endDot = (j == splits.length - 1) && isLast;
 						if (!splits[j].isEmpty() && !endDot) {
 							String st = o.toString();
-							JsonObject fix = PARSER.parse(st).getAsJsonObject();
+							JsonObject fix = JsonParser.parseString(st).getAsJsonObject();
 							fix.addProperty("text", splits[j]);
 							rep.add(fix);
 						}
@@ -307,7 +315,7 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 
 	@Override
 	public String parseEmpty(String json, List<String> replacements, String repl, List<String> tooltip, Player sender) {
-		JsonObject obj = PARSER.parse(json).getAsJsonObject();
+		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		JsonArray array = obj.getAsJsonArray("extra");
 		replaces = replacements;
 		String regex = "";
@@ -330,7 +338,7 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 		JsonArray rep = new JsonArray();
 		JsonArray use = Translator
 				.toJson(repl.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
-		JsonObject hover = PARSER.parse("{\"action\":\"show_text\", \"value\": \"\"}").getAsJsonObject();
+		JsonObject hover = JsonParser.parseString("{\"action\":\"show_text\", \"value\": \"\"}").getAsJsonObject();
 
 		StringBuilder oneLineTooltip = new StringBuilder("");
 		int index = 0;
@@ -410,7 +418,7 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 						boolean endDot = (j == splits.length - 1) && isLast;
 						if (!splits[j].isEmpty() && !endDot) {
 							String st = o.toString();
-							JsonObject fix = PARSER.parse(st).getAsJsonObject();
+							JsonObject fix = JsonParser.parseString(st).getAsJsonObject();
 							fix.addProperty("text", splits[j]);
 							rep.add(fix);
 						}
@@ -532,7 +540,7 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 						boolean endDot = (j == splits.length - 1) && isLast;
 						if (!splits[j].isEmpty() && !endDot) {
 							String st = o.toString();
-							JsonObject fix = PARSER.parse(st).getAsJsonObject();
+							JsonObject fix = JsonParser.parseString(st).getAsJsonObject();
 							fix.addProperty("text", splits[j]);
 							replacer.add(fix);
 						}
@@ -651,7 +659,7 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 						boolean endDot = (j == splits.length - 1) && isLast;
 						if (!splits[j].isEmpty() && !endDot) {
 							String st = o.toString();
-							JsonObject fix = PARSER.parse(st).getAsJsonObject();
+							JsonObject fix = JsonParser.parseString(st).getAsJsonObject();
 							fix.addProperty("text", splits[j]);
 							replacer.add(fix);
 						}
@@ -725,6 +733,7 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 			Map<String, Object> realMap = (Map<String, Object>) MAP.get(realTag);
 			Set<Map.Entry<String, Object>> entrySet = realMap.entrySet();
 			Map<String, Tag> map = tag.getValue();
+			ChatItem.debug("Tag map: " + entrySet.size() + " > " + entrySet);
 			for (Map.Entry<String, Object> entry : entrySet) {
 				map.put(entry.getKey(), toOpenTag(entry.getValue(), entry.getKey()));
 			}
@@ -738,8 +747,40 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 		item.setTag(tag);
 		return item;
 	}
+	
+	private CompoundTag toOpenTag(JSONObject json, String name) throws Exception {
+		CompoundTag tag = new CompoundTag(name);
+		HashMap<String, Tag> map = new HashMap<>();
+		json.forEach((key, value) -> {
+			Function<String, Tag> fun = TYPES_TO_OPEN_NBT_TAGS.get(value.getClass());
+			if(fun != null) {
+				Tag t = fun.apply(key.toString());
+				setValueToOpenTag(t, value);
+				map.put(key.toString(), t);
+			} else
+				ChatItem.debug("Failed to find open tab for JSONObject > " + value.getClass().getSimpleName() + " : " + key);
+		});
+		tag.setValue(map);
+		return tag;
+	}
+	
+	private Tag toOpenTag(JSONArray json, String name) throws Exception {
+		List<Tag> list = new ArrayList<>();
+		for(Object item : json) {
+			if(item instanceof JSONObject) {
+				list.add(toOpenTag((JSONObject) item, ""));
+			} else {
+				ChatItem.debug("This type from JSONArray is not supported. " + item.getClass().getSimpleName() + " : " + item);
+			}
+		}
+		ChatItem.debug("List: " + list + ", str: " + stringifyTag(new ListMultiTypesTag(name, list)));
+		return new ListMultiTypesTag(name, list);
+	}
 
 	private Tag toOpenTag(Object nmsTag, String name) throws Exception {
+		if(nmsTag instanceof String) {
+			return new StringTag(name, (String) nmsTag);
+		}
 		if (NBT_TAG_COMPOUND.isInstance(nmsTag)) {
 			CompoundTag tag = new CompoundTag(name);
 			Map<String, Tag> tagMap = tag.getValue();
@@ -747,20 +788,40 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 			Map<String, Object> nmsMap = (Map<String, Object>) MAP.get(nmsTag);
 			Set<Map.Entry<String, Object>> entrySet = nmsMap.entrySet();
 			for (Map.Entry<String, Object> entry : entrySet) {
-				Tag value = toOpenTag(entry.getValue(), entry.getKey());
-				tagMap.put(entry.getKey(), value);
+				tagMap.put(entry.getKey(), toOpenTag(entry.getValue(), entry.getKey()));
 			}
 			tag.setValue(tagMap);
 			return tag;
 		} else {
 			// Strings are a special case as they need proper escaping
 			if (NBT_STRING.isInstance(nmsTag)) {
+				ChatItem.debug("NbtString for " + name + " > " + nmsTag);
 				String toString = nmsTag.toString();
 				if (toString.startsWith("\"") && toString.endsWith("\"")) {
+					return new StringTag(name, toString.substring(1, toString.length() - 1));
+				} else if (toString.startsWith("'") && toString.endsWith("'")) {
 					toString = toString.substring(1, toString.length() - 1);
-					// toString = escapeSpecials(toString);
-					return new StringTag(name, toString);
-				}
+					CompoundTag tag = new CompoundTag(name);
+					ChatItem.debug("Checking compound " + name);
+					Map<String, Tag> tagMap = tag.getValue();
+					Set<Map.Entry<String, Object>> entrySet = ((Map<String, Object>) new JSONParser().parse(toString)).entrySet();
+					for (Map.Entry<String, Object> entry : entrySet) {
+						Object val = entry.getValue();
+						Tag t;
+						if(val instanceof JSONObject)
+							t = toOpenTag((JSONObject) entry.getValue(), entry.getKey());
+						else if(val instanceof JSONArray)
+							t = toOpenTag((JSONArray) entry.getValue(), entry.getKey());
+						else
+							t = toOpenTag(entry.getValue(), entry.getKey());
+						ChatItem.debug("Key: " + entry.getKey() + " > " + stringifyTag(t) + ", val: " + val.getClass().getSimpleName());
+						tagMap.put(entry.getKey(), t);
+					}
+					tag.setValue(tagMap);
+					ChatItem.debug("Final compound " + stringifyTag(tag));
+					return tag;
+				} else
+					ChatItem.debug("Invalid string about NbtString for " + toString);
 			}
 
 			// NBTTag Lists are also special, as they are a sort of compound themselves and
@@ -768,11 +829,10 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 			if (NBT_LIST.isInstance(nmsTag)) {
 				List<Object> nmsNBTBaseList = (List<Object>) LIST_FIELD.get(nmsTag);
 				List<Tag> list = new ArrayList<>();
-				//int i = 0;
 				for (Object baseTag : nmsNBTBaseList) {
 					list.add(toOpenTag(baseTag, ""));
-					//++i;
 				}
+				ChatItem.debug("NbtList final with " + stringifyTag(new ListTag(name, list)));
 				return new ListTag(name, list);
 			}
 
@@ -788,31 +848,39 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 						return TYPES_TO_MC_NBT_TAGS.get(value.getClass()).apply(name, value);
 					} else {
 						Tag t = TYPES_TO_OPEN_NBT_TAGS.get(value.getClass()).apply(name);
-						if (t instanceof ByteTag) {
-							((ByteTag) t).setValue((byte) value);
-							((ByteTag) t).setValue((byte) value);
-						} else if (t instanceof ByteArrayTag)
-							((ByteArrayTag) t).setValue((byte[]) value);
-						else if (t instanceof DoubleTag)
-							((DoubleTag) t).setValue((double) value);
-						else if (t instanceof FloatTag)
-							((FloatTag) t).setValue((float) value);
-						else if (t instanceof IntTag)
-							((IntTag) t).setValue((int) value);
-						else if (t instanceof IntArrayTag)
-							((IntArrayTag) t).setValue((int[]) value);
-						else if (t instanceof LongTag)
-							((LongTag) t).setValue((long) value);
-						else if (t instanceof ShortTag)
-							((ShortTag) t).setValue((short) value);
-						else
-							ChatItem.getInstance().getLogger().warning("Failed to find Open tag for class: " + t.getClass().getSimpleName());
-						return t; // Should never happen
+						setValueToOpenTag(t, value);
+						return t;
 					}
 				}
 			}
+			ChatItem.debug("What that shit for " + name + " > " + nmsTag.getClass().getSimpleName() + " : " + nmsTag.toString());
 			return null; // Should never happen
 		}
+	}
+	
+	private void setValueToOpenTag(Tag t, Object value) {
+		if (t instanceof ByteTag) {
+			((ByteTag) t).setValue((byte) value);
+		} else if (t instanceof ByteArrayTag)
+			((ByteArrayTag) t).setValue((byte[]) value);
+		else if (t instanceof DoubleTag)
+			((DoubleTag) t).setValue((double) value);
+		else if (t instanceof FloatTag)
+			((FloatTag) t).setValue((float) value);
+		else if (t instanceof IntTag)
+			((IntTag) t).setValue((int) value);
+		else if (t instanceof IntArrayTag)
+			((IntArrayTag) t).setValue((int[]) value);
+		else if (t instanceof LongTag)
+			((LongTag) t).setValue((long) value);
+		else if (t instanceof ShortTag)
+			((ShortTag) t).setValue((short) value);
+		else if (t instanceof StringTag)
+			((StringTag) t).setValue((String) value);
+		else if (t instanceof BooleanTag)
+			((BooleanTag) t).setValue((boolean) value);
+		else
+			ChatItem.getInstance().getLogger().warning("Failed to find Open tag for class: " + t.getClass().getSimpleName());
 	}
 
 	private String stringifyItem(ItemStack stack) throws Exception {
@@ -820,10 +888,12 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 		ItemRewriter.remapIds(Version.getVersion().MAX_VER, protocolVersion.MAX_VER, item);
 		StringBuilder sb = new StringBuilder("{id:");
 		sb.append("\"").append(item.getId()).append("\"").append(","); // Append the id
-		sb.append("Count:").append(item.getAmount()).append("b,"); // Append the amount
-		sb.append("Damage:").append(item.getData()).append("s"); // Append the durability data
+		sb.append("Count:").append(item.getAmount()).append("b"); // Append the amount
 
 		Map<String, Tag> tagMap = item.getTag().getValue();
+		if(!tagMap.containsKey("Damage")) { // for new versions
+			sb.append(",Damage:").append(item.getData()).append("s"); // Append the durability data
+		}
 		if (tagMap.isEmpty()) {
 			sb.append("}");
 			return sb.toString();
@@ -834,18 +904,22 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 		for (Map.Entry<String, Tag> entry : entrySet) {
 			String key = entry.getKey();
 			if (IGNORED.contains(key)) {
+				ChatItem.debug("Ignored key: " + key + " (val: " + entry.getValue().toString() + ")");
 				continue;
 			}
 			Pattern pattern = Pattern.compile("[{}\\[\\],\":\\\\/]");
 			Matcher matcher = pattern.matcher(key);
 			if (matcher.find()) {
+				ChatItem.debug("Invalid matcher: " + key + " (val: " + entry.getValue().toString() + ")");
 				continue; // Skip invalid keys, as they can cause exceptions client-side
 			}
 			String value = stringifyTag(entry.getValue());
 			if (!first) {
 				sb.append(",");
 			}
-			sb.append(key).append(":").append(value);
+			if(!key.isEmpty())
+				sb.append(key).append(":");
+			sb.append(value);
 			first = false;
 		}
 		sb.append("}}"); // End of tag and end of item
@@ -861,12 +935,15 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 			for (Map.Entry<String, Tag> entry : entrySet) {
 				String value = stringifyTag(entry.getValue());
 				if (value == null) {
+					ChatItem.debug("Failed to stringify " + entry.getValue().getClass().getSimpleName());
 					continue;
 				}
 				if (sb.length() > 1) {
 					sb.append(",");
 				}
-				sb.append(entry.getKey()).append(":").append(value);
+				if(!entry.getKey().isEmpty())
+					sb.append(entry.getKey()).append(":");
+				sb.append(value);
 			}
 
 			sb.append("}");
@@ -884,12 +961,13 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 					String index = tag.getName();
 					String value = stringifyTag(tag);
 					if (value == null) {
+						ChatItem.debug("Failed to stringify tag " + tag.getClass().getSimpleName() + ": " + tag);
 						continue;
 					}
 					if (!first) {
 						sb.append(",");
 					}
-					if (protocolVersion.MAX_VER <= Version.V1_11.MAX_VER) { // it's before 1.12
+					if (protocolVersion.MAX_VER <= Version.V1_11.MAX_VER && !index.isEmpty()) { // it's before 1.12
 						sb.append(index).append(":").append(value);
 					} else {
 						sb.append(value);
@@ -939,6 +1017,10 @@ public class JSONManipulatorCurrent implements JSONManipulator {
 			if (normalTag instanceof ShortTag) {
 				return (short) normalTag.getValue() + "s";
 			}
+			if (normalTag instanceof BooleanTag) {
+				return String.valueOf((boolean) normalTag.getValue());
+			}
+			ChatItem.debug("Unrecognized tag " + normalTag.getClass().getClass() + ", value: " + normalTag);
 			return null; // Should never happen
 		}
 	}

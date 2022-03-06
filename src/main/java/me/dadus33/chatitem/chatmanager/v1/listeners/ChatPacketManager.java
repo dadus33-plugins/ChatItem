@@ -36,6 +36,7 @@ public class ChatPacketManager extends PacketHandler {
 	private final static String AMOUNT = "{amount}";
 	private final static String TIMES = "{times}";
 	
+	private Object lastSentPacket = null;
 	private Method serializerGetJson;
 	private PacketEditingChatManager manager;
 
@@ -60,9 +61,10 @@ public class ChatPacketManager extends PacketHandler {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onSend(ChatItemPacket e) {
-		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT)) {
+		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT)) 
 			return;
-		}
+		if(lastSentPacket != null && lastSentPacket == e.getPacket())
+			return; // prevent infinite loop
 		Version version = Version.getVersion();
 		if (version.isNewerOrEquals(Version.V1_8)) { // only if action bar messages are supported in this
 																// version of minecraft
@@ -132,7 +134,7 @@ public class ChatPacketManager extends PacketHandler {
 			ChatItem.debug("Not contains bell " + json);
 			return;
 		}
-		ChatItem.debug("Add packet meta");
+		ChatItem.debug("Add packet meta to json: " + json);
 		String fjson = json, toReplaceStr = toReplace.toString();
 		boolean bUsesBaseComponents = usesBaseComponents;
 		e.setCancelled(true); // We cancel the packet as we're going to resend it anyways (ignoring listeners
@@ -199,13 +201,15 @@ public class ChatPacketManager extends PacketHandler {
 				e1.printStackTrace();
 			}
 			if (message != null) {
+				ChatItem.debug("(v1) Writing message: " + message);
 				if (!bUsesBaseComponents) {
 					packet.getChatComponents().write(0, jsonToChatComponent(message));
 				} else {
 					packet.getSpecificModifier(BaseComponent[].class).write(0, ComponentSerializer.parse(message));
 				}
 			}
-			PacketUtils.sendPacket(e.getPlayer(), e.getPacket());
+			lastSentPacket = e.getPacket();
+			PacketUtils.sendPacket(e.getPlayer(), lastSentPacket);
 		});
 	}
 	
