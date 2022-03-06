@@ -1,6 +1,5 @@
 package me.dadus33.chatitem.chatmanager.v1.json;
 
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

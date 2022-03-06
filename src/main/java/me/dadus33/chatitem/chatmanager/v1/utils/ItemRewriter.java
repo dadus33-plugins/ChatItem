@@ -5,19 +5,24 @@ import static me.dadus33.chatitem.utils.Version.V1_11;
 import static me.dadus33.chatitem.utils.Version.V1_8;
 import static me.dadus33.chatitem.utils.Version.V1_9;
 
+import org.bukkit.inventory.ItemStack;
+
 public class ItemRewriter {
 
-	public static void remapIds(int server, int player, Item item) {
+	public static String remapIds(int server, int player, ItemStack is) {
+        Item item = new Item();
+        item.setAmount((byte)is.getAmount());
+        //item.setData(is.getDurability());
+        //item.setId(id);
+        //item.setTag(tag);
 		if (areIdsCompatible(server, player)) {
-			return;
+			return item.getId();
 		}
 		if ((server >= V1_9.MIN_VER && player <= V1_8.MAX_VER) || (player >= V1_9.MIN_VER && server <= V1_8.MAX_VER)) {
 			if ((server >= V1_9.MIN_VER && player <= V1_8.MAX_VER)) {
 				ItemRewriter_1_9_TO_1_8.reversedToClient(item);
-				return;
-			}
-			ItemRewriter_1_9_TO_1_8.toClient(item);
-			return;
+			} else
+				ItemRewriter_1_9_TO_1_8.toClient(item);
 		}
 		if ((server <= V1_10.MAX_VER && player >= V1_11.MIN_VER)
 				|| (player <= V1_10.MAX_VER && server >= V1_11.MIN_VER)) {
@@ -27,6 +32,7 @@ public class ItemRewriter {
 				ItemRewriter_1_11_TO_1_10.reverseToClient(item);
 			}
 		}
+		return item.getId();
 	}
 
 	public static boolean areIdsCompatible(int version1, int version2) {
