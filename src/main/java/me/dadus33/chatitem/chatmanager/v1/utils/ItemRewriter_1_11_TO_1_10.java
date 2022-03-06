@@ -10,6 +10,7 @@ import com.google.common.collect.HashBiMap;
 /**
  * Thanks to the developers of ViaVersion for this!
  */
+@Deprecated
 public class ItemRewriter_1_11_TO_1_10 {
     private static BiMap<String, String> oldToNewNames = HashBiMap.create();
 

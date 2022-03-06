@@ -7,6 +7,7 @@ import static me.dadus33.chatitem.utils.Version.V1_9;
 
 import org.bukkit.inventory.ItemStack;
 
+@Deprecated
 public class ItemRewriter {
 
 	public static String remapIds(int server, int player, ItemStack is) {

@@ -3,6 +3,7 @@ package me.dadus33.chatitem.chatmanager.v1.utils;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 
+@Deprecated
 public class Item {
     private String id;
     private byte amount;

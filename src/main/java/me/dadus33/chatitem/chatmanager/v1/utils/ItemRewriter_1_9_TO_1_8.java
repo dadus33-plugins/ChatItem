@@ -9,6 +9,7 @@ import java.util.Map;
 /**
  * Thanks to the developers of ViaVersion for this!
  */
+@Deprecated
 public class ItemRewriter_1_9_TO_1_8 {
 
     private static final Map<String, Integer> ENTTIY_NAME_TO_ID = new HashMap<>();
