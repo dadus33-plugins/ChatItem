@@ -2,6 +2,8 @@ package me.dadus33.chatitem.utils;
 
 import java.lang.reflect.Field;
 
+import me.dadus33.chatitem.ChatItem;
+
 public class ReflectionUtils {
 	
 	public static Object getPrivateField(Object object, String field)
@@ -28,15 +30,22 @@ public class ReflectionUtils {
 	 * @param field the name of the field
 	 * @return the requested object of the field
 	 */
-	public static Object getObject(Object source, String field) {
+	public static Object getObject(Object source, String... field) {
 		try {
-			Field f = source.getClass().getDeclaredField(field);
-			f.setAccessible(true);
-			return f.get(source);
+			for(String fieldName : field) {
+				try {
+					Field f = source.getClass().getDeclaredField(fieldName);
+					f.setAccessible(true);
+					return f.get(source);
+				} catch (NoSuchFieldException e) {
+					// ignore because going to next item
+				}
+			}
+			ChatItem.debug("Failed to find fields: " + String.join(", ", field) + " in " + source.getClass().getSimpleName());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
 		}
+		return null;
 	}
 	
 	/**

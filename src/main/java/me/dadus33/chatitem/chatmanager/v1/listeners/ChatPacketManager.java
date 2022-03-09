@@ -165,7 +165,29 @@ public class ChatPacketManager extends PacketHandler {
 			builder.replace(topIndex - (name.length() + 6), topIndex, ""); // we remove both the name and the separator
 			// from the json string
 			String localJson = builder.toString();
+			Version v = manager.getPlayerVersionAdapter().getPlayerVersion(p);
+			if(v.equals(Version.V1_7) && manager.getClient(p).toLowerCase().contains("lunarclient")) {
+				String message;
 
+				if (ItemUtils.isEmpty(p.getItemInHand()))
+					message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS, 
+						getStorage().HAND_NAME, getStorage().HAND_TOOLTIP, p);
+				else
+					message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS, 
+							styleItem(p.getItemInHand(), getStorage()), getStorage().BUGGED_CLIENTS_TOOLTIP, p);
+				if (!bUsesBaseComponents) {
+					ChatItem.debug("Use basic for 1.7 lunar");
+					packet.getChatComponents().write(0, jsonToChatComponent(message));
+				} else {
+					ChatItem.debug("Use baseComponent for 1.7 lunar");
+					packet.getSpecificModifier(BaseComponent[].class).write(0, ComponentSerializer.parse(message));
+				}
+				lastSentPacket = e.getPacket();
+				PacketUtils.sendPacket(e.getPlayer(), lastSentPacket);
+				return;
+			} else
+				ChatItem.debug("Good client: " + v.name() + " > " + manager.getClient(p));
+			
 			String message = null;
 			try {
 				if (!ItemUtils.isEmpty(p.getItemInHand())) {

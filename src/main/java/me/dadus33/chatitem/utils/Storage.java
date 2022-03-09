@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,7 +28,7 @@ public class Storage {
 	public int CONFIG_VERSION, LIMIT, COOLDOWN;
 	public final List<Command> ALLOWED_PLUGIN_COMMANDS = new ArrayList<>();
 	public final List<String> ALLOWED_DEFAULT_COMMANDS = new ArrayList<>();
-	public final List<String> PLACEHOLDERS, HAND_TOOLTIP;
+	public final List<String> PLACEHOLDERS, HAND_TOOLTIP, BUGGED_CLIENTS_TOOLTIP;
 
 	public Storage(FileConfiguration cnf) {
 		this.conf = cnf;
@@ -61,7 +62,8 @@ public class Storage {
         PERMISSION_NAME = conf.getString("general.permission.name", "chatitem.use");
 		HAND_DISABLED = conf.getBoolean("general.hand.disabled", false);
 		HAND_NAME = color(conf.getString("general.hand.name", "&b&l&o{display-name}&b&l&o's hand"));
-		HAND_TOOLTIP = conf.getStringList("general.hand.tooltip");
+		HAND_TOOLTIP = conf.getStringList("general.hand.tooltip").stream().map(Storage::color).collect(Collectors.toList());
+		BUGGED_CLIENTS_TOOLTIP = conf.getStringList("general.bugged_client.tooltip").stream().map(Storage::color).collect(Collectors.toList());
 		CHECK_UPDATE = conf.getBoolean("general.check-update", true);
 		DENY_MESSAGE = color(conf.getString("messages.deny-message", "&c&lYou have no item in hand!"));
 		RELOAD_MESSAGE = color(conf.getString("messages.reload-success", "&b&lSuccessful reload!"));

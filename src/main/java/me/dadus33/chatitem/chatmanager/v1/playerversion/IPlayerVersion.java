@@ -9,6 +9,6 @@ public interface IPlayerVersion {
 	public int getProtocolVersion(Player p);
 	
 	default Version getPlayerVersion(Player p) {
-		return Version.getVersion(getProtocolVersion(p));
+		return Version.getVersion(getProtocolVersion(p), Version.getVersion());
 	}
 }

@@ -50,6 +50,9 @@ general:
     tooltip:
       - "&7Nothing to see here"
       - "&7Just the empty hand of {display-name}."
+  bugged_client:
+    tooltip:
+      - "&7Failed to parse item for your client"
  
   #  Here you can choose which commands will the plugin attempt to parse. Console commands will all be ignored,
   # however player commands will be taken into consideration. To add a command, simply add an element to the list
