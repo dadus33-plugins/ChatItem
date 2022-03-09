@@ -14,7 +14,6 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.ItemPlayer;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.CustomPacketManager;
@@ -58,10 +57,6 @@ public class INC2Channel extends ChannelAbstract {
 				Channel channel = getChannel(player);
 				// Managing outgoing packet (to the player)
 				channel.pipeline().addAfter(KEY_HANDLER_SERVER, KEY_SERVER + endChannelName, new ChannelHandlerSent(player));
-
-				ChatItemPacket pa = ChannelInboundHandler.TMP.remove(channel);
-				if(pa != null)
-					ItemPlayer.getPlayer(player).setProtocolVersion(pa.getContent().getIntegers().readSafely(0, Version.getVersion().MAX_VER));
 			} catch (NoSuchElementException e) {
 				// appear when the player's channel isn't accessible because of reload.
 				getPacketManager().getPlugin().getLogger().warning("Please, don't use reload, this can produce some problem. Currently, " + player.getName() + " isn't fully checked because of that. More details: " + e.getMessage() + " (NoSuchElementException)");
