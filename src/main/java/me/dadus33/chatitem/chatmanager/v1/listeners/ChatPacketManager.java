@@ -35,7 +35,7 @@ public class ChatPacketManager extends PacketHandler {
 	private final static String NAME = "{name}";
 	private final static String AMOUNT = "{amount}";
 	private final static String TIMES = "{times}";
-	
+
 	private Object lastSentPacket = null;
 	private Method serializerGetJson;
 	private PacketEditingChatManager manager;
@@ -61,13 +61,13 @@ public class ChatPacketManager extends PacketHandler {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onSend(ChatItemPacket e) {
-		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT)) 
+		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT))
 			return;
-		if(lastSentPacket != null && lastSentPacket == e.getPacket())
+		if (lastSentPacket != null && lastSentPacket == e.getPacket())
 			return; // prevent infinite loop
 		Version version = Version.getVersion();
 		if (version.isNewerOrEquals(Version.V1_8)) { // only if action bar messages are supported in this
-																// version of minecraft
+														// version of minecraft
 			if (version.isNewerOrEquals(Version.V1_12)) {
 				try {
 					if (((Enum<?>) e.getContent()
@@ -93,13 +93,14 @@ public class ChatPacketManager extends PacketHandler {
 			BaseComponent[] components = packet.getSpecificModifier(BaseComponent[].class).readSafely(0);
 			if (components == null) {
 				Object chatBaseComp = packet.getSpecificModifier(PacketUtils.COMPONENT_CLASS).readSafely(0);
-				if(chatBaseComp == null) {
+				if (chatBaseComp == null) {
 					ChatItem.debug("No base components, without chat base comp");
 					return;
 				} else {
 					ChatItem.debug("No base components, with chatbasecomp: " + chatBaseComp);
 					try {
-						json = PacketUtils.CHAT_SERIALIZER.getMethod("a", PacketUtils.COMPONENT_CLASS).invoke(null, e.getPacket()).toString();
+						json = PacketUtils.CHAT_SERIALIZER.getMethod("a", PacketUtils.COMPONENT_CLASS)
+								.invoke(null, e.getPacket()).toString();
 					} catch (Exception exc) {
 						exc.printStackTrace();
 					}
@@ -126,11 +127,12 @@ public class ChatPacketManager extends PacketHandler {
 			return; // then it's just a normal message without placeholders, so we leave it alone
 		}
 		Object toReplace = null;
-		if(json.lastIndexOf(SEPARATOR) != -1)
+		if (json.lastIndexOf(SEPARATOR) != -1)
 			toReplace = SEPARATOR;
-		if(json.lastIndexOf(SEPARATOR_STR) != -1)
+		if (json.lastIndexOf(SEPARATOR_STR) != -1)
 			toReplace = SEPARATOR_STR;
-		if (toReplace == null) { // if the message doesn't contain the BELL separator, then it's certainly NOT a message we want to parse
+		if (toReplace == null) { // if the message doesn't contain the BELL separator, then it's certainly NOT a
+									// message we want to parse
 			ChatItem.debug("Not contains bell " + json);
 			return;
 		}
@@ -140,11 +142,11 @@ public class ChatPacketManager extends PacketHandler {
 		e.setCancelled(true); // We cancel the packet as we're going to resend it anyways (ignoring listeners
 		// this time)
 		Bukkit.getScheduler().runTaskAsynchronously(ChatItem.getInstance(), () -> {
-
+			Player p = e.getPlayer();
 			int topIndex = -1;
 			String name = null;
-			for (Player p : Bukkit.getOnlinePlayers()) {
-				String pname = toReplaceStr + p.getName();
+			for (Player pl : Bukkit.getOnlinePlayers()) {
+				String pname = toReplaceStr + pl.getName();
 				if (!fjson.contains(pname)) {
 					continue;
 				}
@@ -160,21 +162,22 @@ public class ChatPacketManager extends PacketHandler {
 				return;
 			}
 
-			Player p = Bukkit.getPlayer(name);
+			Player itemPlayer = Bukkit.getPlayer(name);
 			StringBuilder builder = new StringBuilder(fjson);
 			builder.replace(topIndex - (name.length() + 6), topIndex, ""); // we remove both the name and the separator
 			// from the json string
 			String localJson = builder.toString();
 			Version v = manager.getPlayerVersionAdapter().getPlayerVersion(p);
-			if(v.equals(Version.V1_7) && manager.getClient(p).toLowerCase().contains("lunarclient")) {
+			if (v.equals(Version.V1_7) && manager.getClient(p).toLowerCase().contains("lunarclient")) {
 				String message;
 
-				if (ItemUtils.isEmpty(p.getItemInHand()))
-					message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS, 
-						getStorage().HAND_NAME, getStorage().HAND_TOOLTIP, p);
+				if (ItemUtils.isEmpty(itemPlayer.getItemInHand()))
+					message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,
+							getStorage().HAND_NAME, getStorage().HAND_TOOLTIP, itemPlayer);
 				else
-					message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS, 
-							styleItem(p.getItemInHand(), getStorage()), getStorage().BUGGED_CLIENTS_TOOLTIP, p);
+					message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,
+							styleItem(itemPlayer.getItemInHand(), getStorage()), getStorage().BUGGED_CLIENTS_TOOLTIP,
+							itemPlayer);
 				if (!bUsesBaseComponents) {
 					ChatItem.debug("Use basic for 1.7 lunar");
 					packet.getChatComponents().write(0, jsonToChatComponent(message));
@@ -183,15 +186,15 @@ public class ChatPacketManager extends PacketHandler {
 					packet.getSpecificModifier(BaseComponent[].class).write(0, ComponentSerializer.parse(message));
 				}
 				lastSentPacket = e.getPacket();
-				PacketUtils.sendPacket(e.getPlayer(), lastSentPacket);
+				PacketUtils.sendPacket(p, lastSentPacket);
 				return;
 			} else
-				ChatItem.debug("Good client: " + v.name() + " > " + manager.getClient(p));
-			
+				ChatItem.debug("Good client: " + v.name() + " > " + manager.getClient(itemPlayer));
+
 			String message = null;
 			try {
-				if (!ItemUtils.isEmpty(p.getItemInHand())) {
-					ItemStack copy = p.getItemInHand().clone();
+				if (!ItemUtils.isEmpty(itemPlayer.getItemInHand())) {
+					ItemStack copy = itemPlayer.getItemInHand().clone();
 					if (copy.getType().name().contains("_BOOK")) { // filtering written books
 						BookMeta bm = (BookMeta) copy.getItemMeta();
 						bm.setPages(Collections.emptyList());
@@ -212,11 +215,12 @@ public class ChatPacketManager extends PacketHandler {
 						}
 					}
 					message = manager.getManipulator().parse(localJson, getStorage().PLACEHOLDERS, copy,
-							styleItem(copy, getStorage()), manager.getPlayerVersionAdapter().getProtocolVersion(p));
+							styleItem(copy, getStorage()),
+							manager.getPlayerVersionAdapter().getProtocolVersion(itemPlayer));
 				} else {
 					if (!getStorage().HAND_DISABLED) {
 						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,
-								getStorage().HAND_NAME, getStorage().HAND_TOOLTIP, p);
+								getStorage().HAND_NAME, getStorage().HAND_TOOLTIP, itemPlayer);
 					}
 				}
 			} catch (Exception e1) {
@@ -231,10 +235,10 @@ public class ChatPacketManager extends PacketHandler {
 				}
 			}
 			lastSentPacket = e.getPacket();
-			PacketUtils.sendPacket(e.getPlayer(), lastSentPacket);
+			PacketUtils.sendPacket(p, lastSentPacket);
 		});
 	}
-	
+
 	private Object jsonToChatComponent(String json) {
 		try {
 			return PacketUtils.CHAT_SERIALIZER.getMethod("a", String.class).invoke(null, json);
@@ -325,7 +329,6 @@ public class ChatPacketManager extends PacketHandler {
 		}
 		i.setItemMeta(im);
 	}
-
 
 	public Storage getStorage() {
 		return manager.getStorage();
