@@ -2,8 +2,10 @@ package me.dadus33.chatitem.chatmanager.v1.packets;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import me.dadus33.chatitem.utils.PacketUtils;
 
@@ -148,7 +150,7 @@ public class PacketContent {
 		 * @throws NoSuchElementException if the value doesn't exist
 		 */
 		public T read(int i) {
-			return content.values().stream().filter(Objects::nonNull).findFirst().get();
+			return content.values().stream().filter(Objects::nonNull).collect(Collectors.toList()).get(i);
 		}
 		
 		/**
@@ -169,7 +171,8 @@ public class PacketContent {
 		 * @return the requested value.
 		 */
 		public T readSafely(int i, T defaultValue) {
-			return content.values().stream().filter(Objects::nonNull).findFirst().orElse(defaultValue);
+			List<T> vals = content.values().stream().filter(Objects::nonNull).collect(Collectors.toList());
+			return vals.size() <= i ? defaultValue : vals.get(i);
 		}
 		
 		/**

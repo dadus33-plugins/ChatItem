@@ -4,6 +4,8 @@ import java.net.InetSocketAddress;
 
 import org.bukkit.Bukkit;
 
+import me.dadus33.chatitem.ChatItem;
+
 public enum Version {
 	
 	// http://wiki.vg/Protocol_version_numbers
@@ -73,6 +75,7 @@ public enum Version {
 				return ver;
 			}
 		}
+		ChatItem.debug("Failed to find version for protocol " + protocolVersion);
 		return def;
 	}
 

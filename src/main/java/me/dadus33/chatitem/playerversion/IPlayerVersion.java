@@ -1,4 +1,4 @@
-package me.dadus33.chatitem.chatmanager.v1.playerversion;
+package me.dadus33.chatitem.playerversion;
 
 import org.bukkit.entity.Player;
 

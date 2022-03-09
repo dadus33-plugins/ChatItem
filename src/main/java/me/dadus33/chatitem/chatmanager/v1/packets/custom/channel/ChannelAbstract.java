@@ -9,8 +9,8 @@ import java.util.concurrent.Executors;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import me.dadus33.chatitem.ItemPlayer;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.CustomPacketManager;
-import me.dadus33.chatitem.chatmanager.v1.playerversion.hooks.DefaultVersionHook;
 
 public abstract class ChannelAbstract {
 
@@ -54,7 +54,7 @@ public abstract class ChannelAbstract {
 			try {
 				Integer protocol = customPacketManager.protocolVersionPerChannel.remove(getChannel(p));
 				if(protocol != null)
-					DefaultVersionHook.PROTOCOL_PER_UUID.put(p.getUniqueId(), protocol);
+					ItemPlayer.getPlayer(p).setProtocolVersion(protocol);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -9,8 +9,10 @@ import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
 
+import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
+import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent.ContentModifier;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.CustomPacketManager;
 import me.dadus33.chatitem.utils.PacketUtils;
@@ -156,7 +158,11 @@ public class NMUChannel extends ChannelAbstract {
 			try {
 				PacketType packetType = PacketType.getType(packet.getClass().getSimpleName());
 				if(packetType != null && packetType == PacketType.Handshake.IS_SET_PROTOCOL) {
-					getPacketManager().protocolVersionPerChannel.put(channel, new PacketContent(packet).getIntegers().readSafely(0, 0));
+					ContentModifier<Integer> ints = new PacketContent(packet).getIntegers();
+					ints.getContent().forEach((f, i) -> {
+						ChatItem.debug("Int: " + f.getName() + " > " + i);
+					});
+					getPacketManager().protocolVersionPerChannel.put(channel, ints.readSafely(1, 0));
 				}
 				super.channelRead(ctx, packet);
 			} catch (Exception e) {

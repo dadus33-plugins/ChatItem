@@ -1,8 +1,8 @@
-package me.dadus33.chatitem.chatmanager.v1.playerversion.hooks;
+package me.dadus33.chatitem.playerversion.hooks;
 
 import org.bukkit.entity.Player;
 
-import me.dadus33.chatitem.chatmanager.v1.playerversion.IPlayerVersion;
+import me.dadus33.chatitem.playerversion.IPlayerVersion;
 import us.myles.ViaVersion.api.Via;
 
 public class ViaVersionHook implements IPlayerVersion {

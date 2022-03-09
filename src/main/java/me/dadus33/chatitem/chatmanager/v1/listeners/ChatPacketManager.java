@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.ItemPlayer;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
@@ -167,8 +168,8 @@ public class ChatPacketManager extends PacketHandler {
 			builder.replace(topIndex - (name.length() + 6), topIndex, ""); // we remove both the name and the separator
 			// from the json string
 			String localJson = builder.toString();
-			Version v = manager.getPlayerVersionAdapter().getPlayerVersion(p);
-			if (v.equals(Version.V1_7) && manager.getClient(p).toLowerCase().contains("lunarclient")) {
+			ItemPlayer ip = ItemPlayer.getPlayer(p);
+			if (ip.getVersion().equals(Version.V1_7) && ip.getClientName().toLowerCase().contains("lunarclient")) {
 				String message;
 
 				if (ItemUtils.isEmpty(itemPlayer.getItemInHand()))
@@ -189,7 +190,7 @@ public class ChatPacketManager extends PacketHandler {
 				PacketUtils.sendPacket(p, lastSentPacket);
 				return;
 			} else
-				ChatItem.debug("Good client: " + v.name() + " > " + manager.getClient(itemPlayer));
+				ChatItem.debug("Good client: " + ip.toString());
 
 			String message = null;
 			try {
@@ -216,7 +217,7 @@ public class ChatPacketManager extends PacketHandler {
 					}
 					message = manager.getManipulator().parse(localJson, getStorage().PLACEHOLDERS, copy,
 							styleItem(copy, getStorage()),
-							manager.getPlayerVersionAdapter().getProtocolVersion(itemPlayer));
+							ItemPlayer.getPlayer(itemPlayer).getProtocolVersion());
 				} else {
 					if (!getStorage().HAND_DISABLED) {
 						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,

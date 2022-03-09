@@ -15,11 +15,11 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.ItemPlayer;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.CustomPacketManager;
-import me.dadus33.chatitem.chatmanager.v1.playerversion.hooks.DefaultVersionHook;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.Version;
@@ -73,7 +73,7 @@ public class INCChannel extends ChannelAbstract {
 
 				ChatItemPacket pa = ChannelInboundHandler.TMP.remove(channel);
 				if(pa != null)
-					DefaultVersionHook.PROTOCOL_PER_UUID.put(player.getUniqueId(), pa.getContent().getIntegers().readSafely(0, Version.getVersion().MAX_VER));
+					ItemPlayer.getPlayer(player).setProtocolVersion(pa.getContent().getIntegers().readSafely(0, Version.getVersion().MAX_VER));
 			} catch (NoSuchElementException e) {
 				// appear when the player's channel isn't accessible because of reload.
 				getPacketManager().getPlugin().getLogger().warning("Please, don't use reload, this can produce some problem. Currently, " + player.getName() + " isn't fully checked because of that. More details: " + e.getMessage() + " (NoSuchElementException)");

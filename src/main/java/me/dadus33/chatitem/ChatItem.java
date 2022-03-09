@@ -39,6 +39,7 @@ public class ChatItem extends JavaPlugin {
     private Storage storage;
     public static boolean discordSrvSupport = false, hasNewVersion = false;
     private List<ChatManager> chatManager = new ArrayList<>();
+	private final String brandChannelName = Version.getVersion().isNewerOrEquals(Version.V1_13) ? "minecraft:brand" : "MC|Brand";
 
     private void chooseManagers() {
     	this.chatManager.forEach((cm) -> cm.unload(this));
@@ -127,6 +128,12 @@ public class ChatItem extends JavaPlugin {
         	discordSrvSupport = true;
         	getLogger().info("Load DiscordSRV support.");
         }
+
+        getServer().getMessenger().registerIncomingPluginChannel(this, brandChannelName, (chan, p, msg) -> {
+			String client = new String(msg);
+			ChatItem.debug("Detected client " + client + " for " + p.getName());
+			ItemPlayer.getPlayer(p).setClientName(client);
+		});
         
         if(storage.CHECK_UPDATE) {
 	        getServer().getScheduler().runTaskAsynchronously(this, () -> {
