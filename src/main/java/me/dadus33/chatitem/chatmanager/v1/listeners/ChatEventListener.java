@@ -122,7 +122,6 @@ public class ChatEventListener implements Listener {
 				return;
 			}
 		}
-		ChatItem.debug("(v1) Checking cooldown " + e.getMessage());
 		if (getStorage().COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
 			if (COOLDOWNS.containsKey(p.getName())) {
 				long start = COOLDOWNS.get(p.getName());

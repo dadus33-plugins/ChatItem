@@ -176,8 +176,7 @@ public class ChatPacketManager extends PacketHandler {
 				if (!ItemUtils.isEmpty(itemPlayer.getItemInHand())) {
 					ItemStack copy = itemPlayer.getItemInHand().clone();
 
-					ItemPlayer ip = ItemPlayer.getPlayer(p);
-					if (ip.isBuggedClient()) {
+					if (ItemPlayer.getPlayer(p).isBuggedClient()) {
 						String act = getStorage().BUGGED_CLIENT_ACTION;
 						List<String> tooltip;// = act.equalsIgnoreCase("nothing") ? new ArrayList<>() : null;
 						if(act.equalsIgnoreCase("tooltip"))
@@ -203,7 +202,6 @@ public class ChatPacketManager extends PacketHandler {
 						PacketUtils.sendPacket(p, lastSentPacket);
 						return;
 					}
-					ChatItem.debug("Good client: " + ip.toString());
 					if (copy.getType().name().contains("_BOOK")) { // filtering written books
 						BookMeta bm = (BookMeta) copy.getItemMeta();
 						bm.setPages(Collections.emptyList());
@@ -259,7 +257,7 @@ public class ChatPacketManager extends PacketHandler {
 	public static String styleItem(ItemStack item, Storage c) {
 		String replacer = c.NAME_FORMAT;
 		String amount = c.AMOUNT_FORMAT;
-		boolean dname = item.hasItemMeta() ? item.getItemMeta().hasDisplayName() : false;
+		boolean dname = item.hasItemMeta() && item.getItemMeta().hasDisplayName();
 
 		if (item.getAmount() == 1) {
 			if (c.FORCE_ADD_AMOUNT) {
@@ -280,7 +278,7 @@ public class ChatPacketManager extends PacketHandler {
 				replacer = replacer.replace(NAME, trp);
 			}
 		} else {
-			replacer.replace(NAME, getTranslatedItemName(c, item.getType(), item.getDurability()));
+			replacer = replacer.replace(NAME, getTranslatedItemName(c, item.getType(), item.getDurability()));
 		}
 		return replacer;
 	}

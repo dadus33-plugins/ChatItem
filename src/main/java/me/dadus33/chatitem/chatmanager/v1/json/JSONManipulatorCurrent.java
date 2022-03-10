@@ -247,8 +247,8 @@ public class JSONManipulatorCurrent {
 		if(!tooltip.isEmpty()) {
 			for (JsonElement ob : use)
 				ob.getAsJsonObject().add("hoverEvent", hover);
+			classicTooltip = use;
 		}
-		classicTooltip = use;
 
 		for (int i = 0; i < array.size(); ++i) {
 			if (array.get(i).isJsonObject()) {
@@ -541,22 +541,15 @@ public class JSONManipulatorCurrent {
 					} else {
 						String msg = arr.get(i).getAsString();
 						boolean isLast = false;
-						boolean done = false;
-						boolean fnd;
-						String[] splits;
 						for (String repls : replaces) {
-							if (done) {
-								break;
-							}
 							isLast = msg.endsWith(repls);
 							if (isLast) {
-								done = true;
 								msg = msg.concat(".");
+								break;
 							}
 						}
-						splits = msg.split(rgx);
-						fnd = splits.length != 1;
-						if (fnd)
+						String[] splits = msg.split(rgx);
+						if (splits.length != 1) {
 							for (int j = 0; j < splits.length; ++j) {
 								boolean endDot = (j == splits.length - 1) && isLast;
 								if (!splits[j].isEmpty() && !endDot) {
@@ -567,7 +560,7 @@ public class JSONManipulatorCurrent {
 									replacer.add(itemTooltip);
 								}
 							}
-						if (!fnd) {
+						} else {
 							replacer.add(arr.get(i));
 						}
 					}
