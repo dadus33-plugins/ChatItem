@@ -149,6 +149,7 @@ public class ChatEventListener implements Listener {
 		String s = e.getMessage(), firstPlaceholder = getStorage().PLACEHOLDERS.get(0);
 		for (String placeholder : getStorage().PLACEHOLDERS) {
 			s = s.replace(placeholder, firstPlaceholder);
+			ChatItem.debug("Changing " + placeholder + " to " + firstPlaceholder + " > " + s);
 		}
 		int occurrences = countOccurrences(firstPlaceholder, s);
 
@@ -158,14 +159,14 @@ public class ChatEventListener implements Listener {
 			if (getStorage().LIMIT_MESSAGE.isEmpty()) {
 				return;
 			}
-			e.getPlayer().sendMessage(getStorage().LIMIT_MESSAGE);
+			p.sendMessage(getStorage().LIMIT_MESSAGE);
 			return;
 		}
 
 		ChatItem.debug("(v1) Set placeholder: " + e.getMessage());
 		try {
 			StringJoiner msg = new StringJoiner(" ");
-			for(String part : e.getMessage().split(" ")) {
+			for(String part : s.split(" ")) {
 				if(part.equalsIgnoreCase(firstPlaceholder)) {
 					msg.add(firstPlaceholder + SEPARATOR + p.getName());
 				} else {
