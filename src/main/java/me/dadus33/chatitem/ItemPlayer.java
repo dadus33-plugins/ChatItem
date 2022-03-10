@@ -20,17 +20,22 @@ public class ItemPlayer {
 	}
 	private final UUID uuid;
 	private int protocolVersion = 0;
-	private Version version = Version.getVersion();
+	private Version version = null;
 	private String clientName = "unknow";
 	
 	public ItemPlayer(UUID uuid) {
 		this.uuid = uuid;
 		Player p = Bukkit.getPlayer(uuid);
-		setVersion(PlayerVersionManager.getPlayerVersionAdapter().getPlayerVersion(p));
+		if(p != null)
+			setVersion(PlayerVersionManager.getPlayerVersionAdapter().getPlayerVersion(p));
 	}
 	
 	public UUID getUUID() {
 		return uuid;
+	}
+	
+	public Player getPlayer() {
+		return Bukkit.getPlayer(uuid);
 	}
 	
 	public String getClientName() {
@@ -42,6 +47,8 @@ public class ItemPlayer {
 	}
 	
 	public int getProtocolVersion() {
+		if(protocolVersion == 0)
+			setProtocolVersion(PlayerVersionManager.getPlayerVersionAdapter().getProtocolVersion(getPlayer()));
 		return protocolVersion;
 	}
 	
@@ -54,6 +61,8 @@ public class ItemPlayer {
 	}
 	
 	public Version getVersion() {
+		if(version == null)
+			setVersion(PlayerVersionManager.getPlayerVersionAdapter().getPlayerVersion(getPlayer()));
 		return version;
 	}
 	
@@ -65,6 +74,6 @@ public class ItemPlayer {
 	
 	@Override
 	public String toString() {
-		return "ItemPlayer[version=" + version.name() + ",protocol=" + protocolVersion + ",client=" + clientName + "]";
+		return "ItemPlayer[uuid=" + uuid + ",name=" + (getPlayer() != null ? getPlayer().getName() : "-") + ",version=" + version.name() + ",protocol=" + protocolVersion + ",client=" + clientName + "]";
 	}
 }
