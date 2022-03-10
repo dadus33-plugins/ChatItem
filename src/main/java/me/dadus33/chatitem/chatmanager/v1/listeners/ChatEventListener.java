@@ -109,7 +109,6 @@ public class ChatEventListener implements Listener {
 			if (!getStorage().NO_PERMISSION_MESSAGE.isEmpty() && getStorage().SHOW_NO_PERM_NORMAL) {
 				p.sendMessage(getStorage().NO_PERMISSION_MESSAGE);
 			}
-			ChatItem.debug("(v1) Don't have permission");
 			return;
 		}
 		if (p.getItemInHand().getType().equals(Material.AIR)) {
@@ -117,11 +116,9 @@ public class ChatEventListener implements Listener {
 				e.setCancelled(true);
 				if (!getStorage().DENY_MESSAGE.isEmpty())
 					e.getPlayer().sendMessage(getStorage().DENY_MESSAGE);
-				ChatItem.debug("(v1) No item and must deny");
 				return;
 			}
 			if (getStorage().HAND_DISABLED) {
-				ChatItem.debug("(v1) Hand disabled");
 				return;
 			}
 		}
@@ -149,13 +146,11 @@ public class ChatEventListener implements Listener {
 		String s = e.getMessage(), firstPlaceholder = getStorage().PLACEHOLDERS.get(0);
 		for (String placeholder : getStorage().PLACEHOLDERS) {
 			s = s.replace(placeholder, firstPlaceholder);
-			ChatItem.debug("Changing " + placeholder + " to " + firstPlaceholder + " > " + s);
 		}
 		int occurrences = countOccurrences(firstPlaceholder, s);
 
 		if (occurrences > getStorage().LIMIT) {
 			e.setCancelled(true);
-			ChatItem.debug("(v1) Reach message limit");
 			if (getStorage().LIMIT_MESSAGE.isEmpty()) {
 				return;
 			}

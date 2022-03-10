@@ -198,7 +198,6 @@ public class ChatListener implements Listener {
 				defMsg = defMsg.replace(rep, ChatManager.SEPARATOR + "");
 		}
 		if (format.contains("%1$s") || format.contains("%2$s")) {
-			ChatItem.debug("Begin def msg: " + defMsg + "");
 			msg = (format.contains("%2$s") ? String.format(format, p.getDisplayName(), defMsg)
 					: String.format(format, p.getDisplayName()));
 		} else {

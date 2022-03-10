@@ -41,7 +41,7 @@ public class ReflectionUtils {
 					// ignore because going to next item
 				}
 			}
-			ChatItem.debug("Failed to find fields: " + String.join(", ", field) + " in " + source.getClass().getSimpleName());
+			ChatItem.getInstance().getLogger().severe("Failed to find fields: " + String.join(", ", field) + " in " + source.getClass().getSimpleName());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
