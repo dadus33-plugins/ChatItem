@@ -600,7 +600,10 @@ public class JSONManipulatorCurrent {
 		// ItemRewriter.remapIds(Version.getVersion().MAX_VER, protocolVersion.MAX_VER,
 		// is);
 		StringBuilder sb = new StringBuilder("{id:");
-		sb.append("\"").append(id).append("\"").append(","); // Append the id
+		if(protocolVersion.equals(Version.V1_7))
+			sb.append(id).append(","); // Append the id
+		else
+			sb.append("\"").append(id).append("\"").append(","); // Append the id
 		sb.append("Count:").append(is.getAmount()).append("b"); // Append the amount
 
 		if (!tagMap.containsKey("Damage")) { // for new versions
