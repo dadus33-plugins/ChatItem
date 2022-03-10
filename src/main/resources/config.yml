@@ -50,7 +50,19 @@ general:
     tooltip:
       - "&7Nothing to see here"
       - "&7Just the empty hand of {display-name}."
+  # Manage what is showed for bugged client.
+  # Specially lunar client with old version (1.7)
   bugged_client:
+    # You can try to show the most informations as possible:
+    # item name & lore. You will not see specific item meta-data
+    # Or just show the bugged tooltip.
+    #
+    # Action available:
+    # nothing: no hover
+    # item: only try to get values from item
+    # tooltip: only show tooltip
+    # show_both: show item & tooltip below
+    action: "show_both"
     tooltip:
       - "&7Failed to parse item for your client"
  

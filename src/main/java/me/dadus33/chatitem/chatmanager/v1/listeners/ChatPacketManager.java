@@ -4,8 +4,10 @@ import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR_STR;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,10 +29,12 @@ import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
+import me.dadus33.chatitem.utils.Utils;
 import me.dadus33.chatitem.utils.Version;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
+@SuppressWarnings("deprecation")
 public class ChatPacketManager extends PacketHandler {
 
 	private final static String NAME = "{name}";
@@ -59,32 +63,30 @@ public class ChatPacketManager extends PacketHandler {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onSend(ChatItemPacket e) {
 		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT))
 			return;
 		if (lastSentPacket != null && lastSentPacket == e.getPacket())
 			return; // prevent infinite loop
+		PacketContent packet = e.getContent();
 		Version version = Version.getVersion();
 		if (version.isNewerOrEquals(Version.V1_8)) { // only if action bar messages are supported in this
 														// version of minecraft
 			if (version.isNewerOrEquals(Version.V1_12)) {
 				try {
-					if (((Enum<?>) e.getContent()
-							.getSpecificModifier(PacketUtils.getNmsClass("ChatMessageType", "network.chat.")).read(0))
+					if (((Enum<?>) packet.getSpecificModifier(PacketUtils.getNmsClass("ChatMessageType", "network.chat.")).read(0))
 									.name().equals("GAME_INFO")) {
 						return; // It means it's an actionbar message, and we ain't intercepting those
 					}
 				} catch (Exception exc) {
 					exc.printStackTrace();
 				}
-			} else if (e.getContent().getBytes().readSafely(0) == (byte) 2) {
+			} else if (packet.getBytes().readSafely(0) == (byte) 2) {
 				return; // It means it's an actionbar message, and we ain't intercepting those
 			}
 		}
 		boolean usesBaseComponents = false;
-		PacketContent packet = e.getContent();
 		String json = "{}";
 		if (packet.getChatComponents().readSafely(0) == null) { // null check for some cases of messages sent using
 																// spigot's Chat Component API or other means
@@ -176,8 +178,19 @@ public class ChatPacketManager extends PacketHandler {
 
 					ItemPlayer ip = ItemPlayer.getPlayer(p);
 					if (ip.isBuggedClient()) {
+						String act = getStorage().BUGGED_CLIENT_ACTION;
+						List<String> tooltip;// = act.equalsIgnoreCase("nothing") ? new ArrayList<>() : null;
+						if(act.equalsIgnoreCase("tooltip"))
+							tooltip = getStorage().BUGGED_CLIENTS_TOOLTIP;
+						else if(act.equalsIgnoreCase("item"))
+							tooltip = getMaxLinesFromItem(copy);
+						else if(act.equalsIgnoreCase("show_both")) {
+							tooltip = getMaxLinesFromItem(copy);
+							tooltip.addAll(getStorage().BUGGED_CLIENTS_TOOLTIP);
+						} else
+							tooltip = new ArrayList<>();
 						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,
-								styleItem(copy, getStorage()), getStorage().BUGGED_CLIENTS_TOOLTIP, itemPlayer);
+								styleItem(copy, getStorage()), tooltip, itemPlayer);
 						if (!bUsesBaseComponents) {
 							ChatItem.debug("Use basic for 1.7 lunar");
 							packet.getChatComponents().write(0, jsonToChatComponent(message));
@@ -267,19 +280,7 @@ public class ChatPacketManager extends PacketHandler {
 				replacer = replacer.replace(NAME, trp);
 			}
 		} else {
-			HashMap<Short, String> translationSection = c.TRANSLATIONS.get(item.getType().name());
-			if (translationSection == null) {
-				String trp = materialToName(item.getType());
-				replacer = replacer.replace(NAME, trp);
-			} else {
-				@SuppressWarnings("deprecation")
-				String translated = translationSection.get(item.getDurability());
-				if (translated != null) {
-					replacer = replacer.replace(NAME, translated);
-				} else {
-					replacer = replacer.replace(NAME, materialToName(item.getType()));
-				}
-			}
+			replacer.replace(NAME, getTranslatedItemName(c, item.getType(), item.getDurability()));
 		}
 		return replacer;
 	}
@@ -327,5 +328,37 @@ public class ChatPacketManager extends PacketHandler {
 
 	public Storage getStorage() {
 		return manager.getStorage();
+	}
+	
+	private List<String> getMaxLinesFromItem(ItemStack item){
+		List<String> lines = new ArrayList<>();
+		if(item.hasItemMeta()) {
+			ItemMeta meta = item.getItemMeta();
+			lines.add(meta.hasDisplayName() ? meta.getDisplayName() : getTranslatedItemName(getStorage(), item.getType(), item.getDurability()));
+			if(meta.hasEnchants()) {
+				meta.getEnchants().forEach((enchant, lvl) -> {
+					lines.add(ChatColor.RESET + Utils.getEnchantName(enchant) + " " + Utils.toRoman(lvl));
+				});
+			}
+			if(meta.hasLore())
+				lines.addAll(meta.getLore());
+		} else {
+			lines.add(getTranslatedItemName(getStorage(), item.getType(), item.getDurability()));
+		}
+		return lines;
+	}
+	
+	private static String getTranslatedItemName(Storage c, Material type, short d) {
+		HashMap<Short, String> translationSection = c.TRANSLATIONS.get(type.name());
+		if (translationSection == null) {
+			return materialToName(type);
+		} else {
+			String translated = translationSection.get(d);
+			if (translated != null) {
+				return translated;
+			} else {
+				return materialToName(type);
+			}
+		}
 	}
 }

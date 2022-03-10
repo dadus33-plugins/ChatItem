@@ -244,9 +244,10 @@ public class JSONManipulatorCurrent {
 		}
 
 		hover.add("value", new JsonPrimitive(oneLineTooltip.toString()));
-		for (JsonElement ob : use)
-			ob.getAsJsonObject().add("hoverEvent", hover);
-
+		if(!tooltip.isEmpty()) {
+			for (JsonElement ob : use)
+				ob.getAsJsonObject().add("hoverEvent", hover);
+		}
 		classicTooltip = use;
 
 		for (int i = 0; i < array.size(); ++i) {

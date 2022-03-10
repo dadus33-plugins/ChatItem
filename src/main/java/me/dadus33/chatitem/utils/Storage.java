@@ -21,7 +21,7 @@ public class Storage {
 	public final HashMap<String, HashMap<Short, String>> TRANSLATIONS = new HashMap<>();
 	public boolean COLOR_IF_ALREADY_COLORED, FORCE_ADD_AMOUNT, LET_MESSAGE_THROUGH, DENY_IF_NO_ITEM, DEBUG,
 			HAND_DISABLED, SHOW_NO_PERM_NORMAL, CHECK_UPDATE, SHOW_NO_PERM_COMMAND, PERMISSION_ENABLED;
-	public final String HAND_NAME, NAME_FORMAT, AMOUNT_FORMAT, MANAGER, PERMISSION_NAME;
+	public final String HAND_NAME, NAME_FORMAT, AMOUNT_FORMAT, MANAGER, PERMISSION_NAME, BUGGED_CLIENT_ACTION;
 	public final String NO_PERMISSION_MESSAGE, DENY_MESSAGE, RELOAD_MESSAGE, COOLDOWN_MESSAGE, LIMIT_MESSAGE;
 	public final String SECONDS, MINUTES, HOURS;
 	public final String JOIN_UPDATE_MESSAGE, JOIN_UPDATE_HOVER;
@@ -63,6 +63,7 @@ public class Storage {
 		HAND_DISABLED = conf.getBoolean("general.hand.disabled", false);
 		HAND_NAME = color(conf.getString("general.hand.name", "&b&l&o{display-name}&b&l&o's hand"));
 		HAND_TOOLTIP = conf.getStringList("general.hand.tooltip").stream().map(Storage::color).collect(Collectors.toList());
+		BUGGED_CLIENT_ACTION = conf.getString("general.bugged_client.action", "show_both");
 		BUGGED_CLIENTS_TOOLTIP = conf.getStringList("general.bugged_client.tooltip").stream().map(Storage::color).collect(Collectors.toList());
 		CHECK_UPDATE = conf.getBoolean("general.check-update", true);
 		DENY_MESSAGE = color(conf.getString("messages.deny-message", "&c&lYou have no item in hand!"));
