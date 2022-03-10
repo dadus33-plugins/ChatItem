@@ -168,34 +168,29 @@ public class ChatPacketManager extends PacketHandler {
 			builder.replace(topIndex - (name.length() + 6), topIndex, ""); // we remove both the name and the separator
 			// from the json string
 			String localJson = builder.toString();
-			ItemPlayer ip = ItemPlayer.getPlayer(p);
-			if (ip.getVersion().equals(Version.V1_7) && ip.getClientName().toLowerCase().contains("lunarclient")) {
-				String message;
-
-				if (ItemUtils.isEmpty(itemPlayer.getItemInHand()))
-					message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,
-							getStorage().HAND_NAME, getStorage().HAND_TOOLTIP, itemPlayer);
-				else
-					message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,
-							styleItem(itemPlayer.getItemInHand(), getStorage()), getStorage().BUGGED_CLIENTS_TOOLTIP,
-							itemPlayer);
-				if (!bUsesBaseComponents) {
-					ChatItem.debug("Use basic for 1.7 lunar");
-					packet.getChatComponents().write(0, jsonToChatComponent(message));
-				} else {
-					ChatItem.debug("Use baseComponent for 1.7 lunar");
-					packet.getSpecificModifier(BaseComponent[].class).write(0, ComponentSerializer.parse(message));
-				}
-				lastSentPacket = e.getPacket();
-				PacketUtils.sendPacket(p, lastSentPacket);
-				return;
-			} else
-				ChatItem.debug("Good client: " + ip.toString());
 
 			String message = null;
 			try {
 				if (!ItemUtils.isEmpty(itemPlayer.getItemInHand())) {
 					ItemStack copy = itemPlayer.getItemInHand().clone();
+
+					ItemPlayer ip = ItemPlayer.getPlayer(p);
+					if (ip.isBuggedClient()) {
+						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,
+								styleItem(copy, getStorage()), getStorage().BUGGED_CLIENTS_TOOLTIP, itemPlayer);
+						if (!bUsesBaseComponents) {
+							ChatItem.debug("Use basic for 1.7 lunar");
+							packet.getChatComponents().write(0, jsonToChatComponent(message));
+						} else {
+							ChatItem.debug("Use baseComponent for 1.7 lunar");
+							packet.getSpecificModifier(BaseComponent[].class).write(0,
+									ComponentSerializer.parse(message));
+						}
+						lastSentPacket = e.getPacket();
+						PacketUtils.sendPacket(p, lastSentPacket);
+						return;
+					}
+					ChatItem.debug("Good client: " + ip.toString());
 					if (copy.getType().name().contains("_BOOK")) { // filtering written books
 						BookMeta bm = (BookMeta) copy.getItemMeta();
 						bm.setPages(Collections.emptyList());
@@ -216,8 +211,7 @@ public class ChatPacketManager extends PacketHandler {
 						}
 					}
 					message = manager.getManipulator().parse(localJson, getStorage().PLACEHOLDERS, copy,
-							styleItem(copy, getStorage()),
-							ItemPlayer.getPlayer(itemPlayer).getProtocolVersion());
+							styleItem(copy, getStorage()), ItemPlayer.getPlayer(itemPlayer).getProtocolVersion());
 				} else {
 					if (!getStorage().HAND_DISABLED) {
 						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,

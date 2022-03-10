@@ -72,6 +72,10 @@ public class ItemPlayer {
 			this.protocolVersion = version.MAX_VER;
 	}
 	
+	public boolean isBuggedClient() {
+		return getVersion().equals(Version.V1_7) && getClientName().toLowerCase().contains("lunarclient");
+	}
+	
 	@Override
 	public String toString() {
 		return "ItemPlayer[uuid=" + uuid + ",name=" + (getPlayer() != null ? getPlayer().getName() : "-") + ",version=" + version.name() + ",protocol=" + protocolVersion + ",client=" + clientName + "]";

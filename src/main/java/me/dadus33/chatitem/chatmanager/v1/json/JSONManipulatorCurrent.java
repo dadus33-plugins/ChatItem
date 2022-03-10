@@ -27,7 +27,7 @@ import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Reflect;
 import me.dadus33.chatitem.utils.Version;
 
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({ "unchecked" })
 public class JSONManipulatorCurrent {
 
 	private static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
@@ -75,11 +75,14 @@ public class JSONManipulatorCurrent {
 		if ((itemTooltip = STACKS.get(p)) == null) {
 			JsonArray use = Translator.toJson(replacement); // We get the json representation of the old color
 															// formatting method
-			// There's no public clone method for JSONObjects so we need to parse them every time
+			// There's no public clone method for JSONObjects so we need to parse them every
+			// time
 			JsonObject hover = JsonParser.parseString("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
 
-			String jsonRep = stringifyItem(this, item, protocolVersion);// stringifyItem(item); // Get the JSON representation of the item (well, not really JSON, but
-													// rather a string representation of NBT data)
+			String jsonRep = stringifyItem(this, item, protocolVersion);// stringifyItem(item); // Get the JSON
+																		// representation of the item (well, not really
+																		// JSON, but
+			// rather a string representation of NBT data)
 			hover.addProperty("value", jsonRep);
 
 			JsonObject wrapper = new JsonObject(); // Create a wrapper object for the whole array
@@ -111,8 +114,7 @@ public class JSONManipulatorCurrent {
 					if (el != null) {
 						JsonArray jar = el.getAsJsonArray();
 						if (jar.size() != 0) {
-							jar = parseArray(jar);
-							o.add("extra", jar);
+							o.add("extra", parseArray(jar));
 						} else {
 							o.remove("extra");
 						}
@@ -124,8 +126,7 @@ public class JSONManipulatorCurrent {
 						if (el != null) {
 							JsonArray jar = el.getAsJsonArray();
 							if (jar.size() != 0) {
-								jar = parseArray(jar);
-								o.add("extra", jar);
+								o.add("extra", parseArray(jar));
 							} else {
 								o.remove("extra");
 							}
@@ -135,22 +136,16 @@ public class JSONManipulatorCurrent {
 
 				String msg = text.getAsString();
 				boolean isLast = false;
-				boolean done = false;
-				boolean fnd;
 				String[] splits;
 				for (String repls : replacements) {
-					if (done) {
-						break;
-					}
 					isLast = msg.endsWith(repls);
 					if (isLast) {
-						done = true;
 						msg = msg.concat(".");
+						break;
 					}
 				}
 				splits = msg.split(regex);
-				fnd = splits.length != 1;
-				if (fnd)
+				if (splits.length != 1) {
 					for (int j = 0; j < splits.length; ++j) {
 						boolean endDot = (j == splits.length - 1) && isLast;
 						if (!splits[j].isEmpty() && !endDot) {
@@ -163,7 +158,7 @@ public class JSONManipulatorCurrent {
 							rep.add(itemTooltip);
 						}
 					}
-				if (!fnd) {
+				} else {
 					rep.add(o);
 				}
 			} else {
@@ -173,40 +168,30 @@ public class JSONManipulatorCurrent {
 					if (array.get(i).isJsonArray()) {
 						JsonArray jar = array.get(i).getAsJsonArray();
 						if (jar.size() != 0) {
-							jar = parseArray(array.get(i).getAsJsonArray());
-							rep.set(i, jar);
+							rep.set(i, parseArray(array.get(i).getAsJsonArray()));
 						}
 					} else {
-
 						String msg = array.get(i).getAsString();
 						boolean isLast = false;
-						boolean done = false;
-						boolean fnd;
-						String[] splits;
 						for (String repls : replacements) {
-							if (done) {
-								break;
-							}
 							isLast = msg.endsWith(repls);
 							if (isLast) {
-								done = true;
 								msg = msg.concat(".");
+								break;
 							}
 						}
-						splits = msg.split(regex);
-						fnd = splits.length != 1;
-						if (fnd)
+						String[] splits = msg.split(regex);
+						if (splits.length != 1) {
 							for (int j = 0; j < splits.length; ++j) {
 								boolean endDot = (j == splits.length - 1) && isLast;
 								if (!splits[j].isEmpty() && !endDot) {
-									JsonElement fix = new JsonPrimitive(splits[j]);
-									rep.add(fix);
+									rep.add(new JsonPrimitive(splits[j]));
 								}
 								if (j != splits.length - 1) {
 									rep.add(itemTooltip);
 								}
 							}
-						if (!fnd) {
+						} else {
 							rep.add(array.get(i));
 						}
 					}
@@ -281,8 +266,7 @@ public class JSONManipulatorCurrent {
 					if (el != null) {
 						JsonArray jar = el.getAsJsonArray();
 						if (jar.size() != 0) {
-							jar = parseNoItemArray(jar);
-							o.add("extra", jar);
+							o.add("extra", parseNoItemArray(jar));
 						} else {
 							o.remove("extra");
 						}
@@ -294,8 +278,7 @@ public class JSONManipulatorCurrent {
 						if (el != null) {
 							JsonArray jar = el.getAsJsonArray();
 							if (jar.size() != 0) {
-								jar = parseNoItemArray(jar);
-								o.add("extra", jar);
+								o.add("extra", parseNoItemArray(jar));
 							} else {
 								o.remove("extra");
 							}
@@ -305,22 +288,15 @@ public class JSONManipulatorCurrent {
 
 				String msg = text.getAsString();
 				boolean isLast = false;
-				boolean done = false;
-				boolean fnd;
-				String[] splits;
 				for (String repls : replacements) {
-					if (done) {
-						break;
-					}
 					isLast = msg.endsWith(repls);
 					if (isLast) {
-						done = true;
 						msg = msg.concat(".");
+						break;
 					}
 				}
-				splits = msg.split(regex);
-				fnd = splits.length != 1;
-				if (fnd)
+				String[] splits = msg.split(regex);
+				if (splits.length != 1) {
 					for (int j = 0; j < splits.length; ++j) {
 						boolean endDot = (j == splits.length - 1) && isLast;
 						if (!splits[j].isEmpty() && !endDot) {
@@ -333,7 +309,7 @@ public class JSONManipulatorCurrent {
 							rep.addAll(use);
 						}
 					}
-				if (!fnd) {
+				} else {
 					rep.add(o);
 				}
 			} else {
@@ -343,43 +319,33 @@ public class JSONManipulatorCurrent {
 					if (array.get(i).isJsonArray()) {
 						JsonArray jar = array.get(i).getAsJsonArray();
 						if (jar.size() != 0) {
-							jar = parseNoItemArray(array.get(i).getAsJsonArray());
-							rep.set(i, jar);
+							rep.set(i, parseNoItemArray(array.get(i).getAsJsonArray()));
 						}
 					} else {
 
 						String msg = array.get(i).getAsString();
 						boolean isLast = false;
-						boolean done = false;
-						boolean fnd;
-						String[] splits;
 						for (String repls : replacements) {
-							if (done) {
-								break;
-							}
 							isLast = msg.endsWith(repls);
 							if (isLast) {
-								done = true;
 								msg = msg.concat(".");
+								break;
 							}
 						}
-						splits = msg.split(regex);
-						fnd = splits.length != 1;
-						if (fnd)
+						String[] splits = msg.split(regex);
+						if (splits.length != 1) {
 							for (int j = 0; j < splits.length; ++j) {
 								boolean endDot = (j == splits.length - 1) && isLast;
 								if (!splits[j].isEmpty() && !endDot) {
-									JsonElement fix = new JsonPrimitive(splits[j]);
-									rep.add(fix);
+									rep.add(new JsonPrimitive(splits[j]));
 								}
 								if (j != splits.length - 1) {
 									rep.addAll(use);
 								}
 							}
-						if (!fnd) {
+						} else {
 							rep.add(array.get(i));
 						}
-
 					}
 				}
 			}
@@ -418,8 +384,7 @@ public class JSONManipulatorCurrent {
 					}
 					JsonArray jar = el.getAsJsonArray();
 					if (jar.size() != 0) {
-						jar = parseNoItemArray(jar);
-						o.add("extra", jar);
+						o.add("extra", parseNoItemArray(jar));
 					} else {
 						o.remove("extra");
 					}
@@ -427,22 +392,15 @@ public class JSONManipulatorCurrent {
 
 				String msg = text.getAsString();
 				boolean isLast = false;
-				boolean done = false;
-				boolean fnd;
-				String[] splits;
 				for (String repls : replaces) {
-					if (done) {
-						break;
-					}
 					isLast = msg.endsWith(repls);
 					if (isLast) {
-						done = true;
 						msg = msg.concat(".");
+						break;
 					}
 				}
-				splits = msg.split(rgx);
-				fnd = splits.length != 1;
-				if (fnd)
+				String[] splits = msg.split(rgx);
+				if (splits.length != 1) {
 					for (int j = 0; j < splits.length; ++j) {
 						boolean endDot = (j == splits.length - 1) && isLast;
 						if (!splits[j].isEmpty() && !endDot) {
@@ -455,7 +413,7 @@ public class JSONManipulatorCurrent {
 							replacer.addAll(classicTooltip);
 						}
 					}
-				if (!fnd) {
+				} else {
 					replacer.add(o);
 				}
 			} else {
@@ -471,33 +429,25 @@ public class JSONManipulatorCurrent {
 					} else {
 						String msg = arr.get(i).getAsString();
 						boolean isLast = false;
-						boolean done = false;
-						boolean fnd;
-						String[] splits;
 						for (String repls : replaces) {
-							if (done) {
-								break;
-							}
 							isLast = msg.endsWith(repls);
 							if (isLast) {
-								done = true;
 								msg = msg.concat(".");
+								break;
 							}
 						}
-						splits = msg.split(rgx);
-						fnd = splits.length != 1;
-						if (fnd)
+						String[] splits = msg.split(rgx);
+						if (splits.length != 1) {
 							for (int j = 0; j < splits.length; ++j) {
 								boolean endDot = (j == splits.length - 1) && isLast;
 								if (!splits[j].isEmpty() && !endDot) {
-									JsonElement fix = new JsonPrimitive(splits[j]);
-									replacer.add(fix);
+									replacer.add(new JsonPrimitive(splits[j]));
 								}
 								if (j != splits.length - 1) {
 									replacer.addAll(classicTooltip);
 								}
 							}
-						if (!fnd) {
+						} else {
 							replacer.add(arr.get(i));
 						}
 					}
@@ -628,7 +578,8 @@ public class JSONManipulatorCurrent {
 	}
 
 	@SuppressWarnings({ "deprecation" })
-	public static String stringifyItem(JSONManipulatorCurrent j, ItemStack is, Version protocolVersion) throws Exception {
+	public static String stringifyItem(JSONManipulatorCurrent j, ItemStack is, Version protocolVersion)
+			throws Exception {
 		Object nmsStack = JSONManipulatorCurrent.AS_NMS_COPY.invoke(null, is);
 		Object nmsTag = JSONManipulatorCurrent.NBT_TAG_COMPOUND.newInstance();
 		JSONManipulatorCurrent.SAVE_NMS_ITEM_STACK_METHOD.invoke(nmsStack, nmsTag);
@@ -636,7 +587,8 @@ public class JSONManipulatorCurrent {
 		Map<String, Object> nmsMap = (Map<String, Object>) JSONManipulatorCurrent.MAP.get(nmsTag);
 		String id = nmsMap.get("id").toString().replace("\"", "");
 		Object realTag = nmsMap.get("tag");
-		if (JSONManipulatorCurrent.NBT_TAG_COMPOUND.isInstance(realTag)) { // We need to make sure this is indeed an NBTTagCompound
+		if (JSONManipulatorCurrent.NBT_TAG_COMPOUND.isInstance(realTag)) { // We need to make sure this is indeed an
+																			// NBTTagCompound
 			Map<String, Object> realMap = (Map<String, Object>) JSONManipulatorCurrent.MAP.get(realTag);
 			Set<Map.Entry<String, Object>> entrySet = realMap.entrySet();
 			for (Map.Entry<String, Object> entry : entrySet) {
@@ -644,12 +596,13 @@ public class JSONManipulatorCurrent {
 			}
 		}
 		// TODO check for ID remapping
-		//ItemRewriter.remapIds(Version.getVersion().MAX_VER, protocolVersion.MAX_VER, is);
+		// ItemRewriter.remapIds(Version.getVersion().MAX_VER, protocolVersion.MAX_VER,
+		// is);
 		StringBuilder sb = new StringBuilder("{id:");
 		sb.append("\"").append(id).append("\"").append(","); // Append the id
 		sb.append("Count:").append(is.getAmount()).append("b"); // Append the amount
-		
-		if(!tagMap.containsKey("Damage")) { // for new versions
+
+		if (!tagMap.containsKey("Damage")) { // for new versions
 			sb.append(",Damage:").append(is.getDurability()).append("s"); // Append the durability data
 		}
 		if (tagMap.isEmpty()) {
@@ -660,22 +613,18 @@ public class JSONManipulatorCurrent {
 		boolean first = true;
 		sb.append(",tag:{"); // Start of the tag
 		for (Map.Entry<String, String> entry : entrySet) {
-			if(!first)
+			if (!first)
 				sb.append(",");
 			first = false;
-			if(!entry.getKey().isEmpty())
+			if (!entry.getKey().isEmpty())
 				sb.append(entry.getKey()).append(":");
 			sb.append(cleanStr(entry.getValue()));
 		}
 		sb.append("}}"); // End of tag and end of item
 		return sb.toString();
 	}
-	
+
 	private static String cleanStr(String s) {
-		if(s.startsWith("'"))
-			return s.substring(1);
-		if(s.endsWith("'"))
-			return s.substring(0, s.length() - 1);
-		return s;
+		return s.startsWith("'") && s.endsWith("'") ? s.substring(1, s.length() - 1) : s;
 	}
 }

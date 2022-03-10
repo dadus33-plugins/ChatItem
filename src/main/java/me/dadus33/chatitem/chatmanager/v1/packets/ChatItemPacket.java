@@ -8,7 +8,6 @@ public class ChatItemPacket {
 	protected Object packet;
 	protected PacketType type;
 	protected boolean cancel = false;
-	protected PacketMetadata metaData = new PacketMetadata();
 	
 	public ChatItemPacket(PacketType type, Object packet, Player player) {
 		this.player = player;
@@ -50,9 +49,5 @@ public class ChatItemPacket {
 
 	public PacketContent getContent() {
 		return new PacketContent(this);
-	}
-	
-	public PacketMetadata getMetaData() {
-		return metaData;
 	}
 }
