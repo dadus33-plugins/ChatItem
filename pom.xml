@@ -108,9 +108,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.ProtocolSupport</groupId>
+            <groupId>io.shevchik</groupId>
             <artifactId>ProtocolSupport</artifactId>
-            <version>f34959c331</version>
+            <version>1.18.2-1-dev</version>
             <scope>provided</scope>
         </dependency>
 	    <dependency>
