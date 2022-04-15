@@ -1,31 +1,22 @@
 package me.dadus33.chatitem.utils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
-
+import me.dadus33.chatitem.ChatItem;
 import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 
-import me.dadus33.chatitem.ChatItem;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TreeMap;
 
-@SuppressWarnings("deprecation")
 public class Utils {
-	
-    private final static TreeMap<Integer, String> ROMAN_KEYS = new TreeMap<Integer, String>();
+
+    private final static TreeMap<Integer, String> ROMAN_KEYS = new TreeMap<>();
     private final static HashMap<String, String> ENCHANTS_NAMES = new HashMap<>();
 
     static {
@@ -75,58 +66,55 @@ public class Utils {
         ENCHANTS_NAMES.put("WATER_WORKER", "Aqua Affinity");
     }
 
-	@SuppressWarnings("unchecked")
-	public static List<Player> getOnlinePlayers() {
-		Object players = Bukkit.getOnlinePlayers();
-		if(players instanceof Player[])
-			return Arrays.asList((Player[]) players);
-		return new ArrayList<>((Collection<Player>) players);
-	}
+    public static List<Player> getOnlinePlayers() {
+        return new ArrayList<>(Bukkit.getOnlinePlayers());
+    }
 
     public static String toRoman(int number) {
-        int l =  ROMAN_KEYS.floorKey(number);
-        if ( number == l ) {
+        int l = ROMAN_KEYS.floorKey(number);
+        if (number == l) {
             return ROMAN_KEYS.get(number);
         }
         return ROMAN_KEYS.get(l) + toRoman(number - l);
     }
-    
+
+    @SuppressWarnings("deprecation")
     public static String getEnchantName(Enchantment enchant) {
-		String name = ENCHANTS_NAMES.get(enchant.getName());
-    	if(name == null) {
-    		
-    		ChatItem.getInstance().getLogger().warning("Unknow enchant " + enchant.getName() + ". Please report this to Elikill58.");
-    	}	
-    	return name;
+        String name = ENCHANTS_NAMES.get(enchant.getName());
+        if (name == null) {
+
+            ChatItem.getInstance().getLogger().warning("Unknown enchant " + enchant.getName() + ". Please report this to Elikill58.");
+        }
+        return name;
     }
-	
-	public static String getFromURL(String urlName) {
-		ChatItem pl = ChatItem.getInstance();
-		try {
-			URL url = new URL(urlName);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setUseCaches(true);
-			connection.setConnectTimeout(5000);
-			connection.setReadTimeout(5000);
-			connection.setRequestProperty("User-Agent", "ChatItem " + pl.getDescription().getVersion());
-			connection.setDoOutput(true);
-			connection.setRequestMethod("GET");
-			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			String content = "";
-			String input;
-			while ((input = br.readLine()) != null)
-				content = content + input;
-			br.close();
-			return content;
+
+    public static String getFromURL(String urlName) {
+        ChatItem pl = ChatItem.getInstance();
+        try {
+            URL url = new URL(urlName);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setUseCaches(true);
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            connection.setRequestProperty("User-Agent", "ChatItem " + pl.getDescription().getVersion());
+            connection.setDoOutput(true);
+            connection.setRequestMethod("GET");
+            BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder content = new StringBuilder();
+            String input;
+            while ((input = br.readLine()) != null)
+                content.append(input);
+            br.close();
+            return content.toString();
         } catch (SocketTimeoutException e) {
-        	pl.getLogger().info("Failed to access to " + urlName + " (Reason: timed out).");
+            pl.getLogger().info("Failed to access to " + urlName + " (Reason: timed out).");
         } catch (UnknownHostException | MalformedURLException e) {
-        	pl.getLogger().info("Could not use the internet connection to check for update or send stats");
+            pl.getLogger().info("Could not use the internet connection to check for update or send stats");
         } catch (ConnectException e) {
-        	pl.getLogger().warning("Cannot connect to " + urlName + " (Reason: " + e.getMessage() + ").");
+            pl.getLogger().warning("Cannot connect to " + urlName + " (Reason: " + e.getMessage() + ").");
         } catch (IOException e) {
-        	e.printStackTrace();
-		}
-		return null;
-	}
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
