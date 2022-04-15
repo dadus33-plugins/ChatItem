@@ -21,9 +21,7 @@ public class ChatItemTranslationNamer implements INamer {
 		if (translationSection != null) {
 			@SuppressWarnings("deprecation")
 			String translated = translationSection.get(item.getDurability());
-			if (translated != null) {
-				return translated;
-			}
+			return translated;
 		}
 		return null;
 	}

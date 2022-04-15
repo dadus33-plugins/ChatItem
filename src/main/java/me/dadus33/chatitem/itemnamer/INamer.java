@@ -30,7 +30,7 @@ public interface INamer {
 	 */
 	String getName(Player p, ItemStack item, Storage storage);
 	
-	public static enum Priority {
+	enum Priority {
 		MAJOR(4),
 		IMPORTANT(3),
 		MEDIUM(2),
@@ -39,7 +39,7 @@ public interface INamer {
 		
 		private final int priority;
 		
-		private Priority(int priority) {
+		Priority(int priority) {
 			this.priority = priority;
 		}
 		
@@ -48,7 +48,7 @@ public interface INamer {
 		}
 		
 		public static List<Priority> getOrderedPriorities() {
-			return Arrays.asList(values()).stream().sorted((p1, p2) -> p2.getPriority() - p1.getPriority()).collect(Collectors.toList());
+			return Arrays.stream(values()).sorted((p1, p2) -> p2.getPriority() - p1.getPriority()).collect(Collectors.toList());
 		}
 	}
 }

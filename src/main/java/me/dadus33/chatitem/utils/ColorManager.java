@@ -8,24 +8,24 @@ public class ColorManager {
 	public static String getColorString(String input) {
 		if(input == null || input.isEmpty())
 			return "";
-		String str = "";
+		StringBuilder str = new StringBuilder();
 		if(Version.getVersion().isNewerOrEquals(Version.V1_16) && input.startsWith("x")) { // x mean it's an hex
 			ChatItem.debug("Removing char x at begin: " + input.substring(1));
 			input = input.substring(1);
 			if(input.length() >= 6) { // at least hex
-				str += ChatColor.of("#" + input.substring(0, 6)); // get first hex color code
+				str.append(ChatColor.of("#" + input.substring(0, 6))); // get first hex color code
 				ChatItem.debug("Str with hex: " + str);
 				if(input.length() > 6) // if as another color code
-					str += getColorString(input.substring(6)); // get color for after
-				return str;
+					str.append(getColorString(input.substring(6))); // get color for after
+				return str.toString();
 			} else
 				ChatItem.debug("Low len: " + input.length());
 		} else
 			ChatItem.debug("1.15 - for : " + input);
 		// not hex
 		for(char c : input.toCharArray())
-			str += ChatColor.getByChar(c);
-		return str;
+			str.append(ChatColor.getByChar(c));
+		return str.toString();
 	}
 
 	public static ChatColor getColor(String input) {
