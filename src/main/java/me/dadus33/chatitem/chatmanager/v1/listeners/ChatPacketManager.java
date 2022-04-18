@@ -136,7 +136,7 @@ public class ChatPacketManager extends PacketHandler {
 			toReplace = SEPARATOR_STR;
 		if (toReplace == null) { // if the message doesn't contain the BELL separator, then it's certainly NOT a
 									// message we want to parse
-			ChatItem.debug("Not contains bell " + json);
+			ChatItem.debug("Not containing bell " + json);
 			return;
 		}
 		ChatItem.debug("Add packet meta to json: " + json);

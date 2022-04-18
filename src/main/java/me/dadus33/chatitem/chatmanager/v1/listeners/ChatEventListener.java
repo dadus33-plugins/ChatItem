@@ -162,13 +162,16 @@ public class ChatEventListener implements Listener {
 			StringJoiner msg = new StringJoiner(" ");
 			for(String part : s.split(" ")) {
 				if(part.equalsIgnoreCase(firstPlaceholder)) {
-					msg.add(firstPlaceholder + SEPARATOR + p.getName());
+					msg.add(firstPlaceholder);
+					msg.add(String.valueOf(SEPARATOR));
+					msg.add(p.getName());
 				} else {
 					msg.add(part);
 				}
 			}
 			e.setMessage(msg.toString());
 			e.setFormat(e.getFormat().replace(oldMsg, e.getMessage())); // set own message for plugin that already put the message into the format
+			ChatItem.debug("Message: " + e.getMessage() + ", format: " + e.getFormat());
 		} catch (Exception exc) {
 			exc.printStackTrace();
 		}

@@ -70,18 +70,22 @@ public class ChatItem extends JavaPlugin {
                 this.chatManager.add(new PacketEditingChatManager(this));
                 this.chatManager.add(new ChatListenerChatManager(this));
                 getLogger().info("Manager automatically chosen: " + getVisualChatManagers());
+                break;
             case "auto":
                 if (getPluginThatRequirePacket().stream().map(pm::getPlugin).anyMatch(Objects::nonNull) && Version.getVersion().isNewerThan(Version.V1_7))
                     this.chatManager.add(new PacketEditingChatManager(this));
                 else
                     this.chatManager.add(new ChatListenerChatManager(this));
                 getLogger().info("Manager automatically chosen: " + getVisualChatManagers());
+                break;
             case "packet":
                 this.chatManager.add(new PacketEditingChatManager(this));
                 getLogger().info("Manager chosen: " + getVisualChatManagers());
+                break;
             case "chat":
                 this.chatManager.add(new ChatListenerChatManager(this));
                 getLogger().info("Manager chosen: " + getVisualChatManagers());
+                break;
             default:
                 getLogger().severe("----- WARN -----");
                 getLogger().severe("Failed to find manager: " + managerName + ".");
@@ -89,6 +93,7 @@ public class ChatItem extends JavaPlugin {
                 getLogger().severe("Using default manager: chat.");
                 getLogger().severe("----- WARN -----");
                 this.chatManager.add(new ChatListenerChatManager(this));
+                break;
         }
 
         this.chatManager.forEach((cm) -> cm.load(this, getStorage()));
