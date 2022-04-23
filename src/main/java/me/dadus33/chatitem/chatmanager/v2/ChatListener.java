@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.hook.DiscordSrvSupport;
-import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.ColorManager;
 import me.dadus33.chatitem.utils.ItemUtils;
@@ -35,9 +34,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 @SuppressWarnings("deprecation")
 public class ChatListener implements Listener {
 
-	private final static String NAME = "{name}";
-	private final static String AMOUNT = "{amount}";
-	private final static String TIMES = "{times}";
 	private final static String LEFT = "{remaining}";
 	private final HashMap<String, Long> COOLDOWNS = new HashMap<>();
 	private ChatListenerChatManager manage;
@@ -205,7 +201,7 @@ public class ChatListener implements Listener {
 		}
 		ItemStack item = p.getItemInHand();
 		String itemName = ItemUtils.isEmpty(item) ? (c.HAND_DISABLED ? c.PLACEHOLDERS.get(0) : c.HAND_NAME)
-				: styleItem(p, item, c);
+				: ChatManager.styleItem(p, item, c);
 		String loggedMessage = msg.replace(ChatManager.SEPARATOR + "", itemName).replace("{name}", p.getName())
 				.replace("{display-name}", p.getDisplayName());
 		Bukkit.getConsoleSender().sendMessage(loggedMessage); // show in log
@@ -294,7 +290,7 @@ public class ChatListener implements Listener {
 
 	public void addItem(ComponentBuilder builder, Player to, Player origin, ItemStack item) {
 		if (!ItemUtils.isEmpty(item)) {
-			ComponentBuilder itemComponent = new ComponentBuilder(ChatListener.styleItem(to, item, getStorage()));
+			ComponentBuilder itemComponent = new ComponentBuilder(ChatManager.styleItem(to, item, getStorage()));
 			String itemJson = convertItemStackToJson(item);
 			itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
 			appendToComponentBuilder(builder, itemComponent.create());
@@ -322,25 +318,6 @@ public class ChatListener implements Listener {
 				handComp.append(handName.replace("{display-name}", origin.getDisplayName()));
 			appendToComponentBuilder(builder, handComp.create());
 		}
-	}
-
-	public static String styleItem(Player p, ItemStack item, Storage c) {
-		String replacer = c.NAME_FORMAT;
-		String amount = c.AMOUNT_FORMAT;
-
-		if (item.getAmount() == 1) {
-			if (c.FORCE_ADD_AMOUNT) {
-				amount = amount.replace(TIMES, "1");
-				replacer = replacer.replace(AMOUNT, amount);
-			} else {
-				replacer = replacer.replace(AMOUNT, "");
-			}
-		} else {
-			amount = amount.replace(TIMES, String.valueOf(item.getAmount()));
-			replacer = replacer.replace(AMOUNT, amount);
-		}
-		replacer = replacer.replace(NAME, NamerManager.getName(p, item, c));
-		return replacer;
 	}
 
 	@SuppressWarnings({ "unchecked" })

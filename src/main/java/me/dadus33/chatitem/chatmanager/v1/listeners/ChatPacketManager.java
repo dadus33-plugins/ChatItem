@@ -6,7 +6,6 @@ import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR_STR;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -21,11 +20,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.ItemPlayer;
+import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketHandler;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
+import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
@@ -36,10 +37,6 @@ import net.md_5.bungee.chat.ComponentSerializer;
 
 @SuppressWarnings("deprecation")
 public class ChatPacketManager extends PacketHandler {
-
-	private final static String NAME = "{name}";
-	private final static String AMOUNT = "{amount}";
-	private final static String TIMES = "{times}";
 
 	private Object lastSentPacket = null;
 	private Method serializerGetJson;
@@ -75,7 +72,8 @@ public class ChatPacketManager extends PacketHandler {
 														// version of minecraft
 			if (version.isNewerOrEquals(Version.V1_12)) {
 				try {
-					if (((Enum<?>) packet.getSpecificModifier(PacketUtils.getNmsClass("ChatMessageType", "network.chat.")).read(0))
+					if (((Enum<?>) packet
+							.getSpecificModifier(PacketUtils.getNmsClass("ChatMessageType", "network.chat.")).read(0))
 									.name().equals("GAME_INFO")) {
 						return; // It means it's an actionbar message, and we ain't intercepting those
 					}
@@ -134,8 +132,7 @@ public class ChatPacketManager extends PacketHandler {
 			toReplace = SEPARATOR;
 		if (json.lastIndexOf(SEPARATOR_STR) != -1)
 			toReplace = SEPARATOR_STR;
-		if (toReplace == null) { // if the message doesn't contain the BELL separator, then it's certainly NOT a
-									// message we want to parse
+		if (toReplace == null) { // if the message doesn't contain the BELL separator
 			ChatItem.debug("Not containing bell " + json);
 			return;
 		}
@@ -179,17 +176,17 @@ public class ChatPacketManager extends PacketHandler {
 					if (ItemPlayer.getPlayer(p).isBuggedClient()) {
 						String act = getStorage().BUGGED_CLIENT_ACTION;
 						List<String> tooltip;// = act.equalsIgnoreCase("nothing") ? new ArrayList<>() : null;
-						if(act.equalsIgnoreCase("tooltip"))
+						if (act.equalsIgnoreCase("tooltip"))
 							tooltip = getStorage().BUGGED_CLIENTS_TOOLTIP;
-						else if(act.equalsIgnoreCase("item"))
-							tooltip = getMaxLinesFromItem(copy);
-						else if(act.equalsIgnoreCase("show_both")) {
-							tooltip = getMaxLinesFromItem(copy);
+						else if (act.equalsIgnoreCase("item"))
+							tooltip = getMaxLinesFromItem(p, copy);
+						else if (act.equalsIgnoreCase("show_both")) {
+							tooltip = getMaxLinesFromItem(p, copy);
 							tooltip.addAll(getStorage().BUGGED_CLIENTS_TOOLTIP);
 						} else
 							tooltip = new ArrayList<>();
 						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,
-								styleItem(copy, getStorage()), tooltip, itemPlayer);
+								ChatManager.styleItem(p, copy, getStorage()), tooltip, itemPlayer);
 						if (!bUsesBaseComponents) {
 							ChatItem.debug("Use basic for 1.7 lunar");
 							packet.getChatComponents().write(0, jsonToChatComponent(message));
@@ -222,7 +219,7 @@ public class ChatPacketManager extends PacketHandler {
 						}
 					}
 					message = manager.getManipulator().parse(localJson, getStorage().PLACEHOLDERS, copy,
-							styleItem(copy, getStorage()), ItemPlayer.getPlayer(itemPlayer).getProtocolVersion());
+							ChatManager.styleItem(p, copy, getStorage()), ItemPlayer.getPlayer(itemPlayer).getProtocolVersion());
 				} else {
 					if (!getStorage().HAND_DISABLED) {
 						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,
@@ -254,58 +251,6 @@ public class ChatPacketManager extends PacketHandler {
 		return null;
 	}
 
-	public static String styleItem(ItemStack item, Storage c) {
-		String replacer = c.NAME_FORMAT;
-		String amount = c.AMOUNT_FORMAT;
-		boolean dname = item.hasItemMeta() && item.getItemMeta().hasDisplayName();
-
-		if (item.getAmount() == 1) {
-			if (c.FORCE_ADD_AMOUNT) {
-				amount = amount.replace(TIMES, "1");
-				replacer = replacer.replace(AMOUNT, amount);
-			} else {
-				replacer = replacer.replace(AMOUNT, "");
-			}
-		} else {
-			amount = amount.replace(TIMES, String.valueOf(item.getAmount()));
-			replacer = replacer.replace(AMOUNT, amount);
-		}
-		if (dname) {
-			String trp = item.getItemMeta().getDisplayName();
-			if (c.COLOR_IF_ALREADY_COLORED) {
-				replacer = replacer.replace(NAME, ChatColor.stripColor(trp));
-			} else {
-				replacer = replacer.replace(NAME, trp);
-			}
-		} else {
-			replacer = replacer.replace(NAME, getTranslatedItemName(c, item.getType(), item.getDurability()));
-		}
-		return replacer;
-	}
-
-	private static String materialToName(Material m) {
-		if (m.equals(Material.TNT)) {
-			return "TNT";
-		}
-		String orig = m.toString().toLowerCase();
-		String[] splits = orig.split("_");
-		StringBuilder sb = new StringBuilder(orig.length());
-		int pos = 0;
-		for (String split : splits) {
-			sb.append(split);
-			int loc = sb.lastIndexOf(split);
-			char charLoc = sb.charAt(loc);
-			if (!(split.equalsIgnoreCase("of") || split.equalsIgnoreCase("and") || split.equalsIgnoreCase("with")
-					|| split.equalsIgnoreCase("on")))
-				sb.setCharAt(loc, Character.toUpperCase(charLoc));
-			if (pos != splits.length - 1)
-				sb.append(' ');
-			++pos;
-		}
-
-		return sb.toString();
-	}
-
 	private void stripData(ItemStack i) {
 		if (i == null) {
 			return;
@@ -327,36 +272,23 @@ public class ChatPacketManager extends PacketHandler {
 	public Storage getStorage() {
 		return manager.getStorage();
 	}
-	
-	private List<String> getMaxLinesFromItem(ItemStack item){
+
+	private List<String> getMaxLinesFromItem(Player p, ItemStack item) {
 		List<String> lines = new ArrayList<>();
-		if(item.hasItemMeta()) {
+		if (item.hasItemMeta()) {
 			ItemMeta meta = item.getItemMeta();
-			lines.add(meta.hasDisplayName() ? meta.getDisplayName() : getTranslatedItemName(getStorage(), item.getType(), item.getDurability()));
-			if(meta.hasEnchants()) {
+			lines.add(meta.hasDisplayName() ? meta.getDisplayName()
+					: NamerManager.getName(p, item, getStorage()));
+			if (meta.hasEnchants()) {
 				meta.getEnchants().forEach((enchant, lvl) -> {
 					lines.add(ChatColor.RESET + Utils.getEnchantName(enchant) + " " + Utils.toRoman(lvl));
 				});
 			}
-			if(meta.hasLore())
+			if (meta.hasLore())
 				lines.addAll(meta.getLore());
 		} else {
-			lines.add(getTranslatedItemName(getStorage(), item.getType(), item.getDurability()));
+			lines.add(NamerManager.getName(p, item, getStorage()));
 		}
 		return lines;
-	}
-	
-	private static String getTranslatedItemName(Storage c, Material type, short d) {
-		HashMap<Short, String> translationSection = c.TRANSLATIONS.get(type.name());
-		if (translationSection == null) {
-			return materialToName(type);
-		} else {
-			String translated = translationSection.get(d);
-			if (translated != null) {
-				return translated;
-			} else {
-				return materialToName(type);
-			}
-		}
 	}
 }
