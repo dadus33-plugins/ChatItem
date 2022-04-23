@@ -63,4 +63,33 @@ public abstract class ChatManager {
 		}
 		return replacer;
 	}
+
+	public static String calculateTime(long seconds) {
+		Storage c = ChatItem.getInstance().getStorage();
+		if (seconds < 60) {
+			return seconds + c.SECONDS;
+		}
+		if (seconds < 3600) {
+			StringBuilder builder = new StringBuilder();
+			int minutes = (int) seconds / 60;
+			builder.append(minutes).append(c.MINUTES);
+			int secs = (int) seconds - minutes * 60;
+			if (secs != 0) {
+				builder.append(" ").append(secs).append(c.SECONDS);
+			}
+			return builder.toString();
+		}
+		StringBuilder builder = new StringBuilder();
+		int hours = (int) seconds / 3600;
+		builder.append(hours).append(c.HOURS);
+		int minutes = (int) (seconds / 60) - (hours * 60);
+		if (minutes != 0) {
+			builder.append(" ").append(minutes).append(c.MINUTES);
+		}
+		int secs = (int) (seconds - ((seconds / 60) * 60));
+		if (secs != 0) {
+			builder.append(" ").append(secs).append(c.SECONDS);
+		}
+		return builder.toString();
+	}
 }

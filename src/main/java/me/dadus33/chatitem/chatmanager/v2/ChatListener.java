@@ -76,34 +76,6 @@ public class ChatListener implements Listener {
 		return manage.getStorage();
 	}
 
-	private String calculateTime(long seconds) {
-		if (seconds < 60) {
-			return seconds + getStorage().SECONDS;
-		}
-		if (seconds < 3600) {
-			StringBuilder builder = new StringBuilder();
-			int minutes = (int) seconds / 60;
-			builder.append(minutes).append(getStorage().MINUTES);
-			int secs = (int) seconds - minutes * 60;
-			if (secs != 0) {
-				builder.append(" ").append(secs).append(getStorage().SECONDS);
-			}
-			return builder.toString();
-		}
-		StringBuilder builder = new StringBuilder();
-		int hours = (int) seconds / 3600;
-		builder.append(hours).append(getStorage().HOURS);
-		int minutes = (int) (seconds / 60) - (hours * 60);
-		if (minutes != 0) {
-			builder.append(" ").append(minutes).append(getStorage().MINUTES);
-		}
-		int secs = (int) (seconds - ((seconds / 60) * 60));
-		if (secs != 0) {
-			builder.append(" ").append(secs).append(getStorage().SECONDS);
-		}
-		return builder.toString();
-	}
-
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onChat(AsyncPlayerChatEvent e) {
 		Storage c = getStorage();
@@ -175,7 +147,7 @@ public class ChatListener implements Listener {
 					}
 					if (!c.COOLDOWN_MESSAGE.isEmpty()) {
 						long left = (start + c.COOLDOWN) - current;
-						p.sendMessage(c.COOLDOWN_MESSAGE.replace(LEFT, calculateTime(left)));
+						p.sendMessage(c.COOLDOWN_MESSAGE.replace(LEFT, ChatManager.calculateTime(left)));
 					}
 					return;
 				}
@@ -186,12 +158,18 @@ public class ChatListener implements Listener {
 		String format = e.getFormat();
 		String msg, defMsg = e.getMessage();
 		for (String rep : c.PLACEHOLDERS) {
-			if (hasv1)
-				defMsg = defMsg.replace(rep + ChatManager.SEPARATOR + p.getName(), ChatManager.SEPARATOR + ""); // remove
-																												// v1
-																												// char
+			if (hasv1) // remove v1 char
+				defMsg = defMsg.replace(rep + ChatManager.SEPARATOR + p.getName(), ChatManager.SEPARATOR + "");
 			else
 				defMsg = defMsg.replace(rep, ChatManager.SEPARATOR + "");
+		}
+		if ((defMsg.length() - defMsg.replace(ChatManager.SEPARATOR + "", "").length()) > getStorage().LIMIT) {
+			e.setCancelled(true);
+			if (getStorage().LIMIT_MESSAGE.isEmpty()) {
+				return;
+			}
+			p.sendMessage(getStorage().LIMIT_MESSAGE);
+			return;
 		}
 		if (format.contains("%1$s") || format.contains("%2$s")) {
 			msg = (format.contains("%2$s") ? String.format(format, p.getDisplayName(), defMsg)

@@ -16,6 +16,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.utils.Storage;
 
@@ -31,34 +32,6 @@ public class ChatEventListener implements Listener {
 
 	public Storage getStorage() {
 		return this.manage.getStorage();
-	}
-
-	private String calculateTime(long seconds) {
-		if (seconds < 60) {
-			return seconds + getStorage().SECONDS;
-		}
-		if (seconds < 3600) {
-			StringBuilder builder = new StringBuilder();
-			int minutes = (int) seconds / 60;
-			builder.append(minutes).append(getStorage().MINUTES);
-			int secs = (int) seconds - minutes * 60;
-			if (secs != 0) {
-				builder.append(" ").append(secs).append(getStorage().SECONDS);
-			}
-			return builder.toString();
-		}
-		StringBuilder builder = new StringBuilder();
-		int hours = (int) seconds / 3600;
-		builder.append(hours).append(getStorage().HOURS);
-		int minutes = (int) (seconds / 60) - (hours * 60);
-		if (minutes != 0) {
-			builder.append(" ").append(minutes).append(getStorage().MINUTES);
-		}
-		int secs = (int) (seconds - ((seconds / 60) * 60));
-		if (secs != 0) {
-			builder.append(" ").append(secs).append(getStorage().SECONDS);
-		}
-		return builder.toString();
 	}
 
 	private int countOccurrences(String findStr, String str) {
@@ -135,7 +108,7 @@ public class ChatEventListener implements Listener {
 					}
 					if (!getStorage().COOLDOWN_MESSAGE.isEmpty()) {
 						long left = (start + getStorage().COOLDOWN) - current;
-						p.sendMessage(getStorage().COOLDOWN_MESSAGE.replace(LEFT, calculateTime(left)));
+						p.sendMessage(getStorage().COOLDOWN_MESSAGE.replace(LEFT, ChatManager.calculateTime(left)));
 					}
 					ChatItem.debug("(v1) Cooldown");
 					return;
@@ -146,9 +119,7 @@ public class ChatEventListener implements Listener {
 		for (String placeholder : getStorage().PLACEHOLDERS) {
 			s = s.replace(placeholder, firstPlaceholder);
 		}
-		int occurrences = countOccurrences(firstPlaceholder, s);
-
-		if (occurrences > getStorage().LIMIT) {
+		if ((s.length() - s.replace(firstPlaceholder, "").length()) > getStorage().LIMIT) {
 			e.setCancelled(true);
 			if (getStorage().LIMIT_MESSAGE.isEmpty()) {
 				return;
@@ -246,7 +217,7 @@ public class ChatEventListener implements Listener {
 					}
 					if (!getStorage().COOLDOWN_MESSAGE.isEmpty()) {
 						long left = (start + getStorage().COOLDOWN) - current;
-						p.sendMessage(getStorage().COOLDOWN_MESSAGE.replace(LEFT, calculateTime(left)));
+						p.sendMessage(getStorage().COOLDOWN_MESSAGE.replace(LEFT, ChatManager.calculateTime(left)));
 					}
 					return;
 				}
