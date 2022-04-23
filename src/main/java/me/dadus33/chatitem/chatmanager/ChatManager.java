@@ -1,7 +1,11 @@
 package me.dadus33.chatitem.chatmanager;
 
+import java.util.HashMap;
+
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
@@ -10,30 +14,32 @@ import me.dadus33.chatitem.utils.Storage;
 
 public abstract class ChatManager {
 
-	private final static String NAME = "{name}";
-	private final static String AMOUNT = "{amount}";
-	private final static String TIMES = "{times}";
+	public final static HashMap<String, Long> COOLDOWNS = new HashMap<>();
+	public final static String NAME = "{name}";
+	public final static String AMOUNT = "{amount}";
+	public final static String TIMES = "{times}";
+	public final static String LEFT = "{remaining}";
 	public final static char SEPARATOR = ((char) 0x0007);
 	public final static String SEPARATOR_STR = "\\u0007";
-	
+
 	protected Storage s;
-	
+
 	public ChatManager() {
-		
+
 	}
-	
+
 	public abstract String getName();
-	
+
 	public abstract String getId();
-	
+
 	public Storage getStorage() {
 		return s;
 	}
-	
+
 	public void load(ChatItem pl, Storage s) {
 		this.s = s;
 	}
-	
+
 	public abstract void unload(ChatItem pl);
 
 	public static String styleItem(Player p, ItemStack item, Storage c) {
@@ -91,5 +97,50 @@ public abstract class ChatManager {
 			builder.append(" ").append(secs).append(c.SECONDS);
 		}
 		return builder.toString();
+	}
+
+	public static boolean canShowItem(Player p, ItemStack item, Cancellable e) {
+		Storage c = ChatItem.getInstance().getStorage();
+		if (c.PERMISSION_ENABLED && !p.hasPermission(c.PERMISSION_NAME)) {
+			if (!c.LET_MESSAGE_THROUGH) {
+				e.setCancelled(true);
+			}
+			if (!c.NO_PERMISSION_MESSAGE.isEmpty() && c.SHOW_NO_PERM_NORMAL) {
+				p.sendMessage(c.NO_PERMISSION_MESSAGE);
+			}
+			return false;
+		}
+		if (item.getType().equals(Material.AIR)) {
+			if (c.DENY_IF_NO_ITEM) {
+				e.setCancelled(true);
+				if (!c.DENY_MESSAGE.isEmpty())
+					p.sendMessage(c.DENY_MESSAGE);
+				return false;
+			}
+			if (c.HAND_DISABLED) {
+				return false;
+			}
+		}
+		if (c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
+			if (COOLDOWNS.containsKey(p.getName())) {
+				long start = COOLDOWNS.get(p.getName());
+				long current = System.currentTimeMillis() / 1000;
+				long elapsed = current - start;
+				if (elapsed >= c.COOLDOWN) {
+					COOLDOWNS.remove(p.getName());
+				} else {
+					if (!c.LET_MESSAGE_THROUGH) {
+						e.setCancelled(true);
+					}
+					if (!c.COOLDOWN_MESSAGE.isEmpty()) {
+						long left = (start + c.COOLDOWN) - current;
+						p.sendMessage(c.COOLDOWN_MESSAGE.replace(LEFT, ChatManager.calculateTime(left)));
+					}
+					ChatItem.debug("(v1) Cooldown");
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 }

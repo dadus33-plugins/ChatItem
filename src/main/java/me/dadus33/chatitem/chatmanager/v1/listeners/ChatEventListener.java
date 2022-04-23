@@ -2,11 +2,9 @@ package me.dadus33.chatitem.chatmanager.v1.listeners;
 
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
 
-import java.util.HashMap;
 import java.util.StringJoiner;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,8 +20,6 @@ import me.dadus33.chatitem.utils.Storage;
 
 public class ChatEventListener implements Listener {
 
-	private final static String LEFT = "{remaining}";
-	private final HashMap<String, Long> COOLDOWNS = new HashMap<>();
 	private final PacketEditingChatManager manage;
 
 	public ChatEventListener(PacketEditingChatManager manage) {
@@ -32,21 +28,6 @@ public class ChatEventListener implements Listener {
 
 	public Storage getStorage() {
 		return this.manage.getStorage();
-	}
-
-	private int countOccurrences(String findStr, String str) {
-		int lastIndex = 0;
-		int count = 0;
-		while (lastIndex != -1) {
-
-			lastIndex = str.indexOf(findStr, lastIndex);
-
-			if (lastIndex != -1) {
-				count++;
-				lastIndex += findStr.length();
-			}
-		}
-		return count;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -75,46 +56,8 @@ public class ChatEventListener implements Listener {
 
 		Player p = e.getPlayer();
 
-		if (getStorage().PERMISSION_ENABLED && !p.hasPermission(getStorage().PERMISSION_NAME)) {
-			if (!getStorage().LET_MESSAGE_THROUGH) {
-				e.setCancelled(true);
-			}
-			if (!getStorage().NO_PERMISSION_MESSAGE.isEmpty() && getStorage().SHOW_NO_PERM_NORMAL) {
-				p.sendMessage(getStorage().NO_PERMISSION_MESSAGE);
-			}
+		if(!ChatManager.canShowItem(p, p.getItemInHand(), e))
 			return;
-		}
-		if (p.getItemInHand().getType().equals(Material.AIR)) {
-			if (getStorage().DENY_IF_NO_ITEM) {
-				e.setCancelled(true);
-				if (!getStorage().DENY_MESSAGE.isEmpty())
-					e.getPlayer().sendMessage(getStorage().DENY_MESSAGE);
-				return;
-			}
-			if (getStorage().HAND_DISABLED) {
-				return;
-			}
-		}
-		if (getStorage().COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
-			if (COOLDOWNS.containsKey(p.getName())) {
-				long start = COOLDOWNS.get(p.getName());
-				long current = System.currentTimeMillis() / 1000;
-				long elapsed = current - start;
-				if (elapsed >= getStorage().COOLDOWN) {
-					COOLDOWNS.remove(p.getName());
-				} else {
-					if (!getStorage().LET_MESSAGE_THROUGH) {
-						e.setCancelled(true);
-					}
-					if (!getStorage().COOLDOWN_MESSAGE.isEmpty()) {
-						long left = (start + getStorage().COOLDOWN) - current;
-						p.sendMessage(getStorage().COOLDOWN_MESSAGE.replace(LEFT, ChatManager.calculateTime(left)));
-					}
-					ChatItem.debug("(v1) Cooldown");
-					return;
-				}
-			}
-		}
 		String s = e.getMessage(), firstPlaceholder = getStorage().PLACEHOLDERS.get(0);
 		for (String placeholder : getStorage().PLACEHOLDERS) {
 			s = s.replace(placeholder, firstPlaceholder);
@@ -145,7 +88,7 @@ public class ChatEventListener implements Listener {
 			exc.printStackTrace();
 		}
 		if (!p.hasPermission("chatitem.ignore-cooldown")) {
-			COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
+			ChatManager.COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
 		}
 	}
 
@@ -184,53 +127,14 @@ public class ChatEventListener implements Listener {
 			return;
 		}
 
-		if (!p.hasPermission("chatitem.use")) {
-			if (!getStorage().NO_PERMISSION_MESSAGE.isEmpty() && getStorage().SHOW_NO_PERM_COMMAND) {
-				p.sendMessage(getStorage().NO_PERMISSION_MESSAGE);
-			}
-			e.setCancelled(true);
+		if(!ChatManager.canShowItem(p, p.getItemInHand(), e))
 			return;
-		}
-
-		if (e.getPlayer().getItemInHand().getType().equals(Material.AIR)) {
-			if (getStorage().DENY_IF_NO_ITEM) {
-				e.setCancelled(true);
-				if (!getStorage().DENY_MESSAGE.isEmpty()) {
-					e.getPlayer().sendMessage(getStorage().DENY_MESSAGE);
-				}
-			}
-			if (getStorage().HAND_DISABLED) {
-				return;
-			}
-		}
-
-		if (getStorage().COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
-			if (COOLDOWNS.containsKey(p.getName())) {
-				long start = COOLDOWNS.get(p.getName());
-				long current = System.currentTimeMillis() / 1000;
-				long elapsed = current - start;
-				if (elapsed >= getStorage().COOLDOWN) {
-					COOLDOWNS.remove(p.getName());
-				} else {
-					if (!getStorage().LET_MESSAGE_THROUGH) {
-						e.setCancelled(true);
-					}
-					if (!getStorage().COOLDOWN_MESSAGE.isEmpty()) {
-						long left = (start + getStorage().COOLDOWN) - current;
-						p.sendMessage(getStorage().COOLDOWN_MESSAGE.replace(LEFT, ChatManager.calculateTime(left)));
-					}
-					return;
-				}
-			}
-		}
 
 		String s = e.getMessage();
 		for (String placeholder : getStorage().PLACEHOLDERS) {
 			s = s.replace(placeholder, getStorage().PLACEHOLDERS.get(0));
 		}
-		int occurrences = countOccurrences(getStorage().PLACEHOLDERS.get(0), s);
-
-		if (occurrences > getStorage().LIMIT) {
+		if ((s.length() - s.replace(getStorage().PLACEHOLDERS.get(0), "").length()) > getStorage().LIMIT) {
 			e.setCancelled(true);
 			if (getStorage().LIMIT_MESSAGE.isEmpty()) {
 				return;
@@ -243,7 +147,7 @@ public class ChatEventListener implements Listener {
 		sb.append(SEPARATOR).append(e.getPlayer().getName());
 		e.setMessage(sb.toString());
 		if (!p.hasPermission("chatitem.ignore-cooldown")) {
-			COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
+			ChatManager.COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
 		}
 	}
 }

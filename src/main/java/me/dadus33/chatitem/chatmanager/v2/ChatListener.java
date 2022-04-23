@@ -3,11 +3,9 @@ package me.dadus33.chatitem.chatmanager.v2;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -34,8 +32,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 @SuppressWarnings("deprecation")
 public class ChatListener implements Listener {
 
-	private final static String LEFT = "{remaining}";
-	private final HashMap<String, Long> COOLDOWNS = new HashMap<>();
 	private ChatListenerChatManager manage;
 	private Method saveMethod;
 	private boolean shouldUseAppendMethod = false;
@@ -114,46 +110,8 @@ public class ChatListener implements Listener {
 			ChatItem.debug("(v2) Can't found placeholder in: " + e.getMessage() + " > " + PlayerNamerManager.getPlayerNamer().getName(p));
 			return;
 		}
-		if (c.PERMISSION_ENABLED && !p.hasPermission(c.PERMISSION_NAME)) {
-			if (!getStorage().LET_MESSAGE_THROUGH) {
-				e.setCancelled(true);
-			}
-			if (!c.NO_PERMISSION_MESSAGE.isEmpty() && c.SHOW_NO_PERM_NORMAL) {
-				p.sendMessage(c.NO_PERMISSION_MESSAGE);
-			}
+		if(!ChatManager.canShowItem(p, p.getItemInHand(), e))
 			return;
-		}
-		if (p.getItemInHand().getType().equals(Material.AIR)) {
-			if (c.DENY_IF_NO_ITEM) {
-				e.setCancelled(true);
-				if (!c.DENY_MESSAGE.isEmpty())
-					e.getPlayer().sendMessage(c.DENY_MESSAGE);
-				return;
-			}
-			if (c.HAND_DISABLED) {
-				return;
-			}
-		}
-		if (c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) { // use cooldown
-			if (COOLDOWNS.containsKey(p.getName())) {
-				long start = COOLDOWNS.get(p.getName());
-				long current = System.currentTimeMillis() / 1000;
-				long elapsed = current - start;
-				if (elapsed >= getStorage().COOLDOWN) {
-					COOLDOWNS.remove(p.getName());
-				} else {
-					if (!c.LET_MESSAGE_THROUGH) {
-						e.setCancelled(true);
-					}
-					if (!c.COOLDOWN_MESSAGE.isEmpty()) {
-						long left = (start + c.COOLDOWN) - current;
-						p.sendMessage(c.COOLDOWN_MESSAGE.replace(LEFT, ChatManager.calculateTime(left)));
-					}
-					return;
-				}
-			}
-			COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
-		}
 		e.setCancelled(true);
 		String format = e.getFormat();
 		String msg, defMsg = e.getMessage();
