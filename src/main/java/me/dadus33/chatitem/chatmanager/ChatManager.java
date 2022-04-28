@@ -1,14 +1,17 @@
 package me.dadus33.chatitem.chatmanager;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.hook.EcoEnchantsSupport;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.utils.Storage;
 
@@ -41,6 +44,24 @@ public abstract class ChatManager {
 	}
 
 	public abstract void unload(ChatItem pl);
+	
+	@SuppressWarnings("deprecation")
+	public static ItemStack getUsableItem(Player p) {
+		ItemStack item = p.getItemInHand().clone();
+		if(ChatItem.ecoEnchantsSupport) {
+			List<String> addLore = EcoEnchantsSupport.getLores(item);
+			if(!addLore.isEmpty()) {
+				ItemMeta meta = item.getItemMeta();
+				List<String> lores = meta.getLore();
+				for(int i = 0; i < addLore.size(); i++)
+					lores.add(i, addLore.get(i));
+				
+				meta.setLore(lores);
+				item.setItemMeta(meta);
+			}
+		}
+		return item;
+	}
 
 	public static String styleItem(Player p, ItemStack item, Storage c) {
 		String replacer = c.NAME_FORMAT;

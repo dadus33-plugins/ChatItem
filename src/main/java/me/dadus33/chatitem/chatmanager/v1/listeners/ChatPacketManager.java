@@ -35,7 +35,6 @@ import me.dadus33.chatitem.utils.Version;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-@SuppressWarnings("deprecation")
 public class ChatPacketManager extends PacketHandler {
 
 	private Object lastSentPacket = null;
@@ -170,8 +169,9 @@ public class ChatPacketManager extends PacketHandler {
 
 			String message = null;
 			try {
-				if (!ItemUtils.isEmpty(itemPlayer.getItemInHand())) {
-					ItemStack copy = itemPlayer.getItemInHand().clone();
+				ItemStack item = ChatManager.getUsableItem(p);
+				if (!ItemUtils.isEmpty(item)) {
+					ItemStack copy = item.clone();
 
 					if (ItemPlayer.getPlayer(p).isBuggedClient()) {
 						String act = getStorage().BUGGED_CLIENT_ACTION;
@@ -209,8 +209,8 @@ public class ChatPacketManager extends PacketHandler {
 								BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
 								if (bsm.hasBlockState()) {
 									ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
-									for (ItemStack item : sb.getInventory()) {
-										stripData(item);
+									for (ItemStack itemInv : sb.getInventory()) {
+										stripData(itemInv);
 									}
 									bsm.setBlockState(sb);
 								}

@@ -135,7 +135,7 @@ public class ChatListener implements Listener {
 		} else {
 			msg = format.replace(e.getMessage(), defMsg);
 		}
-		ItemStack item = p.getItemInHand();
+		ItemStack item = ChatManager.getUsableItem(p);
 		String itemName = ItemUtils.isEmpty(item) ? (c.HAND_DISABLED ? c.PLACEHOLDERS.get(0) : c.HAND_NAME)
 				: ChatManager.styleItem(p, item, c);
 		String loggedMessage = msg.replace(ChatManager.SEPARATOR + "", itemName).replace("{name}", p.getName())

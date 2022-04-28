@@ -28,7 +28,7 @@ import java.util.*;
 public class ChatItem extends JavaPlugin {
 
     public final static int CFG_VER = 13;
-    public static boolean discordSrvSupport = false, hasNewVersion = false;
+    public static boolean discordSrvSupport = false, ecoEnchantsSupport = false, hasNewVersion = false;
     private static ChatItem instance;
     private final String brandChannelName = Version.getVersion().isNewerOrEquals(Version.V1_13) ? "minecraft:brand" : "MC|Brand";
     private final List<ChatManager> chatManager = new ArrayList<>();
@@ -129,10 +129,19 @@ public class ChatItem extends JavaPlugin {
         //Initialize Log4J filter (remove ugly console messages)
         filter = new Log4jFilter(storage);
 
+        StringJoiner plugins = new StringJoiner(", ");
         if (pm.getPlugin("DiscordSRV") != null) {
             discordSrvSupport = true;
-            getLogger().info("Load DiscordSRV support.");
+            plugins.add("DiscordSRV");
         }
+
+        if (pm.getPlugin("EcoEnchants") != null) {
+            ecoEnchantsSupport = true;
+            plugins.add("EcoEnchants");
+        }
+        if(plugins.length() > 0)
+        	getLogger().info("Load " + plugins.toString() + " support.");
+        
 
         getServer().getMessenger().registerIncomingPluginChannel(this, brandChannelName, (chan, p, msg) -> {
             String client = new String(msg);

@@ -143,6 +143,12 @@
             <version>1.24.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.willfp</groupId>
+            <artifactId>EcoEnchants</artifactId>
+            <version>8.57.2</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

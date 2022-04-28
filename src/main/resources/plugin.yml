@@ -2,7 +2,7 @@ name: ChatItem
 main: me.dadus33.chatitem.ChatItem
 version: ${project.version}
 
-softdepend: [ViaVersion, ProtocolSupport, ProtocolLib, LangUtils, HexNicks]
+softdepend: [ViaVersion, ProtocolSupport, ProtocolLib, LangUtils, HexNicks, EcoEnchants]
 authors: [dadus33, WOLFI3654, Elikill58]
 api-version: 1.13
 
