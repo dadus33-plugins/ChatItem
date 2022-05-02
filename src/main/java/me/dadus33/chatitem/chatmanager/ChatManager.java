@@ -1,5 +1,6 @@
 package me.dadus33.chatitem.chatmanager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public abstract class ChatManager {
 			List<String> addLore = EcoEnchantsSupport.getLores(item);
 			if(!addLore.isEmpty()) {
 				ItemMeta meta = item.getItemMeta();
-				List<String> lores = meta.getLore();
+				List<String> lores = meta.hasLore() ? meta.getLore() : new ArrayList<>();
 				for(int i = 0; i < addLore.size(); i++)
 					lores.add(i, addLore.get(i));
 				
