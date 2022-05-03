@@ -4,6 +4,7 @@ import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
 
 import java.util.StringJoiner;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
@@ -62,7 +63,7 @@ public class ChatEventListener implements Listener {
 		for (String placeholder : getStorage().PLACEHOLDERS) {
 			s = s.replace(placeholder, firstPlaceholder);
 		}
-		if ((s.length() - s.replace(firstPlaceholder, "").length()) > getStorage().LIMIT) {
+		if (StringUtils.countMatches(s, firstPlaceholder) > getStorage().LIMIT) {
 			e.setCancelled(true);
 			if (getStorage().LIMIT_MESSAGE.isEmpty()) {
 				return;

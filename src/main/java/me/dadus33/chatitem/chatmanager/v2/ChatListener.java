@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -121,7 +122,7 @@ public class ChatListener implements Listener {
 			else
 				defMsg = defMsg.replace(rep, ChatManager.SEPARATOR + "");
 		}
-		if ((defMsg.length() - defMsg.replace(ChatManager.SEPARATOR + "", "").length()) > getStorage().LIMIT) {
+		if (StringUtils.countMatches(defMsg, ChatManager.SEPARATOR) > getStorage().LIMIT) {
 			e.setCancelled(true);
 			if (getStorage().LIMIT_MESSAGE.isEmpty()) {
 				return;
