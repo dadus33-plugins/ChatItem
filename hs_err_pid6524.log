@@ -1,0 +1,213 @@
+#
+# There is insufficient memory for the Java Runtime Environment to continue.
+# Native memory allocation (mmap) failed to map 134217728 bytes for G1 virtual space
+# Possible reasons:
+#   The system is out of physical RAM or swap space
+#   The process is running with CompressedOops enabled, and the Java Heap may be blocking the growth of the native heap
+# Possible solutions:
+#   Reduce memory load on the system
+#   Increase physical memory or swap space
+#   Check if swap backing store is full
+#   Decrease Java heap size (-Xmx/-Xms)
+#   Decrease number of Java threads
+#   Decrease Java thread stack sizes (-Xss)
+#   Set larger code cache with -XX:ReservedCodeCacheSize=
+#   JVM is running with Unscaled Compressed Oops mode in which the Java heap is
+#     placed in the first 4GB address space. The Java Heap base address is the
+#     maximum limit for the native heap growth. Please use -XX:HeapBaseMinAddress
+#     to set the Java Heap base and to place the Java Heap above 4GB virtual address.
+# This output file may be truncated or incomplete.
+#
+#  Out of Memory Error (os_windows.cpp:3466), pid=6524, tid=568
+#
+# JRE version:  (16.0.1+9) (build )
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (16.0.1+9-24, mixed mode, sharing, tiered, compressed oops, compressed class ptrs, g1 gc, windows-amd64)
+# No core dump will be written. Minidumps are not enabled by default on client versions of Windows
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -Dmaven.home=EMBEDDED -Dclassworlds.conf=C:\Users\Elikill58\minecraft-workspace\.metadata\.plugins\org.eclipse.m2e.launching\launches\m2conf8088306707630119533.tmp -Dmaven.multiModuleProjectDirectory=C:\Users\Elikill58\git\ChatItem -Dssl.debug=true -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dfile.encoding=UTF-8 -XX:+ShowCodeDetailsInExceptionMessages org.codehaus.plexus.classworlds.launcher.Launcher -Dexport_dir=C:\Users\Elikill58\Documents\Minecraft\Serveurs_locaux\Serveurs_minecraft\1.12.2\plugins -B install
+
+Host: Intel(R) Core(TM) i5-9300H CPU @ 2.40GHz, 8 cores, 7G,  Windows 10 , 64 bit Build 19041 (10.0.19041.1645)
+Time: Tue May  3 14:32:34 2022 Paris, Madrid (heure duild 19041 (10.0.19041.1645) elapsed time: 0.015089 seconds (0d 0h 0m 0s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x000002b1c19ed1f0):  JavaThread "Unknown thread" [_thread_in_vm, id=568, stack(0x000000fe85c00000,0x000000fe85d00000)]
+
+Stack: [0x000000fe85c00000,0x000000fe85d00000]
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [jvm.dll+0x6687ca]
+V  [jvm.dll+0x7ca3c9]
+V  [jvm.dll+0x7cbb53]
+V  [jvm.dll+0x7cc1b3]
+V  [jvm.dll+0x242ea5]
+V  [jvm.dll+0x665589]
+V  [jvm.dll+0x65a175]
+V  [jvm.dll+0x2fc5ab]
+V  [jvm.dll+0x3037a6]
+V  [jvm.dll+0x352fee]
+V  [jvm.dll+0x35321f]
+V  [jvm.dll+0x2d3618]
+V  [jvm.dll+0x2d4854]
+V  [jvm.dll+0x79ccb1]
+V  [jvm.dll+0x360de1]
+V  [jvm.dll+0x77a990]
+V  [jvm.dll+0x3e55af]
+V  [jvm.dll+0x3e7081]
+C  [jli.dll+0x52fb]
+C  [ucrtbase.dll+0x21bb2]
+C  [KERNEL32.DLL+0x17034]
+C  [ntdll.dll+0x52651]
+
+
+---------------  P R O C E S S  ---------------
+
+Threads class SMR info:
+_java_thread_list=0x00007ff840d6cbb8, length=0, elements={
+}
+
+Java Threads: ( => current thread )
+
+Other Threads:
+  0x000002b1c1a2fc10 GCTaskThread "GC Thread#0" [stack: 0x000000fe85d00000,0x000000fe85e00000] [id=23148]
+  0x000002b1c1a418b0 ConcurrentGCThread "G1 Main Marker" [stack: 0x000000fe85e00000,0x000000fe85f00000] [id=19036]
+  0x000002b1c1a429d0 ConcurrentGCThread "G1 Conc#0" [stack: 0x000000fe85f00000,0x000000fe86000000] [id=21668]
+
+[error occurred during error reporting (printing all threads), id 0xc0000005, EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x00007ff8405444d7]
+
+VM state: not at safepoint (not fully initialized)
+
+VM Mutex/Monitor currently owned by a thread:  ([mutex/lock_event])
+[0x000002b1c19e87c0] Heap_lock - owner thread: 0x000002b1c19ed1f0
+
+Heap address: 0x0000000081600000, size: 2026 MB, Compressed Oops mode: 32-bit
+
+CDS archive(s) mapped at: [0x0000000000000000-0x0000000000000000-0x0000000000000000), size 0, SharedBaseAddress: 0x0000000800000000, ArchiveRelocationMode: 0.
+Narrow klass base: 0x0000000000000000, Narrow klass shift: 0, Narrow klass range: 0x0
+
+GC Precious Log:
+<Empty>
+
+Heap:
+ garbage-first heap   total 0K, used 0K [0x0000000081600000, 0x0000000100000000)
+  region size 1024K, 0 young (0K), 0 survivors (0K)
+
+[error occurred during error reporting (printing heap information), id 0xc0000005, EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x00007ff8409224ed]
+
+GC Heap History (0 events):
+No events
+
+Deoptimization events (0 events):
+No events
+
+Classes unloaded (0 events):
+No events
+
+Classes redefined (0 events):
+No events
+
+Internal exceptions (0 events):
+No events
+
+Events (1 events):
+Event: 0.008 Loaded shared library C:\Program Files\Java\jdk-16.0.1\bin\java.dll
+
+
+Dynamic libraries:
+0x00007ff6a0b50000 - 0x00007ff6a0b60000 	C:\Program Files\Java\jdk-16.0.1\bin\javaw.exe
+0x00007ff885f30000 - 0x00007ff886125000 	C:\WINDOWS\SYSTEM32\ntdll.dll
+0x00007ff884400000 - 0x00007ff8844be000 	C:\WINDOWS\System32\KERNEL32.DLL
+0x00007ff8837f0000 - 0x00007ff883ab8000 	C:\WINDOWS\System32\KERNELBASE.dll
+0x00007ff883ac0000 - 0x00007ff883bc0000 	C:\WINDOWS\System32\ucrtbase.dll
+0x00007ff857d20000 - 0x00007ff857d38000 	C:\Program Files\Java\jdk-16.0.1\bin\jli.dll
+0x00007ff885340000 - 0x00007ff8853ee000 	C:\WINDOWS\System32\ADVAPI32.dll
+0x00007ff857d00000 - 0x00007ff857d19000 	C:\Program Files\Java\jdk-16.0.1\bin\VCRUNTIME140.dll
+0x00007ff885cc0000 - 0x00007ff885d5e000 	C:\WINDOWS\System32\msvcrt.dll
+0x00007ff8848d0000 - 0x00007ff88496c000 	C:\WINDOWS\System32\sechost.dll
+0x00007ff884600000 - 0x00007ff884725000 	C:\WINDOWS\System32\RPCRT4.dll
+0x00007ff8849a0000 - 0x00007ff884b40000 	C:\WINDOWS\System32\USER32.dll
+0x00007ff86d180000 - 0x00007ff86d41a000 	C:\WINDOWS\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.19041.1110_none_60b5254171f9507e\COMCTL32.dll
+0x00007ff8837c0000 - 0x00007ff8837e2000 	C:\WINDOWS\System32\win32u.dll
+0x00007ff884fd0000 - 0x00007ff884ffa000 	C:\WINDOWS\System32\GDI32.dll
+0x00007ff883c10000 - 0x00007ff883d1b000 	C:\WINDOWS\System32\gdi32full.dll
+0x00007ff883e80000 - 0x00007ff883f1d000 	C:\WINDOWS\System32\msvcp_win.dll
+0x00007ff87b820000 - 0x00007ff87b82a000 	C:\WINDOWS\SYSTEM32\VERSION.dll
+0x00007ff884970000 - 0x00007ff8849a0000 	C:\WINDOWS\System32\IMM32.DLL
+0x00007ff85c4a0000 - 0x00007ff85c4ac000 	C:\Program Files\Java\jdk-16.0.1\bin\vcruntime140_1.dll
+0x00007ff8496b0000 - 0x00007ff849741000 	C:\Program Files\Java\jdk-16.0.1\bin\msvcp140.dll
+0x00007ff840260000 - 0x00007ff840e0b000 	C:\Program Files\Java\jdk-16.0.1\bin\server\jvm.dll
+0x00007ff8845f0000 - 0x00007ff8845f8000 	C:\WINDOWS\System32\PSAPI.DLL
+0x00007ff863330000 - 0x00007ff863339000 	C:\WINDOWS\SYSTEM32\WSOCK32.dll
+0x00007ff86ddf0000 - 0x00007ff86de17000 	C:\WINDOWS\SYSTEM32\WINMM.dll
+0x00007ff885c50000 - 0x00007ff885cbb000 	C:\WINDOWS\System32\WS2_32.dll
+0x00007ff881750000 - 0x00007ff881762000 	C:\WINDOWS\SYSTEM32\kernel.appcore.dll
+0x00007ff85bfe0000 - 0x00007ff85bfea000 	C:\Program Files\Java\jdk-16.0.1\bin\jimage.dll
+0x00007ff881470000 - 0x00007ff881654000 	C:\WINDOWS\SYSTEM32\DBGHELP.DLL
+0x00007ff87d710000 - 0x00007ff87d73c000 	C:\WINDOWS\SYSTEM32\dbgcore.DLL
+0x00007ff883730000 - 0x00007ff8837b2000 	C:\WINDOWS\System32\bcryptPrimitives.dll
+0x00007ff857560000 - 0x00007ff857585000 	C:\Program Files\Java\jdk-16.0.1\bin\java.dll
+
+dbghelp: loaded successfully - version: 4.0.5 - missing functions: none
+symbol engine: initialized successfully - sym options: 0x614 - pdb path: .;C:\Program Files\Java\jdk-16.0.1\bin;C:\WINDOWS\SYSTEM32;C:\WINDOWS\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.19041.1110_none_60b5254171f9507e;C:\Program Files\Java\jdk-16.0.1\bin\server
+
+VM Arguments:
+jvm_args: -Dmaven.home=EMBEDDED -Dclassworlds.conf=C:\Users\Elikill58\minecraft-workspace\.metadata\.plugins\org.eclipse.m2e.launching\launches\m2conf8088306707630119533.tmp -Dmaven.multiModuleProjectDirectory=C:\Users\Elikill58\git\ChatItem -Dssl.debug=true -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dfile.encoding=UTF-8 -XX:+ShowCodeDetailsInExceptionMessages 
+java_command: org.codehaus.plexus.classworlds.launcher.Launcher -Dexport_dir=C:\Users\Elikill58\Documents\Minecraft\Serveurs_locaux\Serveurs_minecraft\1.12.2\plugins -B install
+java_class_path (initial): C:\Users\Elikill58\.p2\pool\plugins\org.eclipse.m2e.maven.runtime_1.18.1.20211011-2139\jars\plexus-classworlds-2.6.0.jar
+Launcher Type: SUN_STANDARD
+
+[Global flags]
+     intx CICompilerCount                          = 4                                         {product} {ergonomic}
+     uint ConcGCThreads                            = 2                                         {product} {ergonomic}
+     uint G1ConcRefinementThreads                  = 8                                         {product} {ergonomic}
+   size_t G1HeapRegionSize                         = 1048576                                   {product} {ergonomic}
+    uintx GCDrainStackTargetSize                   = 64                                        {product} {ergonomic}
+   size_t InitialHeapSize                          = 134217728                                 {product} {ergonomic}
+   size_t MarkStackSize                            = 4194304                                   {product} {ergonomic}
+   size_t MaxHeapSize                              = 2124414976                                {product} {ergonomic}
+   size_t MinHeapDeltaBytes                        = 1048576                                   {product} {ergonomic}
+   size_t MinHeapSize                              = 8388608                                   {product} {ergonomic}
+    uintx NonNMethodCodeHeapSize                   = 5839372                                {pd product} {ergonomic}
+    uintx NonProfiledCodeHeapSize                  = 122909434                              {pd product} {ergonomic}
+    uintx ProfiledCodeHeapSize                     = 122909434                              {pd product} {ergonomic}
+    uintx ReservedCodeCacheSize                    = 251658240                              {pd product} {ergonomic}
+     bool SegmentedCodeCache                       = true                                      {product} {ergonomic}
+     bool ShowCodeDetailsInExceptionMessages       = true                                   {manageable} {command line}
+   size_t SoftMaxHeapSize                          = 2124414976                             {manageable} {ergonomic}
+     bool UseCompressedClassPointers               = true                           {product lp64_product} {ergonomic}
+     bool UseCompressedOops                        = true                           {product lp64_product} {ergonomic}
+     bool UseG1GC                                  = true                                      {product} {ergonomic}
+     bool UseLargePagesIndividualAllocation        = false                                  {pd product} {ergonomic}
+
+Logging:
+Log output configuration:
+ #0: stdout all=warning uptime,level,tags
+ #1: stderr all=off uptime,level,tags
+
+Environment Variables:
+JAVA_HOME=C:\Program Files\Java\jdk1.8.0_311
+PATH=C:/Program Files/Java/jdk-17.0.1/bin/server;C:/Program Files/Java/jdk-17.0.1/bin;C:\Program Files\Java\jre1.8.0_311;C:\Program Files\Java\jdk1.8.0_311\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\VMware\VMware Player\bin\;C:\Program Files (x86)\Razer\ChromaBroadcast\bin;C:\Program Files\Razer\ChromaBroadcast\bin;C:\Windows\System32;C:\Windows;C:\Windows\System32\wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\PuTTY\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\GnuPG\bin;C:\Program Files (x86)\File Viewer Lite\lib\magick;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Apache Software Foundation\Maven\bin;C:\Program Files\dotnet\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\WINDOWS\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Git\cmd;C:\Program Files\WireGuard\;C:\Program Files\nodejs\;C:\Users\Elikill58\.cargo\bin;C:\Users\Elikill58\AppData\Local\Programs\Python\Python37\Scripts\;C:\Users\Elikill58\AppData\Local\Programs\Python\Python37\;C:\Users\Elikill58\AppData\Local\Microsoft\WindowsApps;C:\Program Files (x86)\FAHClient;C:\Users\Elikill58\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\OpenSSL-Win64\bin;C:\Users\Elikill58\AppData\Local\GitHubDesktop\bin;C:\Users\Elikill58\.dotnet\tools;C:\Program Files\PostgreSQL\14\bin;C:\Users\Elikill58\AppData\Roaming\npm;C:\Users\Elikill58\Desktop\Dev\Eclipse;
+USERNAME=Elikill58
+OS=Windows_NT
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 158 Stepping 10, GenuineIntel
+
+
+
+---------------  S Y S T E M  ---------------
+
+OS:
+ Windows 10 , 64 bit Build 19041 (10.0.19041.1645)
+OS uptime: 4 days 3:29 hours
+
+CPU: total 8 (initial active 8) (4 cores per cpu, 2 threads per core) family 6 model 158 stepping 10 microcode 0xec, cx8, cmov, fxsr, ht, mmx, 3dnowpref, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, lzcnt, tsc, tscinvbit, avx, avx2, aes, erms, clmul, bmi1, bmi2, adx, fma, vzeroupper, clflush, clflushopt
+
+Memory: 4k page, system-wide physical 8103M (352M free)
+TotalPageFile size 32679M (AvailPageFile size 77M)
+current process WorkingSet (physical memory assigned to process): 10M, peak: 10M
+current process commit charge ("private bytes"): 60M, peak: 188M
+
+vm_info: Java HotSpot(TM) 64-Bit Server VM (16.0.1+9-24) for windows-amd64 JRE (16.0.1+9-24), built on Mar 26 2021 19:31:42 by "mach5one" with MS VC++ 16.7 (VS2019)
+
+END.

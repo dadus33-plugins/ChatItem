@@ -165,7 +165,7 @@ public class ChatPacketManager extends PacketHandler {
 			StringBuilder builder = new StringBuilder(fjson);
 			builder.replace(topIndex - (name.length() + 6), topIndex, ""); // we remove both the name and the separator
 			// from the json string
-			String localJson = builder.toString();
+			String localJson = fjson.replace(toReplaceStr + itemPlayer.getName(), "");// builder.toString();
 
 			String message = null;
 			try {
@@ -185,7 +185,7 @@ public class ChatPacketManager extends PacketHandler {
 							tooltip.addAll(getStorage().BUGGED_CLIENTS_TOOLTIP);
 						} else
 							tooltip = new ArrayList<>();
-						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,
+						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS.get(0),
 								ChatManager.styleItem(p, copy, getStorage()), tooltip, itemPlayer);
 						if (!bUsesBaseComponents) {
 							ChatItem.debug("Use basic for 1.7 lunar");
@@ -218,11 +218,11 @@ public class ChatPacketManager extends PacketHandler {
 							}
 						}
 					}
-					message = manager.getManipulator().parse(localJson, getStorage().PLACEHOLDERS, copy,
+					message = manager.getManipulator().parse(localJson, getStorage().PLACEHOLDERS.get(0), copy,
 							ChatManager.styleItem(p, copy, getStorage()), ItemPlayer.getPlayer(itemPlayer).getProtocolVersion());
 				} else {
 					if (!getStorage().HAND_DISABLED) {
-						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS,
+						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS.get(0),
 								getStorage().HAND_NAME, getStorage().HAND_TOOLTIP, itemPlayer);
 					}
 				}

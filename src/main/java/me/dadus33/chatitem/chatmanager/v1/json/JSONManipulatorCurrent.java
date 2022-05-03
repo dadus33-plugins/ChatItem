@@ -40,34 +40,15 @@ public class JSONManipulatorCurrent {
 
 	private static final ConcurrentHashMap<Map.Entry<Version, ItemStack>, JsonObject> STACKS = new ConcurrentHashMap<>();
 
-	private List<String> replaces;
-	private String rgx;
 	private Version protocolVersion;
 	private JsonObject itemTooltip;
 	private JsonArray classicTooltip;
 
-	public String parse(String json, List<String> replacements, ItemStack item, String replacement, int protocol)
+	public String parse(String json, String placeholder, ItemStack item, String replacement, int protocol)
 			throws Exception {
+		ChatItem.debug(json);
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		JsonArray array = obj.getAsJsonArray("extra");
-		replaces = replacements;
-		String regex = "";
-		for (int i = 0; i < replacements.size(); ++i) {
-			if (replacements.size() == 1) {
-				regex = Pattern.quote(replacements.get(0));
-				break;
-			}
-			if (i == 0 || i + 1 == replacements.size()) {
-				if (i == 0) {
-					regex = "(" + Pattern.quote(replacements.get(i));
-				} else {
-					regex = regex.concat("|").concat(Pattern.quote(replacements.get(i))).concat(")");
-				}
-				continue;
-			}
-			regex = regex.concat("|").concat(Pattern.quote(replacements.get(i)));
-		}
-		rgx = regex;
 		JsonArray rep = new JsonArray();
 		final AbstractMap.SimpleEntry<Version, ItemStack> p = new AbstractMap.SimpleEntry<>(
 				protocolVersion = Version.getVersion(protocol), item);
@@ -99,68 +80,7 @@ public class JSONManipulatorCurrent {
 
 		for (int i = 0; i < array.size(); ++i) {
 			if (array.get(i).isJsonObject()) {
-				JsonObject o = array.get(i).getAsJsonObject();
-				boolean inside = false;
-				for (String replace : replacements)
-					if (o.toString().contains(replace)) {
-						if (inside) {
-							break;
-						}
-						inside = true;
-					}
-				JsonElement text = o.get("text");
-				if (text == null) {
-					JsonElement el = o.get("extra");
-					if (el != null) {
-						JsonArray jar = el.getAsJsonArray();
-						if (jar.size() != 0) {
-							o.add("extra", parseArray(jar));
-						} else {
-							o.remove("extra");
-						}
-					}
-					continue;
-				} else {
-					if (text.getAsString().isEmpty()) {
-						JsonElement el = o.get("extra");
-						if (el != null) {
-							JsonArray jar = el.getAsJsonArray();
-							if (jar.size() != 0) {
-								o.add("extra", parseArray(jar));
-							} else {
-								o.remove("extra");
-							}
-						}
-					}
-				}
-
-				String msg = text.getAsString();
-				boolean isLast = false;
-				String[] splits;
-				for (String repls : replacements) {
-					isLast = msg.endsWith(repls);
-					if (isLast) {
-						msg = msg.concat(".");
-						break;
-					}
-				}
-				splits = msg.split(regex);
-				if (splits.length != 1) {
-					for (int j = 0; j < splits.length; ++j) {
-						boolean endDot = (j == splits.length - 1) && isLast;
-						if (!splits[j].isEmpty() && !endDot) {
-							String st = o.toString();
-							JsonObject fix = JsonParser.parseString(st).getAsJsonObject();
-							fix.addProperty("text", splits[j]);
-							rep.add(fix);
-						}
-						if (j != splits.length - 1) {
-							rep.add(itemTooltip);
-						}
-					}
-				} else {
-					rep.add(o);
-				}
+				addParsedJsonObjectToArray(array.get(i).getAsJsonObject(), placeholder, rep);
 			} else {
 				if (array.get(i).isJsonNull()) {
 					continue;
@@ -168,32 +88,10 @@ public class JSONManipulatorCurrent {
 					if (array.get(i).isJsonArray()) {
 						JsonArray jar = array.get(i).getAsJsonArray();
 						if (jar.size() != 0) {
-							rep.set(i, parseArray(array.get(i).getAsJsonArray()));
+							rep.set(i, parseArray(placeholder, array.get(i).getAsJsonArray()));
 						}
 					} else {
-						String msg = array.get(i).getAsString();
-						boolean isLast = false;
-						for (String repls : replacements) {
-							isLast = msg.endsWith(repls);
-							if (isLast) {
-								msg = msg.concat(".");
-								break;
-							}
-						}
-						String[] splits = msg.split(regex);
-						if (splits.length != 1) {
-							for (int j = 0; j < splits.length; ++j) {
-								boolean endDot = (j == splits.length - 1) && isLast;
-								if (!splits[j].isEmpty() && !endDot) {
-									rep.add(new JsonPrimitive(splits[j]));
-								}
-								if (j != splits.length - 1) {
-									rep.add(itemTooltip);
-								}
-							}
-						} else {
-							rep.add(array.get(i));
-						}
+						addParsedStringToArray(array.get(i).getAsString(), placeholder, rep, array.get(i));
 					}
 				}
 			}
@@ -206,27 +104,9 @@ public class JSONManipulatorCurrent {
 		return obj.toString();
 	}
 
-	public String parseEmpty(String json, List<String> replacements, String repl, List<String> tooltip, Player sender) {
+	public String parseEmpty(String json, String placeholder, String repl, List<String> tooltip, Player sender) {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		JsonArray array = obj.getAsJsonArray("extra");
-		replaces = replacements;
-		String regex = "";
-		for (int i = 0; i < replacements.size(); ++i) {
-			if (replacements.size() == 1) {
-				regex = Pattern.quote(replacements.get(0));
-				break;
-			}
-			if (i == 0 || i + 1 == replacements.size()) {
-				if (i == 0) {
-					regex = "(" + Pattern.quote(replacements.get(i));
-				} else {
-					regex = regex.concat("|").concat(Pattern.quote(replacements.get(i))).concat(")");
-				}
-				continue;
-			}
-			regex = regex.concat("|").concat(Pattern.quote(replacements.get(i)));
-		}
-		rgx = regex;
 		JsonArray rep = new JsonArray();
 		JsonArray use = Translator
 				.toJson(repl.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
@@ -244,7 +124,7 @@ public class JSONManipulatorCurrent {
 		}
 
 		hover.add("value", new JsonPrimitive(oneLineTooltip.toString()));
-		if(!tooltip.isEmpty()) {
+		if (!tooltip.isEmpty()) {
 			for (JsonElement ob : use)
 				ob.getAsJsonObject().add("hoverEvent", hover);
 			classicTooltip = use;
@@ -254,20 +134,19 @@ public class JSONManipulatorCurrent {
 			if (array.get(i).isJsonObject()) {
 				JsonObject o = array.get(i).getAsJsonObject();
 				boolean inside = false;
-				for (String replace : replacements)
-					if (o.toString().contains(replace)) {
-						if (inside) {
-							break;
-						}
-						inside = true;
+				if (o.toString().contains(placeholder)) {
+					if (inside) {
+						break;
 					}
+					inside = true;
+				}
 				JsonElement text = o.get("text");
 				if (text == null) {
 					JsonElement el = o.get("extra");
 					if (el != null) {
 						JsonArray jar = el.getAsJsonArray();
 						if (jar.size() != 0) {
-							o.add("extra", parseNoItemArray(jar));
+							o.add("extra", parseNoItemArray(placeholder, jar));
 						} else {
 							o.remove("extra");
 						}
@@ -279,7 +158,7 @@ public class JSONManipulatorCurrent {
 						if (el != null) {
 							JsonArray jar = el.getAsJsonArray();
 							if (jar.size() != 0) {
-								o.add("extra", parseNoItemArray(jar));
+								o.add("extra", parseNoItemArray(placeholder, jar));
 							} else {
 								o.remove("extra");
 							}
@@ -288,15 +167,12 @@ public class JSONManipulatorCurrent {
 				}
 
 				String msg = text.getAsString();
-				boolean isLast = false;
-				for (String repls : replacements) {
-					isLast = msg.endsWith(repls);
-					if (isLast) {
-						msg = msg.concat(".");
-						break;
-					}
+				boolean isLast = msg.endsWith(placeholder);
+				if (isLast) {
+					msg = msg.concat(".");
+					break;
 				}
-				String[] splits = msg.split(regex);
+				String[] splits = msg.split(Pattern.quote(placeholder));
 				if (splits.length != 1) {
 					for (int j = 0; j < splits.length; ++j) {
 						boolean endDot = (j == splits.length - 1) && isLast;
@@ -320,20 +196,13 @@ public class JSONManipulatorCurrent {
 					if (array.get(i).isJsonArray()) {
 						JsonArray jar = array.get(i).getAsJsonArray();
 						if (jar.size() != 0) {
-							rep.set(i, parseNoItemArray(array.get(i).getAsJsonArray()));
+							rep.set(i, parseNoItemArray(placeholder, array.get(i).getAsJsonArray()));
 						}
 					} else {
 
 						String msg = array.get(i).getAsString();
-						boolean isLast = false;
-						for (String repls : replacements) {
-							isLast = msg.endsWith(repls);
-							if (isLast) {
-								msg = msg.concat(".");
-								break;
-							}
-						}
-						String[] splits = msg.split(regex);
+						boolean isLast = msg.endsWith(placeholder);
+						String[] splits = msg.split(Pattern.quote(placeholder));
 						if (splits.length != 1) {
 							for (int j = 0; j < splits.length; ++j) {
 								boolean endDot = (j == splits.length - 1) && isLast;
@@ -356,19 +225,18 @@ public class JSONManipulatorCurrent {
 		return obj.toString();
 	}
 
-	private JsonArray parseNoItemArray(JsonArray arr) {
+	private JsonArray parseNoItemArray(String placeholder, JsonArray arr) {
 		JsonArray replacer = new JsonArray();
 		for (int i = 0; i < arr.size(); ++i) {
 			if (arr.get(i).isJsonObject()) {
 				JsonObject o = arr.get(i).getAsJsonObject();
 				boolean inside = false;
-				for (String replacement : replaces)
-					if (o.toString().contains(replacement)) {
-						if (inside) {
-							break;
-						}
-						inside = true;
+				if (o.toString().contains(placeholder)) {
+					if (inside) {
+						break;
 					}
+					inside = true;
+				}
 				if (!inside) { // the placeholder we're looking for is not inside this element, so we continue
 								// searching
 					replacer.add(o);
@@ -385,22 +253,15 @@ public class JSONManipulatorCurrent {
 					}
 					JsonArray jar = el.getAsJsonArray();
 					if (jar.size() != 0) {
-						o.add("extra", parseNoItemArray(jar));
+						o.add("extra", parseNoItemArray(placeholder, jar));
 					} else {
 						o.remove("extra");
 					}
 				}
 
 				String msg = text.getAsString();
-				boolean isLast = false;
-				for (String repls : replaces) {
-					isLast = msg.endsWith(repls);
-					if (isLast) {
-						msg = msg.concat(".");
-						break;
-					}
-				}
-				String[] splits = msg.split(rgx);
+				boolean isLast = msg.endsWith(placeholder);
+				String[] splits = msg.split(Pattern.quote(placeholder));
 				if (splits.length != 1) {
 					for (int j = 0; j < splits.length; ++j) {
 						boolean endDot = (j == splits.length - 1) && isLast;
@@ -424,20 +285,13 @@ public class JSONManipulatorCurrent {
 					if (arr.get(i).isJsonArray()) {
 						JsonArray jar = arr.get(i).getAsJsonArray();
 						if (jar.size() != 0) {
-							jar = parseNoItemArray(arr.get(i).getAsJsonArray());
+							jar = parseNoItemArray(placeholder, arr.get(i).getAsJsonArray());
 							replacer.set(i, jar);
 						}
 					} else {
 						String msg = arr.get(i).getAsString();
-						boolean isLast = false;
-						for (String repls : replaces) {
-							isLast = msg.endsWith(repls);
-							if (isLast) {
-								msg = msg.concat(".");
-								break;
-							}
-						}
-						String[] splits = msg.split(rgx);
+						boolean isLast = msg.endsWith(placeholder);
+						String[] splits = msg.split(Pattern.quote(placeholder));
 						if (splits.length != 1) {
 							for (int j = 0; j < splits.length; ++j) {
 								boolean endDot = (j == splits.length - 1) && isLast;
@@ -459,75 +313,11 @@ public class JSONManipulatorCurrent {
 		return replacer;
 	}
 
-	private JsonArray parseArray(JsonArray arr) {
+	private JsonArray parseArray(String placeholder, JsonArray arr) {
 		JsonArray replacer = new JsonArray();
 		for (int i = 0; i < arr.size(); ++i) {
 			if (arr.get(i).isJsonObject()) {
-				JsonObject o = arr.get(i).getAsJsonObject();
-				boolean inside = false;
-				for (String replacement : replaces)
-					if (o.toString().contains(replacement)) {
-						if (inside) {
-							break;
-						}
-						inside = true;
-					}
-				if (!inside) { // the placeholder we're looking for is not inside this element, so we continue
-								// searching
-					replacer.add(o);
-					continue;
-				}
-				JsonElement text = o.get("text");
-				if (text == null) {
-					continue;
-				}
-				if (text.getAsString().isEmpty()) {
-					JsonElement el = o.get("extra");
-					if (el == null) {
-						continue;
-					}
-					JsonArray jar = el.getAsJsonArray();
-					if (jar.size() != 0) {
-						jar = parseArray(jar);
-						o.add("extra", jar);
-					} else {
-						o.remove("extra");
-					}
-				}
-
-				String msg = text.getAsString();
-				boolean isLast = false;
-				boolean done = false;
-				boolean fnd;
-				String[] splits;
-				for (String repls : replaces) {
-					if (done) {
-						break;
-					}
-					isLast = msg.endsWith(repls);
-					if (isLast) {
-						done = true;
-						msg = msg.concat(".");
-					}
-				}
-				splits = msg.split(rgx);
-				fnd = splits.length != 1;
-				if (fnd)
-					for (int j = 0; j < splits.length; ++j) {
-						boolean endDot = (j == splits.length - 1) && isLast;
-						if (!splits[j].isEmpty() && !endDot) {
-							String st = o.toString();
-							JsonObject fix = JsonParser.parseString(st).getAsJsonObject();
-							fix.addProperty("text", splits[j]);
-							replacer.add(fix);
-						}
-						if (j != splits.length - 1) {
-							replacer.add(itemTooltip);
-						}
-					}
-				if (!fnd) {
-					replacer.add(o);
-				}
+				addParsedJsonObjectToArray(arr.get(i).getAsJsonObject(), placeholder, replacer);
 			} else {
 				if (arr.get(i).isJsonNull()) {
 					continue;
@@ -535,40 +325,78 @@ public class JSONManipulatorCurrent {
 					if (arr.get(i).isJsonArray()) {
 						JsonArray jar = arr.get(i).getAsJsonArray();
 						if (jar.size() != 0) {
-							jar = parseArray(arr.get(i).getAsJsonArray());
+							jar = parseArray(placeholder, arr.get(i).getAsJsonArray());
 							replacer.set(i, jar);
 						}
 					} else {
-						String msg = arr.get(i).getAsString();
-						boolean isLast = false;
-						for (String repls : replaces) {
-							isLast = msg.endsWith(repls);
-							if (isLast) {
-								msg = msg.concat(".");
-								break;
-							}
-						}
-						String[] splits = msg.split(rgx);
-						if (splits.length != 1) {
-							for (int j = 0; j < splits.length; ++j) {
-								boolean endDot = (j == splits.length - 1) && isLast;
-								if (!splits[j].isEmpty() && !endDot) {
-									JsonElement fix = new JsonPrimitive(splits[j]);
-									replacer.add(fix);
-								}
-								if (j != splits.length - 1) {
-									replacer.add(itemTooltip);
-								}
-							}
-						} else {
-							replacer.add(arr.get(i));
-						}
+						addParsedStringToArray(arr.get(i).getAsString(), placeholder, replacer, arr.get(i));
 					}
 				}
 			}
 
 		}
 		return replacer;
+	}
+	
+	private void addParsedJsonObjectToArray(JsonObject o, String placeholder, JsonArray rep) {
+		boolean inside = false;
+		if (o.toString().contains(placeholder)) {
+			if (inside) {
+				return;
+			}
+			inside = true;
+		}
+		JsonElement text = o.get("text");
+		if (text == null) {
+			JsonElement el = o.get("extra");
+			if (el != null) {
+				JsonArray jar = el.getAsJsonArray();
+				if (jar.size() != 0) {
+					o.add("extra", parseArray(placeholder, jar));
+				} else {
+					o.remove("extra");
+				}
+			}
+			return;
+		} else {
+			if (text.getAsString().isEmpty()) {
+				JsonElement el = o.get("extra");
+				if (el != null) {
+					JsonArray jar = el.getAsJsonArray();
+					if (jar.size() != 0) {
+						o.add("extra", parseArray(placeholder, jar));
+					} else {
+						o.remove("extra");
+					}
+				}
+			}
+		}
+
+		addParsedStringToArray(text.getAsString(), placeholder, rep, o);
+	}
+	
+	private void addParsedStringToArray(String msg, String placeholder, JsonArray rep, JsonElement o) {
+		boolean isLast = msg.endsWith(placeholder);
+		String[] splits = msg.split(Pattern.quote(placeholder));
+		if (splits.length != 1 || (splits.length == 1 && msg.equalsIgnoreCase(placeholder))) {
+			for (int j = 0; j < splits.length; ++j) {
+				boolean endDot = (j == splits.length) && isLast;
+				if (!splits[j].isEmpty() && !endDot) {
+					String st = o.toString();
+					JsonObject fix = JsonParser.parseString(st).getAsJsonObject();
+					fix.addProperty("text", splits[j]);
+					rep.add(fix);
+				}
+				if (j != splits.length - 1) {
+					rep.add(itemTooltip);
+				}
+			}
+			if (isLast)
+				rep.add(itemTooltip);
+		} else {
+			rep.add(splits[0]);
+			rep.add(itemTooltip);
+		}
 	}
 
 	@SuppressWarnings({ "deprecation" })
@@ -593,7 +421,7 @@ public class JSONManipulatorCurrent {
 		// ItemRewriter.remapIds(Version.getVersion().MAX_VER, protocolVersion.MAX_VER,
 		// is);
 		StringBuilder sb = new StringBuilder("{id:");
-		if(protocolVersion.equals(Version.V1_7))
+		if (protocolVersion.equals(Version.V1_7))
 			sb.append(id).append(","); // Append the id
 		else
 			sb.append("\"").append(id).append("\"").append(","); // Append the id
