@@ -49,7 +49,6 @@ public class JSONManipulatorCurrent {
 		ChatItem.debug(json);
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		JsonArray array = obj.getAsJsonArray("extra");
-		JsonArray rep = new JsonArray();
 		final AbstractMap.SimpleEntry<Version, ItemStack> p = new AbstractMap.SimpleEntry<>(
 				protocolVersion = Version.getVersion(protocol), item);
 
@@ -78,26 +77,7 @@ public class JSONManipulatorCurrent {
 			Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), () -> STACKS.remove(p), 100L);
 		}
 
-		for (int i = 0; i < array.size(); ++i) {
-			if (array.get(i).isJsonObject()) {
-				addParsedJsonObjectToArray(array.get(i).getAsJsonObject(), placeholder, rep);
-			} else {
-				if (array.get(i).isJsonNull()) {
-					continue;
-				} else {
-					if (array.get(i).isJsonArray()) {
-						JsonArray jar = array.get(i).getAsJsonArray();
-						if (jar.size() != 0) {
-							rep.set(i, parseArray(placeholder, array.get(i).getAsJsonArray()));
-						}
-					} else {
-						addParsedStringToArray(array.get(i).getAsString(), placeholder, rep, array.get(i));
-					}
-				}
-			}
-
-		}
-		obj.add("extra", rep);
+		obj.add("extra", parseArray(placeholder, array, itemTooltip));
 		if (!obj.has("text")) {
 			obj.addProperty("text", "");
 		}
@@ -107,7 +87,6 @@ public class JSONManipulatorCurrent {
 	public String parseEmpty(String json, String placeholder, String repl, List<String> tooltip, Player sender) {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		JsonArray array = obj.getAsJsonArray("extra");
-		JsonArray rep = new JsonArray();
 		JsonArray use = Translator
 				.toJson(repl.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
 		JsonObject hover = JsonParser.parseString("{\"action\":\"show_text\", \"value\": \"\"}").getAsJsonObject();
@@ -129,230 +108,42 @@ public class JSONManipulatorCurrent {
 				ob.getAsJsonObject().add("hoverEvent", hover);
 			classicTooltip = use;
 		}
-
-		for (int i = 0; i < array.size(); ++i) {
-			if (array.get(i).isJsonObject()) {
-				JsonObject o = array.get(i).getAsJsonObject();
-				boolean inside = false;
-				if (o.toString().contains(placeholder)) {
-					if (inside) {
-						break;
-					}
-					inside = true;
-				}
-				JsonElement text = o.get("text");
-				if (text == null) {
-					JsonElement el = o.get("extra");
-					if (el != null) {
-						JsonArray jar = el.getAsJsonArray();
-						if (jar.size() != 0) {
-							o.add("extra", parseNoItemArray(placeholder, jar));
-						} else {
-							o.remove("extra");
-						}
-					}
-					continue;
-				} else {
-					if (text.getAsString().isEmpty()) {
-						JsonElement el = o.get("extra");
-						if (el != null) {
-							JsonArray jar = el.getAsJsonArray();
-							if (jar.size() != 0) {
-								o.add("extra", parseNoItemArray(placeholder, jar));
-							} else {
-								o.remove("extra");
-							}
-						}
-					}
-				}
-
-				String msg = text.getAsString();
-				boolean isLast = msg.endsWith(placeholder);
-				if (isLast) {
-					msg = msg.concat(".");
-					break;
-				}
-				String[] splits = msg.split(Pattern.quote(placeholder));
-				if (splits.length != 1) {
-					for (int j = 0; j < splits.length; ++j) {
-						boolean endDot = (j == splits.length - 1) && isLast;
-						if (!splits[j].isEmpty() && !endDot) {
-							String st = o.toString();
-							JsonObject fix = JsonParser.parseString(st).getAsJsonObject();
-							fix.addProperty("text", splits[j]);
-							rep.add(fix);
-						}
-						if (j != splits.length - 1) {
-							rep.addAll(use);
-						}
-					}
-				} else {
-					rep.add(o);
-				}
-			} else {
-				if (array.get(i).isJsonNull()) {
-					continue;
-				} else {
-					if (array.get(i).isJsonArray()) {
-						JsonArray jar = array.get(i).getAsJsonArray();
-						if (jar.size() != 0) {
-							rep.set(i, parseNoItemArray(placeholder, array.get(i).getAsJsonArray()));
-						}
-					} else {
-
-						String msg = array.get(i).getAsString();
-						boolean isLast = msg.endsWith(placeholder);
-						String[] splits = msg.split(Pattern.quote(placeholder));
-						if (splits.length != 1) {
-							for (int j = 0; j < splits.length; ++j) {
-								boolean endDot = (j == splits.length - 1) && isLast;
-								if (!splits[j].isEmpty() && !endDot) {
-									rep.add(new JsonPrimitive(splits[j]));
-								}
-								if (j != splits.length - 1) {
-									rep.addAll(use);
-								}
-							}
-						} else {
-							rep.add(array.get(i));
-						}
-					}
-				}
-			}
-
+		obj.add("extra", parseArray(placeholder, array, classicTooltip));
+		if (!obj.has("text")) {
+			obj.addProperty("text", "");
 		}
-		obj.add("extra", rep);
 		return obj.toString();
 	}
 
-	private JsonArray parseNoItemArray(String placeholder, JsonArray arr) {
+	private JsonArray parseArray(String placeholder, JsonArray arr, JsonElement tooltip) {
 		JsonArray replacer = new JsonArray();
 		for (int i = 0; i < arr.size(); ++i) {
-			if (arr.get(i).isJsonObject()) {
-				JsonObject o = arr.get(i).getAsJsonObject();
-				boolean inside = false;
-				if (o.toString().contains(placeholder)) {
-					if (inside) {
-						break;
-					}
-					inside = true;
-				}
-				if (!inside) { // the placeholder we're looking for is not inside this element, so we continue
-								// searching
-					replacer.add(o);
-					continue;
-				}
-				JsonElement text = o.get("text");
-				if (text == null) {
-					continue;
-				}
-				if (text.getAsString().isEmpty()) {
-					JsonElement el = o.get("extra");
-					if (el == null) {
-						continue;
-					}
-					JsonArray jar = el.getAsJsonArray();
-					if (jar.size() != 0) {
-						o.add("extra", parseNoItemArray(placeholder, jar));
-					} else {
-						o.remove("extra");
-					}
-				}
-
-				String msg = text.getAsString();
-				boolean isLast = msg.endsWith(placeholder);
-				String[] splits = msg.split(Pattern.quote(placeholder));
-				if (splits.length != 1) {
-					for (int j = 0; j < splits.length; ++j) {
-						boolean endDot = (j == splits.length - 1) && isLast;
-						if (!splits[j].isEmpty() && !endDot) {
-							String st = o.toString();
-							JsonObject fix = JsonParser.parseString(st).getAsJsonObject();
-							fix.addProperty("text", splits[j]);
-							replacer.add(fix);
-						}
-						if (j != splits.length - 1) {
-							replacer.addAll(classicTooltip);
-						}
-					}
-				} else {
-					replacer.add(o);
+			if (arr.get(i).isJsonNull()) {
+				continue;
+			} else if (arr.get(i).isJsonObject()) {
+				addParsedJsonObjectToArray(arr.get(i).getAsJsonObject(), placeholder, replacer, tooltip);
+			} else if (arr.get(i).isJsonArray()) {
+				JsonArray jar = arr.get(i).getAsJsonArray();
+				if (jar.size() != 0) {
+					jar = parseArray(placeholder, arr.get(i).getAsJsonArray(), tooltip);
+					replacer.set(i, jar);
 				}
 			} else {
-				if (arr.get(i).isJsonNull()) {
-					continue;
-				} else {
-					if (arr.get(i).isJsonArray()) {
-						JsonArray jar = arr.get(i).getAsJsonArray();
-						if (jar.size() != 0) {
-							jar = parseNoItemArray(placeholder, arr.get(i).getAsJsonArray());
-							replacer.set(i, jar);
-						}
-					} else {
-						String msg = arr.get(i).getAsString();
-						boolean isLast = msg.endsWith(placeholder);
-						String[] splits = msg.split(Pattern.quote(placeholder));
-						if (splits.length != 1) {
-							for (int j = 0; j < splits.length; ++j) {
-								boolean endDot = (j == splits.length - 1) && isLast;
-								if (!splits[j].isEmpty() && !endDot) {
-									replacer.add(new JsonPrimitive(splits[j]));
-								}
-								if (j != splits.length - 1) {
-									replacer.addAll(classicTooltip);
-								}
-							}
-						} else {
-							replacer.add(arr.get(i));
-						}
-					}
-				}
-			}
-
-		}
-		return replacer;
-	}
-
-	private JsonArray parseArray(String placeholder, JsonArray arr) {
-		JsonArray replacer = new JsonArray();
-		for (int i = 0; i < arr.size(); ++i) {
-			if (arr.get(i).isJsonObject()) {
-				addParsedJsonObjectToArray(arr.get(i).getAsJsonObject(), placeholder, replacer);
-			} else {
-				if (arr.get(i).isJsonNull()) {
-					continue;
-				} else {
-					if (arr.get(i).isJsonArray()) {
-						JsonArray jar = arr.get(i).getAsJsonArray();
-						if (jar.size() != 0) {
-							jar = parseArray(placeholder, arr.get(i).getAsJsonArray());
-							replacer.set(i, jar);
-						}
-					} else {
-						addParsedStringToArray(arr.get(i).getAsString(), placeholder, replacer, arr.get(i));
-					}
-				}
+				addParsedStringToArray(arr.get(i).getAsString(), placeholder, replacer, arr.get(i), tooltip);
 			}
 
 		}
 		return replacer;
 	}
 	
-	private void addParsedJsonObjectToArray(JsonObject o, String placeholder, JsonArray rep) {
-		boolean inside = false;
-		if (o.toString().contains(placeholder)) {
-			if (inside) {
-				return;
-			}
-			inside = true;
-		}
+	private void addParsedJsonObjectToArray(JsonObject o, String placeholder, JsonArray rep, JsonElement tooltip) {
 		JsonElement text = o.get("text");
 		if (text == null) {
 			JsonElement el = o.get("extra");
 			if (el != null) {
 				JsonArray jar = el.getAsJsonArray();
 				if (jar.size() != 0) {
-					o.add("extra", parseArray(placeholder, jar));
+					o.add("extra", parseArray(placeholder, jar, tooltip));
 				} else {
 					o.remove("extra");
 				}
@@ -364,7 +155,7 @@ public class JSONManipulatorCurrent {
 				if (el != null) {
 					JsonArray jar = el.getAsJsonArray();
 					if (jar.size() != 0) {
-						o.add("extra", parseArray(placeholder, jar));
+						o.add("extra", parseArray(placeholder, jar, tooltip));
 					} else {
 						o.remove("extra");
 					}
@@ -372,30 +163,34 @@ public class JSONManipulatorCurrent {
 			}
 		}
 
-		addParsedStringToArray(text.getAsString(), placeholder, rep, o);
+		addParsedStringToArray(text.getAsString(), placeholder, rep, o, tooltip);
 	}
 	
-	private void addParsedStringToArray(String msg, String placeholder, JsonArray rep, JsonElement o) {
+	private void addParsedStringToArray(String msg, String placeholder, JsonArray rep, JsonElement o, JsonElement tooltip) {
 		boolean isLast = msg.endsWith(placeholder);
+		if (isLast) {
+			msg = msg.concat(".");
+		}
 		String[] splits = msg.split(Pattern.quote(placeholder));
-		if (splits.length != 1 || (splits.length == 1 && msg.equalsIgnoreCase(placeholder))) {
+		if (splits.length != 1) {
 			for (int j = 0; j < splits.length; ++j) {
-				boolean endDot = (j == splits.length) && isLast;
+				boolean endDot = (j == splits.length - 1) && isLast;
 				if (!splits[j].isEmpty() && !endDot) {
 					String st = o.toString();
-					JsonObject fix = JsonParser.parseString(st).getAsJsonObject();
-					fix.addProperty("text", splits[j]);
-					rep.add(fix);
+					JsonElement element = JsonParser.parseString(st);
+					if(element.isJsonObject()) {
+						JsonObject fix = element.getAsJsonObject();
+						fix.addProperty("text", splits[j]);
+						rep.add(fix);
+					} else
+						rep.add(new JsonPrimitive(splits[j]));
 				}
 				if (j != splits.length - 1) {
-					rep.add(itemTooltip);
+					rep.add(tooltip);
 				}
 			}
-			if (isLast)
-				rep.add(itemTooltip);
 		} else {
-			rep.add(splits[0]);
-			rep.add(itemTooltip);
+			rep.add(o);
 		}
 	}
 
