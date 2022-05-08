@@ -169,7 +169,7 @@ public class ChatPacketManager extends PacketHandler {
 
 			String message = null;
 			try {
-				ItemStack item = ChatManager.getUsableItem(p);
+				ItemStack item = ChatManager.getUsableItem(itemPlayer);
 				if (!ItemUtils.isEmpty(item)) {
 					ItemStack copy = item.clone();
 
