@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,6 +22,7 @@ import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.Storage;
+import me.dadus33.chatitem.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -118,11 +118,11 @@ public class ChatListener implements Listener {
 		String msg, defMsg = e.getMessage();
 		for (String rep : c.PLACEHOLDERS) {
 			if (hasv1) // remove v1 char
-				defMsg = defMsg.replace(rep + ChatManager.SEPARATOR + p.getName(), ChatManager.SEPARATOR + "");
+				defMsg = defMsg.replace(rep + ChatManager.SEPARATOR + p.getName(), String.valueOf(ChatManager.SEPARATOR));
 			else
-				defMsg = defMsg.replace(rep, ChatManager.SEPARATOR + "");
+				defMsg = defMsg.replace(rep, String.valueOf(ChatManager.SEPARATOR));
 		}
-		if (StringUtils.countMatches(defMsg, ChatManager.SEPARATOR) > getStorage().LIMIT) {
+		if (Utils.countMatches(defMsg, String.valueOf(ChatManager.SEPARATOR)) > getStorage().LIMIT) {
 			e.setCancelled(true);
 			if (getStorage().LIMIT_MESSAGE.isEmpty()) {
 				return;
