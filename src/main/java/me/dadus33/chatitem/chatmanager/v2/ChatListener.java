@@ -146,6 +146,9 @@ public class ChatListener implements Listener {
 			DiscordSrvSupport.sendchatMessage(p, loggedMessage);
 		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format);
 		e.getRecipients().forEach((pl) -> showItem(pl, p, item, msg));
+		if (c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
+			ChatManager.COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
+		}
 	}
 
 	private void showItem(Player to, Player origin, ItemStack item, String msg) {

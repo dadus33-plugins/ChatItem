@@ -88,7 +88,7 @@ public class ChatEventListener implements Listener {
 		} catch (Exception exc) {
 			exc.printStackTrace();
 		}
-		if (!p.hasPermission("chatitem.ignore-cooldown")) {
+		if (getStorage().COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
 			ChatManager.COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
 		}
 	}
