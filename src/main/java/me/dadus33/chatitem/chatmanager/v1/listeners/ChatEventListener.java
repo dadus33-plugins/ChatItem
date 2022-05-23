@@ -89,7 +89,7 @@ public class ChatEventListener implements Listener {
 			exc.printStackTrace();
 		}
 		if (getStorage().COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
-			ChatManager.COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
+			ChatManager.COOLDOWNS.put(p.getUniqueId(), System.currentTimeMillis() / 1000);
 		}
 	}
 
@@ -148,7 +148,7 @@ public class ChatEventListener implements Listener {
 		sb.append(SEPARATOR).append(e.getPlayer().getName());
 		e.setMessage(sb.toString());
 		if (!p.hasPermission("chatitem.ignore-cooldown")) {
-			ChatManager.COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
+			ChatManager.COOLDOWNS.put(p.getUniqueId(), System.currentTimeMillis() / 1000);
 		}
 	}
 }

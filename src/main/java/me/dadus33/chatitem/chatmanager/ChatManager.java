@@ -3,6 +3,7 @@ package me.dadus33.chatitem.chatmanager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -18,7 +19,8 @@ import me.dadus33.chatitem.utils.Storage;
 
 public abstract class ChatManager {
 
-	public final static HashMap<String, Long> COOLDOWNS = new HashMap<>();
+	public final static HashMap<UUID, Long> COOLDOWNS = new HashMap<>();
+	public final static HashMap<UUID, Long> LAST_INFO_MESSAGE = new HashMap<>();
 	public final static String NAME = "{name}";
 	public final static String AMOUNT = "{amount}";
 	public final static String TIMES = "{times}";
@@ -128,7 +130,7 @@ public abstract class ChatManager {
 				e.setCancelled(true);
 			}
 			if (!c.NO_PERMISSION_MESSAGE.isEmpty() && c.SHOW_NO_PERM_NORMAL) {
-				p.sendMessage(c.NO_PERMISSION_MESSAGE);
+				sendIfNeed(p, c.NO_PERMISSION_MESSAGE);
 			}
 			return false;
 		}
@@ -136,7 +138,7 @@ public abstract class ChatManager {
 			if (c.DENY_IF_NO_ITEM) {
 				e.setCancelled(true);
 				if (!c.DENY_MESSAGE.isEmpty())
-					p.sendMessage(c.DENY_MESSAGE);
+					sendIfNeed(p, c.DENY_MESSAGE);
 				return false;
 			}
 			if (c.HAND_DISABLED) {
@@ -144,25 +146,42 @@ public abstract class ChatManager {
 			}
 		}
 		if (c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
-			if (COOLDOWNS.containsKey(p.getName())) {
-				long start = COOLDOWNS.get(p.getName());
+			if (COOLDOWNS.containsKey(p.getUniqueId())) {
+				long start = COOLDOWNS.get(p.getUniqueId());
 				long current = System.currentTimeMillis() / 1000;
 				long elapsed = current - start;
 				if (elapsed >= c.COOLDOWN) {
-					COOLDOWNS.remove(p.getName());
+					COOLDOWNS.remove(p.getUniqueId());
 				} else {
 					if (!c.LET_MESSAGE_THROUGH) {
 						e.setCancelled(true);
 					}
 					if (!c.COOLDOWN_MESSAGE.isEmpty()) {
 						long left = (start + c.COOLDOWN) - current;
-						p.sendMessage(c.COOLDOWN_MESSAGE.replace(LEFT, ChatManager.calculateTime(left)));
+						sendIfNeed(p, c.COOLDOWN_MESSAGE.replace(LEFT, ChatManager.calculateTime(left)));
 					}
 					ChatItem.debug("(v1) Cooldown");
 					return false;
 				}
 			}
 		}
+		LAST_INFO_MESSAGE.put(p.getUniqueId(), System.currentTimeMillis()); // prevent showing item then send cooldown error message
 		return true;
+	}
+	
+	private static void sendIfNeed(Player p, String msg) {
+		Long time = LAST_INFO_MESSAGE.remove(p.getUniqueId());
+		if(time != null) {
+			long diff = System.currentTimeMillis() - time;
+			if(diff < 100)
+				return; // don't show message
+		}
+		p.sendMessage(msg);
+		LAST_INFO_MESSAGE.put(p.getUniqueId(), System.currentTimeMillis());
+	}
+	
+	public static void clear(Player p) {
+		COOLDOWNS.remove(p.getUniqueId());
+		LAST_INFO_MESSAGE.remove(p.getUniqueId());
 	}
 }

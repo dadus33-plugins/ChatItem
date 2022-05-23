@@ -147,7 +147,7 @@ public class ChatListener implements Listener {
 		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format);
 		e.getRecipients().forEach((pl) -> showItem(pl, p, item, msg));
 		if (c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
-			ChatManager.COOLDOWNS.put(p.getName(), System.currentTimeMillis() / 1000);
+			ChatManager.COOLDOWNS.put(p.getUniqueId(), System.currentTimeMillis() / 1000);
 		}
 	}
 

@@ -4,8 +4,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.ChatManager;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -26,5 +28,10 @@ public class JoinListener implements Listener {
 			text.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/19064/"));
 			p.spigot().sendMessage(text);
 		}
+	}
+	
+	@EventHandler
+	public void onLeft(PlayerQuitEvent e) {
+		ChatManager.clear(e.getPlayer());
 	}
 }
