@@ -20,8 +20,7 @@ public class ColorManager {
 				return str.toString();
 			} else
 				ChatItem.debug("Low len: " + input.length());
-		} else
-			ChatItem.debug("1.15 - for : " + input);
+		}
 		// not hex
 		for(char c : input.toCharArray())
 			str.append(ChatColor.getByChar(c));
@@ -37,8 +36,7 @@ public class ColorManager {
 				return ChatColor.of("#" + input.substring(1, 7)); // get first hex color code
 			} else
 				ChatItem.debug("Low len: " + input.length());
-		} else
-			ChatItem.debug("1.15 - for : " + input);
+		}
 		// not hex
 		return ChatColor.getByChar(input.charAt(0));
 	}
