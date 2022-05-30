@@ -143,7 +143,7 @@ public class ChatListener implements Listener {
 				.replace("{display-name}", p.getDisplayName());
 		Bukkit.getConsoleSender().sendMessage(loggedMessage); // show in log
 		if (ChatItem.discordSrvSupport)
-			DiscordSrvSupport.sendchatMessage(p, defMsg.replace(ChatManager.SEPARATOR + "", itemName).replace("{name}", p.getName())
+			DiscordSrvSupport.sendChatMessage(p, defMsg.replace(ChatManager.SEPARATOR + "", itemName).replace("{name}", p.getName())
 					.replace("{display-name}", p.getDisplayName()));
 		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format);
 		e.getRecipients().forEach((pl) -> showItem(pl, p, item, msg));

@@ -6,7 +6,7 @@ import github.scarsz.discordsrv.DiscordSRV;
 
 public class DiscordSrvSupport {
 
-	public static void sendchatMessage(Player p, String message) {
+	public static void sendChatMessage(Player p, String message) {
 		DiscordSRV pl = DiscordSRV.getPlugin();
 		if (DiscordSRV.config().getBooleanElse("UseModernPaperChatEvent", false) && pl.isModernChatEventAvailable()) {
 			return;
