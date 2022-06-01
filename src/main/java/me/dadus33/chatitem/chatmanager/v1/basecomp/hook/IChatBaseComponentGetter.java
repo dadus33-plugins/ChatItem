@@ -44,4 +44,12 @@ public class IChatBaseComponentGetter implements IBaseComponentGetter {
 		return null;
 	}
 
+	@Override
+	public void writeJson(ChatItemPacket packet, String json) {
+		try {
+			packet.getContent().getChatComponents().write(0, PacketUtils.CHAT_SERIALIZER.getMethod("a", String.class).invoke(null, json));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

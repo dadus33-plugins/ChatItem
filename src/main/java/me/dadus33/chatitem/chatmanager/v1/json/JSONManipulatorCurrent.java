@@ -48,7 +48,7 @@ public class JSONManipulatorCurrent {
 			throws Exception {
 		ChatItem.debug(json);
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
-		JsonArray array = obj.getAsJsonArray("extra");
+		JsonArray array = obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray();
 		final AbstractMap.SimpleEntry<Version, ItemStack> p = new AbstractMap.SimpleEntry<>(
 				protocolVersion = Version.getVersion(protocol), item);
 
@@ -86,7 +86,7 @@ public class JSONManipulatorCurrent {
 
 	public String parseEmpty(String json, String placeholder, String repl, List<String> tooltip, Player sender) {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
-		JsonArray array = obj.getAsJsonArray("extra");
+		JsonArray array = obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray();
 		JsonArray use = Translator
 				.toJson(repl.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
 		JsonObject hover = JsonParser.parseString("{\"action\":\"show_text\", \"value\": \"\"}").getAsJsonObject();

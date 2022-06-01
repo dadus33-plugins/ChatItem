@@ -19,4 +19,8 @@ public class BaseComponentGetter implements IBaseComponentGetter {
 		return comps == null ? null : ComponentSerializer.toString(comps);
 	}
 
+	@Override
+	public void writeJson(ChatItemPacket packet, String json) {
+		packet.getContent().getSpecificModifier(BaseComponent[].class).write(0, ComponentSerializer.parse(json));
+	}
 }

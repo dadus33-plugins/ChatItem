@@ -96,66 +96,16 @@ public class ChatPacketManager extends PacketHandler {
 			}
 		}
 		String json = "{}";
+		IBaseComponentGetter choosedGetter = null;
 		for(IBaseComponentGetter getters : baseComponentGetter) {
 			String tmpJson = getters.getBaseComponentAsJSON(e);
 			if(tmpJson != null) {
 				ChatItem.debug("Found " + tmpJson + " with " + getters.getClass().getName());
 				json = tmpJson;
+				choosedGetter = getters;
 				break;
 			}
 		}
-		/*if (packet.getChatComponents().readSafely(0) == null) { // null check for some cases of messages sent using
-																// spigot's Chat Component API or other means
-			if (!manager.supportsChatComponentApi()) // only if the API is supported in this server distribution
-				return;// We don't know how to deal with anything else. Most probably some mod message
-						// we shouldn't mess with anyways
-			BaseComponent[] components = packet.getSpecificModifier(BaseComponent[].class).readSafely(0);
-			if (components == null) {
-				Object chatBaseComp = packet.getSpecificModifier(PacketUtils.COMPONENT_CLASS).readSafely(0);
-				if (chatBaseComp == null) {
-					if(getStorage().DEBUG) {
-						Object o = e.getPacket();
-						ChatItem.debug("No base components, without chat base comp. Class: " + o.getClass().getName());
-						try {
-							Field f = o.getClass().getField("adventure$message");
-							ChatItem.debug("Field: " + f);
-							f.setAccessible(true);
-							Component co = (Component) f.get(o);
-							ChatItem.debug("adventuremessage: " + co.examinableName());
-							ChatItem.debug("Finito");
-						} catch (Exception exc) {
-							ChatItem.debug("Error: " + exc.getMessage());
-							exc.printStackTrace();
-						}
-						for(Field f : o.getClass().getDeclaredFields()) {
-							try {
-								f.setAccessible(true);
-								ChatItem.debug(" - " + f.getName() + " > " + f.get(o) + " : " + f.getType().getName());
-							} catch (Exception exc) {
-								exc.printStackTrace();
-							}
-						}
-					}
-					return;
-				} else {
-					ChatItem.debug("No base components, with chatbasecomp: " + chatBaseComp);
-					try {
-						json = PacketUtils.CHAT_SERIALIZER.getMethod("a", PacketUtils.COMPONENT_CLASS)
-								.invoke(null, e.getPacket()).toString();
-					} catch (Exception exc) {
-						exc.printStackTrace();
-					}
-				}
-			} else
-				json = ComponentSerializer.toString(components);
-			usesBaseComponents = true;
-		} else {
-			try {
-				json = (String) serializerGetJson.invoke(null, packet.getChatComponents().readSafely(0));
-			} catch (Exception exc) {
-				exc.printStackTrace();
-			}
-		}*/
 		boolean found = false;
 		for (String rep : getStorage().PLACEHOLDERS) {
 			if (json.contains(rep)) {
@@ -177,6 +127,7 @@ public class ChatPacketManager extends PacketHandler {
 			return;
 		}
 		ChatItem.debug("Add packet meta to json: " + json);
+		IBaseComponentGetter fchoosedGetter = choosedGetter;
 		String fjson = json, toReplaceStr = toReplace.toString();
 		e.setCancelled(true); // We cancel the packet as we're going to resend it anyways (ignoring listeners
 		// this time)
@@ -271,11 +222,7 @@ public class ChatPacketManager extends PacketHandler {
 			}
 			if (message != null) {
 				ChatItem.debug("(v1) Writing message: " + message);
-				if (!manager.supportsChatComponentApi()) {
-					packet.getChatComponents().write(0, jsonToChatComponent(message));
-				} else {
-					packet.getSpecificModifier(BaseComponent[].class).write(0, ComponentSerializer.parse(message));
-				}
+				fchoosedGetter.writeJson(e, message);
 			}
 			lastSentPacket = e.getPacket();
 			PacketUtils.sendPacket(p, lastSentPacket);

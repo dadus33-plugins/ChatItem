@@ -31,6 +31,11 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 	@Override
 	public String getBaseComponentAsJSON(ChatItemPacket packet) {
 		Component comp = packet.getContent().getSpecificModifier(Component.class).readSafely(0);
-		return comp == null ? null : ComponentSerializer.toString(BungeeComponentSerializer.get().serialize(comp));
+		return comp == null ? null : ComponentSerializer.toString(BungeeComponentSerializer.legacy().serialize(comp));
+	}
+
+	@Override
+	public void writeJson(ChatItemPacket packet, String json) {
+		packet.getContent().getSpecificModifier(Component.class).write(0, BungeeComponentSerializer.get().deserialize(ComponentSerializer.parse(json)));
 	}
 }

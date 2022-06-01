@@ -10,4 +10,5 @@ public interface IBaseComponentGetter {
 	
 	String getBaseComponentAsJSON(ChatItemPacket packet);
 	
+	void writeJson(ChatItemPacket packet, String json);
 }
