@@ -130,17 +130,16 @@ public class ChatEventListener implements Listener {
 
 		if(!ChatManager.canShowItem(p, p.getItemInHand(), e))
 			return;
-
-		String s = e.getMessage();
+		String s = e.getMessage(), firstPlaceholder = getStorage().PLACEHOLDERS.get(0);
 		for (String placeholder : getStorage().PLACEHOLDERS) {
-			s = s.replace(placeholder, getStorage().PLACEHOLDERS.get(0));
+			s = s.replace(placeholder, firstPlaceholder);
 		}
-		if ((s.length() - s.replace(getStorage().PLACEHOLDERS.get(0), "").length()) > getStorage().LIMIT) {
+		if (Utils.countMatches(s, firstPlaceholder) > getStorage().LIMIT) {
 			e.setCancelled(true);
 			if (getStorage().LIMIT_MESSAGE.isEmpty()) {
 				return;
 			}
-			e.getPlayer().sendMessage(getStorage().LIMIT_MESSAGE);
+			p.sendMessage(getStorage().LIMIT_MESSAGE);
 			return;
 		}
 

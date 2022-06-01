@@ -160,7 +160,7 @@ public abstract class ChatManager {
 						long left = (start + c.COOLDOWN) - current;
 						sendIfNeed(p, c.COOLDOWN_MESSAGE.replace(LEFT, ChatManager.calculateTime(left)));
 					}
-					ChatItem.debug("(v1) Cooldown");
+					ChatItem.debug("Cooldown");
 					return false;
 				}
 			}
