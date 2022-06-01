@@ -31,8 +31,10 @@ public class ProtocollibPacketManager extends PacketManager {
 		        	return;
 				ChatItemPacket packet = onPacketSent(PacketType.getType(e.getPacket().getHandle().getClass().getSimpleName()),
 						p, e.getPacket().getHandle());
-				if(packet == null)
+				if(packet == null) {
+					ChatItem.debug("Can't find packet: " + e.getPacket().getHandle().getClass().getName());
 					return;
+				}
 		        if(!e.isCancelled())
 		        	e.setCancelled(packet.isCancelled());
 			}

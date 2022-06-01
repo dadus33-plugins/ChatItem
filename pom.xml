@@ -98,7 +98,7 @@
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>4.8.0</version>
+            <version>5.0.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -134,8 +134,14 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-api</artifactId>
-            <version>4.9.1</version>
+            <version>4.10.1</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bungeecord</artifactId>
+            <version>4.1.0</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.discordsrv</groupId>
@@ -192,7 +198,25 @@
                                     <pattern>com.google.gson</pattern>
                                     <shadedPattern>me.dadus33.libs.gson</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>net.kyori.adventure.text.serializer.bungeecord</pattern>
+                                    <shadedPattern>me.dadus33.libs.kyori.serializer.bungeecord</shadedPattern>
+                                </relocation>
                             </relocations>
+                            <filters>
+                                <filter>
+                                    <artifact>*</artifact>
+                                    <excludes>
+                                        <exclude>net.kyori:examination-api:**</exclude>
+                                        <exclude>net.kyori:examination-string:**</exclude>
+                                        <exclude>net.kyori:adventure-platform-api:**</exclude>
+                                        <exclude>net.kyori:adventure-text-serializer-legacy:**</exclude>
+                                        <exclude>net.kyori:adventure-text-serializer-gson:**</exclude>
+                                        <exclude>net.kyori:adventure-platform-facet:**</exclude>
+                                        <exclude>net.kyori:adventure-nbt:**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
