@@ -50,7 +50,6 @@
         </repository>
         <repository>
             <id>dv8tion</id>
-            <name>m2-dv8tion</name>
             <url>https://m2.dv8tion.net/releases</url>
         </repository>
         <repository>
@@ -178,7 +177,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -218,7 +217,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.2.2</version>
                 <configuration>
                     <outputDirectory>${export_dir}</outputDirectory>
                 </configuration>
