@@ -36,7 +36,6 @@ public class ChatEventListener implements Listener {
 																			// to get to the event before DeluxeChat or
 																			// other plugins do
 	public void onChat(AsyncPlayerChatEvent e) {
-		ChatItem.debug("(v1) Check for v1 system. Cancelled: " + e.isCancelled());
 		if (e.getMessage().indexOf(SEPARATOR) != -1) { // If the BELL character is found, we have to remove it
 			String msg = e.getMessage().replace(Character.toString(SEPARATOR), "");
 			ChatItem.debug("Already bell in message: " + e.getMessage());

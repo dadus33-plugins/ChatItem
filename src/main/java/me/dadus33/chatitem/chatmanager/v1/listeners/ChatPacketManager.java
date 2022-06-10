@@ -3,7 +3,6 @@ package me.dadus33.chatitem.chatmanager.v1.listeners;
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR_STR;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,18 +78,6 @@ public class ChatPacketManager extends PacketHandler {
 			return;
 		if (lastSentPacket != null && lastSentPacket == e.getPacket())
 			return; // prevent infinite loop
-		//if(e.getPacket().getClass().getName().equalsIgnoreCase("ClientboundSystemChatPacket")) {
-			for(Field f : e.getPacket().getClass().getDeclaredFields()) {
-				try {
-					f.setAccessible(true);
-					ChatItem.debug(" " + f.getName() +": " + f.get(e.getPacket()));
-				} catch (IllegalArgumentException e1) {
-					e1.printStackTrace();
-				} catch (IllegalAccessException e1) {
-					e1.printStackTrace();
-				}
-			}
-		//}
 		PacketContent packet = e.getContent();
 		Version version = Version.getVersion();
 		String json = "{}";
