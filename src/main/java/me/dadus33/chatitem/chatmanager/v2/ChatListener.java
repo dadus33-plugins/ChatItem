@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -29,6 +30,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 
 @SuppressWarnings("deprecation")
 public class ChatListener implements Listener {
@@ -59,14 +61,13 @@ public class ChatListener implements Listener {
 		} catch (Exception e) {
 
 		}
+		Logger log = ChatItem.getInstance().getLogger();
 		String appendMethodMsg = shouldUseAppendMethod ? "Use ComponentBuilder's method."
 				: "Use own ComponentBuilder append method.";
 		if (saveMethod == null)
-			ChatItem.getInstance().getLogger()
-					.info("Failed to find save method. Using default system. " + appendMethodMsg);
+			log.info("Failed to find save method. Using default system. " + appendMethodMsg);
 		else
-			ChatItem.getInstance().getLogger()
-					.info("Save method founded: " + saveMethod.getName() + ". " + appendMethodMsg);
+			log.info("Save method founded: " + saveMethod.getName() + ". " + appendMethodMsg);
 	}
 
 	public Storage getStorage() {
@@ -91,23 +92,23 @@ public class ChatListener implements Listener {
 			return;
 		}
 		Player p = e.getPlayer();
-		boolean found = false, hasv1 = false;
-
+		boolean hasv1 = false;
+		String placeholder = null;
 		for (String rep : c.PLACEHOLDERS) {
 			// v1 try to manage it, but the message have not been changed by another plugin
 			if (e.getMessage().contains(rep + ChatManager.SEPARATOR + p.getName())) {
 				hasv1 = true;
-				found = true;
 				ChatItem.debug("Found v1 placeholders in v2");
+				placeholder = rep;
 				break;
 			}
 			if (e.getMessage().contains(rep)) {
-				found = true;
+				placeholder = rep;
 				break;
 			}
 		}
 
-		if (!found) {
+		if (placeholder == null) { // if not found
 			ChatItem.debug("(v2) Can't found placeholder in: " + e.getMessage() + " > " + PlayerNamerManager.getPlayerNamer().getName(p));
 			return;
 		}
@@ -186,8 +187,7 @@ public class ChatListener implements Listener {
 						text += ColorManager.getColorString(colorCode);
 					colorCode = "";
 				}
-				if (args == ChatManager.SEPARATOR
-						&& (!getStorage().HAND_DISABLED || (item != null && item.hasItemMeta()))) {
+				if (args == ChatManager.SEPARATOR) {
 					// here put the item
 					appendToComponentBuilder(builder, new ComponentBuilder(text).color(color).create());
 					addItem(builder, to, origin, item);
@@ -214,7 +214,7 @@ public class ChatListener implements Listener {
 		try {
 			Class<?> nbtTag = PacketUtils.getNmsClass("NBTTagCompound", "nbt.");
 			Class<?> craftItemClass = PacketUtils.getObcClass("inventory.CraftItemStack");
-			Object nmsNbtTagCompoundObj = nbtTag.newInstance();
+			Object nmsNbtTagCompoundObj = nbtTag.getConstructor().newInstance();
 			if (saveMethod == null) {
 				Object nmsItemStackObj = craftItemClass.getMethod("asNMSCopy", ItemStack.class).invoke(null, itemStack);
 				return nmsItemStackObj.getClass().getMethod("save", nbtTag)
@@ -247,7 +247,7 @@ public class ChatListener implements Listener {
 				if (stay > 0)
 					handTooltip.append("\n");
 			}
-			handComp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, handTooltip.create()));
+			handComp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(handTooltip.create())));
 			if (handName.contains("{name}")) {
 				String[] splitted = handName.split("\\{name\\}");
 				for (int i = 0; i < (splitted.length - 1); i++) {
@@ -261,7 +261,7 @@ public class ChatListener implements Listener {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings("unchecked")
 	public void appendToComponentBuilder(ComponentBuilder builder, BaseComponent[] comps) {
 		if (shouldUseAppendMethod) {
 			try {
