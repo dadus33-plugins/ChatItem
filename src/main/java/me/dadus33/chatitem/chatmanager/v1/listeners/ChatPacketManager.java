@@ -75,13 +75,10 @@ public class ChatPacketManager extends PacketHandler {
 
 	@Override
 	public void onSend(ChatItemPacket e) {
-		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT)) {
-			ChatItem.debug("Player & type: " + e.getPacket().getClass().getName());
+		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT))
 			return;
-		}
 		if (lastSentPacket != null && lastSentPacket == e.getPacket())
 			return; // prevent infinite loop
-		ChatItem.debug("Packet " + e.getPacketType().getPacketName());
 		//if(e.getPacket().getClass().getName().equalsIgnoreCase("ClientboundSystemChatPacket")) {
 			for(Field f : e.getPacket().getClass().getDeclaredFields()) {
 				try {
