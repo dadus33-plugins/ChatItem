@@ -1,6 +1,7 @@
 package me.dadus33.chatitem.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 import me.dadus33.chatitem.ChatItem;
 
@@ -94,7 +95,7 @@ public class ReflectionUtils {
 	@SuppressWarnings("unchecked")
 	public static <T> T getFirstWith(Object from, Class<?> clazz, Class<T> searchingFor) throws Exception {
 		for (Field f : clazz.getDeclaredFields()) {
-			if (f.getType().equals(searchingFor)) {
+			if (f.getType().equals(searchingFor) && !Modifier.isStatic(f.getModifiers())) {
 				f.setAccessible(true);
 				return (T) f.get(from);
 			}

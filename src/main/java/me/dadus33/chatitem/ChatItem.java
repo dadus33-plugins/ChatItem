@@ -110,6 +110,7 @@ public class ChatItem extends JavaPlugin {
     public void onEnable() {
         //Save the instance (we're basically a singleton)
         instance = this;
+        getLogger().info("Detected server version: " + Version.getVersion().name().toLowerCase());
 
         //Load config
         saveDefaultConfig();

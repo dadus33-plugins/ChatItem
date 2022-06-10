@@ -20,8 +20,8 @@ public enum Version {
 	V1_15(100, 550, 578),
 	V1_16(100, 700, 754),
 	V1_17(100, 755, 756),
-	V1_18(100, 757, 800),
-	V1_19(100, 801, 1000),
+	V1_18(100, 757, 758),
+	V1_19(100, 759, 1000),
 	HIGHER(Integer.MAX_VALUE, -1, Integer.MAX_VALUE);
 
 	// Latest version should always have the upper limit set to Integer.MAX_VALUE so
