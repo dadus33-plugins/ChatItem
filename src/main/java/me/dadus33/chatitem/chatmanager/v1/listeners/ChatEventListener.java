@@ -12,6 +12,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
@@ -31,7 +32,6 @@ public class ChatEventListener implements Listener {
 		return this.manage.getStorage();
 	}
 
-	@SuppressWarnings("deprecation")
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST) // We need to have lowest priority in order
 																			// to get to the event before DeluxeChat or
 																			// other plugins do
@@ -55,8 +55,8 @@ public class ChatEventListener implements Listener {
 		}
 
 		Player p = e.getPlayer();
-
-		if(!ChatManager.canShowItem(p, p.getItemInHand(), e))
+		ItemStack item = ChatManager.getUsableItem(p);
+		if(!ChatManager.canShowItem(p, item, e))
 			return;
 		String s = e.getMessage(), firstPlaceholder = getStorage().PLACEHOLDERS.get(0);
 		for (String placeholder : getStorage().PLACEHOLDERS) {
@@ -92,7 +92,6 @@ public class ChatEventListener implements Listener {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onCommand(final PlayerCommandPreprocessEvent e) {
 		if (e.getMessage().indexOf(SEPARATOR) != -1) { // If the BELL character is found, we have to remove it
@@ -126,8 +125,8 @@ public class ChatEventListener implements Listener {
 		if (!found) {
 			return;
 		}
-
-		if(!ChatManager.canShowItem(p, p.getItemInHand(), e))
+		ItemStack item = ChatManager.getUsableItem(p);
+		if(!ChatManager.canShowItem(p, item, e))
 			return;
 		String s = e.getMessage(), firstPlaceholder = getStorage().PLACEHOLDERS.get(0);
 		for (String placeholder : getStorage().PLACEHOLDERS) {
@@ -142,10 +141,21 @@ public class ChatEventListener implements Listener {
 			return;
 		}
 
-		StringBuilder sb = new StringBuilder(e.getMessage());
-		sb.append(SEPARATOR).append(e.getPlayer().getName());
-		e.setMessage(sb.toString());
-		if (!p.hasPermission("chatitem.ignore-cooldown")) {
+		ChatItem.debug("(v1) Set placeholder: " + e.getMessage());
+		try {
+			StringJoiner msg = new StringJoiner(" ");
+			for(String part : s.split(" ")) {
+				if(part.equalsIgnoreCase(firstPlaceholder)) {
+					msg.add(firstPlaceholder + SEPARATOR + p.getName());
+				} else {
+					msg.add(part);
+				}
+			}
+			e.setMessage(msg.toString());
+		} catch (Exception exc) {
+			exc.printStackTrace();
+		}
+		if (getStorage().COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
 			ChatManager.COOLDOWNS.put(p.getUniqueId(), System.currentTimeMillis() / 1000);
 		}
 	}

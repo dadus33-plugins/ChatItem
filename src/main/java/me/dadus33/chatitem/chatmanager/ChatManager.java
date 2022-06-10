@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.hook.EcoEnchantsSupport;
 import me.dadus33.chatitem.itemnamer.NamerManager;
+import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.Storage;
 
 public abstract class ChatManager {
@@ -48,9 +49,15 @@ public abstract class ChatManager {
 
 	public abstract void unload(ChatItem pl);
 	
-	@SuppressWarnings("deprecation")
+	/**
+	 * Get the item in hand as usable one.<br>
+	 * Will include, in lore, all informations from other plugins.
+	 * 
+	 * @param p the player
+	 * @return the usable item
+	 */
 	public static ItemStack getUsableItem(Player p) {
-		ItemStack item = p.getItemInHand().clone();
+		ItemStack item = HandItem.getBetterItem(p).clone();
 		if(ChatItem.ecoEnchantsSupport) {
 			List<String> addLore = EcoEnchantsSupport.getLores(item);
 			if(!addLore.isEmpty()) {
@@ -66,7 +73,58 @@ public abstract class ChatManager {
 		return item;
 	}
 
+	/**
+	 * Get the name of item according to player & config<br>
+	 * Prefer use {@link #getNameOfItem(Player, ItemStack, Storage)} if you want take in count the empty item
+	 *  
+	 * @param p the player
+	 * @param item the item
+	 * @param c the config
+	 * @return the name of item
+	 */
 	public static String styleItem(Player p, ItemStack item, Storage c) {
+		String replacer = c.NAME_FORMAT;
+		String amount = c.AMOUNT_FORMAT;
+		boolean dname = item.hasItemMeta() && item.getItemMeta().hasDisplayName();
+		if (item.getAmount() == 1) {
+			if (c.FORCE_ADD_AMOUNT) {
+				amount = amount.replace(TIMES, "1");
+				replacer = replacer.replace(AMOUNT, amount);
+			} else {
+				replacer = replacer.replace(AMOUNT, "");
+			}
+		} else {
+			amount = amount.replace(TIMES, String.valueOf(item.getAmount()));
+			replacer = replacer.replace(AMOUNT, amount);
+		}
+		if (dname) {
+			String trp = item.getItemMeta().getDisplayName();
+			if (c.COLOR_IF_ALREADY_COLORED) {
+				replacer = replacer.replace(NAME, ChatColor.stripColor(trp));
+			} else {
+				replacer = replacer.replace(NAME, trp);
+			}
+		} else {
+			replacer = replacer.replace(NAME, NamerManager.getName(p, item, c));
+		}
+		return replacer;
+	}
+
+	/**
+	 * Get the name of item according to player & config
+	 * 
+	 * @param p the player
+	 * @param item the item
+	 * @param c the config
+	 * @return the name of item or hand
+	 */
+	public static String getNameOfItem(Player p, ItemStack item, Storage c) {
+		if(ItemUtils.isEmpty(item)) {
+			if(c.HAND_DISABLED)
+				return c.PLACEHOLDERS.get(0);
+			else
+				return c.HAND_NAME;
+		}
 		String replacer = c.NAME_FORMAT;
 		String amount = c.AMOUNT_FORMAT;
 		boolean dname = item.hasItemMeta() && item.getItemMeta().hasDisplayName();

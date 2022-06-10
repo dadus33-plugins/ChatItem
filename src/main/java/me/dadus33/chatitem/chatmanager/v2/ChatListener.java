@@ -112,7 +112,8 @@ public class ChatListener implements Listener {
 			ChatItem.debug("(v2) Can't found placeholder in: " + e.getMessage() + " > " + PlayerNamerManager.getPlayerNamer().getName(p));
 			return;
 		}
-		if(!ChatManager.canShowItem(p, p.getItemInHand(), e))
+		ItemStack item = ChatManager.getUsableItem(p);
+		if(!ChatManager.canShowItem(p, item, e))
 			return;
 		e.setCancelled(true);
 		String format = e.getFormat();
@@ -137,9 +138,7 @@ public class ChatListener implements Listener {
 		} else {
 			msg = format.replace(e.getMessage(), defMsg);
 		}
-		ItemStack item = ChatManager.getUsableItem(p);
-		String itemName = ItemUtils.isEmpty(item) ? (c.HAND_DISABLED ? c.PLACEHOLDERS.get(0) : c.HAND_NAME)
-				: ChatManager.styleItem(p, item, c);
+		String itemName = ChatManager.getNameOfItem(p, item, c);
 		String loggedMessage = msg.replace(ChatManager.SEPARATOR + "", itemName).replace("{name}", p.getName())
 				.replace("{display-name}", p.getDisplayName());
 		Bukkit.getConsoleSender().sendMessage(loggedMessage); // show in log
