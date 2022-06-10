@@ -1,6 +1,7 @@
 package me.dadus33.chatitem.chatmanager.v1.packets;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public interface PacketType {
@@ -10,6 +11,13 @@ public interface PacketType {
 	String getFullName();
 	List<String> getAlias();
 	
+	public static List<PacketType> values() {
+		List<PacketType> list = new ArrayList<>();
+		list.addAll(Arrays.asList(Server.values()));
+		list.addAll(Arrays.asList(Handshake.values()));
+		return list;
+	}
+	
 	static final String SERVER_PREFIX = "PacketPlayOut", HANDSHAKE_PREFIX = "PacketHandshaking";
 	
 	public static PacketType getType(String packetName) {
@@ -18,6 +26,10 @@ public interface PacketType {
 		} else if(packetName.startsWith(HANDSHAKE_PREFIX)) {
 			return getPacketTypeFor(packetName, Handshake.values(), Handshake.UNSET);
 		} else {
+			for(PacketType types : values()) {
+				if(types.getFullName().equalsIgnoreCase(packetName) || types.getAlias().contains(packetName))
+					return types;
+			}
 			return null;
 		}
 	}
@@ -31,7 +43,7 @@ public interface PacketType {
 	
 	public static enum Server implements PacketType {
 		
-		CHAT("Chat"),
+		CHAT("Chat", "ClientboundSystemChatPacket"),
 		UNSET("Unset");
 		
 		private final String packetName, fullName;
@@ -41,7 +53,7 @@ public interface PacketType {
 			this.packetName = packetName;
 			this.fullName = SERVER_PREFIX + packetName;
 			for(String al : alias)
-				this.alias.add(SERVER_PREFIX + al);
+				this.alias.add(al);
 		}
 
 		@Override

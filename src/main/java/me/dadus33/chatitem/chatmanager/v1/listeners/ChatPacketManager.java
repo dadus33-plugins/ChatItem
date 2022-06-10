@@ -3,6 +3,7 @@ package me.dadus33.chatitem.chatmanager.v1.listeners;
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR_STR;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +29,7 @@ import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.AdventureComponentGetter
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.BaseComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.ComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.IChatBaseComponentGetter;
+import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.StringComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketHandler;
@@ -73,37 +75,58 @@ public class ChatPacketManager extends PacketHandler {
 
 	@Override
 	public void onSend(ChatItemPacket e) {
-		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT))
+		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT)) {
+			ChatItem.debug("Player & type: " + e.getPacket().getClass().getName());
 			return;
+		}
 		if (lastSentPacket != null && lastSentPacket == e.getPacket())
 			return; // prevent infinite loop
+		ChatItem.debug("Packet " + e.getPacketType().getPacketName());
+		//if(e.getPacket().getClass().getName().equalsIgnoreCase("ClientboundSystemChatPacket")) {
+			for(Field f : e.getPacket().getClass().getDeclaredFields()) {
+				try {
+					f.setAccessible(true);
+					ChatItem.debug(" " + f.getName() +": " + f.get(e.getPacket()));
+				} catch (IllegalArgumentException e1) {
+					e1.printStackTrace();
+				} catch (IllegalAccessException e1) {
+					e1.printStackTrace();
+				}
+			}
+		//}
 		PacketContent packet = e.getContent();
 		Version version = Version.getVersion();
-		if (version.isNewerOrEquals(Version.V1_8)) { // only if action bar messages are supported in this
-														// version of minecraft
-			if (version.isNewerOrEquals(Version.V1_12)) {
-				try {
-					if (((Enum<?>) packet
-							.getSpecificModifier(PacketUtils.getNmsClass("ChatMessageType", "network.chat.")).read(0))
-									.name().equals("GAME_INFO")) {
-						return; // It means it's an actionbar message, and we ain't intercepting those
-					}
-				} catch (Exception exc) {
-					exc.printStackTrace();
-				}
-			} else if (packet.getBytes().readSafely(0) == (byte) 2) {
-				return; // It means it's an actionbar message, and we ain't intercepting those
-			}
-		}
 		String json = "{}";
 		IBaseComponentGetter choosedGetter = null;
-		for(IBaseComponentGetter getters : baseComponentGetter) {
-			String tmpJson = getters.getBaseComponentAsJSON(e);
-			if(tmpJson != null) {
-				ChatItem.debug("Found " + tmpJson + " with " + getters.getClass().getName());
-				json = tmpJson;
-				choosedGetter = getters;
-				break;
+		if (version.isNewerOrEquals(Version.V1_19)) {
+			if(packet.getIntegers().readSafely(0) != 1)
+				return;
+			String foundedJson = packet.getStrings().read(0); // for final things
+			json = foundedJson;
+			choosedGetter = new StringComponentGetter();
+		} else if (version.isNewerOrEquals(Version.V1_12)) {
+			// only if action bar messages are supported in this version of minecraft
+			try {
+				if (((Enum<?>) packet
+						.getSpecificModifier(PacketUtils.getNmsClass("ChatMessageType", "network.chat.")).read(0))
+								.name().equals("GAME_INFO")) {
+					return; // It means it's an actionbar message, and we ain't intercepting those
+				}
+			} catch (Exception exc) {
+				exc.printStackTrace();
+			}
+		} else if (version.isNewerOrEquals(Version.V1_8) && packet.getBytes().readSafely(0) == (byte) 2) {
+			return; // It means it's an actionbar message, and we ain't intercepting those
+		}
+		if(json == null || choosedGetter == null) {
+			for(IBaseComponentGetter getters : baseComponentGetter) {
+				String tmpJson = getters.getBaseComponentAsJSON(e);
+				if(tmpJson != null) {
+					ChatItem.debug("Found " + tmpJson + " with " + getters.getClass().getName());
+					json = tmpJson;
+					choosedGetter = getters;
+					break;
+				}
 			}
 		}
 		boolean found = false;

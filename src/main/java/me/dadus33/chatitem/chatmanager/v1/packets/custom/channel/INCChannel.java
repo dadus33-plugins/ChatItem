@@ -117,7 +117,7 @@ public class INCChannel extends ChannelAbstract {
 			ChatItemPacket nextPacket = getPacketManager().onPacketSent(PacketType.getType(packet.getClass().getSimpleName()), owner, packet);
 			if(nextPacket != null && nextPacket.isCancelled())
 				return;
-			super.write(ctx, packet, promise);
+			super.write(ctx, nextPacket == null ? packet : nextPacket.getPacket(), promise);
 		}
 	}
 }

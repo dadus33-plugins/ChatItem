@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 
 public class ChatItemPacket {
 
-	protected Player player;
+	protected final Player player;
 	protected Object packet;
 	protected PacketType type;
 	protected boolean cancel = false;
@@ -29,6 +29,10 @@ public class ChatItemPacket {
 	
 	public Object getPacket() {
 		return packet;
+	}
+	
+	public void setPacket(Object packet) {
+		this.packet = packet;
 	}
 
 	public String getPacketName() {

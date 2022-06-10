@@ -10,7 +10,7 @@ public class ComponentGetter implements IBaseComponentGetter {
 	public boolean hasConditions() {
 		return PacketUtils.COMPONENT_CLASS != null;
 	}
-
+	
 	@Override
 	public String getBaseComponentAsJSON(ChatItemPacket packet) {
 		Object chatBaseComp = packet.getContent().getSpecificModifier(PacketUtils.COMPONENT_CLASS).readSafely(0);

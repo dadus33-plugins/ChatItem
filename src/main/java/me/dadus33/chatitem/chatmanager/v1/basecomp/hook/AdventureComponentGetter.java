@@ -33,7 +33,7 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 		}
 		return true;
 	}
-
+	
 	@Override
 	public String getBaseComponentAsJSON(ChatItemPacket packet) {
 		Component comp = packet.getContent().getSpecificModifier(Component.class).readSafely(0);

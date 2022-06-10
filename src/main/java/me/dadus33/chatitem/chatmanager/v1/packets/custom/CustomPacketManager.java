@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
+import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
@@ -83,7 +84,7 @@ public class CustomPacketManager extends PacketManager implements Listener {
 
 	public ChatItemPacket onPacketSent(PacketType type, Player sender, Object packet) {
 		if(type == null) {
-			//ChatItem.debug("Failed to find packet type for " + packet.getClass().getSimpleName());
+			ChatItem.debug("Failed to find packet type for " + packet.getClass().getSimpleName());
 			return null;
 		}
 		ChatItemPacket customPacket = new ChatItemPacket(type, packet, sender);

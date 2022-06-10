@@ -188,6 +188,12 @@ public class PacketContent {
 			} else {
 				content.put(key, value);
 				try {
+					key.setAccessible(true);
+					/*if(Modifier.isFinal(key.getModifiers())) {
+				        Field modifiersField = Field.class.getDeclaredField("modifiers");
+				        modifiersField.setAccessible(true);
+				        modifiersField.setInt(key, key.getModifiers() & ~Modifier.FINAL);
+					}*/
 					key.set(obj, value);
 				} catch (Exception e) {
 					e.printStackTrace();
