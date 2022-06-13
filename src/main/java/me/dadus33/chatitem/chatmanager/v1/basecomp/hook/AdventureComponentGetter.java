@@ -27,7 +27,7 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 			return false;
 		}
 		try {
-			PacketUtils.getNmsClass("PacketPlayOutChat", "network.protocol.game.").getField("adventure$message");
+			PacketUtils.getNmsClass("PacketPlayOutChat", "network.protocol.game.", "ClientboundSystemChatPacket").getField("adventure$message");
 		} catch (Exception e) {
 			return false;
 		}
