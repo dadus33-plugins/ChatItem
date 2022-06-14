@@ -83,11 +83,13 @@ public class ChatPacketManager extends PacketHandler {
 		String json = "{}";
 		IBaseComponentGetter choosedGetter = null;
 		if (version.isNewerOrEquals(Version.V1_19)) {
-			if(packet.getIntegers().readSafely(0) != 1)
+			if(packet.getIntegers().readSafely(0, 0) != 1)
 				return;
-			String foundedJson = packet.getStrings().read(0); // for final things
-			json = foundedJson;
-			choosedGetter = new StringComponentGetter();
+			String foundedJson = packet.getStrings().readSafely(0);
+			if(foundedJson != null) {
+				json = foundedJson;
+				choosedGetter = new StringComponentGetter();
+			}
 		} else if (version.isNewerOrEquals(Version.V1_12)) {
 			// only if action bar messages are supported in this version of minecraft
 			try {
