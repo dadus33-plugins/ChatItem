@@ -20,10 +20,10 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class ChatItemCommand implements CommandExecutor, TabExecutor {
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player)) {
@@ -47,7 +47,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 				String hover = Storage.color(linkConfig.getString("hover"));
 				if (hover != null)
 					linkComp.setHoverEvent(
-							new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hover).create()));
+							new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(new ComponentBuilder(hover).create())));
 				String link = linkConfig.getString("link");
 				if (link != null)
 					linkComp.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, link));
