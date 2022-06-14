@@ -145,7 +145,7 @@ public class ChatItem extends JavaPlugin {
         
 
         getServer().getMessenger().registerIncomingPluginChannel(this, brandChannelName, (chan, p, msg) -> {
-            String client = new String(msg);
+            String client = new String(msg).substring(1);
             ChatItem.debug("Detected client " + client + " for " + p.getName());
             ItemPlayer.getPlayer(p).setClientName(client);
         });
