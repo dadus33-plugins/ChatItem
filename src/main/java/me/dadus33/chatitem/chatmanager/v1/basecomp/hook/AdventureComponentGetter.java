@@ -97,7 +97,30 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 					val = val.replaceAll("\\\"", "\"");
 					ChatItem.debug("Fixed json: " + ("{" + val.substring(1, val.length() - 1) + "}"));
 					hoverObject.remove("value");
-					hoverObject.add("contents", JsonParser.parseString("{" + val.substring(1, val.length() - 1) + "}"));
+					JsonElement tagElement = JsonParser.parseString("{" + val.substring(1, val.length() - 1) + "}");
+					tagElement.getAsJsonObject().remove("tag");
+					/*if(tagElement.getAsJsonObject().has("tag")) {
+						JsonElement tag = tagElement.getAsJsonObject().get("tag");
+						if(tag.isJsonObject()) {
+							JsonObject tagObj = tag.getAsJsonObject();
+							tagObj.entrySet().forEach(entry -> {
+								ChatItem.debug("Tag json: " + entry.getKey() + " > " + entry.getValue());
+								JsonElement value = entry.getValue();
+								String sval = value.getAsString();
+								if(Utils.isInteger(sval)) {
+									if(Utils.isShort(sval))
+										tagObj.addProperty(entry.getKey(), sval + "s");
+									else if(Utils.isByte(sval))
+										tagObj.addProperty(entry.getKey(), sval + "b");
+									else if(Utils.isLong(sval))
+										tagObj.addProperty(entry.getKey(), sval + "l");
+									else
+										tagObj.addProperty(entry.getKey(), value + "i");
+								}
+							});
+						}
+					}*/
+					hoverObject.add("contents", tagElement);
 					o.add("hoverEvent", hoverObject);
 				}
 			}

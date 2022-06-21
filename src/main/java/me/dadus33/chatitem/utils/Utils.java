@@ -138,4 +138,40 @@ public class Utils {
 		}
 		return b;
 	}
+	
+	public static boolean isInteger(String s) {
+		try {
+			Integer.parseInt(s);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	public static boolean isByte(String s) {
+		try {
+			Byte.parseByte(s);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	public static boolean isShort(String s) {
+		try {
+			Short.parseShort(s);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	public static boolean isLong(String s) {
+		try {
+			Long.parseLong(s);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }
