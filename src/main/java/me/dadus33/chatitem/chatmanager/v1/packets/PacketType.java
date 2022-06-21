@@ -43,7 +43,7 @@ public interface PacketType {
 	
 	public static enum Server implements PacketType {
 		
-		CHAT("Chat", "ClientboundSystemChatPacket"),
+		CHAT("Chat", "ClientboundPlayerChatPacket", "ClientboundSystemChatPacket"),
 		UNSET("Unset");
 		
 		private final String packetName, fullName;

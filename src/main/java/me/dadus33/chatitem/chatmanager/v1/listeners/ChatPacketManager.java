@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -65,11 +66,12 @@ public class ChatPacketManager extends PacketHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		for(IBaseComponentGetter getter : Arrays.asList(new IChatBaseComponentGetter(), new BaseComponentGetter(), new ComponentGetter(), new AdventureComponentGetter())) {
+		for(IBaseComponentGetter getter : Arrays.asList(new IChatBaseComponentGetter(), new BaseComponentGetter(), new ComponentGetter(), new AdventureComponentGetter(), new StringComponentGetter())) {
 			if(getter.hasConditions())
 				baseComponentGetter.add(getter);
 		}
 		ChatItem.getInstance().getLogger().info("Loaded " + baseComponentGetter.size() + " getter for base components.");
+		ChatItem.debug("BaseComponentGetters: " + String.join(", ", baseComponentGetter.stream().map(IBaseComponentGetter::getClass).map(Class::getSimpleName).collect(Collectors.toList())));
 	}
 
 	@Override
@@ -124,6 +126,16 @@ public class ChatPacketManager extends PacketHandler {
 		}
 		if (!found) {
 			ChatItem.debug("No placeholders founded in " + json);
+			ChatItem.debug("Ints: " + packet.getIntegers().getContent());
+			ChatItem.debug("String: " + packet.getStrings().getContent());
+			try {
+				Class<?> c = Class.forName("net.kyori.adventure.text.Component");
+				ChatItem.debug("Component: " + packet.getSpecificModifier(c).getContent());
+			} catch (ClassNotFoundException exc) {
+				ChatItem.debug("Can't find Kyori's component");
+			} catch(Exception exc) {
+				exc.printStackTrace();
+			}
 			return; // then it's just a normal message without placeholders, so we leave it alone
 		}
 		Object toReplace = null;
@@ -135,7 +147,6 @@ public class ChatPacketManager extends PacketHandler {
 			ChatItem.debug("Not containing bell " + json);
 			return;
 		}
-		ChatItem.debug("Add packet meta to json: " + json);
 		IBaseComponentGetter fchoosedGetter = choosedGetter;
 		String fjson = json, toReplaceStr = toReplace.toString();
 		e.setCancelled(true); // We cancel the packet as we're going to resend it anyways (ignoring listeners

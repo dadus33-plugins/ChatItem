@@ -16,7 +16,11 @@ public class ChatItemPacketManager {
 	public ChatItemPacketManager(ChatItem pl) {
 		Plugin protocolLibPlugin = Bukkit.getPluginManager().getPlugin("ProtocolLib");
 		if (protocolLibPlugin != null) {
-			if(checkProtocollibConditions()) {
+			String version = protocolLibPlugin.getDescription().getVersion();
+			if(version.contains("5.0.0-SNAPSHOT")) {
+				pl.getLogger().warning("ProtocolLib have been detected, but actually, snapshot have issues with chat packet. More informations here: https://github.com/dmulloy2/ProtocolLib/issues/1670.");
+				packetManager = new CustomPacketManager(pl);
+			} else if(checkProtocollibConditions()) {
 				pl.getLogger().info("The plugin ProtocolLib has been detected. Loading Protocollib support ...");
 				packetManager = new ProtocollibPacketManager(pl);
 			} else {

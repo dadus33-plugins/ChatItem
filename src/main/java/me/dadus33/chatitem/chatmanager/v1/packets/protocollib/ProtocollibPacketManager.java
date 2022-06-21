@@ -23,14 +23,13 @@ public class ProtocollibPacketManager extends PacketManager {
 	
 	public ProtocollibPacketManager(ChatItem pl) {
 		protocolManager = ProtocolLibrary.getProtocolManager();
-		protocolManager.addPacketListener(new PacketAdapter(pl, ListenerPriority.LOWEST, Arrays.asList(Play.Server.CHAT)) {
+		protocolManager.addPacketListener(new PacketAdapter(pl, ListenerPriority.LOWEST, Arrays.asList(Play.Server.CHAT, Play.Server.SYSTEM_CHAT)) {
 			@Override
 			public void onPacketSending(PacketEvent e) {
 				Player p = e.getPlayer();
 		        if (p == null || e.isPlayerTemporary())
 		        	return;
-				ChatItemPacket packet = onPacketSent(PacketType.getType(e.getPacket().getHandle().getClass().getSimpleName()),
-						p, e.getPacket().getHandle());
+				ChatItemPacket packet = onPacketSent(PacketType.getType(e.getPacket().getHandle().getClass().getSimpleName()), p, e.getPacket().getHandle());
 				if(packet == null) {
 					ChatItem.debug("Can't find packet: " + e.getPacket().getHandle().getClass().getName());
 					return;

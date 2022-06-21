@@ -8,7 +8,7 @@ public class StringComponentGetter implements IBaseComponentGetter{
 
 	@Override
 	public String getBaseComponentAsJSON(ChatItemPacket packet) {
-		return packet.getContent().getStrings().read(0);
+		return packet.getContent().getStrings().readSafely(0);
 	}
 
 	@Override

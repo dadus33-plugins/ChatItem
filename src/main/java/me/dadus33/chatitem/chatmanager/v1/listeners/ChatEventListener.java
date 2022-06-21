@@ -83,7 +83,7 @@ public class ChatEventListener implements Listener {
 			}
 			e.setMessage(msg.toString());
 			e.setFormat(e.getFormat().replace(oldMsg, e.getMessage())); // set own message for plugin that already put the message into the format
-			ChatItem.debug("Message: " + e.getMessage() + ", format: " + e.getFormat());
+			ChatItem.debug("Message: " + e.getMessage().replace(SEPARATOR, 'S') + ", format: " + e.getFormat());
 		} catch (Exception exc) {
 			exc.printStackTrace();
 		}

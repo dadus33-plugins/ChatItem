@@ -56,7 +56,7 @@ public class ChatItem extends JavaPlugin {
 
     public static void debug(String msg) {
         if (getInstance().getStorage().DEBUG)
-            getInstance().getLogger().info("[Debug] " + msg);
+            getInstance().getLogger().info("[Debug] " + msg.replace(ChatManager.SEPARATOR, 'S'));
     }
 
     private void chooseManagers() {

@@ -26,19 +26,21 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 		} catch (ClassNotFoundException e) { // can't support this, adventure comp not found
 			return false;
 		}
-		try {
-			PacketUtils.getNmsClass("PacketPlayOutChat", "network.protocol.game.", "ClientboundSystemChatPacket").getField("adventure$message");
+		/*try {
+			PacketUtils.getNmsClass("PacketPlayOutChat", "network.protocol.game.", "ClientboundSystemChatPacket", "ClientboundPlayerChatPacket").getField("adventure$message");
 		} catch (Exception e) {
 			return false;
-		}
+		}*/
 		return true;
 	}
 	
 	@Override
 	public String getBaseComponentAsJSON(ChatItemPacket packet) {
 		Component comp = packet.getContent().getSpecificModifier(Component.class).readSafely(0);
-		if(comp == null)
+		if(comp == null) {
+			ChatItem.debug("The component is null.");
 			return null;
+		}
 		String json = ComponentSerializer.toString(BungeeComponentSerializer.legacy().serialize(comp).clone());
 		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
 		JsonObject next = new JsonObject();
@@ -52,7 +54,12 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 		next.addProperty("translate", "chat.type.text");
 		next.add("with", fixParsedArray(JsonParser.parseString(json).getAsJsonObject().getAsJsonArray("extra")));
 		ChatItem.debug("Adventure Json: " + next.toString());
-		packet.getContent().getSpecificModifier(Component.class).write(0, BungeeComponentSerializer.legacy().deserialize(ComponentSerializer.parse(next.toString())));
+		try {
+			Class<?> packetClass = PacketUtils.getNmsClass("ClientboundSystemChatPacket", "network.protocol.game.");
+			packet.setPacket(packetClass.getConstructor(Component.class, String.class, int.class).newInstance(BungeeComponentSerializer.legacy().deserialize(ComponentSerializer.parse(next.toString())), null, 1));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private JsonArray fixParsedArray(JsonArray arr) {
