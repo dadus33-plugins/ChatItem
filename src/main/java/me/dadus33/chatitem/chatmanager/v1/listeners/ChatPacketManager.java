@@ -126,7 +126,6 @@ public class ChatPacketManager extends PacketHandler {
 		}
 		if (!found) {
 			ChatItem.debug("No placeholders founded in " + json);
-			ChatItem.debug("Ints: " + packet.getIntegers().getContent());
 			ChatItem.debug("String: " + packet.getStrings().getContent());
 			try {
 				Class<?> c = Class.forName("net.kyori.adventure.text.Component");

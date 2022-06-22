@@ -8,15 +8,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IBaseComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
-import me.dadus33.chatitem.utils.PacketUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 public class AdventureComponentGetter implements IBaseComponentGetter {
 
+	private boolean useExtra = false;
+	
 	@Override
 	public boolean hasConditions() {
 		try {
@@ -26,11 +28,6 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 		} catch (ClassNotFoundException e) { // can't support this, adventure comp not found
 			return false;
 		}
-		/*try {
-			PacketUtils.getNmsClass("PacketPlayOutChat", "network.protocol.game.", "ClientboundSystemChatPacket", "ClientboundPlayerChatPacket").getField("adventure$message");
-		} catch (Exception e) {
-			return false;
-		}*/
 		return true;
 	}
 	
@@ -42,27 +39,46 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 			return null;
 		}
 		String json = ComponentSerializer.toString(BungeeComponentSerializer.legacy().serialize(comp).clone());
+		ChatItem.debug("AdventureJSON : " + json.replace(ChatManager.SEPARATOR, 'S'));
 		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
-		JsonObject next = new JsonObject();
-		next.add("extra", jsonObj.get("with"));
-		return next.toString();
+		if(jsonObj.has("with")) {
+			JsonObject next = new JsonObject();
+			next.add("extra", jsonObj.get("with"));
+			return next.toString();
+		}
+		useExtra = true;
+		return json;
 	}
 
 	@Override
 	public void writeJson(ChatItemPacket packet, String json) {
-		JsonObject next = new JsonObject();
+		/*JsonObject next = new JsonObject();
 		next.addProperty("translate", "chat.type.text");
-		next.add("with", fixParsedArray(JsonParser.parseString(json).getAsJsonObject().getAsJsonArray("extra")));
-		ChatItem.debug("Adventure Json: " + next.toString());
+		if(useExtra)
+			next.add("with", fixParsedArray(JsonParser.parseString(json).getAsJsonObject().getAsJsonArray("extra")));
+		else
+			next.add("extra", fixParsedArray(JsonParser.parseString(json).getAsJsonObject().getAsJsonArray("extra")));*/
+		JsonElement globalElement = JsonParser.parseString(json);
+		JsonArray extraArray = fixParsedArray(globalElement.getAsJsonObject().getAsJsonArray("extra"));
+		String localJson;
+		if(useExtra) {
+			globalElement.getAsJsonObject().add("extra", extraArray);
+			localJson = globalElement.toString();
+		} else {
+			JsonObject next = new JsonObject();
+			next.addProperty("translate", "chat.type.text");
+			next.add("with", extraArray);
+			localJson = next.toString();
+		}
+		ChatItem.debug("Adventure Json: " + json);
 		try {
-			Class<?> packetClass = PacketUtils.getNmsClass("ClientboundSystemChatPacket", "network.protocol.game.");
-			packet.setPacket(packetClass.getConstructor(Component.class, String.class, int.class).newInstance(BungeeComponentSerializer.legacy().deserialize(ComponentSerializer.parse(next.toString())), null, 1));
+			packet.setPacket(packet.getPacket().getClass().getConstructor(Component.class, String.class, int.class).newInstance(BungeeComponentSerializer.legacy().deserialize(ComponentSerializer.parse(localJson)), null, 1));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private JsonArray fixParsedArray(JsonArray arr) {
+	public JsonArray fixParsedArray(JsonArray arr) {
 		JsonArray next = new JsonArray();
 		for(JsonElement e : arr) {
 			if(e.isJsonArray()) {
@@ -108,10 +124,10 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 								JsonElement value = entry.getValue();
 								String sval = value.getAsString();
 								if(Utils.isInteger(sval)) {
-									if(Utils.isShort(sval))
-										tagObj.addProperty(entry.getKey(), sval + "s");
-									else if(Utils.isByte(sval))
+									if(Utils.isByte(sval))
 										tagObj.addProperty(entry.getKey(), sval + "b");
+									else if(Utils.isShort(sval))
+										tagObj.addProperty(entry.getKey(), sval + "s");
 									else if(Utils.isLong(sval))
 										tagObj.addProperty(entry.getKey(), sval + "l");
 									else

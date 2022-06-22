@@ -46,7 +46,6 @@ public class JSONManipulatorCurrent {
 
 	public String parse(String json, String placeholder, ItemStack item, String replacement, int protocol)
 			throws Exception {
-		ChatItem.debug("Parsing: " + json);
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		JsonArray array = obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray();
 		final AbstractMap.SimpleEntry<Version, ItemStack> p = new AbstractMap.SimpleEntry<>(
