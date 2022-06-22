@@ -87,11 +87,8 @@ public class ChatPacketManager extends PacketHandler {
 		if (version.isNewerOrEquals(Version.V1_19)) {
 			if(packet.getIntegers().readSafely(0, 0) != 1)
 				return;
-			String foundedJson = packet.getStrings().readSafely(0);
-			if(foundedJson != null) {
-				json = foundedJson;
-				choosedGetter = new StringComponentGetter();
-			}
+			choosedGetter = new StringComponentGetter();
+			json = choosedGetter.getBaseComponentAsJSON(e); // if null, will be re-checked so anyway
 		} else if (version.isNewerOrEquals(Version.V1_12)) {
 			// only if action bar messages are supported in this version of minecraft
 			try {
@@ -110,7 +107,6 @@ public class ChatPacketManager extends PacketHandler {
 			for(IBaseComponentGetter getters : baseComponentGetter) {
 				String tmpJson = getters.getBaseComponentAsJSON(e);
 				if(tmpJson != null) {
-					ChatItem.debug("Found " + tmpJson + " with " + getters.getClass().getName());
 					json = tmpJson;
 					choosedGetter = getters;
 					break;
@@ -137,6 +133,7 @@ public class ChatPacketManager extends PacketHandler {
 			}
 			return; // then it's just a normal message without placeholders, so we leave it alone
 		}
+		ChatItem.debug("Found " + json + " with " + choosedGetter.getClass().getName());
 		Object toReplace = null;
 		if (json.lastIndexOf(SEPARATOR) != -1)
 			toReplace = SEPARATOR;
