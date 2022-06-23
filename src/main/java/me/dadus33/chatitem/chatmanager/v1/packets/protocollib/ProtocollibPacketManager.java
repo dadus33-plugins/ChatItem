@@ -1,6 +1,7 @@
 package me.dadus33.chatitem.chatmanager.v1.packets.protocollib;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.entity.Player;
 
@@ -23,7 +24,14 @@ public class ProtocollibPacketManager extends PacketManager {
 	
 	public ProtocollibPacketManager(ChatItem pl) {
 		protocolManager = ProtocolLibrary.getProtocolManager();
-		protocolManager.addPacketListener(new PacketAdapter(pl, ListenerPriority.LOWEST, Arrays.asList(Play.Server.CHAT, Play.Server.SYSTEM_CHAT)) {
+		List<com.comphenix.protocol.PacketType> list = new ArrayList<>();
+		list.add(Play.Server.CHAT);
+		try {
+			list.add((com.comphenix.protocol.PacketType) Play.Server.class.getDeclaredField("SYSTEM_CHAT").get(null));
+		} catch (Exception e) {
+			 // ignore because using old version
+		}
+		protocolManager.addPacketListener(new PacketAdapter(pl, ListenerPriority.LOWEST, list) {
 			@Override
 			public void onPacketSending(PacketEvent e) {
 				Player p = e.getPlayer();
