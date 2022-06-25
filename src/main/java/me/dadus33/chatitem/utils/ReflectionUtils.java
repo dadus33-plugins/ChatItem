@@ -84,7 +84,7 @@ public class ReflectionUtils {
 	}
 
 	/**
-	 * Get the first field which have the searching for class type
+	 * Get the first object which have the searching for class type
 	 * 
 	 * @param from the object where we will try to find the field
 	 * @param clazz the class that have to define the field
@@ -98,6 +98,25 @@ public class ReflectionUtils {
 			if (f.getType().equals(searchingFor) && !Modifier.isStatic(f.getModifiers())) {
 				f.setAccessible(true);
 				return (T) f.get(from);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Get the first field which have the searching for class type
+	 * 
+	 * @param from the object where we will try to find the field
+	 * @param clazz the class that have to define the field
+	 * @param searchingFor the class of the required field
+	 * @return the field (or null if not found)
+	 * @throws Exception if something gone wrong
+	 */
+	public static Field getFirstFieldWith(Class<?> clazz, Class<?> searchingFor) throws Exception {
+		for (Field f : clazz.getDeclaredFields()) {
+			if (f.getType().equals(searchingFor) && !Modifier.isStatic(f.getModifiers())) {
+				f.setAccessible(true);
+				return f;
 			}
 		}
 		return null;

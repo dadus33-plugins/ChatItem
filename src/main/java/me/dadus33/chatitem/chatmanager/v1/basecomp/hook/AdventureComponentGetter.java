@@ -1,6 +1,8 @@
 package me.dadus33.chatitem.chatmanager.v1.basecomp.hook;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -11,6 +13,7 @@ import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IBaseComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
+import me.dadus33.chatitem.utils.ReflectionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -72,7 +75,20 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 		}
 		ChatItem.debug("Adventure Json: " + json);
 		try {
-			packet.setPacket(packet.getPacket().getClass().getConstructor(Component.class, String.class, int.class).newInstance(BungeeComponentSerializer.legacy().deserialize(ComponentSerializer.parse(localJson)), null, 1));
+			Class<?> packetClass = packet.getPacket().getClass();
+			if(packetClass.getSimpleName().equalsIgnoreCase("PacketPlayOutChat")) {
+				Field componentField = ReflectionUtils.getFirstFieldWith(packetClass, Component.class);
+				if(componentField != null) {
+					componentField.setAccessible(true);
+					componentField.set(packet.getPacket(), BungeeComponentSerializer.legacy().deserialize(ComponentSerializer.parse(localJson)));
+				} else {
+					throw new UnsupportedOperationException("The packet PacketPlayOutChat doesn't have Kyori's field. It has: " + Arrays.asList(packetClass.getDeclaredFields()).stream().map(f -> f.getName() + ": " + f.getType().getName()).collect(Collectors.toList()));
+				}
+			} else if(packetClass.getSimpleName().equalsIgnoreCase("CliendboundSystemChatPacket")) {
+				packet.setPacket(packetClass.getConstructor(Component.class, String.class, int.class).newInstance(BungeeComponentSerializer.legacy().deserialize(ComponentSerializer.parse(localJson)), null, 1));
+			} else {
+				throw new UnsupportedOperationException("The packet " + packetClass.getSimpleName() + " insupported by the AdventureGetter. Please report this.");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
