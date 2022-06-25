@@ -1,7 +1,7 @@
 package me.dadus33.chatitem;
 
-import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -11,7 +11,7 @@ import me.dadus33.chatitem.utils.Version;
 
 public class ItemPlayer {
 
-	private static final HashMap<UUID, ItemPlayer> PLAYERS = new HashMap<>();
+	private static final ConcurrentHashMap<UUID, ItemPlayer> PLAYERS = new ConcurrentHashMap<>();
 	public static ItemPlayer getPlayer(Player p) {
 		return PLAYERS.computeIfAbsent(p.getUniqueId(), ItemPlayer::new);
 	}
