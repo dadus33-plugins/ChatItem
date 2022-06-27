@@ -154,9 +154,9 @@ public class ChatListener implements Listener {
 
 	private void showItem(Player to, Player origin, ItemStack item, String msg) {
 		ComponentBuilder builder = new ComponentBuilder("");
-		ChatColor color = ChatColor.RESET;
+		ChatColor color = ChatColor.WHITE;
 		String colorCode = "", text = "";
-		boolean waiting = false, isHex = false;
+		boolean waiting = false;
 		for (char args : msg.toCharArray()) {
 			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
@@ -172,15 +172,23 @@ public class ChatListener implements Listener {
 					color = ChatColor.RESET;
 					continue;
 				}
-				if(args == 'x' && colorCode.isEmpty())
-					isHex = true;
-				colorCode += args; // a color by itself
+				if(args == 'x' && !colorCode.isEmpty()) {
+					text += ColorManager.getColorString(colorCode);
+					colorCode = "x";
+				} else
+					colorCode += args; // a color by itself
 			} else {
 				waiting = false;
 				if(!colorCode.isEmpty()) {
-					if(isHex && colorCode.length() >= 7)
-						color = ColorManager.getColor(colorCode);
-					else if(colorCode.length() == 1) // if only one color code
+					if(colorCode.startsWith("x") && colorCode.length() >= 7) {
+						if(colorCode.length() == 7)
+							color = ColorManager.getColor(colorCode);
+						else {
+							color = ColorManager.getColor(colorCode.substring(0, 7)); // only the hex code
+							ChatItem.debug("Adding color for " + colorCode.substring(7, colorCode.length()) + " (in " + colorCode + ")");
+							text += ColorManager.getColorString(colorCode.substring(7, colorCode.length()));
+						}
+					} else if(colorCode.length() == 1) // if only one color code
 						color = ColorManager.getColor(colorCode);
 					else
 						text += ColorManager.getColorString(colorCode);
