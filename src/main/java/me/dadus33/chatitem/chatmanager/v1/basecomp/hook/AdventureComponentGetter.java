@@ -84,10 +84,10 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 				} else {
 					throw new UnsupportedOperationException("The packet PacketPlayOutChat doesn't have Kyori's field. It has: " + Arrays.asList(packetClass.getDeclaredFields()).stream().map(f -> f.getName() + ": " + f.getType().getName()).collect(Collectors.toList()));
 				}
-			} else if(packetClass.getSimpleName().equalsIgnoreCase("CliendboundSystemChatPacket")) {
+			} else if(packetClass.getSimpleName().equalsIgnoreCase("ClientboundSystemChatPacket")) {
 				packet.setPacket(packetClass.getConstructor(Component.class, String.class, int.class).newInstance(BungeeComponentSerializer.legacy().deserialize(ComponentSerializer.parse(localJson)), null, 1));
 			} else {
-				throw new UnsupportedOperationException("The packet " + packetClass.getSimpleName() + " insupported by the AdventureGetter. Please report this.");
+				throw new UnsupportedOperationException("The packet " + packetClass.getSimpleName() + " isn't supported by the AdventureGetter. Please report this.");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
