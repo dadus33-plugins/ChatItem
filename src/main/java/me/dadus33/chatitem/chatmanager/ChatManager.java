@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,7 +29,7 @@ public abstract class ChatManager {
 	public final static String TIMES = "{times}";
 	public final static String LEFT = "{remaining}";
 	public final static char SEPARATOR = ((char) 0x0007);
-	public final static String SEPARATOR_STR = "\\u0007";
+	public final static String SEPARATOR_STR = String.valueOf(SEPARATOR);
 
 	protected Storage s;
 
@@ -181,11 +183,12 @@ public abstract class ChatManager {
 		return builder.toString();
 	}
 
-	public static boolean canShowItem(Player p, ItemStack item, Cancellable e) {
+	public static boolean canShowItem(Player p, ItemStack item, @Nullable Cancellable e) {
 		Storage c = ChatItem.getInstance().getStorage();
 		if (c.PERMISSION_ENABLED && !p.hasPermission(c.PERMISSION_NAME)) {
 			if (!c.LET_MESSAGE_THROUGH) {
-				e.setCancelled(true);
+				if(e != null)
+					e.setCancelled(true);
 			}
 			if (!c.NO_PERMISSION_MESSAGE.isEmpty() && c.SHOW_NO_PERM_NORMAL) {
 				sendIfNeed(p, c.NO_PERMISSION_MESSAGE);
@@ -194,7 +197,8 @@ public abstract class ChatManager {
 		}
 		if (item.getType().equals(Material.AIR)) {
 			if (c.DENY_IF_NO_ITEM) {
-				e.setCancelled(true);
+				if(e != null)
+					e.setCancelled(true);
 				if (!c.DENY_MESSAGE.isEmpty())
 					sendIfNeed(p, c.DENY_MESSAGE);
 				return false;
@@ -212,7 +216,8 @@ public abstract class ChatManager {
 					COOLDOWNS.remove(p.getUniqueId());
 				} else {
 					if (!c.LET_MESSAGE_THROUGH) {
-						e.setCancelled(true);
+						if(e != null)
+							e.setCancelled(true);
 					}
 					if (!c.COOLDOWN_MESSAGE.isEmpty()) {
 						long left = (start + c.COOLDOWN) - current;

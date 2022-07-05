@@ -5,14 +5,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.ChatManager;
+import me.dadus33.chatitem.chatmanager.v2.ChatListener;
 import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.Storage;
@@ -37,6 +41,13 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 			InventoryListener.open(p);
 		} else if (args[0].equalsIgnoreCase("reload")) {
 			ChatItem.reload(sender);
+		} else if (args[0].equalsIgnoreCase("show")) {
+			Storage c = ChatItem.getInstance().getStorage();
+			ItemStack item = ChatManager.getUsableItem(p);
+			if(ChatManager.canShowItem(p, item, null)) {
+				for(Player all : Bukkit.getOnlinePlayers())
+					ChatListener.showItem(p, all, item, c.COMMAND_FORMAT.replace("%name%", p.getName()).replace("%item%", ChatManager.SEPARATOR_STR));
+			}
 		} else if (args[0].equalsIgnoreCase("link") || args[0].equalsIgnoreCase("links")) {
 			ConfigurationSection config = ChatItem.getInstance().getConfig()
 					.getConfigurationSection("messages.chatitem-cmd.links");

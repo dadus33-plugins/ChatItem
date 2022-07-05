@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class Storage {
 
     public final HashMap<String, HashMap<Short, String>> TRANSLATIONS = new HashMap<>();
-    public final String HAND_NAME, NAME_FORMAT, AMOUNT_FORMAT, MANAGER, PERMISSION_NAME, BUGGED_CLIENT_ACTION;
+    public final String HAND_NAME, NAME_FORMAT, AMOUNT_FORMAT, COMMAND_FORMAT, MANAGER, PERMISSION_NAME, BUGGED_CLIENT_ACTION;
     public final String NO_PERMISSION_MESSAGE, DENY_MESSAGE, RELOAD_MESSAGE, COOLDOWN_MESSAGE, LIMIT_MESSAGE;
     public final String SECONDS, MINUTES, HOURS;
     public final String JOIN_UPDATE_MESSAGE, JOIN_UPDATE_HOVER;
@@ -48,6 +48,7 @@ public class Storage {
         PLACEHOLDERS = ImmutableList.copyOf(conf.getStringList("general.placeholders"));
         NAME_FORMAT = color(conf.getString("general.name-format", "&b&l&o{name} {amount}&r"));
         AMOUNT_FORMAT = color(conf.getString("general.amount-format", "x{times}"));
+        COMMAND_FORMAT = color(conf.getString("general.command-format", "&6%name%'s item is %item%"));
         COLOR_IF_ALREADY_COLORED = conf.getBoolean("general.color-if-already-colored", true);
         LET_MESSAGE_THROUGH = conf.getBoolean("general.let-message-through", true);
         FORCE_ADD_AMOUNT = conf.getBoolean("general.force-add-amount", true);

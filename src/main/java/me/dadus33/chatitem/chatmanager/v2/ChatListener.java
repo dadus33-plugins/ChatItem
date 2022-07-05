@@ -34,14 +34,11 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 
 @SuppressWarnings("deprecation")
 public class ChatListener implements Listener {
-
-	private ChatListenerChatManager manage;
-	private Method saveMethod;
-	private boolean shouldUseAppendMethod = false;
-
-	public ChatListener(ChatListenerChatManager manage) {
-		this.manage = manage;
-
+	
+	private static Method saveMethod;
+	private static boolean shouldUseAppendMethod = false;
+	
+	static {
 		try {
 			Class<?> nbtTag = PacketUtils.getNmsClass("NBTTagCompound", "nbt.");
 			Class<?> itemClass = PacketUtils.getNmsClass("ItemStack", "world.item.");
@@ -68,6 +65,12 @@ public class ChatListener implements Listener {
 			log.info("Failed to find save method. Using default system. " + appendMethodMsg);
 		else
 			log.info("Save method founded: " + saveMethod.getName() + ". " + appendMethodMsg);
+	}
+	
+	private ChatListenerChatManager manage;
+
+	public ChatListener(ChatListenerChatManager manage) {
+		this.manage = manage;
 	}
 
 	public Storage getStorage() {
@@ -152,7 +155,7 @@ public class ChatListener implements Listener {
 		}
 	}
 
-	private void showItem(Player to, Player origin, ItemStack item, String msg) {
+	public static void showItem(Player to, Player origin, ItemStack item, String msg) {
 		ComponentBuilder builder = new ComponentBuilder("");
 		ChatColor color = ChatColor.WHITE;
 		String colorCode = "", text = "";
@@ -217,7 +220,7 @@ public class ChatListener implements Listener {
 	 * @param itemStack the item to convert
 	 * @return the Json string representation of the item
 	 */
-	public String convertItemStackToJson(ItemStack itemStack) {
+	public static String convertItemStackToJson(ItemStack itemStack) {
 		try {
 			Class<?> nbtTag = PacketUtils.getNmsClass("NBTTagCompound", "nbt.");
 			Class<?> craftItemClass = PacketUtils.getObcClass("inventory.CraftItemStack");
@@ -236,18 +239,19 @@ public class ChatListener implements Listener {
 		}
 	}
 
-	public void addItem(ComponentBuilder builder, Player to, Player origin, ItemStack item) {
+	public static void addItem(ComponentBuilder builder, Player to, Player origin, ItemStack item) {
+		Storage c = ChatItem.getInstance().getStorage();
 		if (!ItemUtils.isEmpty(item)) {
-			ComponentBuilder itemComponent = new ComponentBuilder(ChatManager.styleItem(to, item, getStorage()));
+			ComponentBuilder itemComponent = new ComponentBuilder(ChatManager.styleItem(to, item, c));
 			String itemJson = convertItemStackToJson(item);
 			itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
 			appendToComponentBuilder(builder, itemComponent.create());
 		} else {
-			String handName = getStorage().HAND_NAME;
+			String handName = c.HAND_NAME;
 			ComponentBuilder handComp = new ComponentBuilder("");
 			ComponentBuilder handTooltip = new ComponentBuilder("");
-			int stay = getStorage().HAND_TOOLTIP.size();
-			for (String line : getStorage().HAND_TOOLTIP) {
+			int stay = c.HAND_TOOLTIP.size();
+			for (String line : c.HAND_TOOLTIP) {
 				stay--;
 				handTooltip.append(
 						line.replace("{name}", origin.getName()).replace("{display-name}", origin.getDisplayName()));
@@ -269,7 +273,7 @@ public class ChatListener implements Listener {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void appendToComponentBuilder(ComponentBuilder builder, BaseComponent[] comps) {
+	public static void appendToComponentBuilder(ComponentBuilder builder, BaseComponent[] comps) {
 		if (shouldUseAppendMethod) {
 			try {
 				builder.append(comps);
