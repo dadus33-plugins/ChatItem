@@ -54,6 +54,7 @@ public class JSONManipulatorCurrent {
 		if ((itemTooltip = STACKS.get(p)) == null) {
 			JsonArray use = Translator.toJson(replacement); // We get the json representation of the old color
 															// formatting method
+			ChatItem.debug("Remplacement: " + replacement + " use: " + use.toString());
 			// There's no public clone method for JSONObjects so we need to parse them every
 			// time
 			JsonObject hover = JsonParser.parseString("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
@@ -242,7 +243,7 @@ public class JSONManipulatorCurrent {
 					sb.append(entry.getKey());
 				sb.append(":");
 			}
-			ChatItem.debug("Cleaning: " + entry.getValue() + " > " + cleanStr(entry.getValue()));
+			ChatItem.debug("Cleaning " + entry.getKey() + ": " + entry.getValue() + " > " + cleanStr(entry.getValue()));
 			sb.append(cleanStr(entry.getValue()));
 		}
 		sb.append("}}"); // End of tag and end of item

@@ -101,6 +101,7 @@ public abstract class ChatManager {
 		}
 		if (dname) {
 			String trp = item.getItemMeta().getDisplayName();
+			ChatItem.debug("trp: " + trp);
 			if (c.COLOR_IF_ALREADY_COLORED) {
 				replacer = replacer.replace(NAME, ChatColor.stripColor(trp));
 			} else {

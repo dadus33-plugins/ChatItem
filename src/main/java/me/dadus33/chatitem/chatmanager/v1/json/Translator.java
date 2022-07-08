@@ -3,14 +3,86 @@ package me.dadus33.chatitem.chatmanager.v1.json;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.bukkit.ChatColor;
+
+import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.utils.ColorManager;
+import net.md_5.bungee.api.ChatColor;
 
 //Based on DarkSeraphim's system, but using Gson and supporting some more edge cases
 public class Translator {
 
     private static final String STYLES = "klmnor"; //All style codes
 
+
     public static JsonArray toJson(String old){
+        if(old.lastIndexOf(ChatColor.COLOR_CHAR) == -1){
+            JsonArray arr = new JsonArray();
+            JsonObject obj = new JsonObject();
+            obj.addProperty("text", old);
+            arr.add(obj);
+            return arr;
+        }
+        JsonArray message = new JsonArray();
+        JsonObject next = new JsonObject();
+		ChatColor color = null;
+		String colorCode = "", text = "";
+		boolean waiting = false;
+		for (char args : old.toCharArray()) {
+			if (args == '§') { // begin of color
+				waiting = true; // waiting for color code
+			} else if (waiting) { // if waiting for code and valid str
+				// if it's hexademical value and with enough space for full color
+				waiting = false;
+				if(isStyle(args)) { // is style and not making rich color code
+                    next.addProperty(getStyleName(args), true);
+					continue;
+				}
+				if(args == 'x' && !colorCode.isEmpty()) {
+					if(!text.isEmpty()) // ignore this if no text before
+						text += ColorManager.getColorString(colorCode);
+					colorCode = "x";
+				} else
+					colorCode += args; // a color by itself
+			} else {
+				waiting = false;
+				if(!colorCode.isEmpty()) { // manage color
+					ChatColor nextColor = null;
+					if(colorCode.startsWith("x") && colorCode.length() >= 7) { // hex color
+						if(colorCode.length() == 7)
+							nextColor = ColorManager.getColor(colorCode);
+						else {
+							nextColor = ColorManager.getColor(colorCode.substring(0, 7)); // only the hex code
+							ChatItem.debug("Adding color for " + colorCode.substring(7, colorCode.length()) + " (in " + colorCode + ")");
+							text += ColorManager.getColorString(colorCode.substring(7, colorCode.length()));
+						}
+					} else if(colorCode.length() == 1) { // if only one color code
+						nextColor = ColorManager.getColor(colorCode);
+					} else if(!text.isEmpty())// no text before -> color will be used as "color"
+						text += ColorManager.getColorString(colorCode);
+					
+					if(nextColor != null) {
+						if(color == null || (nextColor.getName().startsWith("#") && text.isEmpty())) { // no color OR multiple one without text yet
+							color = nextColor;
+						} else // no text before -> color will be used as "color"
+							text += nextColor.getName();
+					}
+					ChatItem.debug("Add " + colorCode + " to " + text + ", color: " + color);
+					colorCode = "";
+				}
+				// basic text, not waiting for code after '§'
+				text += args;
+			}
+		}
+        next.addProperty("text", text);
+		if(color == null)
+			next.addProperty("color", "white");
+		else
+			next.addProperty("color", color.getName());
+		message.add(next);
+        return message;
+    }
+
+    public static JsonArray toJsonOld(String old){
         if(old.lastIndexOf(ChatColor.COLOR_CHAR) == -1){
             JsonArray arr = new JsonArray();
             JsonObject obj = new JsonObject();
@@ -104,7 +176,7 @@ public class Translator {
     }
 
     private static String getColorName(char code){
-        return ChatColor.getByChar(code).name().toLowerCase();
+        return ChatColor.getByChar(code).getName().toLowerCase();
     }
 
     private static String getStyleName(char code){
@@ -115,7 +187,9 @@ public class Translator {
             case 'n': return "underlined";
             case 'o': return "italic";
             case 'r': return "reset";
-            default: return null; //Should never happen. Made it return null to throw errors if a new format pops up and it really happens
+            default:
+            	ChatItem.getInstance().getLogger().severe("Can't find code for style " + code);
+            	return null; //Should never happen. Made it return null to throw errors if a new format pops up and it really happens
         }
     }
 
