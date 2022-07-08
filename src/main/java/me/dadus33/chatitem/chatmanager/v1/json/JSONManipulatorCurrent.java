@@ -235,8 +235,14 @@ public class JSONManipulatorCurrent {
 			if (!first)
 				sb.append(",");
 			first = false;
-			if (!entry.getKey().isEmpty())
-				sb.append(entry.getKey()).append(":");
+			if (!entry.getKey().isEmpty()) {
+				if(entry.getKey().contains(";"))
+					sb.append("\"" + entry.getKey() + "\"");
+				else
+					sb.append(entry.getKey());
+				sb.append(":");
+			}
+			ChatItem.debug("Cleaning: " + entry.getValue() + " > " + cleanStr(entry.getValue()));
 			sb.append(cleanStr(entry.getValue()));
 		}
 		sb.append("}}"); // End of tag and end of item
