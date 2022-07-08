@@ -29,7 +29,7 @@ public abstract class ChatManager {
 	public final static String TIMES = "{times}";
 	public final static String LEFT = "{remaining}";
 	public final static char SEPARATOR = ((char) 0x0007);
-	public final static String SEPARATOR_STR = String.valueOf(SEPARATOR);
+	public final static String SEPARATOR_STR = "\\u0007";
 
 	protected Storage s;
 
