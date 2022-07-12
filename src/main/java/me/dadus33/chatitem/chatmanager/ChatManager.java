@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.hook.EcoEnchantsSupport;
 import me.dadus33.chatitem.itemnamer.NamerManager;
+import me.dadus33.chatitem.utils.ColorManager;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.Storage;
 
@@ -105,7 +106,7 @@ public abstract class ChatManager {
 			if (c.COLOR_IF_ALREADY_COLORED) {
 				replacer = replacer.replace(NAME, ChatColor.stripColor(trp));
 			} else {
-				replacer = replacer.replace(NAME, trp);
+				replacer = replacer.replace(NAME, ColorManager.fixColor(trp));
 			}
 		} else {
 			replacer = replacer.replace(NAME, NamerManager.getName(p, item, c));
