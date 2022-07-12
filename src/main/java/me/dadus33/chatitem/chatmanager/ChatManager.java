@@ -248,4 +248,8 @@ public abstract class ChatManager {
 		COOLDOWNS.remove(p.getUniqueId());
 		LAST_INFO_MESSAGE.remove(p.getUniqueId());
 	}
+	
+	public static void applyCooldown(Player p) {
+		COOLDOWNS.put(p.getUniqueId(), System.currentTimeMillis() / 1000);
+	}
 }

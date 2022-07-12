@@ -169,6 +169,9 @@ public class ChatPacketManager extends PacketHandler {
 			}
 
 			Player itemPlayer = Bukkit.getPlayer(name);
+			if (getStorage().COOLDOWN > 0 && !itemPlayer.hasPermission("chatitem.ignore-cooldown")) {
+				ChatManager.applyCooldown(itemPlayer);
+			}
 			StringBuilder builder = new StringBuilder(fjson);
 			builder.replace(topIndex - (name.length() + 6), topIndex, ""); // we remove both the name and the separator
 			// from the json string

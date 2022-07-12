@@ -150,9 +150,8 @@ public class ChatListener implements Listener {
 					.replace("{display-name}", p.getDisplayName()));
 		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format);
 		e.getRecipients().forEach((pl) -> showItem(pl, p, item, msg));
-		if (c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
-			ChatManager.COOLDOWNS.put(p.getUniqueId(), System.currentTimeMillis() / 1000);
-		}
+		if (c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown"))
+			ChatManager.applyCooldown(p);
 	}
 
 	public static void showItem(Player to, Player origin, ItemStack item, String msg) {
