@@ -156,19 +156,59 @@ public class ChatListener implements Listener {
 
 	public static void showItem(Player to, Player origin, ItemStack item, String msg) {
 		ComponentBuilder builder = new ComponentBuilder("");
-		String text = "";
-		for (char args : ColorManager.fixColor(msg).toCharArray()) {
-			if (args == ChatManager.SEPARATOR) {
-				// here put the item
-				appendToComponentBuilder(builder, new ComponentBuilder(text).create());
-				addItem(builder, to, origin, item);
-				text = "";
+		ChatColor color = ChatColor.WHITE;
+		String colorCode = "", text = "";
+		boolean waiting = false;
+		for (char args : msg.toCharArray()) {
+			if (args == '§') { // begin of color
+				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
+					ChatItem.debug("Append " + text);
+					appendToComponentBuilder(builder, new ComponentBuilder(text).color(color).create());
+					text = "";
+				}
+				waiting = true; // waiting for color code
+			} else if (waiting) { // if waiting for code and valid str
+				// if it's hexademical value and with enough space for full color
+				waiting = false;
+				if(args == 'r' && colorCode.isEmpty()) {
+					color = ChatColor.RESET;
+					continue;
+				}
+				if(args == 'x' && !colorCode.isEmpty()) {
+					text += ColorManager.getColorString(colorCode);
+					colorCode = "x";
+				} else
+					colorCode += args; // a color by itself
 			} else {
-				text += args;
+				waiting = false;
+				if(!colorCode.isEmpty()) {
+					if(colorCode.startsWith("x") && colorCode.length() >= 7) {
+						if(colorCode.length() == 7)
+							color = ColorManager.getColor(colorCode);
+						else {
+							color = ColorManager.getColor(colorCode.substring(0, 7)); // only the hex code
+							ChatItem.debug("Adding color for " + colorCode.substring(7, colorCode.length()) + " (in " + colorCode + ")");
+							text += ColorManager.getColorString(colorCode.substring(7, colorCode.length()));
+						}
+					} else if(colorCode.length() == 1) // if only one color code
+						color = ColorManager.getColor(colorCode);
+					else
+						text += ColorManager.getColorString(colorCode);
+					colorCode = "";
+				}
+				if (args == ChatManager.SEPARATOR) {
+					// here put the item
+					appendToComponentBuilder(builder, fixColorComponent(text, color));
+					addItem(builder, to, origin, item);
+					text = "";
+				} else {
+					// basic text, not waiting for code after '§'
+					text += args;
+				}
 			}
 		}
 		if(!text.isEmpty())
-			appendToComponentBuilder(builder, new ComponentBuilder(text).create());
+			appendToComponentBuilder(builder, new ComponentBuilder(text).color(color).create());
 		to.spigot().sendMessage(builder.create());
 	}
 
@@ -252,5 +292,55 @@ public class ChatListener implements Listener {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public static BaseComponent[] fixColorComponent(String message, ChatColor color) {
+		ComponentBuilder builder = new ComponentBuilder("");
+		String colorCode = "", text = "";
+		boolean waiting = false;
+		for (char args : message.toCharArray()) {
+			if (args == '§') { // begin of color
+				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
+					ChatItem.debug("Append " + text);
+					appendToComponentBuilder(builder, new ComponentBuilder(text).color(color).create());
+					text = "";
+				}
+				waiting = true; // waiting for color code
+			} else if (waiting) { // if waiting for code and valid str
+				// if it's hexademical value and with enough space for full color
+				waiting = false;
+				if(args == 'r' && colorCode.isEmpty()) {
+					color = ChatColor.RESET;
+					continue;
+				}
+				if(args == 'x' && !colorCode.isEmpty()) {
+					text += ColorManager.getColorString(colorCode);
+					colorCode = "x";
+				} else
+					colorCode += args; // a color by itself
+			} else {
+				waiting = false;
+				if(!colorCode.isEmpty()) {
+					if(colorCode.startsWith("x") && colorCode.length() >= 7) {
+						if(colorCode.length() == 7)
+							color = ColorManager.getColor(colorCode);
+						else {
+							color = ColorManager.getColor(colorCode.substring(0, 7)); // only the hex code
+							ChatItem.debug("Adding color for " + colorCode.substring(7, colorCode.length()) + " (in " + colorCode + ")");
+							text += ColorManager.getColorString(colorCode.substring(7, colorCode.length()));
+						}
+					} else if(colorCode.length() == 1) // if only one color code
+						color = ColorManager.getColor(colorCode);
+					else
+						text += ColorManager.getColorString(colorCode);
+					colorCode = "";
+				}
+				// basic text, not waiting for code after '§'
+				text += args;
+			}
+		}
+		if(!text.isEmpty())
+			appendToComponentBuilder(builder, new ComponentBuilder(text).color(color).create());
+		return builder.create();
 	}
 }
