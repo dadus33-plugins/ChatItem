@@ -301,7 +301,7 @@ public class ChatListener implements Listener {
 		for (char args : message.toCharArray()) {
 			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
-					ChatItem.debug("Append " + text);
+					ChatItem.debug("Append while fixing name " + text);
 					appendToComponentBuilder(builder, new ComponentBuilder(text).color(color).create());
 					text = "";
 				}
