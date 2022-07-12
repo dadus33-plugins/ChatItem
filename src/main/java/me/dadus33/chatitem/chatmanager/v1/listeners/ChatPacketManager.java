@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
@@ -34,11 +33,9 @@ import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketHandler;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
-import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
-import me.dadus33.chatitem.utils.Utils;
 import me.dadus33.chatitem.utils.Version;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -189,9 +186,9 @@ public class ChatPacketManager extends PacketHandler {
 						if (act.equalsIgnoreCase("tooltip"))
 							tooltip = getStorage().BUGGED_CLIENTS_TOOLTIP;
 						else if (act.equalsIgnoreCase("item"))
-							tooltip = getMaxLinesFromItem(p, copy);
+							tooltip = ChatManager.getMaxLinesFromItem(p, copy);
 						else if (act.equalsIgnoreCase("show_both")) {
-							tooltip = getMaxLinesFromItem(p, copy);
+							tooltip = ChatManager.getMaxLinesFromItem(p, copy);
 							tooltip.addAll(getStorage().BUGGED_CLIENTS_TOOLTIP);
 						} else
 							tooltip = new ArrayList<>();
@@ -277,24 +274,5 @@ public class ChatPacketManager extends PacketHandler {
 
 	public Storage getStorage() {
 		return manager.getStorage();
-	}
-
-	private List<String> getMaxLinesFromItem(Player p, ItemStack item) {
-		List<String> lines = new ArrayList<>();
-		if (item.hasItemMeta()) {
-			ItemMeta meta = item.getItemMeta();
-			lines.add(meta.hasDisplayName() ? meta.getDisplayName()
-					: NamerManager.getName(p, item, getStorage()));
-			if (meta.hasEnchants()) {
-				meta.getEnchants().forEach((enchant, lvl) -> {
-					lines.add(ChatColor.RESET + Utils.getEnchantName(enchant) + " " + Utils.toRoman(lvl));
-				});
-			}
-			if (meta.hasLore())
-				lines.addAll(meta.getLore());
-		} else {
-			lines.add(NamerManager.getName(p, item, getStorage()));
-		}
-		return lines;
 	}
 }

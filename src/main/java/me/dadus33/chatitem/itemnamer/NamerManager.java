@@ -56,8 +56,9 @@ public class NamerManager {
 	/**
 	 * Get the name of this item, according to this storage.
 	 * 
-	 * @param item
-	 * @param storage
+	 * @param p the player that will see the name
+	 * @param item the item to show
+	 * @param storage the storage
 	 * @return the name (should NOT return null)
 	 */
 	public static String getName(Player p, ItemStack item, Storage storage) {

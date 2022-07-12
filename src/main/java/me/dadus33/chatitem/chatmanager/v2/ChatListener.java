@@ -15,6 +15,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.ItemPlayer;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.hook.DiscordSrvSupport;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
@@ -243,6 +244,7 @@ public class ChatListener implements Listener {
 		if (!ItemUtils.isEmpty(item)) {
 			ComponentBuilder itemComponent = new ComponentBuilder(ChatManager.styleItem(to, item, c));
 			String itemJson = convertItemStackToJson(item);
+			ChatItem.debug("Item for " + to.getName() + " (ver: " + ItemPlayer.getPlayer(to).getVersion().name() + ") : " + itemJson);
 			itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
 			appendToComponentBuilder(builder, itemComponent.create());
 		} else {

@@ -19,15 +19,16 @@ import me.dadus33.chatitem.hook.EcoEnchantsSupport;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.Storage;
+import me.dadus33.chatitem.utils.Utils;
 
 public abstract class ChatManager {
 
-	public final static HashMap<UUID, Long> COOLDOWNS = new HashMap<>();
-	public final static HashMap<UUID, Long> LAST_INFO_MESSAGE = new HashMap<>();
-	public final static String NAME = "{name}";
-	public final static String AMOUNT = "{amount}";
-	public final static String TIMES = "{times}";
-	public final static String LEFT = "{remaining}";
+	private final static HashMap<UUID, Long> COOLDOWNS = new HashMap<>();
+	private final static HashMap<UUID, Long> LAST_INFO_MESSAGE = new HashMap<>();
+	private final static String NAME = "{name}";
+	private final static String AMOUNT = "{amount}";
+	private final static String TIMES = "{times}";
+	private final static String LEFT = "{remaining}";
 	public final static char SEPARATOR = ((char) 0x0007);
 	public final static String SEPARATOR_STR = "\\u0007";
 
@@ -75,6 +76,31 @@ public abstract class ChatManager {
 		return item;
 	}
 
+	/**
+	 * Get all lores lines of an item, to replace the show_item action which is not working with ViaBackwards
+	 * 
+	 * @param item the item to get lines from
+	 * @return all lores
+	 */
+	public static List<String> getMaxLinesFromItem(Player p, ItemStack item) {
+		List<String> lines = new ArrayList<>();
+		if (item.hasItemMeta()) {
+			ItemMeta meta = item.getItemMeta();
+			lines.add(meta.hasDisplayName() ? meta.getDisplayName()
+					: NamerManager.getName(p, item, ChatItem.getInstance().getStorage()));
+			if (meta.hasEnchants()) {
+				meta.getEnchants().forEach((enchant, lvl) -> {
+					lines.add(ChatColor.RESET + Utils.getEnchantName(enchant) + " " + Utils.toRoman(lvl));
+				});
+			}
+			if (meta.hasLore())
+				lines.addAll(meta.getLore());
+		} else {
+			lines.add(NamerManager.getName(p, item, ChatItem.getInstance().getStorage()));
+		}
+		return lines;
+	}
+	
 	/**
 	 * Get the name of item according to player & config<br>
 	 * Prefer use {@link #getNameOfItem(Player, ItemStack, Storage)} if you want take in count the empty item
