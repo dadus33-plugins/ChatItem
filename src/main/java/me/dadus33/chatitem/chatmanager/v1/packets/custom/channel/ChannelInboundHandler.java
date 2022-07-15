@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,6 +14,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
+import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent.ContentModifier;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.CustomPacketManager;
 
 public class ChannelInboundHandler extends ChannelInboundHandlerAdapter {
@@ -71,7 +74,11 @@ public class ChannelInboundHandler extends ChannelInboundHandlerAdapter {
 			try {
 				PacketType packetType = PacketType.getType(packet.getClass().getSimpleName());
 				if(packetType != null && packetType == PacketType.Handshake.IS_SET_PROTOCOL) {
-					packetManager.protocolVersionPerChannel.put(channel, new PacketContent(packet).getIntegers().readSafely(0, 0));
+					ContentModifier<Integer> ints = new PacketContent(packet).getIntegers();
+					int possibleProtocol = ints.readSafely(0, 0);
+					if(possibleProtocol == Bukkit.getPort())
+						possibleProtocol = ints.readSafely(1, 0);
+					packetManager.protocolVersionPerChannel.put(channel, possibleProtocol);
 				}
 				super.channelRead(ctx, packet);
 			} catch (Exception e) {
