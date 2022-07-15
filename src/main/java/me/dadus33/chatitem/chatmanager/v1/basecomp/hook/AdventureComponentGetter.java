@@ -10,7 +10,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IBaseComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.utils.ReflectionUtils;
@@ -42,7 +41,7 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 			return null;
 		}
 		String json = ComponentSerializer.toString(BungeeComponentSerializer.legacy().serialize(comp).clone());
-		ChatItem.debug("AdventureJSON : " + json.replace(ChatManager.SEPARATOR, 'S'));
+		ChatItem.debug("AdventureJSON : " + json);
 		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
 		if(jsonObj.has("with")) {
 			JsonObject next = new JsonObject();

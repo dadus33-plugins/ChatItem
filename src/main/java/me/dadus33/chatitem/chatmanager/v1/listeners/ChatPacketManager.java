@@ -120,14 +120,6 @@ public class ChatPacketManager extends PacketHandler {
 		if (!found) {
 			ChatItem.debug("No placeholders founded in " + json);
 			ChatItem.debug("String: " + packet.getStrings().getContent());
-			try {
-				Class<?> c = Class.forName("net.kyori.adventure.text.Component");
-				ChatItem.debug("Component: " + packet.getSpecificModifier(c).getContent());
-			} catch (ClassNotFoundException exc) {
-				ChatItem.debug("Can't find Kyori's component");
-			} catch(Exception exc) {
-				exc.printStackTrace();
-			}
 			return; // then it's just a normal message without placeholders, so we leave it alone
 		}
 		ChatItem.debug("Found " + json + " with " + choosedGetter.getClass().getName());

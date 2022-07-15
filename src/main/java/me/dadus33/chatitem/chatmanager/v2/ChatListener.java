@@ -254,21 +254,20 @@ public class ChatListener implements Listener {
 			int stay = c.HAND_TOOLTIP.size();
 			for (String line : c.HAND_TOOLTIP) {
 				stay--;
-				handTooltip.append(
-						line.replace("{name}", origin.getName()).replace("{display-name}", origin.getDisplayName()));
+				handTooltip.append(ColorManager.fixColor(line.replace("{name}", origin.getName()).replace("{display-name}", origin.getDisplayName())));
 				if (stay > 0)
 					handTooltip.append("\n");
 			}
 			handComp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(handTooltip.create())));
-			if (handName.contains("{name}")) {
-				String[] splitted = handName.split("\\{name\\}");
+			if (handName.contains("{display-name}")) {
+				String[] splitted = handName.split("\\{display-name\\}");
 				for (int i = 0; i < (splitted.length - 1); i++) {
 					handComp.append(splitted[i]);
 					appendToComponentBuilder(handComp, PlayerNamerManager.getPlayerNamer().getName(origin));
 				}
 				handComp.append(splitted[splitted.length - 1]);
 			} else
-				handComp.append(handName.replace("{display-name}", origin.getDisplayName()));
+				handComp.append(handName.replace("{name}", origin.getName()));
 			appendToComponentBuilder(builder, handComp.create());
 		}
 	}
