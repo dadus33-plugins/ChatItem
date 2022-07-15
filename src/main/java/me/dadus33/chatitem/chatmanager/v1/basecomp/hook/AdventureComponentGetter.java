@@ -27,7 +27,7 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 			for (String cl : Arrays.asList("net.kyori.adventure.text.Component",
 					"net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer"))
 				Class.forName(cl);
-		} catch (ClassNotFoundException e) { // can't support this, adventure comp not found
+		} catch (Exception e) { // can't support this, adventure comp not found
 			return false;
 		}
 		return true;
