@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IBaseComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.utils.ReflectionUtils;
@@ -24,7 +25,7 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 	@Override
 	public boolean hasConditions() {
 		try {
-			for (String cl : Arrays.asList("net.kyori.adventure.text.Component",
+			for (String cl : Arrays.asList("net.kyori.adventure.text.Component", "net.kyori.adventure.builder.AbstractBuilder",
 					"net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer"))
 				Class.forName(cl);
 		} catch (Exception e) { // can't support this, adventure comp not found
@@ -84,7 +85,7 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 					throw new UnsupportedOperationException("The packet PacketPlayOutChat doesn't have Kyori's field. It has: " + Arrays.asList(packetClass.getDeclaredFields()).stream().map(f -> f.getName() + ": " + f.getType().getName()).collect(Collectors.toList()));
 				}
 			} else if(packetClass.getSimpleName().equalsIgnoreCase("ClientboundSystemChatPacket")) {
-				packet.setPacket(packetClass.getConstructor(Component.class, String.class, int.class).newInstance(BungeeComponentSerializer.legacy().deserialize(ComponentSerializer.parse(localJson)), null, 1));
+				packet.setPacket(PacketEditingChatManager.createSystemChatPacket(localJson));
 			} else {
 				throw new UnsupportedOperationException("The packet " + packetClass.getSimpleName() + " isn't supported by the AdventureGetter. Please report this.");
 			}

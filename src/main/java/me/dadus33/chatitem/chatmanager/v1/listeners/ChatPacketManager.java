@@ -63,7 +63,7 @@ public class ChatPacketManager extends PacketHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		for(IBaseComponentGetter getter : Arrays.asList(new IChatBaseComponentGetter(), new BaseComponentGetter(), new ComponentGetter(), new AdventureComponentGetter(), new StringComponentGetter())) {
+		for(IBaseComponentGetter getter : Arrays.asList(new IChatBaseComponentGetter(), new BaseComponentGetter(), new ComponentGetter(), new StringComponentGetter(), new AdventureComponentGetter())) {
 			if(getter.hasConditions())
 				baseComponentGetter.add(getter);
 		}
@@ -110,6 +110,8 @@ public class ChatPacketManager extends PacketHandler {
 				}
 			}
 		}
+		if(json == null)
+			return; // can't find something (should not appear)
 		boolean found = false;
 		for (String rep : getStorage().PLACEHOLDERS) {
 			if (json.contains(rep)) {

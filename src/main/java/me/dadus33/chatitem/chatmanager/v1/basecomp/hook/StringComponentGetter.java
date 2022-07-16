@@ -6,9 +6,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IBaseComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
-import net.kyori.adventure.text.Component;
 
 public class StringComponentGetter implements IBaseComponentGetter{
 
@@ -35,7 +35,7 @@ public class StringComponentGetter implements IBaseComponentGetter{
 	@Override
 	public void writeJson(ChatItemPacket packet, String json) {
 		try {
-			packet.setPacket(packet.getPacket().getClass().getConstructor(Component.class, String.class, int.class).newInstance(null, json, 1));
+			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(json));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
