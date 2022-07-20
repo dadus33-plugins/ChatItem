@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -42,12 +43,14 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 		} else if (args[0].equalsIgnoreCase("reload")) {
 			ChatItem.reload(sender);
 		} else if (args[0].equalsIgnoreCase("show")) {
-			Storage c = ChatItem.getInstance().getStorage();
-			ItemStack item = ChatManager.getUsableItem(p);
-			if(ChatManager.canShowItem(p, item, null)) {
-				for(Player all : Bukkit.getOnlinePlayers())
-					ChatListener.showItem(p, all, item, c.COMMAND_FORMAT.replace("%name%", p.getName()).replace("%item%", ChatManager.SEPARATOR_STR));
+			Player cible = args.length == 1 ? p : Bukkit.getPlayer(args[1]);
+			if(cible == null) {
+				p.sendMessage(ChatColor.RED + "The player " + args[1] + " can't be found.");
+				return false;
 			}
+			Storage c = ChatItem.getInstance().getStorage();
+			ItemStack item = ChatManager.getUsableItem(cible);
+			ChatListener.showItem(p, cible, item, c.COMMAND_FORMAT.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
 		} else if (args[0].equalsIgnoreCase("link") || args[0].equalsIgnoreCase("links")) {
 			ConfigurationSection config = ChatItem.getInstance().getConfig()
 					.getConfigurationSection("messages.chatitem-cmd.links");
@@ -75,7 +78,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] arg) {
 		List<String> list = new ArrayList<>();
 		String prefix = arg[arg.length - 1].toLowerCase(Locale.ROOT);
-		for (String s : Arrays.asList("help", "admin", "reload", "link"))
+		for (String s : Arrays.asList("help", "admin", "reload", "link", "show"))
 			if (prefix.isEmpty() || s.startsWith(prefix))
 				list.add(s);
 		return list.isEmpty() ? null : list;
