@@ -51,6 +51,16 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 			Storage c = ChatItem.getInstance().getStorage();
 			ItemStack item = ChatManager.getUsableItem(cible);
 			ChatListener.showItem(p, cible, item, c.COMMAND_FORMAT.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
+		} else if (args[0].equalsIgnoreCase("broadcast")) {
+			Player cible = args.length == 1 ? p : Bukkit.getPlayer(args[1]);
+			if(cible == null) {
+				p.sendMessage(ChatColor.RED + "The player " + args[1] + " can't be found.");
+				return false;
+			}
+			Storage c = ChatItem.getInstance().getStorage();
+			ItemStack item = ChatManager.getUsableItem(cible);
+			for(Player all : Bukkit.getOnlinePlayers())
+				ChatListener.showItem(all, cible, item, c.COMMAND_FORMAT.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
 		} else if (args[0].equalsIgnoreCase("link") || args[0].equalsIgnoreCase("links")) {
 			ConfigurationSection config = ChatItem.getInstance().getConfig()
 					.getConfigurationSection("messages.chatitem-cmd.links");
@@ -78,7 +88,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] arg) {
 		List<String> list = new ArrayList<>();
 		String prefix = arg[arg.length - 1].toLowerCase(Locale.ROOT);
-		for (String s : Arrays.asList("help", "admin", "reload", "link", "show"))
+		for (String s : Arrays.asList("help", "admin", "reload", "link", "show", "broadcast"))
 			if (prefix.isEmpty() || s.startsWith(prefix))
 				list.add(s);
 		return list.isEmpty() ? null : list;
