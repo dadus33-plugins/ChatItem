@@ -4,16 +4,20 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import org.bukkit.entity.Player;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IBaseComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.utils.ReflectionUtils;
+import me.dadus33.chatitem.utils.Storage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -41,7 +45,7 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 			ChatItem.debug("The component is null.");
 			return null;
 		}
-		String json = ComponentSerializer.toString(BungeeComponentSerializer.legacy().serialize(comp).clone());
+		String json = ComponentSerializer.toString(BungeeComponentSerializer.get().serialize(comp).clone());
 		ChatItem.debug("AdventureJSON : " + json);
 		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
 		if(jsonObj.has("with")) {
@@ -52,15 +56,124 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 		useExtra = true;
 		return json;
 	}
+	
+	@Override
+	public String hasPlaceholders(Storage c, String json) {
+		if(useExtra)
+			return IBaseComponentGetter.super.hasPlaceholders(c, json);
+		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
+		if(!jsonObj.has("extra"))
+			return null;
+		for(JsonElement element : jsonObj.get("extra").getAsJsonArray()) {
+			if(element.isJsonObject()) {
+				JsonObject withObj = element.getAsJsonObject();
+				if(withObj.has("extra")) {
+					String text = "";
+					for(JsonElement extra : withObj.get("extra").getAsJsonArray()) {
+						if(extra.isJsonObject()) {
+							JsonObject extraObj = extra.getAsJsonObject();
+							if(extraObj.has("text") && extraObj.get("text").isJsonPrimitive())
+								text += extraObj.get("text").getAsString();
+						}
+					}
+					String placeholder = IBaseComponentGetter.super.hasPlaceholders(c, text);
+					if(placeholder != null)
+						return placeholder;
+				}
+			} // ignoring all others because it should not appear
+		}
+		return null;
+	}
+	
+	@Override
+	public String getNameFromMessage(String json, String toReplace) {
+		if(useExtra)
+			return IBaseComponentGetter.super.getNameFromMessage(json, toReplace);
+		String tmpName = IBaseComponentGetter.super.getNameFromMessage(json, toReplace);
+		if(tmpName != null)
+			return tmpName; // don't need to check for json if basically found
+		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
+		if(!jsonObj.has("extra"))
+			return null;
+		for(JsonElement element : jsonObj.get("extra").getAsJsonArray()) {
+			if(element.isJsonObject()) {
+				JsonObject withObj = element.getAsJsonObject();
+				if(withObj.has("extra")) {
+					String text = "";
+					for(JsonElement extra : withObj.get("extra").getAsJsonArray()) {
+						if(extra.isJsonObject()) {
+							JsonObject extraObj = extra.getAsJsonObject();
+							if(extraObj.has("text") && extraObj.get("text").isJsonPrimitive())
+								text += extraObj.get("text").getAsString();
+						}
+					}
+					String possibleName = IBaseComponentGetter.super.getNameFromMessage(text, toReplace);
+					if(possibleName != null)
+						return possibleName;
+				}
+			} // ignoring all others because it should not appear
+		}
+		return null;
+	}
+	
+	@Override
+	public String removePlaceholdersAndName(String json, String toReplace, Player foundedPlayer) {
+		if(useExtra)
+			return IBaseComponentGetter.super.removePlaceholdersAndName(json, toReplace, foundedPlayer);
+		String tmpName = IBaseComponentGetter.super.removePlaceholdersAndName(json, toReplace, foundedPlayer);
+		if(!tmpName.equals(json)) // if not the same -> name found and removed
+			return tmpName;
+		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
+		if(!jsonObj.has("extra"))
+			return json;
+		String searched = toReplace + foundedPlayer.getName();
+		for(JsonElement element : jsonObj.get("extra").getAsJsonArray()) {
+			if(element.isJsonObject()) {
+				JsonObject withObj = element.getAsJsonObject();
+				if(withObj.has("extra")) {
+					String text = "";
+					int possibleId = -1;
+					JsonArray extraArray = withObj.get("extra").getAsJsonArray();
+					for(int i = 0; i < extraArray.size(); i++) {
+						JsonElement extra = extraArray.get(i);
+						if(!extra.isJsonObject())
+							continue; // prevent error but should not appear
+						JsonObject extraObj = extra.getAsJsonObject();
+						if(extraObj.has("text") && extraObj.get("text").isJsonPrimitive()) {
+							String extraTxt = extraObj.get("text").getAsString();
+							if(possibleId == -1) { // don't found the begin yet
+								if(searched.startsWith(extraTxt)) { // begin of replaced
+									possibleId = i;
+									text = extraTxt;
+								}
+							} else {
+								if(searched.startsWith(extraTxt, text.length()) || ChatManager.equalsSeparator(extraTxt)) {
+									text += extraTxt;
+									if(searched.equals(text)) { // found everything
+										// change actual, then remove all old
+										extraArray.set(i, JsonParser.parseString("{\"text\":\"" + Character.toString(ChatManager.SEPARATOR) + "\"}"));
+										for(int x = possibleId; x < i; x++)
+											extraArray.remove(possibleId); // remove elements
+										ChatItem.debug("Cleaned: " + jsonObj.toString());
+										return jsonObj.toString();
+									}
+								} else {
+									possibleId = -1; // was not good things
+									text = "";
+								}
+							}
+						}
+					}
+					ChatItem.debug("Failed to find: " + text + ", id: " + possibleId + " for " + withObj);
+				}
+			} // ignoring all others because it should not appear
+		}
+		ChatItem.debug("Nothing founded while trying to remove placeholders");
+		return IBaseComponentGetter.super.removePlaceholdersAndName(json, toReplace, foundedPlayer);
+	}
 
 	@Override
 	public void writeJson(ChatItemPacket packet, String json) {
-		/*JsonObject next = new JsonObject();
-		next.addProperty("translate", "chat.type.text");
-		if(useExtra)
-			next.add("with", fixParsedArray(JsonParser.parseString(json).getAsJsonObject().getAsJsonArray("extra")));
-		else
-			next.add("extra", fixParsedArray(JsonParser.parseString(json).getAsJsonObject().getAsJsonArray("extra")));*/
 		JsonElement globalElement = JsonParser.parseString(json);
 		JsonArray extraArray = fixParsedArray(globalElement.getAsJsonObject().getAsJsonArray("extra"));
 		String localJson;

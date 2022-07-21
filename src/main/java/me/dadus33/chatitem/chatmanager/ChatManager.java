@@ -32,6 +32,38 @@ public abstract class ChatManager {
 	public final static char SEPARATOR = ((char) 0x0007);
 	public final static String SEPARATOR_STR = "\\u0007";
 
+	public static String fixSeparator(String s) {
+		return s.replace(ChatManager.SEPARATOR_STR, Character.toString(ChatManager.SEPARATOR));
+	}
+
+	public static boolean equalsSeparator(String s) {
+		return s.equalsIgnoreCase(SEPARATOR_STR) || s.equalsIgnoreCase(Character.toString(SEPARATOR));
+	}
+
+	public static boolean containsSeparator(String s) {
+		return s.contains(SEPARATOR_STR) || s.contains(Character.toString(SEPARATOR));
+	}
+	
+	public static boolean endsWithSeparator(String s) {
+		return s.endsWith(SEPARATOR_STR) || s.endsWith(Character.toString(SEPARATOR));
+	}
+	
+	public static String[] splitWithSeparator(String msg) {
+		List<String> list = new ArrayList<>();
+		String current = "";
+		for(String s : msg.split("")) {
+			if(equalsSeparator(s)) {
+				if(!current.isEmpty())
+					list.add(current);
+				current = "";
+			} else
+				current += s;
+		}
+		if(!current.isEmpty())
+			list.add(current);
+		return list.toArray(new String[] {});
+	}
+
 	protected Storage s;
 
 	public ChatManager() {

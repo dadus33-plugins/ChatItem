@@ -11,6 +11,7 @@ import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulatorCurrent;
 import me.dadus33.chatitem.chatmanager.v1.listeners.ChatEventListener;
 import me.dadus33.chatitem.chatmanager.v1.listeners.ChatPacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacketManager;
+import me.dadus33.chatitem.chatmanager.v1.packets.PacketManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
 
@@ -51,14 +52,17 @@ public class PacketEditingChatManager extends ChatManager {
 		super.load(pl, s);
 
 		Bukkit.getPluginManager().registerEvents(chatEventListener, pl);
-		packetManager.getPacketManager().addHandler(chatPacketManager);
+		PacketManager pm = packetManager.getPacketManager();
+		pm.addHandler(chatPacketManager);
+		Bukkit.getOnlinePlayers().forEach(pm::addPlayer); // add actual online players
 	}
 
 	@Override
 	public void unload(ChatItem pl) {
 		HandlerList.unregisterAll(chatEventListener);
-		packetManager.getPacketManager().removeHandler(chatPacketManager);
-		packetManager.getPacketManager().stop();
+		PacketManager pm = packetManager.getPacketManager();
+		pm.removeHandler(chatPacketManager);
+		pm.stop();
 	}
 
 	public JSONManipulatorCurrent getManipulator() {

@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -23,6 +22,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Reflect;
 import me.dadus33.chatitem.utils.Version;
@@ -44,7 +44,7 @@ public class JSONManipulatorCurrent {
 	private JsonObject itemTooltip;
 	private JsonArray classicTooltip;
 
-	public String parse(String json, String placeholder, ItemStack item, String replacement, int protocol)
+	public String parse(String json, ItemStack item, String replacement, int protocol)
 			throws Exception {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		JsonArray array = obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray();
@@ -55,15 +55,12 @@ public class JSONManipulatorCurrent {
 			JsonArray use = Translator.toJson(replacement); // We get the json representation of the old color
 															// formatting method
 			ChatItem.debug("Remplacement: " + replacement + " use: " + use.toString());
-			// There's no public clone method for JSONObjects so we need to parse them every
-			// time
-			JsonObject hover = JsonParser.parseString("{\"action\":\"show_item\", \"value\": \"\"}").getAsJsonObject();
+			// There's no public clone method for JSONObjects so we need to parse them every time
+			JsonObject hover = new JsonObject();
+			hover.addProperty("action", "show_item");
 
-			String jsonRep = stringifyItem(this, item, protocolVersion);// stringifyItem(item); // Get the JSON
-																		// representation of the item (well, not really
-																		// JSON, but
-			// rather a string representation of NBT data)
-			hover.addProperty("value", jsonRep);
+			// Get the JSON representation of the item (well, not really JSON, but rather a string representation of NBT data)
+			hover.addProperty("value", stringifyItem(this, item, protocolVersion));
 
 			JsonObject wrapper = new JsonObject(); // Create a wrapper object for the whole array
 			wrapper.addProperty("text", ""); // The text field is compulsory, even if it's empty
@@ -77,14 +74,14 @@ public class JSONManipulatorCurrent {
 			Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), () -> STACKS.remove(p), 100L);
 		}
 
-		obj.add("extra", parseArray(placeholder, array, itemTooltip));
+		obj.add("extra", parseArray(array, itemTooltip));
 		if (!obj.has("text")) {
 			obj.addProperty("text", "");
 		}
 		return obj.toString();
 	}
 
-	public String parseEmpty(String json, String placeholder, String repl, List<String> tooltip, Player sender) {
+	public String parseEmpty(String json, String repl, List<String> tooltip, Player sender) {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		JsonArray array = obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray();
 		JsonArray use = Translator
@@ -108,42 +105,42 @@ public class JSONManipulatorCurrent {
 				ob.getAsJsonObject().add("hoverEvent", hover);
 			classicTooltip = use;
 		}
-		obj.add("extra", parseArray(placeholder, array, classicTooltip));
+		obj.add("extra", parseArray(array, classicTooltip));
 		if (!obj.has("text")) {
 			obj.addProperty("text", "");
 		}
 		return obj.toString();
 	}
 
-	private JsonArray parseArray(String placeholder, JsonArray arr, JsonElement tooltip) {
+	private JsonArray parseArray(JsonArray arr, JsonElement tooltip) {
 		JsonArray replacer = new JsonArray();
 		for (int i = 0; i < arr.size(); ++i) {
 			if (arr.get(i).isJsonNull()) {
 				continue;
 			} else if (arr.get(i).isJsonObject()) {
-				addParsedJsonObjectToArray(arr.get(i).getAsJsonObject(), placeholder, replacer, tooltip);
+				addParsedJsonObjectToArray(arr.get(i).getAsJsonObject(), replacer, tooltip);
 			} else if (arr.get(i).isJsonArray()) {
 				JsonArray jar = arr.get(i).getAsJsonArray();
 				if (jar.size() != 0) {
-					jar = parseArray(placeholder, arr.get(i).getAsJsonArray(), tooltip);
+					jar = parseArray(arr.get(i).getAsJsonArray(), tooltip);
 					replacer.set(i, jar);
 				}
 			} else {
-				addParsedStringToArray(arr.get(i).getAsString(), placeholder, replacer, arr.get(i), tooltip);
+				addParsedStringToArray(arr.get(i).getAsString(), replacer, arr.get(i), tooltip);
 			}
 
 		}
 		return replacer;
 	}
 	
-	private void addParsedJsonObjectToArray(JsonObject o, String placeholder, JsonArray rep, JsonElement tooltip) {
+	private void addParsedJsonObjectToArray(JsonObject o, JsonArray rep, JsonElement tooltip) {
 		JsonElement text = o.get("text");
 		if (text == null) {
 			JsonElement el = o.get("extra");
 			if (el != null) {
 				JsonArray jar = el.getAsJsonArray();
 				if (jar.size() != 0) {
-					o.add("extra", parseArray(placeholder, jar, tooltip));
+					o.add("extra", parseArray(jar, tooltip));
 				} else {
 					o.remove("extra");
 				}
@@ -155,7 +152,7 @@ public class JSONManipulatorCurrent {
 				if (el != null) {
 					JsonArray jar = el.getAsJsonArray();
 					if (jar.size() != 0) {
-						o.add("extra", parseArray(placeholder, jar, tooltip));
+						o.add("extra", parseArray(jar, tooltip));
 					} else {
 						o.remove("extra");
 					}
@@ -163,35 +160,29 @@ public class JSONManipulatorCurrent {
 			}
 		}
 
-		addParsedStringToArray(text.getAsString(), placeholder, rep, o, tooltip);
+		addParsedStringToArray(text.getAsString(), rep, o, tooltip);
 	}
 	
-	private void addParsedStringToArray(String msg, String placeholder, JsonArray rep, JsonElement o, JsonElement tooltip) {
-		boolean isLast = msg.endsWith(placeholder);
-		if (isLast) {
-			msg = msg.concat(".");
-		}
-		String[] splits = msg.split(Pattern.quote(placeholder));
-		if (splits.length != 1) {
-			for (int j = 0; j < splits.length; ++j) {
-				boolean endDot = (j == splits.length - 1) && isLast;
-				if (!splits[j].isEmpty() && !endDot) {
-					String st = o.toString();
-					JsonElement element = JsonParser.parseString(st);
-					if(element.isJsonObject()) {
-						JsonObject fix = element.getAsJsonObject();
-						fix.addProperty("text", splits[j]);
-						rep.add(fix);
-					} else
-						rep.add(new JsonPrimitive(splits[j]));
-				}
-				if (j != splits.length - 1) {
-					rep.add(tooltip);
-				}
-			}
-		} else {
+	private void addParsedStringToArray(String msg, JsonArray rep, JsonElement o, JsonElement tooltip) {
+		ChatItem.debug("Checking " + msg + " > " + rep + ", o: " + o);
+		if(!ChatManager.containsSeparator(msg)) {
 			rep.add(o);
+			return;
 		}
+		String current = "";
+		for(String parts : msg.split("")) {
+			if(ChatManager.equalsSeparator(parts)) {
+				if(!current.isEmpty()) {
+					rep.add(current);
+					current = "";
+				}
+				rep.add(tooltip);
+			} else {
+				current += parts;
+			}
+		}
+		if(!current.isEmpty())
+			rep.add(current);
 	}
 
 	@SuppressWarnings({ "deprecation" })

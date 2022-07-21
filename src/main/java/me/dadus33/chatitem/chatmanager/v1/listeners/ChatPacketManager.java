@@ -104,70 +104,48 @@ public class ChatPacketManager extends PacketHandler {
 			for(IBaseComponentGetter getters : baseComponentGetter) {
 				String tmpJson = getters.getBaseComponentAsJSON(e);
 				if(tmpJson != null) {
-					json = tmpJson;
+					json = ChatManager.fixSeparator(tmpJson);
 					choosedGetter = getters;
 					break;
 				}
 			}
 		}
 		if(json == null)
-			return; // can't find something (should not appear)
-		boolean found = false;
-		for (String rep : getStorage().PLACEHOLDERS) {
-			if (json.contains(rep)) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
+			return; // can't find something
+		String placeholder = choosedGetter.hasPlaceholders(getStorage(), json);
+		if (placeholder == null) {
 			ChatItem.debug("No placeholders founded in " + json);
 			ChatItem.debug("String: " + packet.getStrings().getContent());
 			return; // then it's just a normal message without placeholders, so we leave it alone
 		}
-		ChatItem.debug("Found " + json + " with " + choosedGetter.getClass().getName());
-		Object toReplace = null;
+		ChatItem.debug("Found " + placeholder + " with " + choosedGetter.getClass().getName());
+		String toReplace = null;
 		if (json.lastIndexOf(SEPARATOR) != -1)
-			toReplace = SEPARATOR;
+			toReplace = ((Object) SEPARATOR).toString();
 		if (json.lastIndexOf(SEPARATOR_STR) != -1)
 			toReplace = SEPARATOR_STR;
 		if (toReplace == null) { // if the message doesn't contain the BELL separator
 			ChatItem.debug("Not containing bell " + json);
 			return;
 		}
+		toReplace = placeholder + toReplace; // add placeholder
+		String name = choosedGetter.getNameFromMessage(json, toReplace);
+		if (name == null) { // something went really bad, so we run away and hide (AKA the player left or is
+			// on another server)
+			ChatItem.debug("Name null for " + json);
+			return;
+		}
+		Player itemPlayer = Bukkit.getPlayer(name);
+		String localJson = choosedGetter.removePlaceholdersAndName(json, toReplace, itemPlayer);
+		ChatItem.debug("Local json: " + localJson);
 		IBaseComponentGetter fchoosedGetter = choosedGetter;
-		String fjson = json, toReplaceStr = toReplace.toString();
 		e.setCancelled(true); // We cancel the packet as we're going to resend it anyways (ignoring listeners
 		// this time)
 		Bukkit.getScheduler().runTaskAsynchronously(ChatItem.getInstance(), () -> {
 			Player p = e.getPlayer();
-			int topIndex = -1;
-			String name = null;
-			for (Player pl : Bukkit.getOnlinePlayers()) {
-				String pname = toReplaceStr + pl.getName();
-				if (!fjson.contains(pname)) {
-					continue;
-				}
-				int index = fjson.lastIndexOf(pname) + pname.length();
-				if (index > topIndex) {
-					topIndex = index;
-					name = pname.replace(toReplaceStr, "");
-				}
-			}
-			if (name == null) { // something went really bad, so we run away and hide (AKA the player left or is
-				// on another server)
-				ChatItem.debug("Name null for " + fjson);
-				return;
-			}
-
-			Player itemPlayer = Bukkit.getPlayer(name);
 			if (getStorage().COOLDOWN > 0 && !itemPlayer.hasPermission("chatitem.ignore-cooldown")) {
 				ChatManager.applyCooldown(itemPlayer);
 			}
-			StringBuilder builder = new StringBuilder(fjson);
-			builder.replace(topIndex - (name.length() + 6), topIndex, ""); // we remove both the name and the separator
-			// from the json string
-			String localJson = fjson.replace(toReplaceStr + itemPlayer.getName(), "");// builder.toString();
-
 			String message = null;
 			try {
 				ItemStack item = ChatManager.getUsableItem(itemPlayer);
@@ -186,7 +164,7 @@ public class ChatPacketManager extends PacketHandler {
 							tooltip.addAll(getStorage().BUGGED_CLIENTS_TOOLTIP);
 						} else
 							tooltip = new ArrayList<>();
-						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS.get(0),
+						message = manager.getManipulator().parseEmpty(localJson,
 								ChatManager.styleItem(p, copy, getStorage()), tooltip, itemPlayer);
 						if (!manager.supportsChatComponentApi()) {
 							ChatItem.debug("Use basic for 1.7 lunar");
@@ -219,12 +197,11 @@ public class ChatPacketManager extends PacketHandler {
 							}
 						}
 					}
-					message = manager.getManipulator().parse(localJson, getStorage().PLACEHOLDERS.get(0), copy,
+					message = manager.getManipulator().parse(localJson, copy,
 							ChatManager.styleItem(p, copy, getStorage()), ItemPlayer.getPlayer(itemPlayer).getProtocolVersion());
 				} else {
 					if (!getStorage().HAND_DISABLED) {
-						message = manager.getManipulator().parseEmpty(localJson, getStorage().PLACEHOLDERS.get(0),
-								getStorage().HAND_NAME, getStorage().HAND_TOOLTIP, itemPlayer);
+						message = manager.getManipulator().parseEmpty(localJson, getStorage().HAND_NAME, getStorage().HAND_TOOLTIP, itemPlayer);
 					}
 				}
 			} catch (Exception e1) {
