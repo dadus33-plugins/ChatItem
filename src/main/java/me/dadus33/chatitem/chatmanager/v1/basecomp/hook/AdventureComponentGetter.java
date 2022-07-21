@@ -79,6 +79,10 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 					String placeholder = IBaseComponentGetter.super.hasPlaceholders(c, text);
 					if(placeholder != null)
 						return placeholder;
+				} else if(withObj.has("text")) {
+					String placeholder = IBaseComponentGetter.super.hasPlaceholders(c, withObj.get("text").getAsString());
+					if(placeholder != null)
+						return placeholder;
 				}
 			} // ignoring all others because it should not appear
 		}
@@ -108,6 +112,10 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 						}
 					}
 					String possibleName = IBaseComponentGetter.super.getNameFromMessage(text, toReplace);
+					if(possibleName != null)
+						return possibleName;
+				} else if(withObj.has("text")) {
+					String possibleName = IBaseComponentGetter.super.getNameFromMessage(withObj.get("text").getAsString(), toReplace);
 					if(possibleName != null)
 						return possibleName;
 				}
