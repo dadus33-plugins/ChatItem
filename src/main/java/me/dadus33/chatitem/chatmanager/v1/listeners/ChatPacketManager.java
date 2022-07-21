@@ -110,8 +110,11 @@ public class ChatPacketManager extends PacketHandler {
 				}
 			}
 		}
-		if(json == null)
+		if(json == null || choosedGetter == null) {
+			ChatItem.debug("Can't find valid json getter or json itself");
+			ChatItem.debug("String: " + packet.getStrings().getContent());
 			return; // can't find something
+		}
 		String placeholder = choosedGetter.hasPlaceholders(getStorage(), json);
 		if (placeholder == null) {
 			ChatItem.debug("No placeholders founded in " + json);

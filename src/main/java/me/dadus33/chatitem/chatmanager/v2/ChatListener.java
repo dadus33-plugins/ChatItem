@@ -31,7 +31,6 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 
 @SuppressWarnings("deprecation")
 public class ChatListener implements Listener {
@@ -258,7 +257,7 @@ public class ChatListener implements Listener {
 				if (stay > 0)
 					handTooltip.append("\n");
 			}
-			handComp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(handTooltip.create())));
+			handComp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, handTooltip.create()));
 			if (handName.contains("{display-name}")) {
 				String[] splitted = handName.split("\\{display-name\\}");
 				for (int i = 0; i < (splitted.length - 1); i++) {
