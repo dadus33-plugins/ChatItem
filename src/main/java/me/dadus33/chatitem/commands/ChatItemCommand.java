@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -45,7 +44,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 		} else if (args[0].equalsIgnoreCase("show")) {
 			Player cible = args.length == 1 ? p : Bukkit.getPlayer(args[1]);
 			if(cible == null) {
-				p.sendMessage(ChatColor.RED + "The player " + args[1] + " can't be found.");
+				Messages.sendMessage(p, "player-not-found", "%arg%", args[1]);
 				return false;
 			}
 			Storage c = ChatItem.getInstance().getStorage();
@@ -54,7 +53,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 		} else if (args[0].equalsIgnoreCase("broadcast")) {
 			Player cible = args.length == 1 ? p : Bukkit.getPlayer(args[1]);
 			if(cible == null) {
-				p.sendMessage(ChatColor.RED + "The player " + args[1] + " can't be found.");
+				Messages.sendMessage(p, "player-not-found", "%arg%", args[1]);
 				return false;
 			}
 			Storage c = ChatItem.getInstance().getStorage();
