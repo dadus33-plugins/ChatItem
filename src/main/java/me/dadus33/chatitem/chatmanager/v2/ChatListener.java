@@ -241,7 +241,8 @@ public class ChatListener implements Listener {
 	public static void addItem(ComponentBuilder builder, Player to, Player origin, ItemStack item) {
 		Storage c = ChatItem.getInstance().getStorage();
 		if (!ItemUtils.isEmpty(item)) {
-			ComponentBuilder itemComponent = new ComponentBuilder(ChatManager.styleItem(to, item, c));
+			ComponentBuilder itemComponent = new ComponentBuilder("");
+			appendToComponentBuilder(itemComponent, fixColorComponent(ChatManager.getNameOfItem(to, item, c), ChatColor.WHITE));
 			String itemJson = convertItemStackToJson(item);
 			ChatItem.debug("Item for " + to.getName() + " (ver: " + ItemPlayer.getPlayer(to).getVersion().name() + ") : " + itemJson);
 			itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
@@ -302,7 +303,7 @@ public class ChatListener implements Listener {
 			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
 					ChatItem.debug("Append while fixing name " + text);
-					appendToComponentBuilder(builder, new ComponentBuilder(text).color(color).create());
+					appendToComponentBuilder(builder, new ComponentBuilder(ColorManager.isHexColor(color) ? ChatColor.stripColor(text) : text).color(color).create());
 					text = "";
 				}
 				waiting = true; // waiting for color code

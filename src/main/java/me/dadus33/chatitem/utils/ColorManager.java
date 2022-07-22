@@ -4,6 +4,10 @@ import me.dadus33.chatitem.ChatItem;
 import net.md_5.bungee.api.ChatColor;
 
 public class ColorManager {
+	
+	public static boolean isHexColor(ChatColor c) {
+		return Version.getVersion().isNewerOrEquals(Version.V1_16) && c.getName().startsWith("#");
+	}
 
 	public static String getColorString(String input) {
 		if (input == null || input.isEmpty())
