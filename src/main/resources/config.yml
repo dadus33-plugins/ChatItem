@@ -116,6 +116,8 @@ messages:
     hover: "&6Click to go to spigot page !"
   # For all commands ran by console by reserved to player
   only-players: "&cOnly players can run this command"
+  # The player is not found
+  player-not-found: "&cThe player %arg% can't be founded."
   # All messages for the /chatitem command
   chatitem-cmd:
     help:
@@ -161,6 +163,7 @@ messages:
     limit-per-message: "&6Limit per message: &a%state%"
     cooldown: "&6Cooldown: &a%state%"
     debug: "&6Debug: &a%state%"
+    check-update: "&6Check updates: &a%state%"
     # Change name and lore of all managers
     manager:
       both:

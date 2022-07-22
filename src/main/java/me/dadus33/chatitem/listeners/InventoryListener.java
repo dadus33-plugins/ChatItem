@@ -50,6 +50,9 @@ public class InventoryListener implements Listener {
 		} else if(type.equals(Material.STICK)) {
 			setInConfig("general.hand.disabled", c.HAND_DISABLED = !c.HAND_DISABLED);
 			open(p);
+		} else if(type.equals(Material.BOOK)) {
+			setInConfig("general.check-update", c.CHECK_UPDATE = !c.CHECK_UPDATE);
+			open(p);
 		} else if(type.equals(ItemUtils.FIREWORK_CHARGE)) {
 			setInConfig("debug", c.DEBUG = !c.DEBUG);
 			open(p);
@@ -97,6 +100,7 @@ public class InventoryListener implements Listener {
 		inv.setItem(20, getBoolChangeItem(Material.STICK, "hand-disabled", c.HAND_DISABLED));
 		inv.setItem(21, getAmountChangeItem(Material.IRON_DOOR, "limit-per-message", c.LIMIT));
 		inv.setItem(22, getAmountChangeItem(Material.APPLE, "cooldown", c.COOLDOWN));
+		inv.setItem(23, getBoolChangeItem(Material.BOOK, "check-update", c.CHECK_UPDATE));
 		
 		inv.setItem(26, createItem(ItemUtils.MATERIAL_CLOSE, Messages.getMessage("admin-inv.close")));
 		p.openInventory(inv);
