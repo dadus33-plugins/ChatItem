@@ -302,8 +302,8 @@ public class ChatListener implements Listener {
 		for (char args : message.toCharArray()) {
 			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
-					ChatItem.debug("Append while fixing name " + text);
-					appendToComponentBuilder(builder, new ComponentBuilder(ColorManager.isHexColor(color) ? ChatColor.stripColor(text) : text).color(color).create());
+					ChatItem.debug("Append while fixing name " + (ColorManager.isHexColor(color) && builder.getParts().isEmpty() ? ColorManager.removeColorAtBegin(text) : text));
+					appendToComponentBuilder(builder, new ComponentBuilder(ColorManager.isHexColor(color) ? ColorManager.removeColorAtBegin(text) : text).color(color).create());
 					text = "";
 				}
 				waiting = true; // waiting for color code
@@ -334,6 +334,7 @@ public class ChatListener implements Listener {
 						color = ColorManager.getColor(colorCode);
 					else
 						text += ColorManager.getColorString(colorCode);
+					ChatItem.debug("Color: " + color + ", text: " + text);
 					colorCode = "";
 				}
 				// basic text, not waiting for code after '§'

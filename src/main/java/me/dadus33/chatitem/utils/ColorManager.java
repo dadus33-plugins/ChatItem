@@ -1,14 +1,45 @@
 package me.dadus33.chatitem.utils;
 
+import java.util.Arrays;
+import java.util.List;
+
 import me.dadus33.chatitem.ChatItem;
 import net.md_5.bungee.api.ChatColor;
 
 public class ColorManager {
+
+	public static final List<String> COLORS = Arrays.asList("4", "c", "6", "e", "2", "a", "b", "3", "1", "9", "d", "5", "f", "7", "8", "0");
 	
 	public static boolean isHexColor(ChatColor c) {
 		return Version.getVersion().isNewerOrEquals(Version.V1_16) && c.getName().startsWith("#");
 	}
 
+	public static String removeColorAtBegin(String s) {
+		if(s == null || s.isEmpty())
+			return "";
+		boolean wasColorChar = s.startsWith(Character.toString(ChatColor.COLOR_CHAR));
+		if(!wasColorChar)
+			return s;
+		String next = "";
+		for(int i = 1; i < s.length(); i++) {
+			char c = s.charAt(i);
+			if(wasColorChar) {
+				if(!COLORS.contains(Character.toString(c)))
+					next = next + ChatColor.COLOR_CHAR + "" + c;
+				wasColorChar = false;
+			} else {
+				wasColorChar = c == ChatColor.COLOR_CHAR;
+				if(!wasColorChar) { // something other than color code
+					next += s.substring(i);
+					break;
+				}
+			}
+		}
+		if(next.isEmpty())
+			next = s;
+		return next;
+	}
+	
 	public static String getColorString(String input) {
 		if (input == null || input.isEmpty())
 			return "";
