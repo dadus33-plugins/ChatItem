@@ -103,7 +103,9 @@ public abstract class ChatManager {
 				
 				meta.setLore(lores);
 				item.setItemMeta(meta);
-			}
+				ChatItem.debug("Added " + addLore.size() + " lores from EcoEnchants");
+			} else
+				ChatItem.debug("No lore to add from EcoEnchants");
 		}
 		return item;
 	}
