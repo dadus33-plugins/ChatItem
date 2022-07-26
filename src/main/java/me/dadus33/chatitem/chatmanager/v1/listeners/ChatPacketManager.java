@@ -181,23 +181,22 @@ public class ChatPacketManager extends PacketHandler {
 						PacketUtils.sendPacket(p, lastSentPacket);
 						return;
 					}
-					if (copy.getType().name().contains("_BOOK")) { // filtering written books
-						BookMeta bm = (BookMeta) copy.getItemMeta();
-						bm.setPages(Collections.emptyList());
-						copy.setItemMeta(bm);
-					} else {
-						if (copy.getType().name().contains("SHULKER_BOX")) { // if it's shulker
-							if (copy.hasItemMeta()) {
-								BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
-								if (bsm.hasBlockState()) {
-									ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
-									for (ItemStack itemInv : sb.getInventory()) {
-										stripData(itemInv);
-									}
-									bsm.setBlockState(sb);
+					if(copy.hasItemMeta()) {
+						ItemMeta meta = copy.getItemMeta();
+						if (meta instanceof BookMeta) { // filtering written books
+							BookMeta bm = (BookMeta) copy.getItemMeta();
+							bm.setPages(Collections.emptyList());
+							copy.setItemMeta(bm);
+						} else if (meta instanceof BlockStateMeta) { // if it's a block
+							BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
+							if (bsm.hasBlockState()) {
+								ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
+								for (ItemStack itemInv : sb.getInventory()) {
+									stripData(itemInv);
 								}
-								copy.setItemMeta(bsm);
+								bsm.setBlockState(sb);
 							}
+							copy.setItemMeta(bsm);
 						}
 					}
 					message = manager.getManipulator().parse(localJson, copy,
