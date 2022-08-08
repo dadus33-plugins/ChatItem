@@ -187,9 +187,9 @@ public class ChatPacketManager extends PacketHandler {
 							BookMeta bm = (BookMeta) copy.getItemMeta();
 							bm.setPages(Collections.emptyList());
 							copy.setItemMeta(bm);
-						} else if (meta instanceof BlockStateMeta) { // if it's a block
+						} else if (meta instanceof BlockStateMeta && Version.getVersion().isNewerOrEquals(Version.V1_9)) { // if it's a block
 							BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
-							if (bsm.hasBlockState()) {
+							if (bsm.hasBlockState() && bsm.getBlockState() instanceof ShulkerBox) {
 								ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
 								for (ItemStack itemInv : sb.getInventory()) {
 									stripData(itemInv);
