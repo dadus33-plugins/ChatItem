@@ -234,8 +234,14 @@ public class JSONManipulatorCurrent {
 					sb.append(entry.getKey());
 				sb.append(":");
 			}
-			ChatItem.debug("Cleaning " + entry.getKey() + ": " + entry.getValue() + " > " + cleanStr(entry.getValue()));
-			sb.append(cleanStr(entry.getValue()));
+			if(entry.getKey().equalsIgnoreCase("display") && Version.getVersion().isNewerOrEquals(Version.V1_16)) {
+				String replaced = entry.getValue().replace("','", ",").replace("\"}',", "\"},");
+				ChatItem.debug("Cleaning display (custom): " + entry.getValue() + " > " + replaced);
+				sb.append(replaced);
+			} else {
+				ChatItem.debug("Cleaning " + entry.getKey() + ": " + entry.getValue() + " > " + cleanStr(entry.getValue()));
+				sb.append(cleanStr(entry.getValue()));
+			}
 		}
 		sb.append("}}"); // End of tag and end of item
 		return sb.toString();

@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -242,8 +244,8 @@ public class ChatListener implements Listener {
 		Storage c = ChatItem.getInstance().getStorage();
 		if (!ItemUtils.isEmpty(item)) {
 			ComponentBuilder itemComponent = new ComponentBuilder("");
-			appendToComponentBuilder(itemComponent, fixColorComponent(ChatManager.getNameOfItem(to, item, c), ChatColor.WHITE));
 			String itemJson = convertItemStackToJson(item);
+			appendToComponentBuilder(itemComponent, fixColorComponent(ChatManager.getNameOfItem(to, item, c), ChatColor.WHITE, itemJson));
 			ChatItem.debug("Item for " + to.getName() + " (ver: " + ItemPlayer.getPlayer(to).getVersion().name() + ") : " + itemJson);
 			itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
 			appendToComponentBuilder(builder, itemComponent.create());
@@ -296,6 +298,10 @@ public class ChatListener implements Listener {
 	}
 
 	public static BaseComponent[] fixColorComponent(String message, ChatColor color) {
+		return fixColorComponent(message, color, null);
+	}
+	
+	public static BaseComponent[] fixColorComponent(String message, ChatColor color, @Nullable String jsonItem) {
 		ComponentBuilder builder = new ComponentBuilder("");
 		String colorCode = "", text = "";
 		boolean waiting = false;
@@ -303,7 +309,11 @@ public class ChatListener implements Listener {
 			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
 					ChatItem.debug("Append while fixing name " + (ColorManager.isHexColor(color) && builder.getParts().isEmpty() ? ColorManager.removeColorAtBegin(text) : text));
-					appendToComponentBuilder(builder, new ComponentBuilder(ColorManager.isHexColor(color) ? ColorManager.removeColorAtBegin(text) : text).color(color).create());
+					ComponentBuilder littleBuilder = new ComponentBuilder(ColorManager.isHexColor(color) ? ColorManager.removeColorAtBegin(text) : text).color(color);
+					if(jsonItem != null) { // add to all possible sub parts
+						littleBuilder.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(jsonItem).create()));
+					}
+					appendToComponentBuilder(builder, littleBuilder.create());
 					text = "";
 				}
 				waiting = true; // waiting for color code
@@ -341,8 +351,13 @@ public class ChatListener implements Listener {
 				text += args;
 			}
 		}
-		if(!text.isEmpty())
-			appendToComponentBuilder(builder, new ComponentBuilder(text).color(color).create());
+		if(!text.isEmpty()) {
+			ComponentBuilder littleBuilder = new ComponentBuilder(text).color(color);
+			if(jsonItem != null) { // add to all possible sub parts
+				littleBuilder.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(jsonItem).create()));
+			}
+			appendToComponentBuilder(builder, littleBuilder.create());
+		}
 		return builder.create();
 	}
 }
