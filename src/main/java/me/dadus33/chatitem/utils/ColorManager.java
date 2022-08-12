@@ -96,7 +96,7 @@ public class ColorManager {
 				if (args == 'x' && !colorCode.isEmpty()) {
 					text += ColorManager.getColorString(colorCode);
 					colorCode = "x";
-				} else
+				} else if(Character.digit(args, 16) != -1)
 					colorCode += args; // a color by itself
 			} else {
 				waiting = false;
