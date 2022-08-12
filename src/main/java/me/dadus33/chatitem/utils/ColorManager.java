@@ -13,6 +13,10 @@ public class ColorManager {
 	public static boolean isHexColor(ChatColor c) {
 		return Version.getVersion().isNewerOrEquals(Version.V1_16) && c.getName().startsWith("#");
 	}
+	
+	public static boolean isHexColor(String c) {
+		return Version.getVersion().isNewerOrEquals(Version.V1_16) && c.startsWith("#");
+	}
 
 	public static String removeColorAtBegin(String s) {
 		if(s == null || s.isEmpty())
@@ -44,7 +48,7 @@ public class ColorManager {
 		if (input == null || input.isEmpty())
 			return "";
 		StringBuilder str = new StringBuilder();
-		if (Version.getVersion().isNewerOrEquals(Version.V1_16) && input.startsWith("x")) { // x mean it's an hex
+		if (isHexColor(input)) { // x mean it's an hex
 			ChatItem.debug("Removing char x at begin: " + input.substring(1));
 			input = input.substring(1);
 			if (input.length() >= 6) { // at least hex
@@ -65,7 +69,7 @@ public class ColorManager {
 	public static ChatColor getColor(String input) {
 		if (input == null || input.isEmpty())
 			return ChatColor.RESET;
-		if (Version.getVersion().isNewerOrEquals(Version.V1_16) && input.startsWith("x")) { // x mean it's an hex
+		if (isHexColor(input)) { // x mean it's an hex
 			ChatItem.debug("Removing char x at begin: " + input.substring(1));
 			if (input.length() >= 7) { // at least hex, and 7 because we count the "x"
 				return ChatColor.of("#" + input.substring(1, 7)); // get first hex color code
@@ -97,7 +101,7 @@ public class ColorManager {
 			} else {
 				waiting = false;
 				if (!colorCode.isEmpty()) {
-					if (colorCode.startsWith("x") && colorCode.length() >= 7) {
+					if (isHexColor(colorCode) && colorCode.length() >= 7) {
 						if (colorCode.length() == 7)
 							text += ColorManager.getColor(colorCode);
 						else {
