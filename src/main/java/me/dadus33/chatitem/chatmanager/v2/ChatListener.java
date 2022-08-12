@@ -245,9 +245,10 @@ public class ChatListener implements Listener {
 		if (!ItemUtils.isEmpty(item)) {
 			ComponentBuilder itemComponent = new ComponentBuilder("");
 			String itemJson = convertItemStackToJson(item);
-			appendToComponentBuilder(itemComponent, fixColorComponent(ChatManager.getNameOfItem(to, item, c), ChatColor.WHITE, itemJson));
+			BaseComponent[] itemBaseComponent = new ComponentBuilder(itemJson).create();
+			appendToComponentBuilder(itemComponent, fixColorComponent(ChatManager.getNameOfItem(to, item, c), ChatColor.WHITE, itemBaseComponent));
 			ChatItem.debug("Item for " + to.getName() + " (ver: " + ItemPlayer.getPlayer(to).getVersion().name() + ") : " + itemJson);
-			itemComponent.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(itemJson).create()));
+			//itemComponent.event(new HoverEvent(Action.SHOW_ITEM, itemBaseComponent));
 			appendToComponentBuilder(builder, itemComponent.create());
 		} else {
 			String handName = c.HAND_NAME;
@@ -301,7 +302,7 @@ public class ChatListener implements Listener {
 		return fixColorComponent(message, color, null);
 	}
 	
-	public static BaseComponent[] fixColorComponent(String message, ChatColor color, @Nullable String jsonItem) {
+	public static BaseComponent[] fixColorComponent(String message, ChatColor color, @Nullable BaseComponent[] jsonItem) {
 		ComponentBuilder builder = new ComponentBuilder("");
 		String colorCode = "", text = "";
 		boolean waiting = false;
@@ -311,7 +312,7 @@ public class ChatListener implements Listener {
 					ChatItem.debug("Append while fixing name " + (ColorManager.isHexColor(color) && builder.getParts().isEmpty() ? ColorManager.removeColorAtBegin(text) : text));
 					ComponentBuilder littleBuilder = new ComponentBuilder(ColorManager.isHexColor(color) ? ColorManager.removeColorAtBegin(text) : text).color(color);
 					if(jsonItem != null) { // add to all possible sub parts
-						littleBuilder.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(jsonItem).create()));
+						littleBuilder.event(new HoverEvent(Action.SHOW_ITEM, jsonItem));
 					}
 					appendToComponentBuilder(builder, littleBuilder.create());
 					text = "";
@@ -344,7 +345,7 @@ public class ChatListener implements Listener {
 						color = ColorManager.getColor(colorCode);
 					else
 						text += ColorManager.getColorString(colorCode);
-					ChatItem.debug("Color: " + color + ", text: " + text);
+					ChatItem.debug("Color: " + color + ", text: " + text + ", code: " + colorCode);
 					colorCode = "";
 				}
 				// basic text, not waiting for code after '§'
@@ -354,7 +355,7 @@ public class ChatListener implements Listener {
 		if(!text.isEmpty()) {
 			ComponentBuilder littleBuilder = new ComponentBuilder(text).color(color);
 			if(jsonItem != null) { // add to all possible sub parts
-				littleBuilder.event(new HoverEvent(Action.SHOW_ITEM, new ComponentBuilder(jsonItem).create()));
+				littleBuilder.event(new HoverEvent(Action.SHOW_ITEM, jsonItem));
 			}
 			appendToComponentBuilder(builder, littleBuilder.create());
 		}

@@ -78,6 +78,7 @@ public class JSONManipulatorCurrent {
 		if (!obj.has("text")) {
 			obj.addProperty("text", "");
 		}
+		ChatItem.debug("Parsed array for item: " + obj.toString());
 		return obj.toString();
 	}
 

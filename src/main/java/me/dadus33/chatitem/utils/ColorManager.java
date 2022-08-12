@@ -15,7 +15,7 @@ public class ColorManager {
 	}
 	
 	public static boolean isHexColor(String c) {
-		return Version.getVersion().isNewerOrEquals(Version.V1_16) && c.startsWith("#");
+		return Version.getVersion().isNewerOrEquals(Version.V1_16) && c.startsWith("x");
 	}
 
 	public static String removeColorAtBegin(String s) {
@@ -96,7 +96,7 @@ public class ColorManager {
 				if (args == 'x' && !colorCode.isEmpty()) {
 					text += ColorManager.getColorString(colorCode);
 					colorCode = "x";
-				} else if(Character.digit(args, 16) != -1)
+				} else if(Character.digit(Character.toLowerCase(args), 16) != -1)
 					colorCode += args; // a color by itself
 			} else {
 				waiting = false;
