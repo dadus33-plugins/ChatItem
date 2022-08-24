@@ -81,9 +81,12 @@ public class PacketEditingChatManager extends ChatManager {
 			if (cons.getParameterCount() == 2 && cons.getParameterTypes()[0].equals(String.class)
 					&& cons.getParameterTypes()[1].equals(int.class)) { // "string, int"
 				return cons.newInstance(json, 1);
-			} else if (cons.getParameterCount() == 3 && cons.getParameterTypes()[1].equals(String.class)
-					&& cons.getParameterTypes()[2].equals(int.class)) { // "component", "string", "int"
-				return cons.newInstance(null, json, 1);
+			} else if (cons.getParameterCount() == 3 && cons.getParameterTypes()[1].equals(String.class)) { // "component", "string", <something not checked>
+				Class<?> secondParam = cons.getParameterTypes()[2];
+				if(secondParam.equals(int.class)) // "component", "string", "int"
+					return cons.newInstance(null, json, 1);
+				else if(secondParam.equals(boolean.class)) // "component", "string", "boolean"
+					return cons.newInstance(null, json, false);
 			}
 		}
 		ChatItem.getInstance().getLogger()

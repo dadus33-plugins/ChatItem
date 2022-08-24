@@ -54,7 +54,7 @@ public class Utils {
 		ENCHANTS_NAMES.put("LURE", "Lure");
 		ENCHANTS_NAMES.put("MENDING", "Mending");
 		ENCHANTS_NAMES.put("OXYGEN", "Respiration");
-		ENCHANTS_NAMES.put("PROTECTION_ENVIRONMENTAL    ", "Protection");
+		ENCHANTS_NAMES.put("PROTECTION_ENVIRONMENTAL", "Protection");
 		ENCHANTS_NAMES.put("PROTECTION_EXPLOSIONS", "Blast Protection");
 		ENCHANTS_NAMES.put("PROTECTION_FALL", "Feather Falling");
 		ENCHANTS_NAMES.put("PROTECTION_FIRE", "Fire Protection");
@@ -82,7 +82,6 @@ public class Utils {
 	public static String getEnchantName(Enchantment enchant) {
 		String name = ENCHANTS_NAMES.get(enchant.getName());
 		if (name == null) {
-
 			ChatItem.getInstance().getLogger()
 					.warning("Unknown enchant " + enchant.getName() + ". Please report this to Elikill58.");
 		}

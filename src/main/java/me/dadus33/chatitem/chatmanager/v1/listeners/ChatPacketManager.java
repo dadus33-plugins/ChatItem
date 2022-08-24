@@ -75,6 +75,7 @@ public class ChatPacketManager extends PacketHandler {
 	public void onSend(ChatItemPacket e) {
 		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT))
 			return;
+		ChatItem.debug("Checking: " + e.getPacketType().getFullName() + " > " + e.getPacket().getClass().getSimpleName());
 		if (lastSentPacket != null && lastSentPacket == e.getPacket())
 			return; // prevent infinite loop
 		PacketContent packet = e.getContent();
@@ -82,8 +83,10 @@ public class ChatPacketManager extends PacketHandler {
 		String json = "{}";
 		IBaseComponentGetter choosedGetter = null;
 		if (version.isNewerOrEquals(Version.V1_19)) {
-			if(packet.getIntegers().readSafely(0, 0) != 1)
+			if(packet.getIntegers().readSafely(0, 0) > 1) { // not parsed chat message type
+				ChatItem.debug("Invalid int: " + packet.getIntegers().read(0));
 				return;
+			}
 			choosedGetter = new StringComponentGetter();
 			json = choosedGetter.getBaseComponentAsJSON(e); // if null, will be re-checked so anyway
 		} else if (version.isNewerOrEquals(Version.V1_12)) {
