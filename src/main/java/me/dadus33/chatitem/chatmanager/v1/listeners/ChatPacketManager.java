@@ -118,13 +118,7 @@ public class ChatPacketManager extends PacketHandler {
 			ChatItem.debug("String: " + packet.getStrings().getContent());
 			return; // can't find something
 		}
-		String placeholder = choosedGetter.hasPlaceholders(getStorage(), json);
-		if (placeholder == null) {
-			ChatItem.debug("No placeholders founded in " + json);
-			ChatItem.debug("String: " + packet.getStrings().getContent());
-			return; // then it's just a normal message without placeholders, so we leave it alone
-		}
-		ChatItem.debug("Found " + placeholder + " with " + choosedGetter.getClass().getName());
+		ChatItem.debug("Found with " + choosedGetter.getClass().getName());
 		String toReplace = null;
 		if (json.lastIndexOf(SEPARATOR) != -1)
 			toReplace = ((Object) SEPARATOR).toString();
@@ -134,7 +128,6 @@ public class ChatPacketManager extends PacketHandler {
 			ChatItem.debug("Not containing bell " + json);
 			return;
 		}
-		toReplace = placeholder + toReplace; // add placeholder
 		String name = choosedGetter.getNameFromMessage(json, toReplace);
 		if (name == null) { // something went really bad, so we run away and hide (AKA the player left or is
 			// on another server)

@@ -17,7 +17,6 @@ import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IBaseComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.utils.ReflectionUtils;
-import me.dadus33.chatitem.utils.Storage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -46,8 +45,8 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 			return null;
 		}
 		String json = ComponentSerializer.toString(BungeeComponentSerializer.get().serialize(comp).clone());
-		ChatItem.debug("AdventureJSON : " + json);
 		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
+		ChatItem.debug("AdventureJSON : " + json + ", use extra: " + (!jsonObj.has("with")));
 		if(jsonObj.has("with")) {
 			JsonObject next = new JsonObject();
 			next.add("extra", jsonObj.get("with"));
@@ -58,76 +57,7 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 	}
 	
 	@Override
-	public String hasPlaceholders(Storage c, String json) {
-		if(useExtra)
-			return IBaseComponentGetter.super.hasPlaceholders(c, json);
-		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
-		if(!jsonObj.has("extra"))
-			return null;
-		for(JsonElement element : jsonObj.get("extra").getAsJsonArray()) {
-			if(element.isJsonObject()) {
-				JsonObject withObj = element.getAsJsonObject();
-				if(withObj.has("extra")) {
-					String text = "";
-					for(JsonElement extra : withObj.get("extra").getAsJsonArray()) {
-						if(extra.isJsonObject()) {
-							JsonObject extraObj = extra.getAsJsonObject();
-							if(extraObj.has("text") && extraObj.get("text").isJsonPrimitive())
-								text += extraObj.get("text").getAsString();
-						}
-					}
-					String placeholder = IBaseComponentGetter.super.hasPlaceholders(c, text);
-					if(placeholder != null)
-						return placeholder;
-				} else if(withObj.has("text")) {
-					String placeholder = IBaseComponentGetter.super.hasPlaceholders(c, withObj.get("text").getAsString());
-					if(placeholder != null)
-						return placeholder;
-				}
-			} // ignoring all others because it should not appear
-		}
-		return null;
-	}
-	
-	@Override
-	public String getNameFromMessage(String json, String toReplace) {
-		if(useExtra)
-			return IBaseComponentGetter.super.getNameFromMessage(json, toReplace);
-		String tmpName = IBaseComponentGetter.super.getNameFromMessage(json, toReplace);
-		if(tmpName != null)
-			return tmpName; // don't need to check for json if basically found
-		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
-		if(!jsonObj.has("extra"))
-			return null;
-		for(JsonElement element : jsonObj.get("extra").getAsJsonArray()) {
-			if(element.isJsonObject()) {
-				JsonObject withObj = element.getAsJsonObject();
-				if(withObj.has("extra")) {
-					String text = "";
-					for(JsonElement extra : withObj.get("extra").getAsJsonArray()) {
-						if(extra.isJsonObject()) {
-							JsonObject extraObj = extra.getAsJsonObject();
-							if(extraObj.has("text") && extraObj.get("text").isJsonPrimitive())
-								text += extraObj.get("text").getAsString();
-						}
-					}
-					String possibleName = IBaseComponentGetter.super.getNameFromMessage(text, toReplace);
-					if(possibleName != null)
-						return possibleName;
-				} else if(withObj.has("text")) {
-					String possibleName = IBaseComponentGetter.super.getNameFromMessage(withObj.get("text").getAsString(), toReplace);
-					if(possibleName != null)
-						return possibleName;
-				}
-			} // ignoring all others because it should not appear
-		}
-		return null;
-	}
-	
-	@Override
 	public String removePlaceholdersAndName(String json, String toReplace, Player foundedPlayer) {
-		if(useExtra)
-			return IBaseComponentGetter.super.removePlaceholdersAndName(json, toReplace, foundedPlayer);
 		String tmpName = IBaseComponentGetter.super.removePlaceholdersAndName(json, toReplace, foundedPlayer);
 		if(!tmpName.equals(json)) // if not the same -> name found and removed
 			return tmpName;
@@ -194,7 +124,7 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 			next.add("with", extraArray);
 			localJson = next.toString();
 		}
-		ChatItem.debug("Adventure Json: " + json);
+		ChatItem.debug("Adventure Json: " + localJson);
 		try {
 			Class<?> packetClass = packet.getPacket().getClass();
 			if(packetClass.getSimpleName().equalsIgnoreCase("PacketPlayOutChat")) {

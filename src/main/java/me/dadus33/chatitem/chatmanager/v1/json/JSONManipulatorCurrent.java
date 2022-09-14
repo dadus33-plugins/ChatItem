@@ -47,10 +47,10 @@ public class JSONManipulatorCurrent {
 	public String parse(String json, ItemStack item, String replacement, int protocol)
 			throws Exception {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
-		JsonArray array = obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray();
 		final AbstractMap.SimpleEntry<Version, ItemStack> p = new AbstractMap.SimpleEntry<>(
 				protocolVersion = Version.getVersion(protocol), item);
 
+		JsonObject wrapper = new JsonObject(); // Create a wrapper object for the whole array
 		if ((itemTooltip = STACKS.get(p)) == null) {
 			JsonArray use = Translator.toJson(replacement); // We get the json representation of the old color
 															// formatting method
@@ -62,7 +62,6 @@ public class JSONManipulatorCurrent {
 			// Get the JSON representation of the item (well, not really JSON, but rather a string representation of NBT data)
 			hover.addProperty("value", stringifyItem(this, item, protocolVersion));
 
-			JsonObject wrapper = new JsonObject(); // Create a wrapper object for the whole array
 			wrapper.addProperty("text", ""); // The text field is compulsory, even if it's empty
 			wrapper.add("extra", use);
 			wrapper.add("hoverEvent", hover);
@@ -73,12 +72,16 @@ public class JSONManipulatorCurrent {
 			// We remove it later when no longer needed to save memory
 			Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), () -> STACKS.remove(p), 100L);
 		}
-
-		obj.add("extra", parseArray(array, itemTooltip));
+		if(obj.size() == 1 && obj.has("text")) {
+			wrapper.add("text", obj.get("text"));
+			ChatItem.debug("[JsonManipulator] Parsed quick: " + obj.toString() + ", wrapper: " + wrapper);
+			return wrapper.toString().replace(Character.toString(ChatManager.SEPARATOR), "").replace(ChatManager.SEPARATOR_STR, "");
+		}
+		obj.add("extra", parseArray(obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray(), wrapper));
 		if (!obj.has("text")) {
 			obj.addProperty("text", "");
 		}
-		ChatItem.debug("Parsed array for item: " + obj.toString());
+		ChatItem.debug("Parsed array for item: " + obj.toString() + ", wrapper: " + wrapper);
 		return obj.toString();
 	}
 

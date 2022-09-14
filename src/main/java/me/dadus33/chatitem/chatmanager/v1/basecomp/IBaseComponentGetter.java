@@ -5,6 +5,10 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.utils.Storage;
@@ -29,6 +33,42 @@ public interface IBaseComponentGetter {
 	default @Nullable String hasPlaceholders(Storage c, String json) {
 		if(json == null || json.isEmpty())
 			return null;
+		String placeholder = hasPlaceholdersSpecificMessage(c, json);
+		if(placeholder != null)
+			return placeholder;
+		try {
+			JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
+			if(!jsonObj.has("extra"))
+				return null;
+			for(JsonElement element : jsonObj.get("extra").getAsJsonArray()) {
+				if(element.isJsonObject()) {
+					JsonObject withObj = element.getAsJsonObject();
+					if(withObj.has("extra")) {
+						String text = "";
+						for(JsonElement extra : withObj.get("extra").getAsJsonArray()) {
+							if(extra.isJsonObject()) {
+								JsonObject extraObj = extra.getAsJsonObject();
+								if(extraObj.has("text") && extraObj.get("text").isJsonPrimitive())
+									text += extraObj.get("text").getAsString();
+							}
+						}
+						placeholder = hasPlaceholdersSpecificMessage(c, text);
+						if(placeholder != null)
+							return placeholder;
+					} else if(withObj.has("text")) {
+						placeholder = hasPlaceholdersSpecificMessage(c, withObj.get("text").getAsString());
+						if(placeholder != null)
+							return placeholder;
+					}
+				} // ignoring all others because it should not appear
+			}
+		} catch (Exception e) {} // not JSON
+		return null;
+	}
+	
+	default @Nullable String hasPlaceholdersSpecificMessage(Storage c, String json) {
+		if(json == null || json.isEmpty())
+			return null;
 		for (String rep : c.PLACEHOLDERS) {
 			if (json.contains(rep)) {
 				return rep;
@@ -38,6 +78,40 @@ public interface IBaseComponentGetter {
 	}
 	
 	default @Nullable String getNameFromMessage(String json, String toReplace) {
+		String checkedName = getNameFromSpecificMessage(json, toReplace);
+		if(checkedName != null)
+			return checkedName;
+		try {
+			JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
+			if(!jsonObj.has("extra"))
+				return null;
+			for(JsonElement element : jsonObj.get("extra").getAsJsonArray()) {
+				if(element.isJsonObject()) {
+					JsonObject withObj = element.getAsJsonObject();
+					if(withObj.has("extra")) {
+						String text = "";
+						for(JsonElement extra : withObj.get("extra").getAsJsonArray()) {
+							if(extra.isJsonObject()) {
+								JsonObject extraObj = extra.getAsJsonObject();
+								if(extraObj.has("text") && extraObj.get("text").isJsonPrimitive())
+									text += extraObj.get("text").getAsString();
+							}
+						}
+						String possibleName = getNameFromSpecificMessage(text, toReplace);
+						if(possibleName != null)
+							return possibleName;
+					} else if(withObj.has("text")) {
+						String possibleName = getNameFromSpecificMessage(withObj.get("text").getAsString(), toReplace);
+						if(possibleName != null)
+							return possibleName;
+					}
+				} // ignoring all others because it should not appear
+			}
+		} catch (Exception e) {} // not JSON
+		return null;
+	}
+	
+	default @Nullable String getNameFromSpecificMessage(String json, String toReplace) {
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			String name = toReplace + p.getName();
 			if (json.contains(name))

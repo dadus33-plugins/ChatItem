@@ -76,7 +76,7 @@ public class ChatEventListener implements Listener {
 			StringJoiner msg = new StringJoiner(" ");
 			for(String part : s.split(" ")) {
 				if(part.equalsIgnoreCase(firstPlaceholder)) {
-					msg.add(firstPlaceholder + SEPARATOR + p.getName());
+					msg.add(SEPARATOR + p.getName());
 				} else {
 					msg.add(part);
 				}
@@ -143,7 +143,7 @@ public class ChatEventListener implements Listener {
 			StringJoiner msg = new StringJoiner(" ");
 			for(String part : s.split(" ")) {
 				if(part.equalsIgnoreCase(firstPlaceholder)) {
-					msg.add(firstPlaceholder + Character.toString(SEPARATOR) + p.getName());
+					msg.add(SEPARATOR + p.getName());
 				} else {
 					msg.add(part);
 				}
