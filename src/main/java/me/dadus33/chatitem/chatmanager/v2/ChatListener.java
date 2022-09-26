@@ -99,17 +99,17 @@ public class ChatListener implements Listener {
 		Player p = e.getPlayer();
 		boolean hasv1 = false;
 		String placeholder = null;
-		for (String rep : c.PLACEHOLDERS) {
-			// v1 try to manage it, but the message have not been changed by another plugin
-			if (e.getMessage().contains(rep + ChatManager.SEPARATOR + p.getName())) {
-				hasv1 = true;
-				ChatItem.debug("Found v1 placeholders in v2");
-				placeholder = rep;
-				break;
-			}
-			if (e.getMessage().contains(rep)) {
-				placeholder = rep;
-				break;
+		// v1 try to manage it, but the message have not been changed by another plugin
+		if (e.getMessage().contains(ChatManager.SEPARATOR + p.getName())) {
+			hasv1 = true;
+			ChatItem.debug("Found v1 placeholders in v2");
+			placeholder = "";
+		} else {
+			for (String rep : c.PLACEHOLDERS) {
+				if (e.getMessage().contains(rep)) {
+					placeholder = rep;
+					break;
+				}
 			}
 		}
 
@@ -125,7 +125,7 @@ public class ChatListener implements Listener {
 		String msg, defMsg = e.getMessage();
 		for (String rep : c.PLACEHOLDERS) {
 			if (hasv1) // remove v1 char
-				defMsg = defMsg.replace(rep + ChatManager.SEPARATOR + p.getName(), String.valueOf(ChatManager.SEPARATOR));
+				defMsg = defMsg.replace(ChatManager.SEPARATOR + p.getName(), String.valueOf(ChatManager.SEPARATOR));
 			else
 				defMsg = defMsg.replace(rep, String.valueOf(ChatManager.SEPARATOR));
 		}
