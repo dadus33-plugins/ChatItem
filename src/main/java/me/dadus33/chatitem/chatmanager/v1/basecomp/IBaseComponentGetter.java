@@ -85,11 +85,11 @@ public interface IBaseComponentGetter {
 			JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
 			if(!jsonObj.has("extra"))
 				return null;
+			String text = "";
 			for(JsonElement element : jsonObj.get("extra").getAsJsonArray()) {
 				if(element.isJsonObject()) {
 					JsonObject withObj = element.getAsJsonObject();
 					if(withObj.has("extra")) {
-						String text = "";
 						for(JsonElement extra : withObj.get("extra").getAsJsonArray()) {
 							if(extra.isJsonObject()) {
 								JsonObject extraObj = extra.getAsJsonObject();
@@ -97,16 +97,14 @@ public interface IBaseComponentGetter {
 									text += extraObj.get("text").getAsString();
 							}
 						}
-						String possibleName = getNameFromSpecificMessage(text, toReplace);
-						if(possibleName != null)
-							return possibleName;
 					} else if(withObj.has("text")) {
-						String possibleName = getNameFromSpecificMessage(withObj.get("text").getAsString(), toReplace);
-						if(possibleName != null)
-							return possibleName;
+						text += withObj.get("text").getAsString();
 					}
 				} // ignoring all others because it should not appear
 			}
+			String possibleName = getNameFromSpecificMessage(text, toReplace);
+			if(possibleName != null)
+				return possibleName;
 		} catch (Exception e) {} // not JSON
 		return null;
 	}
@@ -130,6 +128,42 @@ public interface IBaseComponentGetter {
 	 * @return the replaced json
 	 */
 	default String removePlaceholdersAndName(String json, String toReplace, Player foundedPlayer) {
+		try {
+			JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
+			if(!jsonObj.has("extra"))
+				return null;
+			String remove = toReplace + foundedPlayer.getName();
+			for(JsonElement element : jsonObj.get("extra").getAsJsonArray()) {
+				if(element.isJsonObject()) {
+					JsonObject withObj = element.getAsJsonObject();
+					if(withObj.has("extra")) {
+						for(JsonElement extra : withObj.get("extra").getAsJsonArray()) {
+							if(extra.isJsonObject()) {
+								JsonObject extraObj = extra.getAsJsonObject();
+								if(extraObj.has("text") && extraObj.get("text").isJsonPrimitive()) {
+									String s = extraObj.get("text").getAsString();
+									if(remove.startsWith(s)) {
+										extraObj.addProperty("text", "");
+										remove = remove.substring(s.length());
+										if(remove.isEmpty())
+											return jsonObj.toString();
+									}
+								}
+							}
+						}
+					} else if(withObj.has("text")) {
+						String s = withObj.get("text").getAsString();
+						if(remove.startsWith(s)) {
+							withObj.addProperty("text", "");
+							remove = remove.substring(s.length());
+							if(remove.isEmpty())
+								return jsonObj.toString();
+						}
+					}
+				} // ignoring all others because it should not appear
+			}
+			return jsonObj.toString();
+		} catch (Exception e) {} // not JSON
 		return json.replace(toReplace + foundedPlayer.getName(), Character.toString(ChatManager.SEPARATOR));
 	}
 }
