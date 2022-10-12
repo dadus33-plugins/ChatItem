@@ -75,7 +75,7 @@ public class ChatPacketManager extends PacketHandler {
 	public void onSend(ChatItemPacket e) {
 		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT))
 			return;
-		ChatItem.debug("Checking: " + e.getPacketType().getFullName() + " > " + e.getPacket().getClass().getSimpleName());
+		ChatItem.debug("Checking: " + e.getPacketType().getFullName() + " to " + e.getPlayername());
 		if (lastSentPacket != null && lastSentPacket == e.getPacket())
 			return; // prevent infinite loop
 		PacketContent packet = e.getContent();

@@ -5,10 +5,13 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
+import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.utils.Storage;
@@ -128,12 +131,17 @@ public interface IBaseComponentGetter {
 	 * @return the replaced json
 	 */
 	default String removePlaceholdersAndName(String json, String toReplace, Player foundedPlayer) {
+		String remove = toReplace + foundedPlayer.getName();
+		boolean firstRemove = true;
 		try {
 			JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
-			if(!jsonObj.has("extra"))
-				return null;
-			String remove = toReplace + foundedPlayer.getName();
-			for(JsonElement element : jsonObj.get("extra").getAsJsonArray()) {
+			if(!jsonObj.has("extra")) {
+				ChatItem.debug("[IBase] No extra in json");
+				return json.replace(remove, Character.toString(ChatManager.SEPARATOR));
+			}
+			JsonArray extraArray = jsonObj.get("extra").getAsJsonArray();
+			for(int i = 0; i < extraArray.size(); i++) {
+				JsonElement element = extraArray.get(i);
 				if(element.isJsonObject()) {
 					JsonObject withObj = element.getAsJsonObject();
 					if(withObj.has("extra")) {
@@ -143,7 +151,8 @@ public interface IBaseComponentGetter {
 								if(extraObj.has("text") && extraObj.get("text").isJsonPrimitive()) {
 									String s = extraObj.get("text").getAsString();
 									if(remove.startsWith(s)) {
-										extraObj.addProperty("text", "");
+										extraObj.addProperty("text", firstRemove ? Character.toString(ChatManager.SEPARATOR) : "");
+										firstRemove = false;
 										remove = remove.substring(s.length());
 										if(remove.isEmpty())
 											return jsonObj.toString();
@@ -154,16 +163,26 @@ public interface IBaseComponentGetter {
 					} else if(withObj.has("text")) {
 						String s = withObj.get("text").getAsString();
 						if(remove.startsWith(s)) {
-							withObj.addProperty("text", "");
+							withObj.addProperty("text", firstRemove ? Character.toString(ChatManager.SEPARATOR) : "");
+							firstRemove = false;
 							remove = remove.substring(s.length());
 							if(remove.isEmpty())
 								return jsonObj.toString();
 						}
 					}
-				} // ignoring all others because it should not appear
+				} else if(element.isJsonPrimitive()) {
+					String s = element.getAsString();
+					if(s.contains(remove)) {
+						extraArray.set(i, new JsonPrimitive(s.replace(remove, Character.toString(ChatManager.SEPARATOR))));
+						return jsonObj.toString();
+					}
+				}
+				
+				// ignoring all others because it should not appear
 			}
+			ChatItem.debug("[IBase] Remove not fully managed: " + remove + " > " + jsonObj.toString());
 			return jsonObj.toString();
 		} catch (Exception e) {} // not JSON
-		return json.replace(toReplace + foundedPlayer.getName(), Character.toString(ChatManager.SEPARATOR));
+		return json.replace(remove, Character.toString(ChatManager.SEPARATOR));
 	}
 }

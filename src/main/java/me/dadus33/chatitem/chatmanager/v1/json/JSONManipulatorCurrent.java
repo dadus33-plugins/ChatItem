@@ -27,7 +27,6 @@ import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Reflect;
 import me.dadus33.chatitem.utils.Version;
 
-@SuppressWarnings({ "unchecked" })
 public class JSONManipulatorCurrent {
 
 	private static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
@@ -144,7 +143,9 @@ public class JSONManipulatorCurrent {
 			if (el != null) {
 				JsonArray jar = el.getAsJsonArray();
 				if (jar.size() != 0) {
-					o.add("extra", parseArray(jar, tooltip));
+					JsonArray tmpArray = parseArray(jar, tooltip);
+					if(!tmpArray.isEmpty())
+						o.add("extra", tmpArray);
 				} else {
 					o.remove("extra");
 				}
@@ -155,8 +156,10 @@ public class JSONManipulatorCurrent {
 				JsonElement el = o.get("extra");
 				if (el != null) {
 					JsonArray jar = el.getAsJsonArray();
-					if (jar.size() != 0) {
-						o.add("extra", parseArray(jar, tooltip));
+					if (!jar.isEmpty()) {
+						JsonArray tmpArray = parseArray(jar, tooltip);
+						if(!tmpArray.isEmpty())
+							o.add("extra", tmpArray);
 					} else {
 						o.remove("extra");
 					}
@@ -238,14 +241,8 @@ public class JSONManipulatorCurrent {
 					sb.append(entry.getKey());
 				sb.append(":");
 			}
-			/*if(entry.getKey().equalsIgnoreCase("display") && Version.getVersion().isNewerOrEquals(Version.V1_16)) {
-				String replaced = entry.getValue().replace("}','{", "},{").replace("\"}',", "\"},").replace("'{\",", "{\"");
-				ChatItem.debug("Cleaning display (custom): " + entry.getValue() + " > " + replaced);
-				sb.append(replaced);
-			} else {*/
-				ChatItem.debug("Cleaning " + entry.getKey() + ": " + entry.getValue() + " > " + cleanStr(entry.getValue()));
-				sb.append(cleanStr(entry.getValue()));
-			//}
+			ChatItem.debug("Cleaning " + entry.getKey() + ": " + entry.getValue() + " > " + cleanStr(entry.getValue()));
+			sb.append(cleanStr(entry.getValue()));
 		}
 		sb.append("}}"); // End of tag and end of item
 		return sb.toString();

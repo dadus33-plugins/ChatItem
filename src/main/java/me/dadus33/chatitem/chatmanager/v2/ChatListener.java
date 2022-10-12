@@ -150,8 +150,11 @@ public class ChatListener implements Listener {
 		if (ChatItem.discordSrvSupport)
 			DiscordSrvSupport.sendChatMessage(p, defMsg.replace(ChatManager.SEPARATOR + "", itemName).replace("{name}", p.getName())
 					.replace("{display-name}", p.getDisplayName()));
-		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format);
-		e.getRecipients().forEach((pl) -> showItem(pl, p, item, msg));
+		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format + " to " + e.getRecipients().size() + " players");
+		if(e.getRecipients().isEmpty()) {// should not appear
+			ChatItem.debug("Empty recipients ???");
+		} else
+			e.getRecipients().forEach((pl) -> showItem(pl, p, item, msg));
 		if (c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown"))
 			ChatManager.applyCooldown(p);
 	}
@@ -275,7 +278,6 @@ public class ChatListener implements Listener {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void appendToComponentBuilder(ComponentBuilder builder, BaseComponent[] comps) {
 		if (shouldUseAppendMethod) {
 			try {
