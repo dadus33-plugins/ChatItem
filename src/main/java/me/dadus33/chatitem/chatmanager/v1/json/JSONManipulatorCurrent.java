@@ -61,8 +61,18 @@ public class JSONManipulatorCurrent {
 			// Get the JSON representation of the item (well, not really JSON, but rather a string representation of NBT data)
 			hover.addProperty("value", stringifyItem(this, item, protocolVersion));
 
-			wrapper.addProperty("text", ""); // The text field is compulsory, even if it's empty
-			wrapper.add("extra", use);
+			if(use.size() == 1) {
+				JsonElement extraElement = use.get(0);
+				if(extraElement.isJsonPrimitive())
+					wrapper.addProperty("text", extraElement.getAsString());
+				else if(extraElement.isJsonObject())
+					wrapper.addProperty("text", extraElement.getAsJsonObject().get("text").getAsString());
+				else
+					wrapper.add("extra", use); // add it only if
+			} else if(!use.isEmpty())
+				wrapper.add("extra", use); // add it only if
+			if(!wrapper.has("text"))
+				wrapper.addProperty("text", ""); // The text field is compulsory, even if it's empty
 			wrapper.add("hoverEvent", hover);
 
 			itemTooltip = wrapper; // Save the tooltip for later use when we encounter a placeholder
@@ -117,19 +127,26 @@ public class JSONManipulatorCurrent {
 
 	private JsonArray parseArray(JsonArray arr, JsonElement tooltip) {
 		JsonArray replacer = new JsonArray();
+		boolean isComplex = false;
 		for (int i = 0; i < arr.size(); ++i) {
-			if (arr.get(i).isJsonNull()) {
+			JsonElement element = arr.get(i);
+			if (element.isJsonNull()) {
 				continue;
-			} else if (arr.get(i).isJsonObject()) {
-				addParsedJsonObjectToArray(arr.get(i).getAsJsonObject(), replacer, tooltip);
-			} else if (arr.get(i).isJsonArray()) {
-				JsonArray jar = arr.get(i).getAsJsonArray();
+			} else if (element.isJsonObject()) {
+				isComplex = true;
+				addParsedJsonObjectToArray(element.getAsJsonObject(), replacer, tooltip);
+			} else if (element.isJsonArray()) {
+				isComplex = true;
+				JsonArray jar = element.getAsJsonArray();
 				if (jar.size() != 0) {
-					jar = parseArray(arr.get(i).getAsJsonArray(), tooltip);
+					jar = parseArray(element.getAsJsonArray(), tooltip);
 					replacer.set(i, jar);
 				}
+			} else if(element.isJsonPrimitive() && isComplex) {
+				ChatItem.debug("[JSONManipulator] Put " + element + " to trash as it's primitive with complex things");
+				// ignore
 			} else {
-				addParsedStringToArray(arr.get(i).getAsString(), replacer, arr.get(i), tooltip);
+				addParsedStringToArray(element.getAsString(), replacer, element, tooltip);
 			}
 
 		}
