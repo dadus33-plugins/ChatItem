@@ -102,22 +102,19 @@ public class StringComponentManager implements IComponentManager {
 	}
 
 	private void checkComponent(BaseComponent comp, HoverEvent hover, String itemName, String playerName) {
-		if (ChatManager.containsSeparator(comp.getInsertion())) {
-			comp.setInsertion(ChatManager.replaceSeparator(comp.getInsertion(), itemName, playerName));
-			comp.setHoverEvent(hover);
-			ChatItem.debug("Changed " + comp.getInsertion());
-		} else if (comp instanceof TextComponent) {
+		if (comp instanceof TextComponent) {
 			TextComponent tc = (TextComponent) comp;
 			if (ChatManager.containsSeparator(tc.getText())) {
+				ChatItem.debug("Changing text " + tc.getText() + " to " + itemName);
 				tc.setText(ChatManager.replaceSeparator(tc.getText(), itemName, playerName));
 				tc.setHoverEvent(hover);
-				ChatItem.debug("Changed text " + tc.getText());
+				for(BaseComponent legacyExtra : TextComponent.fromLegacyText(itemName, tc.getColor())) {
+					tc.addExtra(legacyExtra);
+				}
 			} else
 				ChatItem.debug("No insert of text without separator: " + tc.getText() + " (legacy: " + tc.toLegacyText()
 						+ ")");
-		} else
-			ChatItem.debug(
-					"No insert without separator: " + comp.getInsertion() + " (legacy: " + comp.toLegacyText() + ")");
+		}
 		if (comp.getExtra() != null) {
 			for (BaseComponent extra : comp.getExtra()) {
 				checkComponent(extra, hover, itemName, playerName);
