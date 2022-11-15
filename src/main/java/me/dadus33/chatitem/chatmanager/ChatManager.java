@@ -32,20 +32,28 @@ public abstract class ChatManager {
 	public final static char SEPARATOR = ((char) 0x0007);
 	public final static String SEPARATOR_STR = "\\u0007";
 
+	public static String replaceSeparator(String message, String replacement) {
+		return replaceSeparator(message, replacement, "");
+	}
+
+	public static String replaceSeparator(String message, String replacement, String playerName) {
+		return fixSeparator(message).replace(Character.toString(ChatManager.SEPARATOR) + playerName, replacement);
+	}
+	
 	public static String fixSeparator(String s) {
-		return s.replace(ChatManager.SEPARATOR_STR, Character.toString(ChatManager.SEPARATOR));
+		return s == null ? "" : s.replace(ChatManager.SEPARATOR_STR, Character.toString(ChatManager.SEPARATOR));
 	}
 
 	public static boolean equalsSeparator(String s) {
-		return s.equalsIgnoreCase(SEPARATOR_STR) || s.equalsIgnoreCase(Character.toString(SEPARATOR));
+		return s != null && (s.equalsIgnoreCase(SEPARATOR_STR) || s.equalsIgnoreCase(Character.toString(SEPARATOR)));
 	}
 
 	public static boolean containsSeparator(String s) {
-		return s.contains(SEPARATOR_STR) || s.contains(Character.toString(SEPARATOR));
+		return s != null && (s.contains(SEPARATOR_STR) || s.contains(Character.toString(SEPARATOR)));
 	}
 	
 	public static boolean endsWithSeparator(String s) {
-		return s.endsWith(SEPARATOR_STR) || s.endsWith(Character.toString(SEPARATOR));
+		return s != null && (s.endsWith(SEPARATOR_STR) || s.endsWith(Character.toString(SEPARATOR)));
 	}
 	
 	public static String[] splitWithSeparator(String msg) {
@@ -176,7 +184,7 @@ public abstract class ChatManager {
 	/**
 	 * Get the name of item according to player & config
 	 * 
-	 * @param p the player
+	 * @param p the player that is owner of item
 	 * @param item the item
 	 * @param c the config
 	 * @return the name of item or hand

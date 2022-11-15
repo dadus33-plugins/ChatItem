@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -12,7 +13,9 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.ItemPlayer;
 import me.dadus33.chatitem.chatmanager.ChatManager;
+import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.utils.Storage;
 
@@ -25,60 +28,6 @@ public interface IBaseComponentGetter {
 	String getBaseComponentAsJSON(ChatItemPacket packet);
 	
 	void writeJson(ChatItemPacket packet, String json);
-	
-	/**
-	 * Use actual base component getter to check if the given json has placeholders
-	 * 
-	 * @param c the storage config
-	 * @param json the json
-	 * @return the founded placeholder or null
-	 */
-	default @Nullable String hasPlaceholders(Storage c, String json) {
-		if(json == null || json.isEmpty())
-			return null;
-		String placeholder = hasPlaceholdersSpecificMessage(c, json);
-		if(placeholder != null)
-			return placeholder;
-		try {
-			JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
-			if(!jsonObj.has("extra"))
-				return null;
-			for(JsonElement element : jsonObj.get("extra").getAsJsonArray()) {
-				if(element.isJsonObject()) {
-					JsonObject withObj = element.getAsJsonObject();
-					if(withObj.has("extra")) {
-						String text = "";
-						for(JsonElement extra : withObj.get("extra").getAsJsonArray()) {
-							if(extra.isJsonObject()) {
-								JsonObject extraObj = extra.getAsJsonObject();
-								if(extraObj.has("text") && extraObj.get("text").isJsonPrimitive())
-									text += extraObj.get("text").getAsString();
-							}
-						}
-						placeholder = hasPlaceholdersSpecificMessage(c, text);
-						if(placeholder != null)
-							return placeholder;
-					} else if(withObj.has("text")) {
-						placeholder = hasPlaceholdersSpecificMessage(c, withObj.get("text").getAsString());
-						if(placeholder != null)
-							return placeholder;
-					}
-				} // ignoring all others because it should not appear
-			}
-		} catch (Exception e) {} // not JSON
-		return null;
-	}
-	
-	default @Nullable String hasPlaceholdersSpecificMessage(Storage c, String json) {
-		if(json == null || json.isEmpty())
-			return null;
-		for (String rep : c.PLACEHOLDERS) {
-			if (json.contains(rep)) {
-				return rep;
-			}
-		}
-		return null;
-	}
 	
 	default @Nullable String getNameFromMessage(String json, String toReplace) {
 		String checkedName = getNameFromSpecificMessage(json, toReplace);
@@ -184,5 +133,23 @@ public interface IBaseComponentGetter {
 			return jsonObj.toString();
 		} catch (Exception e) {} // not JSON
 		return json.replace(remove, Character.toString(ChatManager.SEPARATOR));
+	}
+
+	default Object manageItem(Player p, ItemPlayer itemPlayer, ChatItemPacket packet, ItemStack item, Storage c) throws Exception {
+		String message = JSONManipulator.getInstance().parse(getBaseComponentAsJSON(packet), item, ChatManager.styleItem(itemPlayer.getPlayer(), item, c), ItemPlayer.getPlayer(p).getProtocolVersion());
+		if (message != null) {
+			ChatItem.debug("(v1) Writing message: " + message);
+			writeJson(packet, message);
+		}
+		return packet.getPacket();
+	}
+	
+	default Object manageEmpty(Player p, ItemPlayer itemPlayer, ChatItemPacket packet, Storage c) {
+		String message = JSONManipulator.getInstance().parseEmpty(getBaseComponentAsJSON(packet), c.HAND_NAME, c.HAND_TOOLTIP, itemPlayer.getPlayer());
+		if (message != null) {
+			ChatItem.debug("(v1) Writing empty message: " + message);
+			writeJson(packet, message);
+		}
+		return packet.getPacket();
 	}
 }

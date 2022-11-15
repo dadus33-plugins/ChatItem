@@ -25,10 +25,10 @@ import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IBaseComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.AdventureComponentGetter;
-import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.BaseComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.ComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.IChatBaseComponentGetter;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.StringComponentGetter;
+import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketHandler;
@@ -63,7 +63,7 @@ public class ChatPacketManager extends PacketHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		for(IBaseComponentGetter getter : Arrays.asList(new IChatBaseComponentGetter(), new BaseComponentGetter(), new ComponentGetter(), new StringComponentGetter(), new AdventureComponentGetter())) {
+		for(IBaseComponentGetter getter : Arrays.asList(new IChatBaseComponentGetter(), new ComponentGetter(), new StringComponentGetter(), new AdventureComponentGetter())) {
 			if(getter.hasConditions())
 				baseComponentGetter.add(getter);
 		}
@@ -90,18 +90,18 @@ public class ChatPacketManager extends PacketHandler {
 			choosedGetter = new StringComponentGetter();
 			json = choosedGetter.getBaseComponentAsJSON(e); // if null, will be re-checked so anyway
 		} else if (version.isNewerOrEquals(Version.V1_12)) {
-			// only if action bar messages are supported in this version of minecraft
+			// only if action bar messages are supported
 			try {
 				if (((Enum<?>) packet
 						.getSpecificModifier(PacketUtils.getNmsClass("ChatMessageType", "network.chat.")).read(0))
 								.name().equals("GAME_INFO")) {
-					return; // It means it's an actionbar message, and we ain't intercepting those
+					return; // It's an actionbar message, ignoring
 				}
 			} catch (Exception exc) {
 				exc.printStackTrace();
 			}
 		} else if (version.isNewerOrEquals(Version.V1_8) && packet.getBytes().readSafely(0) == (byte) 2) {
-			return; // It means it's an actionbar message, and we ain't intercepting those
+			return; // It's an actionbar message, ignoring
 		}
 		if(json == null || choosedGetter == null) {
 			for(IBaseComponentGetter getters : baseComponentGetter) {
@@ -135,8 +135,8 @@ public class ChatPacketManager extends PacketHandler {
 			return;
 		}
 		Player itemPlayer = Bukkit.getPlayer(name);
-		String localJson = choosedGetter.removePlaceholdersAndName(json, toReplace, itemPlayer);
-		ChatItem.debug("Local json: " + localJson);
+		//String localJson = choosedGetter.removePlaceholdersAndName(json, toReplace, itemPlayer);
+		//ChatItem.debug("Local json: " + localJson);
 		IBaseComponentGetter fchoosedGetter = choosedGetter;
 		e.setCancelled(true); // We cancel the packet as we're going to resend it anyways (ignoring listeners
 		// this time)
@@ -148,10 +148,11 @@ public class ChatPacketManager extends PacketHandler {
 			String message = null;
 			try {
 				ItemStack item = ChatManager.getUsableItem(itemPlayer);
+				ItemPlayer ip = ItemPlayer.getPlayer(p);
 				if (!ItemUtils.isEmpty(item)) {
 					ItemStack copy = item.clone();
 
-					if (ItemPlayer.getPlayer(p).isBuggedClient()) {
+					if (ip.isBuggedClient()) {
 						String act = getStorage().BUGGED_CLIENT_ACTION;
 						List<String> tooltip;// = act.equalsIgnoreCase("nothing") ? new ArrayList<>() : null;
 						if (act.equalsIgnoreCase("tooltip"))
@@ -163,7 +164,7 @@ public class ChatPacketManager extends PacketHandler {
 							tooltip.addAll(getStorage().BUGGED_CLIENTS_TOOLTIP);
 						} else
 							tooltip = new ArrayList<>();
-						message = manager.getManipulator().parseEmpty(localJson,
+						message = JSONManipulator.getInstance().parseEmpty(fchoosedGetter.getBaseComponentAsJSON(e),
 								ChatManager.styleItem(p, copy, getStorage()), tooltip, itemPlayer);
 						if (!manager.supportsChatComponentApi()) {
 							ChatItem.debug("Use basic for 1.7 lunar");
@@ -195,22 +196,19 @@ public class ChatPacketManager extends PacketHandler {
 							copy.setItemMeta(bsm);
 						}
 					}
-					message = manager.getManipulator().parse(localJson, copy,
-							ChatManager.styleItem(p, copy, getStorage()), ItemPlayer.getPlayer(itemPlayer).getProtocolVersion());
+					lastSentPacket = fchoosedGetter.manageItem(p, ip, e, item, getStorage());
 				} else {
 					if (!getStorage().HAND_DISABLED) {
-						message = manager.getManipulator().parseEmpty(localJson, getStorage().HAND_NAME, getStorage().HAND_TOOLTIP, itemPlayer);
+						lastSentPacket = fchoosedGetter.manageEmpty(p, ip, e, getStorage());
 					}
 				}
+				if(lastSentPacket == null)
+					ChatItem.debug("(v1) No packet to sent with manager " + fchoosedGetter.getClass().getName());
+				else
+					PacketUtils.sendPacket(p, lastSentPacket);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
-			if (message != null) {
-				ChatItem.debug("(v1) Writing message: " + message);
-				fchoosedGetter.writeJson(e, message);
-			}
-			lastSentPacket = e.getPacket();
-			PacketUtils.sendPacket(p, lastSentPacket);
 		});
 	}
 

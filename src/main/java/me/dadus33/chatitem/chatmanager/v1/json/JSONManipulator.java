@@ -27,7 +27,13 @@ import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Reflect;
 import me.dadus33.chatitem.utils.Version;
 
-public class JSONManipulatorCurrent {
+public class JSONManipulator {
+	
+	private static JSONManipulator instance = new JSONManipulator();
+	
+	public static JSONManipulator getInstance() {
+		return instance;
+	}
 
 	private static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
 	private static final Class<?> NMS_ITEM_STACK_CLASS = getNmsClass("ItemStack", "world.item.");
@@ -59,7 +65,7 @@ public class JSONManipulatorCurrent {
 			hover.addProperty("action", "show_item");
 
 			// Get the JSON representation of the item (well, not really JSON, but rather a string representation of NBT data)
-			hover.addProperty("value", stringifyItem(this, item, protocolVersion));
+			hover.addProperty("value", stringifyItem(item, protocolVersion));
 
 			if(use.size() == 1) {
 				JsonElement extraElement = use.get(0);
@@ -210,18 +216,18 @@ public class JSONManipulatorCurrent {
 	}
 
 	@SuppressWarnings({ "deprecation" })
-	public static String stringifyItem(JSONManipulatorCurrent j, ItemStack is, Version protocolVersion)
+	public static String stringifyItem(ItemStack is, Version protocolVersion)
 			throws Exception {
-		Object nmsStack = JSONManipulatorCurrent.AS_NMS_COPY.invoke(null, is);
-		Object nmsTag = JSONManipulatorCurrent.NBT_TAG_COMPOUND.newInstance();
-		JSONManipulatorCurrent.SAVE_NMS_ITEM_STACK_METHOD.invoke(nmsStack, nmsTag);
+		Object nmsStack = JSONManipulator.AS_NMS_COPY.invoke(null, is);
+		Object nmsTag = JSONManipulator.NBT_TAG_COMPOUND.newInstance();
+		JSONManipulator.SAVE_NMS_ITEM_STACK_METHOD.invoke(nmsStack, nmsTag);
 		HashMap<String, String> tagMap = new HashMap<>();
-		Map<String, Object> nmsMap = (Map<String, Object>) JSONManipulatorCurrent.MAP.get(nmsTag);
+		Map<String, Object> nmsMap = (Map<String, Object>) JSONManipulator.MAP.get(nmsTag);
 		String id = nmsMap.get("id").toString().replace("\"", "");
 		Object realTag = nmsMap.get("tag");
-		if (JSONManipulatorCurrent.NBT_TAG_COMPOUND.isInstance(realTag)) { // We need to make sure this is indeed an
+		if (JSONManipulator.NBT_TAG_COMPOUND.isInstance(realTag)) { // We need to make sure this is indeed an
 																			// NBTTagCompound
-			Map<String, Object> realMap = (Map<String, Object>) JSONManipulatorCurrent.MAP.get(realTag);
+			Map<String, Object> realMap = (Map<String, Object>) JSONManipulator.MAP.get(realTag);
 			Set<Map.Entry<String, Object>> entrySet = realMap.entrySet();
 			for (Map.Entry<String, Object> entry : entrySet) {
 				tagMap.put(entry.getKey(), entry.getValue().toString());
