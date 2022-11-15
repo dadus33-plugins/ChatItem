@@ -14,7 +14,7 @@ import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.ItemPlayer;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
-import me.dadus33.chatitem.chatmanager.v1.basecomp.IBaseComponentGetter;
+import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.utils.Storage;
@@ -24,7 +24,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-public class StringComponentGetter implements IBaseComponentGetter {
+public class StringComponentManager implements IComponentManager {
 
 	@Override
 	public String getBaseComponentAsJSON(ChatItemPacket packet) {

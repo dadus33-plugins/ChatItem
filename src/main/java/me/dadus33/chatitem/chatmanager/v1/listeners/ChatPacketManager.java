@@ -23,11 +23,11 @@ import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.ItemPlayer;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
-import me.dadus33.chatitem.chatmanager.v1.basecomp.IBaseComponentGetter;
-import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.AdventureComponentGetter;
-import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.ComponentGetter;
-import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.IChatBaseComponentGetter;
-import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.StringComponentGetter;
+import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
+import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.AdventureComponentManager;
+import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.ComponentNMSManager;
+import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.IChatBaseComponentManager;
+import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.StringComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
@@ -45,7 +45,7 @@ public class ChatPacketManager extends PacketHandler {
 	private Object lastSentPacket = null;
 	private Method serializerGetJson;
 	private PacketEditingChatManager manager;
-	private final List<IBaseComponentGetter> baseComponentGetter = new ArrayList<>();
+	private final List<IComponentManager> componentManager = new ArrayList<>();
 
 	public ChatPacketManager(PacketEditingChatManager manager) {
 		this.manager = manager;
@@ -63,12 +63,12 @@ public class ChatPacketManager extends PacketHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		for(IBaseComponentGetter getter : Arrays.asList(new IChatBaseComponentGetter(), new ComponentGetter(), new StringComponentGetter(), new AdventureComponentGetter())) {
+		for(IComponentManager getter : Arrays.asList(new IChatBaseComponentManager(), new ComponentNMSManager(), new StringComponentManager(), new AdventureComponentManager())) {
 			if(getter.hasConditions())
-				baseComponentGetter.add(getter);
+				componentManager.add(getter);
 		}
-		ChatItem.getInstance().getLogger().info("Loaded " + baseComponentGetter.size() + " getter for base components.");
-		ChatItem.debug("BaseComponentGetters: " + String.join(", ", baseComponentGetter.stream().map(IBaseComponentGetter::getClass).map(Class::getSimpleName).collect(Collectors.toList())));
+		ChatItem.getInstance().getLogger().info("Loaded " + componentManager.size() + " getter for base components.");
+		ChatItem.debug("BaseComponentGetters: " + String.join(", ", componentManager.stream().map(IComponentManager::getClass).map(Class::getSimpleName).collect(Collectors.toList())));
 	}
 
 	@Override
@@ -81,13 +81,13 @@ public class ChatPacketManager extends PacketHandler {
 		PacketContent packet = e.getContent();
 		Version version = Version.getVersion();
 		String json = "{}";
-		IBaseComponentGetter choosedGetter = null;
+		IComponentManager choosedGetter = null;
 		if (version.isNewerOrEquals(Version.V1_19)) {
 			if(packet.getIntegers().readSafely(0, 0) > 1) { // not parsed chat message type
 				ChatItem.debug("Invalid int: " + packet.getIntegers().read(0));
 				return;
 			}
-			choosedGetter = new StringComponentGetter();
+			choosedGetter = new StringComponentManager();
 			json = choosedGetter.getBaseComponentAsJSON(e); // if null, will be re-checked so anyway
 		} else if (version.isNewerOrEquals(Version.V1_12)) {
 			// only if action bar messages are supported
@@ -104,7 +104,7 @@ public class ChatPacketManager extends PacketHandler {
 			return; // It's an actionbar message, ignoring
 		}
 		if(json == null || choosedGetter == null) {
-			for(IBaseComponentGetter getters : baseComponentGetter) {
+			for(IComponentManager getters : componentManager) {
 				String tmpJson = getters.getBaseComponentAsJSON(e);
 				if(tmpJson != null) {
 					json = ChatManager.fixSeparator(tmpJson);
@@ -137,7 +137,7 @@ public class ChatPacketManager extends PacketHandler {
 		Player itemPlayer = Bukkit.getPlayer(name);
 		//String localJson = choosedGetter.removePlaceholdersAndName(json, toReplace, itemPlayer);
 		//ChatItem.debug("Local json: " + localJson);
-		IBaseComponentGetter fchoosedGetter = choosedGetter;
+		IComponentManager fchoosedGetter = choosedGetter;
 		e.setCancelled(true); // We cancel the packet as we're going to resend it anyways (ignoring listeners
 		// this time)
 		Bukkit.getScheduler().runTaskAsynchronously(ChatItem.getInstance(), () -> {

@@ -19,7 +19,7 @@ import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.utils.Storage;
 
-public interface IBaseComponentGetter {
+public interface IComponentManager {
 
 	default boolean hasConditions() {
 		return true;

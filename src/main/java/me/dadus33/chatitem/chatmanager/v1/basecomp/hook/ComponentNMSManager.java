@@ -1,10 +1,10 @@
 package me.dadus33.chatitem.chatmanager.v1.basecomp.hook;
 
-import me.dadus33.chatitem.chatmanager.v1.basecomp.IBaseComponentGetter;
+import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.utils.PacketUtils;
 
-public class ComponentGetter implements IBaseComponentGetter {
+public class ComponentNMSManager implements IComponentManager {
 
 	@Override
 	public boolean hasConditions() {

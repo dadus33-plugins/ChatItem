@@ -6,18 +6,18 @@ import java.time.Instant;
 import java.util.Optional;
 
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.chatmanager.v1.basecomp.IBaseComponentGetter;
+import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 
-public class IChatBaseComponentGetter implements IBaseComponentGetter {
+public class IChatBaseComponentManager implements IComponentManager {
 
 	private Method serializerGetJson;
 	private boolean canEditVariable = true;
 
-	public IChatBaseComponentGetter() {
+	public IChatBaseComponentManager() {
 		try {
 			for (Method m : PacketUtils.CHAT_SERIALIZER.getDeclaredMethods()) {
 				if (m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(PacketUtils.COMPONENT_CLASS)

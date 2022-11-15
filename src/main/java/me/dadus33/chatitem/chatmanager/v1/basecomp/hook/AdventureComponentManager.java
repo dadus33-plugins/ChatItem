@@ -14,14 +14,14 @@ import com.google.gson.JsonParser;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
-import me.dadus33.chatitem.chatmanager.v1.basecomp.IBaseComponentGetter;
+import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
 
-public class AdventureComponentGetter implements IBaseComponentGetter {
+public class AdventureComponentManager implements IComponentManager {
 
 	private boolean useExtra = false;
 	
@@ -58,7 +58,7 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 	
 	@Override
 	public String removePlaceholdersAndName(String json, String toReplace, Player foundedPlayer) {
-		String tmpName = IBaseComponentGetter.super.removePlaceholdersAndName(json, toReplace, foundedPlayer);
+		String tmpName = IComponentManager.super.removePlaceholdersAndName(json, toReplace, foundedPlayer);
 		if(!tmpName.equals(json)) // if not the same -> name found and removed
 			return tmpName;
 		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
@@ -107,7 +107,7 @@ public class AdventureComponentGetter implements IBaseComponentGetter {
 			} // ignoring all others because it should not appear
 		}
 		ChatItem.debug("Nothing founded while trying to remove placeholders");
-		return IBaseComponentGetter.super.removePlaceholdersAndName(json, toReplace, foundedPlayer);
+		return IComponentManager.super.removePlaceholdersAndName(json, toReplace, foundedPlayer);
 	}
 
 	@Override
