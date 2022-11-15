@@ -17,7 +17,7 @@ public class PacketUtils {
 	public static final String NMS_PREFIX;
 	public static final String OBC_PREFIX;
 	public static final boolean IS_THERMOS;
-	public static final Class<?> CRAFT_PLAYER_CLASS, CHAT_SERIALIZER, COMPONENT_CLASS;
+	public static final Class<?> CHAT_SERIALIZER, COMPONENT_CLASS;
 
 	/**
 	 * This Map is to reduce Reflection action which take more resources than just
@@ -30,7 +30,6 @@ public class PacketUtils {
 		NMS_PREFIX = Version.getVersion().isNewerOrEquals(Version.V1_17) || IS_THERMOS ? "net.minecraft."
 				: "net.minecraft.server." + VERSION + ".";
 		OBC_PREFIX = "org.bukkit.craftbukkit." + VERSION + ".";
-		CRAFT_PLAYER_CLASS = getObcClass("entity.CraftPlayer");
 		CHAT_SERIALIZER = getNmsClass("IChatBaseComponent$ChatSerializer", "network.chat.", "ChatSerializer");
 		COMPONENT_CLASS = getNmsClass("IChatBaseComponent", "network.chat.");
 	}
@@ -111,7 +110,7 @@ public class PacketUtils {
 	 */
 	public static Object getEntityPlayer(Player p) {
 		try {
-			return CRAFT_PLAYER_CLASS.getMethod("getHandle").invoke(p);
+			return getObcClass("entity.CraftPlayer").getMethod("getHandle").invoke(p);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -154,7 +153,7 @@ public class PacketUtils {
 	 */
 	public static Object getCraftServer() {
 		try {
-			return getObcClass("CraftServer").getClass().getMethod("getHandle").invoke(Bukkit.getServer());
+			return getObcClass("CraftServer").getMethod("getHandle").invoke(Bukkit.getServer());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
