@@ -15,9 +15,9 @@ import me.dadus33.chatitem.ItemPlayer;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
-import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.utils.Storage;
+import me.dadus33.chatitem.utils.Utils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -55,18 +55,13 @@ public class StringComponentManager implements IComponentManager {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public Object manageItem(Player p, ItemPlayer itemPlayer, ChatItemPacket packet, ItemStack item, Storage c)
 			throws Exception {
 		String itemName = ChatManager.getNameOfItem(itemPlayer.getPlayer(), item, c);
-		HoverEvent hover = new HoverEvent(HoverEvent.Action.SHOW_ITEM,
-				new ComponentBuilder(JSONManipulator.stringifyItem(item, ItemPlayer.getPlayer(p).getVersion()))
-						.create());
-		return manage(p, itemPlayer, packet, itemName, hover);
+		return manage(p, itemPlayer, packet, itemName, Utils.createItemHover(item));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public Object manageEmpty(Player p, ItemPlayer itemPlayer, ChatItemPacket packet, Storage c) {
 		ComponentBuilder builder = new ComponentBuilder("");
@@ -74,7 +69,7 @@ public class StringComponentManager implements IComponentManager {
 		Player sender = itemPlayer.getPlayer();
 		String handName = c.HAND_NAME.replace("{name}", sender.getName()).replace("{display-name}",
 				sender.getDisplayName());
-		return manage(p, itemPlayer, packet, handName, new HoverEvent(HoverEvent.Action.SHOW_TEXT, builder.create()));
+		return manage(p, itemPlayer, packet, handName, Utils.createTextHover(builder.create()));
 	}
 
 	private Object manage(Player p, ItemPlayer itemPlayer, ChatItemPacket packet, String replacement,

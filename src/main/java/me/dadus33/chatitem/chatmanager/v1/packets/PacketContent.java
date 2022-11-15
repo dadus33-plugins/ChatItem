@@ -67,7 +67,6 @@ public class PacketContent {
 		return new ContentModifier<byte[]>(obj, byte[].class);
 	}
 
-	@SuppressWarnings("unchecked")
 	public ContentModifier<Object> getChatComponents() {
 		return (ContentModifier<Object>) getSpecificModifier(PacketUtils.COMPONENT_CLASS);
 	}
@@ -77,7 +76,6 @@ public class PacketContent {
 		private Object obj;
 		private HashMap<Field, T> content = new HashMap<>();
 
-		@SuppressWarnings("unchecked")
 		public ContentModifier(Object obj, Class<?> clazz) {
 			this.obj = obj;
 			

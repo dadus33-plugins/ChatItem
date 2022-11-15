@@ -1,18 +1,32 @@
 package me.dadus33.chatitem.utils;
 
-import me.dadus33.chatitem.ChatItem;
-import org.bukkit.Bukkit;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.*;
+import java.net.ConnectException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
+
+import org.bukkit.Bukkit;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.ItemTag;
+import net.md_5.bungee.api.chat.hover.content.Item;
+import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class Utils {
 
@@ -136,6 +150,28 @@ public class Utils {
 			i += searched.length();
 		}
 		return b;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static HoverEvent createItemHover(ItemStack item) {
+		if(Version.getVersion().isNewerOrEquals(Version.V1_13)) {
+			return new HoverEvent(HoverEvent.Action.SHOW_ITEM, new Item(item.getType().getKey().getKey(), item.getAmount(), ItemTag.ofNbt(PacketUtils.getNbtTag(item))));
+		} else {
+			return new HoverEvent(HoverEvent.Action.SHOW_ITEM, new ComponentBuilder(JSONManipulator.stringifyItem(item)).create());
+		}
+	}
+
+	public static HoverEvent createTextHover(String text) {
+		return createTextHover(new ComponentBuilder(text).create());
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static HoverEvent createTextHover(BaseComponent[] comps) {
+		if(Version.getVersion().isNewerOrEquals(Version.V1_13)) {
+			return new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(comps));
+		} else {
+			return new HoverEvent(HoverEvent.Action.SHOW_TEXT, comps);
+		}
 	}
 	
 	public static boolean isInteger(String s) {

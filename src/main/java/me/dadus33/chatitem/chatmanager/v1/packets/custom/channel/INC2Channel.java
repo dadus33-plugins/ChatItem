@@ -26,7 +26,6 @@ public class INC2Channel extends ChannelAbstract {
 	private final ChannelInboundHandler boundHandler;
 	private ChannelPipeline pipeline;
 	
-	@SuppressWarnings("unchecked")
 	public INC2Channel(CustomPacketManager customPacketManager) {
 		super(customPacketManager);
 		boundHandler = new ChannelInboundHandler(customPacketManager);

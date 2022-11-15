@@ -22,7 +22,6 @@ import me.dadus33.chatitem.chatmanager.v1.packets.custom.CustomPacketManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 
-@SuppressWarnings("unchecked")
 public class INCChannel extends ChannelAbstract {
 	
 	private final ChannelInboundHandler boundHandler;

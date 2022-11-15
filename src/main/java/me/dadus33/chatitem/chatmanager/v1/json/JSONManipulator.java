@@ -35,17 +35,17 @@ public class JSONManipulator {
 		return instance;
 	}
 
-	private static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
-	private static final Class<?> NMS_ITEM_STACK_CLASS = getNmsClass("ItemStack", "world.item.");
-	private static final Method AS_NMS_COPY = Reflect.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
-	private static final Class<?> NBT_TAG_COMPOUND = getNmsClass("NBTTagCompound", "nbt.");
-	private static final Method SAVE_NMS_ITEM_STACK_METHOD = Reflect.getMethod(NMS_ITEM_STACK_CLASS, NBT_TAG_COMPOUND,
+	public static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
+	public static final Class<?> NMS_ITEM_STACK_CLASS = getNmsClass("ItemStack", "world.item.");
+	public static final Method AS_NMS_COPY = Reflect.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
+	public static final Class<?> NBT_TAG_COMPOUND = getNmsClass("NBTTagCompound", "nbt.");
+	public static final Method SAVE_NMS_ITEM_STACK_METHOD = Reflect.getMethod(NMS_ITEM_STACK_CLASS, NBT_TAG_COMPOUND,
 			NBT_TAG_COMPOUND);
-	private static final Field MAP = Reflect.getField(NBT_TAG_COMPOUND, "map", "x");
+	public static final Field MAP = Reflect.getField(NBT_TAG_COMPOUND, "map", "x");
 
 	private static final ConcurrentHashMap<Map.Entry<Version, ItemStack>, JsonObject> STACKS = new ConcurrentHashMap<>();
 
-	private Version protocolVersion;
+	protected Version protocolVersion;
 	private JsonObject itemTooltip;
 	private JsonArray classicTooltip;
 
@@ -65,7 +65,7 @@ public class JSONManipulator {
 			hover.addProperty("action", "show_item");
 
 			// Get the JSON representation of the item (well, not really JSON, but rather a string representation of NBT data)
-			hover.addProperty("value", stringifyItem(item, protocolVersion));
+			hover.addProperty("value", stringifyItem(item));
 
 			if(use.size() == 1) {
 				JsonElement extraElement = use.get(0);
@@ -215,9 +215,17 @@ public class JSONManipulator {
 			rep.add(current);
 	}
 
+	public static String stringifyItem(ItemStack is) {
+		try {
+			return stringifyItemInternal(is);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "{}";
+		}
+	}
+
 	@SuppressWarnings({ "deprecation" })
-	public static String stringifyItem(ItemStack is, Version protocolVersion)
-			throws Exception {
+	public static String stringifyItemInternal(ItemStack is) throws Exception {
 		Object nmsStack = JSONManipulator.AS_NMS_COPY.invoke(null, is);
 		Object nmsTag = JSONManipulator.NBT_TAG_COMPOUND.newInstance();
 		JSONManipulator.SAVE_NMS_ITEM_STACK_METHOD.invoke(nmsStack, nmsTag);
@@ -237,10 +245,7 @@ public class JSONManipulator {
 		// ItemRewriter.remapIds(Version.getVersion().MAX_VER, protocolVersion.MAX_VER,
 		// is);
 		StringBuilder sb = new StringBuilder("{id:");
-		if (protocolVersion.equals(Version.V1_7))
-			sb.append(id).append(","); // Append the id
-		else
-			sb.append("\"").append(id).append("\"").append(","); // Append the id
+		sb.append("\"").append(id).append("\"").append(","); // Append the id
 		sb.append("Count:").append(is.getAmount()).append("b"); // Append the amount
 
 		if (!tagMap.containsKey("Damage")) { // for new versions

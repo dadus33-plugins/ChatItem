@@ -30,11 +30,8 @@ import me.dadus33.chatitem.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
 
-@SuppressWarnings("deprecation")
 public class ChatListener implements Listener {
 	
 	private static Method saveMethod;
@@ -217,40 +214,12 @@ public class ChatListener implements Listener {
 		to.spigot().sendMessage(builder.create());
 	}
 
-	/**
-	 * Converts an {@link org.bukkit.inventory.ItemStack} to a Json string for
-	 * sending with {@link net.md_5.bungee.api.chat.BaseComponent}'s.
-	 *
-	 * @param itemStack the item to convert
-	 * @return the Json string representation of the item
-	 */
-	public static String convertItemStackToJson(ItemStack itemStack) {
-		try {
-			Class<?> nbtTag = PacketUtils.getNmsClass("NBTTagCompound", "nbt.");
-			Class<?> craftItemClass = PacketUtils.getObcClass("inventory.CraftItemStack");
-			Object nmsNbtTagCompoundObj = nbtTag.getConstructor().newInstance();
-			if (saveMethod == null) {
-				Object nmsItemStackObj = craftItemClass.getMethod("asNMSCopy", ItemStack.class).invoke(null, itemStack);
-				return nmsItemStackObj.getClass().getMethod("save", nbtTag)
-						.invoke(nmsItemStackObj, nmsNbtTagCompoundObj).toString();
-			} else {
-				Object nmsItemStackObj = craftItemClass.getMethod("asNMSCopy", ItemStack.class).invoke(null, itemStack);
-				return saveMethod.invoke(nmsItemStackObj, nmsNbtTagCompoundObj).toString();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
 	public static void addItem(ComponentBuilder builder, Player to, Player origin, ItemStack item) {
 		Storage c = ChatItem.getInstance().getStorage();
 		if (!ItemUtils.isEmpty(item)) {
 			ComponentBuilder itemComponent = new ComponentBuilder("");
-			String itemJson = convertItemStackToJson(item);
-			BaseComponent[] itemBaseComponent = new ComponentBuilder(itemJson).create();
-			appendToComponentBuilder(itemComponent, fixColorComponent(ChatManager.getNameOfItem(to, item, c), ChatColor.WHITE, itemBaseComponent));
-			ChatItem.debug("Item for " + to.getName() + " (ver: " + ItemPlayer.getPlayer(to).getVersion().name() + ") : " + itemJson);
+			appendToComponentBuilder(itemComponent, fixColorComponent(ChatManager.getNameOfItem(to, item, c), ChatColor.WHITE, item));
+			ChatItem.debug("Item for " + to.getName() + " (ver: " + ItemPlayer.getPlayer(to).getVersion().name() + ") : " + PacketUtils.getNbtTag(item));
 			//itemComponent.event(new HoverEvent(Action.SHOW_ITEM, itemBaseComponent));
 			appendToComponentBuilder(builder, itemComponent.create());
 		} else {
@@ -264,7 +233,7 @@ public class ChatListener implements Listener {
 				if (stay > 0)
 					handTooltip.append("\n");
 			}
-			handComp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, handTooltip.create()));
+			handComp.event(Utils.createTextHover(handTooltip.create()));
 			if (handName.contains("{display-name}")) {
 				String[] splitted = handName.split("\\{display-name\\}");
 				for (int i = 0; i < (splitted.length - 1); i++) {
@@ -304,7 +273,7 @@ public class ChatListener implements Listener {
 		return fixColorComponent(message, color, null);
 	}
 	
-	public static BaseComponent[] fixColorComponent(String message, ChatColor color, @Nullable BaseComponent[] jsonItem) {
+	public static BaseComponent[] fixColorComponent(String message, ChatColor color, @Nullable ItemStack item) {
 		ComponentBuilder builder = new ComponentBuilder("");
 		String colorCode = "", text = "";
 		boolean waiting = false;
@@ -313,8 +282,8 @@ public class ChatListener implements Listener {
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
 					ChatItem.debug("Append while fixing name " + (ColorManager.isHexColor(color) && builder.getParts().isEmpty() ? ColorManager.removeColorAtBegin(text) : text));
 					ComponentBuilder littleBuilder = new ComponentBuilder(ColorManager.isHexColor(color) ? ColorManager.removeColorAtBegin(text) : text).color(color);
-					if(jsonItem != null) { // add to all possible sub parts
-						littleBuilder.event(new HoverEvent(Action.SHOW_ITEM, jsonItem));
+					if(item != null) { // add to all possible sub parts
+						littleBuilder.event(Utils.createItemHover(item));
 					}
 					appendToComponentBuilder(builder, littleBuilder.create());
 					text = "";
@@ -356,8 +325,8 @@ public class ChatListener implements Listener {
 		}
 		if(!text.isEmpty()) {
 			ComponentBuilder littleBuilder = new ComponentBuilder(text).color(color);
-			if(jsonItem != null) { // add to all possible sub parts
-				littleBuilder.event(new HoverEvent(Action.SHOW_ITEM, jsonItem));
+			if(item != null) { // add to all possible sub parts
+				littleBuilder.event(Utils.createItemHover(item));
 			}
 			appendToComponentBuilder(builder, littleBuilder.create());
 		}

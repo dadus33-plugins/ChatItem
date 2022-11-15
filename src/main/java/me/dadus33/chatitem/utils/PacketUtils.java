@@ -6,6 +6,9 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 
 public class PacketUtils {
 
@@ -14,88 +17,92 @@ public class PacketUtils {
 	public static final String NMS_PREFIX;
 	public static final String OBC_PREFIX;
 	public static final boolean IS_THERMOS;
-	public static final Class<?> CRAFT_PLAYER_CLASS, CRAFT_SERVER_CLASS, CHAT_SERIALIZER, COMPONENT_CLASS;
-	
+	public static final Class<?> CRAFT_PLAYER_CLASS, CHAT_SERIALIZER, COMPONENT_CLASS;
+
 	/**
-	 * This Map is to reduce Reflection action which take more resources than just RAM action
+	 * This Map is to reduce Reflection action which take more resources than just
+	 * RAM action
 	 */
 	private static final Map<String, Class<?>> ALL_CLASS = Collections.synchronizedMap(new HashMap<String, Class<?>>());
-	
+
 	static {
 		IS_THERMOS = isClassExist("thermos.Thermos");
-		NMS_PREFIX = Version.getVersion().isNewerOrEquals(Version.V1_17) || IS_THERMOS ? "net.minecraft." : "net.minecraft.server." + VERSION + ".";
+		NMS_PREFIX = Version.getVersion().isNewerOrEquals(Version.V1_17) || IS_THERMOS ? "net.minecraft."
+				: "net.minecraft.server." + VERSION + ".";
 		OBC_PREFIX = "org.bukkit.craftbukkit." + VERSION + ".";
 		CRAFT_PLAYER_CLASS = getObcClass("entity.CraftPlayer");
 		CHAT_SERIALIZER = getNmsClass("IChatBaseComponent$ChatSerializer", "network.chat.", "ChatSerializer");
 		COMPONENT_CLASS = getNmsClass("IChatBaseComponent", "network.chat.");
-		CRAFT_SERVER_CLASS = getObcClass("CraftServer");
 	}
-	
+
 	/**
 	 * Get the Class in NMS, with a processing reducer
 	 * 
-	 * @param name of the NMS class (in net.minecraft.server package ONLY, because it's NMS)
+	 * @param name of the NMS class (in net.minecraft.server package ONLY, because
+	 *             it's NMS)
 	 * @return clazz the searched class
 	 */
-	public static Class<?> getNmsClass(String name, String packagePrefix, String... alias){
+	public static Class<?> getNmsClass(String name, String packagePrefix, String... alias) {
 		return ALL_CLASS.computeIfAbsent(name, (a) -> {
-			String fullPrefix = NMS_PREFIX + (Version.getVersion().isNewerOrEquals(Version.V1_17) || IS_THERMOS ? packagePrefix : "");
+			String fullPrefix = NMS_PREFIX
+					+ (Version.getVersion().isNewerOrEquals(Version.V1_17) || IS_THERMOS ? packagePrefix : "");
 			try {
 				Class<?> clazz = Class.forName(fullPrefix + name);
-				if(clazz != null)
+				if (clazz != null)
 					return clazz;
 			} catch (ClassNotFoundException e) {
-				if(alias.length == 0)
+				if (alias.length == 0)
 					e.printStackTrace(); // no alias, print error
 				// else ignore and go check for alias
 			}
-			
-			for(String className : alias) {
+
+			for (String className : alias) {
 				try {
 					Class<?> clazz = Class.forName(fullPrefix + className);
-					if(clazz != null)
+					if (clazz != null)
 						return clazz;
 				} catch (ClassNotFoundException e) {
-					if(className == alias[alias.length - 1]) // if it's last alias, print error
+					if (className == alias[alias.length - 1]) // if it's last alias, print error
 						e.printStackTrace();
 				}
 			}
 			return null;
 		});
 	}
-		
+
 	/**
 	 * Get the Class in NMS, with a processing reducer
 	 * 
-	 * @param name of the NMS class (in net.minecraft.server package ONLY, because it's NMS)
+	 * @param name of the NMS class (in net.minecraft.server package ONLY, because
+	 *             it's NMS)
 	 * @return clazz the searched class
 	 */
-	public static Class<?> getObcClass(String name, String... alias){
+	public static Class<?> getObcClass(String name, String... alias) {
 		return ALL_CLASS.computeIfAbsent(name, (a) -> {
 			try {
 				Class<?> clazz = Class.forName(OBC_PREFIX + name);
-				if(clazz != null)
+				if (clazz != null)
 					return clazz;
 			} catch (ClassNotFoundException e) {
-				if(alias.length == 0)
+				if (alias.length == 0)
 					e.printStackTrace(); // no alias, print error
 				// else ignore and go check for alias
 			}
-			
-			for(String className : alias) {
+
+			for (String className : alias) {
 				try {
 					Class<?> clazz = Class.forName(OBC_PREFIX + className);
-					if(clazz != null)
+					if (clazz != null)
 						return clazz;
 				} catch (ClassNotFoundException e) {
-					if(className == alias[alias.length - 1]) // if it's last alias, print error
+					if (className == alias[alias.length - 1]) // if it's last alias, print error
 						e.printStackTrace();
 				}
 			}
 			return null;
 		});
 	}
-	
+
 	/**
 	 * Get NMS entity player of specified one
 	 * 
@@ -104,14 +111,13 @@ public class PacketUtils {
 	 */
 	public static Object getEntityPlayer(Player p) {
 		try {
-			Object craftPlayer = CRAFT_PLAYER_CLASS.cast(p);
-			return craftPlayer.getClass().getMethod("getHandle").invoke(craftPlayer);
+			return CRAFT_PLAYER_CLASS.getMethod("getHandle").invoke(p);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-	
+
 	public static boolean isClassExist(String name) {
 		try {
 			Class.forName(name);
@@ -130,7 +136,7 @@ public class PacketUtils {
 	public static Object getPlayerConnection(Player p) {
 		try {
 			Object entityPlayer = getEntityPlayer(p);
-			if(Version.getVersion().isNewerOrEquals(Version.V1_17))
+			if (Version.getVersion().isNewerOrEquals(Version.V1_17))
 				return entityPlayer.getClass().getField("b").get(entityPlayer);
 			else
 				return entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
@@ -139,7 +145,7 @@ public class PacketUtils {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Get NMS entity player of specified one
 	 * 
@@ -148,8 +154,7 @@ public class PacketUtils {
 	 */
 	public static Object getCraftServer() {
 		try {
-			Object craftServer = CRAFT_SERVER_CLASS.cast(Bukkit.getServer());
-			return craftServer.getClass().getMethod("getHandle").invoke(craftServer);
+			return getObcClass("CraftServer").getClass().getMethod("getHandle").invoke(Bukkit.getServer());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -159,15 +164,39 @@ public class PacketUtils {
 	/**
 	 * Send the packet to the specified player
 	 * 
-	 * @param p which will receive the packet
+	 * @param p      which will receive the packet
 	 * @param packet the packet to sent
 	 */
 	public static void sendPacket(Player p, Object packet) {
 		try {
 			Object playerConnection = getPlayerConnection(p);
-			playerConnection.getClass().getMethod(Version.getVersion().isNewerOrEquals(Version.V1_18) ? "a" : "sendPacket", getNmsClass("Packet", "network.protocol.")).invoke(playerConnection, packet);
+			playerConnection.getClass()
+					.getMethod(Version.getVersion().isNewerOrEquals(Version.V1_18) ? "a" : "sendPacket",
+							getNmsClass("Packet", "network.protocol."))
+					.invoke(playerConnection, packet);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Converts an {@link org.bukkit.inventory.ItemStack} to a Json string for
+	 * sending with {@link net.md_5.bungee.api.chat.BaseComponent}'s.
+	 *
+	 * @param item the item to convert
+	 * @return the Json string representation of the item
+	 */
+	public static String getNbtTag(ItemStack item) {
+		try {
+			Object nmsStack = JSONManipulator.AS_NMS_COPY.invoke(null, item);
+			Version v = Version.getVersion();
+			Object tag = getNmsClass("ItemStack", "world.item.")
+					.getMethod(v.equals(Version.V1_18) ? "t" : (v.isNewerOrEquals(Version.V1_19) ? "u" : "getTag"))
+					.invoke(nmsStack);
+			return tag == null ? "{}" : tag.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "{}";
 	}
 }
