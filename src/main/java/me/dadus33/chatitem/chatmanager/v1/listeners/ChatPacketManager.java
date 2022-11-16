@@ -68,16 +68,16 @@ public class ChatPacketManager extends PacketHandler {
 				componentManager.add(getter);
 		}
 		ChatItem.getInstance().getLogger().info("Loaded " + componentManager.size() + " getter for base components.");
-		ChatItem.debug("BaseComponentGetters: " + String.join(", ", componentManager.stream().map(IComponentManager::getClass).map(Class::getSimpleName).collect(Collectors.toList())));
+		ChatItem.debug("ComponentManager: " + String.join(", ", componentManager.stream().map(IComponentManager::getClass).map(Class::getSimpleName).collect(Collectors.toList())));
 	}
 
 	@Override
 	public void onSend(ChatItemPacket e) {
 		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT))
 			return;
-		ChatItem.debug("Checking: " + e.getPacketType().getFullName() + " to " + e.getPlayername());
 		if (lastSentPacket != null && lastSentPacket == e.getPacket())
 			return; // prevent infinite loop
+		ChatItem.debug("Checking: " + e.getPacketType().getFullName() + " to " + e.getPlayername());
 		PacketContent packet = e.getContent();
 		Version version = Version.getVersion();
 		String json = "{}";

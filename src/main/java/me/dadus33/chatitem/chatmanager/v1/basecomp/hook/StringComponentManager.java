@@ -106,7 +106,7 @@ public class StringComponentManager implements IComponentManager {
 			TextComponent tc = (TextComponent) comp;
 			if (ChatManager.containsSeparator(tc.getText())) {
 				ChatItem.debug("Changing text " + tc.getText() + " to " + itemName);
-				tc.setText(ChatManager.replaceSeparator(tc.getText(), itemName, playerName));
+				tc.setText(ChatManager.replaceSeparator(tc.getText(), "", playerName));
 				tc.setHoverEvent(hover);
 				for(BaseComponent legacyExtra : TextComponent.fromLegacyText(itemName, tc.getColor())) {
 					tc.addExtra(legacyExtra);
