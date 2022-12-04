@@ -169,6 +169,8 @@ public class JSONManipulator {
 					JsonArray tmpArray = parseArray(jar, tooltip);
 					if(!tmpArray.isEmpty())
 						o.add("extra", tmpArray);
+					else
+						o.remove("extra");
 				} else {
 					o.remove("extra");
 				}
