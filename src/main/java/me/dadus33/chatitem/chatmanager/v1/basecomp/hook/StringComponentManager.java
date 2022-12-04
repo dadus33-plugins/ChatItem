@@ -91,7 +91,14 @@ public class StringComponentManager implements IComponentManager {
 			jsonObject.add("extra", extra);
 			json = jsonObject.toString();
 		}
-		BaseComponent[] components = ComponentSerializer.parse(json);
+		BaseComponent[] components = null;
+		try {
+			components = ComponentSerializer.parse(json);
+		} catch (Exception e) {
+			ChatItem.getInstance().getLogger().severe("Failed to parse JSON: " + json + ". Error:");
+			e.printStackTrace();
+			return packet.getPacket();
+		}
 		ChatItem.debug("Checking for json " + json + ", with " + components.length + " components");
 		Arrays.asList(components)
 				.forEach(comp -> checkComponent(comp, hover, replacement, itemPlayer.getPlayer().getName()));
