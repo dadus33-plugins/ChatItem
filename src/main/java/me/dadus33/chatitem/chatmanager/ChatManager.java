@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.hook.EcoEnchantsSupport;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.Storage;
@@ -101,7 +100,7 @@ public abstract class ChatManager {
 	 */
 	public static ItemStack getUsableItem(Player p) {
 		ItemStack item = HandItem.getBetterItem(p).clone();
-		if(ChatItem.ecoEnchantsSupport) {
+		/*if(ChatItem.ecoEnchantsSupport) {
 			List<String> addLore = EcoEnchantsSupport.getLores(item);
 			if(!addLore.isEmpty()) {
 				ItemMeta meta = item.getItemMeta();
@@ -114,7 +113,7 @@ public abstract class ChatManager {
 				ChatItem.debug("Added " + addLore.size() + " lores from EcoEnchants");
 			} else
 				ChatItem.debug("No lore to add from EcoEnchants");
-		}
+		}*/
 		return item;
 	}
 

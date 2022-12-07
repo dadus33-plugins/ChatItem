@@ -34,7 +34,7 @@ import me.dadus33.chatitem.utils.Version;
 public class ChatItem extends JavaPlugin {
 
     public final static int CFG_VER = 13;
-    public static boolean discordSrvSupport = false, ecoEnchantsSupport = false, hasNewVersion = false;
+    public static boolean discordSrvSupport = false, hasNewVersion = false;
     private static ChatItem instance;
     private final String brandChannelName = Version.getVersion().isNewerOrEquals(Version.V1_13) ? "minecraft:brand" : "MC|Brand";
     private final List<ChatManager> chatManager = new ArrayList<>();
@@ -137,10 +137,6 @@ public class ChatItem extends JavaPlugin {
             plugins.add("DiscordSRV");
         }
 
-        if (pm.getPlugin("EcoEnchants") != null) {
-            ecoEnchantsSupport = true;
-            plugins.add("EcoEnchants");
-        }
         if(plugins.length() > 0)
         	getLogger().info("Load " + plugins.toString() + " support.");
         
