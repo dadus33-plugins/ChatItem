@@ -86,15 +86,15 @@ public class JSONManipulator {
 			Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), () -> STACKS.remove(p), 100L);
 		}
 		if(obj.size() == 1 && obj.has("text")) {
-			wrapper.add("text", obj.get("text"));
-			ChatItem.debug("[JsonManipulator] Parsed quick: " + obj.toString() + ", wrapper: " + wrapper);
-			return wrapper.toString().replace(Character.toString(ChatManager.SEPARATOR), "").replace(ChatManager.SEPARATOR_STR, "");
+			itemTooltip.add("text", obj.get("text"));
+			ChatItem.debug("[JsonManipulator] Parsed quick: " + obj.toString() + ", wrapper: " + itemTooltip);
+			return itemTooltip.toString().replace(Character.toString(ChatManager.SEPARATOR), "").replace(ChatManager.SEPARATOR_STR, "");
 		}
-		obj.add("extra", parseArray(obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray(), wrapper));
+		obj.add("extra", parseArray(obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray(), itemTooltip));
 		if (!obj.has("text")) {
 			obj.addProperty("text", "");
 		}
-		ChatItem.debug("Parsed array for item: " + obj.toString() + ", wrapper: " + wrapper);
+		ChatItem.debug("Parsed array for item: " + obj.toString() + ", wrapper: " + itemTooltip);
 		return obj.toString();
 	}
 
