@@ -2,8 +2,9 @@ package me.dadus33.chatitem.playerversion.hooks;
 
 import org.bukkit.entity.Player;
 
+import com.viaversion.viaversion.api.Via;
+
 import me.dadus33.chatitem.playerversion.IPlayerVersion;
-import us.myles.ViaVersion.api.Via;
 
 public class ViaVersionHook implements IPlayerVersion {
 
