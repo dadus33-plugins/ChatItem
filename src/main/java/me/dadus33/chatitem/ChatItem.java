@@ -1,20 +1,12 @@
 package me.dadus33.chatitem;
 
-import com.google.common.base.Strings;
-import me.dadus33.chatitem.chatmanager.ChatManager;
-import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
-import me.dadus33.chatitem.chatmanager.v2.ChatListenerChatManager;
-import me.dadus33.chatitem.commands.CIReloadCommand;
-import me.dadus33.chatitem.commands.ChatItemCommand;
-import me.dadus33.chatitem.filters.Log4jFilter;
-import me.dadus33.chatitem.itemnamer.NamerManager;
-import me.dadus33.chatitem.listeners.InventoryListener;
-import me.dadus33.chatitem.listeners.JoinListener;
-import me.dadus33.chatitem.playernamer.PlayerNamerManager;
-import me.dadus33.chatitem.utils.SemVer;
-import me.dadus33.chatitem.utils.Storage;
-import me.dadus33.chatitem.utils.Utils;
-import me.dadus33.chatitem.utils.Version;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.StringJoiner;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,7 +15,21 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import com.google.common.base.Strings;
+
+import me.dadus33.chatitem.chatmanager.ChatManager;
+import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
+import me.dadus33.chatitem.chatmanager.v2.ChatListenerChatManager;
+import me.dadus33.chatitem.commands.CIReloadCommand;
+import me.dadus33.chatitem.commands.ChatItemCommand;
+import me.dadus33.chatitem.itemnamer.NamerManager;
+import me.dadus33.chatitem.listeners.InventoryListener;
+import me.dadus33.chatitem.listeners.JoinListener;
+import me.dadus33.chatitem.playernamer.PlayerNamerManager;
+import me.dadus33.chatitem.utils.SemVer;
+import me.dadus33.chatitem.utils.Storage;
+import me.dadus33.chatitem.utils.Utils;
+import me.dadus33.chatitem.utils.Version;
 
 public class ChatItem extends JavaPlugin {
 
@@ -32,7 +38,6 @@ public class ChatItem extends JavaPlugin {
     private static ChatItem instance;
     private final String brandChannelName = Version.getVersion().isNewerOrEquals(Version.V1_13) ? "minecraft:brand" : "MC|Brand";
     private final List<ChatManager> chatManager = new ArrayList<>();
-    private Log4jFilter filter;
     private Storage storage;
 
     public static void reload(CommandSender sender) {
@@ -43,7 +48,6 @@ public class ChatItem extends JavaPlugin {
         String oldChatManager = pl.storage.MANAGER;
         pl.storage = new Storage(pl.getConfig());
         pl.chooseManagers();
-        pl.filter.setStorage(pl.storage);
         if (!pl.storage.RELOAD_MESSAGE.isEmpty())
             sender.sendMessage(pl.storage.RELOAD_MESSAGE);
         if (!oldChatManager.equalsIgnoreCase(pl.storage.MANAGER))
@@ -126,9 +130,6 @@ public class ChatItem extends JavaPlugin {
         pm.registerEvents(new InventoryListener(), this);
 
         chooseManagers();
-
-        //Initialize Log4J filter (remove ugly console messages)
-        filter = new Log4jFilter(storage);
 
         StringJoiner plugins = new StringJoiner(", ");
         if (pm.getPlugin("DiscordSRV") != null) {

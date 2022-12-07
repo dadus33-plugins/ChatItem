@@ -45,15 +45,13 @@ public class JSONManipulator {
 
 	private static final ConcurrentHashMap<Map.Entry<Version, ItemStack>, JsonObject> STACKS = new ConcurrentHashMap<>();
 
-	protected Version protocolVersion;
 	private JsonObject itemTooltip;
 	private JsonArray classicTooltip;
 
 	public String parse(String json, ItemStack item, String replacement, int protocol)
 			throws Exception {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
-		final AbstractMap.SimpleEntry<Version, ItemStack> p = new AbstractMap.SimpleEntry<>(
-				protocolVersion = Version.getVersion(protocol), item);
+		final AbstractMap.SimpleEntry<Version, ItemStack> p = new AbstractMap.SimpleEntry<>(Version.getVersion(protocol), item);
 
 		JsonObject wrapper = new JsonObject(); // Create a wrapper object for the whole array
 		if ((itemTooltip = STACKS.get(p)) == null) {

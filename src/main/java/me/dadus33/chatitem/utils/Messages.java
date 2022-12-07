@@ -18,7 +18,6 @@ public class Messages {
 		return colorAndPlaceholders(ChatItem.getInstance().getConfig().getString("messages." + key, key), placeholders);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static List<String> getMessageList(String key, Object... placeholders) {
 		Object obj = ChatItem.getInstance().getConfig().get("messages." + key);
 		if(obj == null)
