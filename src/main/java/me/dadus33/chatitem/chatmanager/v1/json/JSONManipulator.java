@@ -204,6 +204,7 @@ public class JSONManipulator {
 			return;
 		}
 		String current = "";
+		boolean wasSep = false;
 		for(String parts : msg.split("")) {
 			if(ChatManager.equalsSeparator(parts)) {
 				if(!current.isEmpty()) {
@@ -211,6 +212,12 @@ public class JSONManipulator {
 					current = "";
 				}
 				rep.add(tooltip);
+				wasSep = true;
+			} else if(wasSep) {
+				if(parts == " ") { // sep finished
+					wasSep = false;
+					current += parts;
+				}
 			} else {
 				current += parts;
 			}
