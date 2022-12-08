@@ -3,6 +3,7 @@ package me.dadus33.chatitem.chatmanager.v1.listeners;
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
 import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR_STR;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -116,6 +117,14 @@ public class ChatPacketManager extends PacketHandler {
 		if(json == null || choosedGetter == null) {
 			ChatItem.debug("Can't find valid json getter or json itself");
 			ChatItem.debug("String: " + packet.getStrings().getContent());
+			for(Field f : e.getPacket().getClass().getDeclaredFields()) {
+				f.setAccessible(true);
+				try {
+					ChatItem.debug(f.getName() + ": " + f.get(e.getPacket()));
+				} catch (Exception exc) {
+					exc.printStackTrace();
+				}
+			}
 			return; // can't find something
 		}
 		ChatItem.debug("Found with " + choosedGetter.getClass().getName());

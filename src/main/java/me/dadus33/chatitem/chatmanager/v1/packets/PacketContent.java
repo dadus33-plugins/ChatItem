@@ -103,6 +103,10 @@ public class PacketContent {
 			}
 		}
 		
+		public Object getObj() {
+			return obj;
+		}
+		
 		/**
 		 * Get the size of the Map of content
 		 * 

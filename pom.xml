@@ -126,8 +126,8 @@
         </dependency>
         <dependency>
             <groupId>net.kyori</groupId>
-            <artifactId>adventure-platform-bungeecord</artifactId>
-            <version>4.1.0</version>
+            <artifactId>adventure-platform-bukkit</artifactId>
+            <version>4.1.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

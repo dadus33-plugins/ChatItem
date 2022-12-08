@@ -27,7 +27,9 @@ public interface IComponentManager {
 	
 	String getBaseComponentAsJSON(ChatItemPacket packet);
 	
-	void writeJson(ChatItemPacket packet, String json);
+	default void writeJson(ChatItemPacket packet, String json) {
+		
+	}
 	
 	default @Nullable String getNameFromMessage(String json, String toReplace) {
 		String checkedName = getNameFromSpecificMessage(json, toReplace);
