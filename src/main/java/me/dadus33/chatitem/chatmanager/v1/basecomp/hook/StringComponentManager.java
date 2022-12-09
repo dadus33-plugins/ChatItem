@@ -44,6 +44,10 @@ public class StringComponentManager implements IComponentManager {
 			jsonObject.addProperty("text", "");
 			jsonObject.add("extra", extra);
 			json = jsonObject.toString();
+		} else if(json == null) {
+			BaseComponent[] comp = packet.getContent().getSpecificModifier(BaseComponent[].class).readSafely(0);
+			if(comp != null)
+				return ComponentSerializer.toString(comp);
 		}
 		return json;
 	}
@@ -76,30 +80,32 @@ public class StringComponentManager implements IComponentManager {
 
 	private Object manage(Player p, ItemPlayer itemPlayer, ChatItemPacket packet, String replacement,
 			HoverEvent hover) {
-		String json = packet.getContent().getStrings().readSafely(0);
-		if (json != null && json.startsWith("[") && json.endsWith("]")) { // if used as array instead of json obj
-			JsonArray extra = new JsonArray();
-			for (JsonElement element : JsonParser.parseString(json).getAsJsonArray()) {
-				if (element.isJsonObject()) { // ignore this
-					extra.add(element);
-				} else {
-					ChatItem.debug("Ignoring element " + element);
+		BaseComponent[] components = packet.getContent().getSpecificModifier(BaseComponent[].class).readSafely(0);
+		if(components == null) {
+			String json = packet.getContent().getStrings().readSafely(0);
+			if (json != null && json.startsWith("[") && json.endsWith("]")) { // if used as array instead of json obj
+				JsonArray extra = new JsonArray();
+				for (JsonElement element : JsonParser.parseString(json).getAsJsonArray()) {
+					if (element.isJsonObject()) { // ignore this
+						extra.add(element);
+					} else {
+						ChatItem.debug("Ignoring element " + element);
+					}
 				}
+				JsonObject jsonObject = new JsonObject();
+				jsonObject.addProperty("text", "");
+				jsonObject.add("extra", extra);
+				json = jsonObject.toString();
 			}
-			JsonObject jsonObject = new JsonObject();
-			jsonObject.addProperty("text", "");
-			jsonObject.add("extra", extra);
-			json = jsonObject.toString();
+			try {
+				components = ComponentSerializer.parse(json);
+			} catch (Exception e) {
+				ChatItem.getInstance().getLogger().severe("Failed to parse JSON: " + json + ". Error:");
+				e.printStackTrace();
+				return packet.getPacket();
+			}
 		}
-		BaseComponent[] components = null;
-		try {
-			components = ComponentSerializer.parse(json);
-		} catch (Exception e) {
-			ChatItem.getInstance().getLogger().severe("Failed to parse JSON: " + json + ". Error:");
-			e.printStackTrace();
-			return packet.getPacket();
-		}
-		ChatItem.debug("Checking for json " + json + ", with " + components.length + " components");
+		ChatItem.debug("Checking for " + components.length + " components");
 		Arrays.asList(components)
 				.forEach(comp -> checkComponent(comp, hover, replacement, itemPlayer.getPlayer().getName()));
 		try {
