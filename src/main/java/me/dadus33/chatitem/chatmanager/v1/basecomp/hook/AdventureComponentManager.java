@@ -49,7 +49,7 @@ public class AdventureComponentManager implements IComponentManager {
 		}
 		String json = ComponentSerializer.toString(BungeeComponentSerializer.get().serialize(comp).clone());
 		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
-		ChatItem.debug("AdventureJSON : " + json + ", use extra: " + (!jsonObj.has("with")));
+		ChatItem.debug("AdventureJSON : " + json);
 		if (jsonObj.has("with")) {
 			JsonObject next = new JsonObject();
 			next.add("extra", jsonObj.get("with"));
@@ -92,26 +92,22 @@ public class AdventureComponentManager implements IComponentManager {
 			TextComponent tc = (TextComponent) comp;
 			if (ChatManager.containsSeparator(tc.content())) {
 				ChatItem.debug("Changing text " + tc.content() + " to " + itemName);
-				tc = tc.content(ChatManager.replaceSeparator(tc.content(), itemName, playerName)).hoverEvent(hover);
+				comp = tc.content(ChatManager.replaceSeparator(tc.content(), itemName, playerName)).hoverEvent(hover);
 			} else
 				ChatItem.debug("No insert of text without separator: " + tc.content());
-			return tc;
 		} else if(comp instanceof TranslatableComponent) {
 			TranslatableComponent tc = (TranslatableComponent) comp;
 			List<Component> next = new ArrayList<>();
 			for (Component extra : tc.args()) {
 				next.add(checkComponent(extra, hover, itemName, playerName));
 			}
-			return tc.args(next);
+			comp = tc.args(next);
 		} else
 			ChatItem.debug("Not valid comp class " + comp.getClass().getSimpleName() + " : " + comp);
-		if (!comp.children().isEmpty()) {
-			List<Component> next = new ArrayList<>();
-			for (Component extra : comp.children()) {
-				next.add(checkComponent(extra, hover, itemName, playerName));
-			}
-			return comp.children(next);
+		List<Component> next = new ArrayList<>();
+		for (Component extra : comp.children()) {
+			next.add(checkComponent(extra, hover, itemName, playerName));
 		}
-		return comp;
+		return comp.children(next);
 	}
 }
