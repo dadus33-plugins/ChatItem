@@ -119,7 +119,8 @@ public class ChatPacketManager extends PacketHandler {
 				if(tmpJson != null) {
 					json = ChatManager.fixSeparator(tmpJson);
 					choosedGetter = getters;
-					break;
+					if(ChatManager.containsSeparator(json))
+						break; // be sure it's valid one
 				}
 			}
 		}
