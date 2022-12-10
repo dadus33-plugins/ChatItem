@@ -20,11 +20,11 @@ import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
+import net.kyori.adventure.platform.bukkit.BukkitComponentSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 public class AdventureComponentManager implements IComponentManager {
@@ -32,7 +32,7 @@ public class AdventureComponentManager implements IComponentManager {
 	@Override
 	public boolean hasConditions() {
 		try {
-			for (String cl : Arrays.asList("net.kyori.adventure.text.Component", "net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer"))
+			for (String cl : Arrays.asList("net.kyori.adventure.text.Component", "net.kyori.adventure.text.serializer.bukkit.BukkitComponentSerializer"))
 				Class.forName(cl);
 		} catch (Exception e) { // can't support this, adventure comp not found
 			return false;
@@ -47,7 +47,7 @@ public class AdventureComponentManager implements IComponentManager {
 			ChatItem.debug("The component is null.");
 			return null;
 		}
-		String json = ComponentSerializer.toString(BungeeComponentSerializer.get().serialize(comp).clone());
+		String json = ComponentSerializer.toString(BukkitComponentSerializer.gson().serialize(comp));
 		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
 		ChatItem.debug("AdventureJSON : " + json);
 		if (jsonObj.has("with")) {
@@ -81,7 +81,7 @@ public class AdventureComponentManager implements IComponentManager {
 			return null;
 		}
 		comp = checkComponent(comp, hover, replacement, itemPlayer.getPlayer().getName());
-		ChatItem.debug("Result: " + ComponentSerializer.toString(BungeeComponentSerializer.get().serialize(comp).clone()));
+		ChatItem.debug("Result: " + ComponentSerializer.toString(BukkitComponentSerializer.gson().serialize(comp)));
 		modifier.write(0, comp);
 		packet.setPacket(modifier.getObj());
 		return packet.getPacket();

@@ -64,12 +64,21 @@ public class ChatPacketManager extends PacketHandler {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		for(IComponentManager getter : Arrays.asList(new IChatBaseComponentManager(), new ComponentNMSManager(), new StringComponentManager(), new AdventureComponentManager())) {
-			if(getter.hasConditions())
-				componentManager.add(getter);
+		
+		for(IComponentManager getter : Arrays.asList(new IChatBaseComponentManager(), new ComponentNMSManager(), new StringComponentManager())) {
+			tryRegister(getter);
 		}
+		try {
+			if(Class.forName("net.kyori.adventure.text.Component") != null)
+				tryRegister(new AdventureComponentManager());
+		} catch (Exception e) {}
 		ChatItem.getInstance().getLogger().info("Loaded " + componentManager.size() + " getter for base components.");
 		ChatItem.debug("ComponentManager: " + String.join(", ", componentManager.stream().map(IComponentManager::getClass).map(Class::getSimpleName).collect(Collectors.toList())));
+	}
+	
+	private void tryRegister(IComponentManager getter) {
+		if(getter.hasConditions())
+			componentManager.add(getter);
 	}
 
 	@Override
@@ -151,9 +160,6 @@ public class ChatPacketManager extends PacketHandler {
 		// this time)
 		Bukkit.getScheduler().runTaskAsynchronously(ChatItem.getInstance(), () -> {
 			Player p = e.getPlayer();
-			if (getStorage().COOLDOWN > 0 && !itemPlayer.hasPermission("chatitem.ignore-cooldown")) {
-				ChatManager.applyCooldown(itemPlayer);
-			}
 			String message = null;
 			try {
 				ItemStack item = ChatManager.getUsableItem(itemPlayer);

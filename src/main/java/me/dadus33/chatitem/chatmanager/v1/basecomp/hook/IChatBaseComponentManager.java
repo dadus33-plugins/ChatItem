@@ -14,12 +14,14 @@ import me.dadus33.chatitem.utils.ReflectionUtils;
 
 public class IChatBaseComponentManager implements IComponentManager {
 
-	private Method serializerGetJson;
+	private Method serializerGetJson, fromJson;
 	private boolean canEditVariable = true;
 
 	public IChatBaseComponentManager() {
 		try {
-			for (Method m : PacketUtils.CHAT_SERIALIZER.getDeclaredMethods()) {
+			Class<?> chatSerializer = PacketUtils.CHAT_SERIALIZER;
+			fromJson = chatSerializer.getMethod("a", String.class);
+			for (Method m : chatSerializer.getDeclaredMethods()) {
 				if (m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(PacketUtils.COMPONENT_CLASS)
 						&& m.getReturnType().equals(String.class)) {
 					serializerGetJson = m;
@@ -28,7 +30,7 @@ public class IChatBaseComponentManager implements IComponentManager {
 			}
 			if (serializerGetJson == null)
 				ChatItem.getInstance().getLogger().warning(
-						"Failed to find JSON serializer in class: " + PacketUtils.CHAT_SERIALIZER.getCanonicalName());
+						"Failed to find JSON serializer in class: " + chatSerializer.getCanonicalName());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -54,7 +56,7 @@ public class IChatBaseComponentManager implements IComponentManager {
 	public void writeJson(ChatItemPacket packet, String json) {
 		try {
 			PacketContent content = packet.getContent();
-			Object chatComponent = PacketUtils.CHAT_SERIALIZER.getMethod("a", String.class).invoke(null, json);
+			Object chatComponent = fromJson.invoke(null, json);
 			if (canEditVariable)
 				content.getChatComponents().write(0, chatComponent);
 			else {
@@ -76,7 +78,7 @@ public class IChatBaseComponentManager implements IComponentManager {
 								+ packetClass.getSimpleName() + ". Please report this.");
 					} else {
 						throw new UnsupportedOperationException("The packet " + packetClass.getSimpleName()
-								+ " isn't supported by the AdventureGetter. Please report this.");
+								+ " isn't supported by the IChatBaseComponentManager. Please report this.");
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

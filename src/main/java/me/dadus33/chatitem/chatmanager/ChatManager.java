@@ -195,31 +195,7 @@ public abstract class ChatManager {
 			else
 				return c.HAND_NAME;
 		}
-		String replacer = c.NAME_FORMAT;
-		String amount = c.AMOUNT_FORMAT;
-		boolean dname = item.hasItemMeta() && item.getItemMeta().hasDisplayName();
-		if (item.getAmount() == 1) {
-			if (c.FORCE_ADD_AMOUNT) {
-				amount = amount.replace(TIMES, "1");
-				replacer = replacer.replace(AMOUNT, amount);
-			} else {
-				replacer = replacer.replace(AMOUNT, "");
-			}
-		} else {
-			amount = amount.replace(TIMES, String.valueOf(item.getAmount()));
-			replacer = replacer.replace(AMOUNT, amount);
-		}
-		if (dname) {
-			String trp = item.getItemMeta().getDisplayName();
-			if (c.COLOR_IF_ALREADY_COLORED) {
-				replacer = replacer.replace(NAME, ChatColor.stripColor(trp));
-			} else {
-				replacer = replacer.replace(NAME, trp);
-			}
-		} else {
-			replacer = replacer.replace(NAME, NamerManager.getName(p, item, c));
-		}
-		return replacer;
+		return styleItem(p, item, c);
 	}
 
 	public static String calculateTime(long seconds) {

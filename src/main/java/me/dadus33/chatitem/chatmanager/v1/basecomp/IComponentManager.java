@@ -64,12 +64,15 @@ public interface IComponentManager {
 	}
 	
 	default @Nullable String getNameFromSpecificMessage(String json, String toReplace) {
+		Player cible = null;
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			String name = toReplace + p.getName();
-			if (json.contains(name))
-				return p.getName();
+			if (json.contains(name)) {
+				if(cible == null || cible.getName().length() < p.getName().length())
+					cible = p;
+			}
 		}
-		return null;
+		return cible == null ? null : cible.getName();
 	}
 	
 	/**
