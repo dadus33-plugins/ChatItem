@@ -17,7 +17,7 @@ public class ComponentNMSManager implements IComponentManager {
 		if (chatBaseComp != null) {
 			try {
 				return PacketUtils.CHAT_SERIALIZER.getMethod("a", PacketUtils.COMPONENT_CLASS)
-						.invoke(null, packet.getPacket()).toString();
+						.invoke(null, chatBaseComp).toString();
 			} catch (Exception exc) {
 				exc.printStackTrace();
 			}
