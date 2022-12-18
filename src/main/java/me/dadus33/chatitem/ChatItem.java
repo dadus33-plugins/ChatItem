@@ -1,5 +1,6 @@
 package me.dadus33.chatitem;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -117,7 +118,8 @@ public class ChatItem extends JavaPlugin {
         getLogger().info("Detected server version: " + Version.getVersion().name().toLowerCase());
 
         //Load config
-        saveDefaultConfig();
+        if(!new File(getDataFolder(), "config.yml").exists())
+        	saveDefaultConfig();
         storage = new Storage(getConfig());
 
         //Commands
