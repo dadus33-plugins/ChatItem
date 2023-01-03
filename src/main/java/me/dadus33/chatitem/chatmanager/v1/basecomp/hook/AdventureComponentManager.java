@@ -11,7 +11,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.ItemPlayer;
+import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
@@ -39,6 +39,9 @@ public class AdventureComponentManager implements IComponentManager {
 		}
 		return true;
 	}
+	
+	@Override
+	public void writeJson(ChatItemPacket packet, String json) {}
 
 	@Override
 	public String getBaseComponentAsJSON(ChatItemPacket packet) {
@@ -59,54 +62,54 @@ public class AdventureComponentManager implements IComponentManager {
 	}
 
 	@Override
-	public Object manageItem(Player p, ItemPlayer itemPlayer, ChatItemPacket packet, ItemStack item, Storage c) throws Exception {
-		String itemName = ChatManager.getNameOfItem(itemPlayer.getPlayer(), item, c);
-		return manage(p, itemPlayer, packet, itemName, HoverEvent.showItem(Key.key(item.getType().getKey().getKey()), item.getAmount(), BinaryTagHolder.of(PacketUtils.getNbtTag(item))));
+	public Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, Storage c) throws Exception {
+		String itemName = ChatManager.getNameOfItem(chat.getPlayer(), item, c);
+		return manage(p, chat, packet, itemName, HoverEvent.showItem(Key.key(item.getType().getKey().getKey()), item.getAmount(), BinaryTagHolder.of(PacketUtils.getNbtTag(item))));
 	}
 
 	@Override
-	public Object manageEmpty(Player p, ItemPlayer itemPlayer, ChatItemPacket packet, Storage c) {
+	public Object manageEmpty(Player p, Chat chat, ChatItemPacket packet, Storage c) {
 		Component builder = Component.text("");
 		c.HAND_TOOLTIP.forEach(s -> builder.append(Component.text(s)));
-		Player sender = itemPlayer.getPlayer();
+		Player sender = chat.getPlayer();
 		String handName = c.HAND_NAME.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName());
-		return manage(p, itemPlayer, packet, handName, HoverEvent.showText(builder));
+		return manage(p, chat, packet, handName, HoverEvent.showText(builder));
 	}
 
-	private Object manage(Player p, ItemPlayer itemPlayer, ChatItemPacket packet, String replacement, HoverEvent<?> hover) {
+	private Object manage(Player p, Chat chat, ChatItemPacket packet, String replacement, HoverEvent<?> hover) {
 		ContentModifier<Component> modifier = packet.getContent().getSpecificModifier(Component.class);
 		Component comp = modifier.readSafely(0);
 		if (comp == null) {
 			ChatItem.debug("The component is null.");
 			return null;
 		}
-		comp = checkComponent(comp, hover, replacement, itemPlayer.getPlayer().getName());
+		comp = checkComponent(comp, hover, replacement, chat);
 		ChatItem.debug("Result: " + GsonComponentSerializer.gson().serialize(comp));
 		modifier.write(0, comp);
 		packet.setPacket(modifier.getObj());
 		return packet.getPacket();
 	}
 
-	private Component checkComponent(Component comp, HoverEvent<?> hover, String itemName, String playerName) {
+	private Component checkComponent(Component comp, HoverEvent<?> hover, String itemName, Chat chat) {
 		if (comp instanceof TextComponent) {
 			TextComponent tc = (TextComponent) comp;
 			if (ChatManager.containsSeparator(tc.content())) {
 				ChatItem.debug("Changing text " + tc.content() + " to " + itemName);
-				comp = tc.content(ChatManager.replaceSeparator(tc.content(), itemName, playerName)).hoverEvent(hover);
+				comp = tc.content(ChatManager.replaceSeparator(chat, tc.content(), itemName)).hoverEvent(hover);
 			} else
 				ChatItem.debug("No insert of text without separator: " + tc.content());
 		} else if(comp instanceof TranslatableComponent) {
 			TranslatableComponent tc = (TranslatableComponent) comp;
 			List<Component> next = new ArrayList<>();
 			for (Component extra : tc.args()) {
-				next.add(checkComponent(extra, hover, itemName, playerName));
+				next.add(checkComponent(extra, hover, itemName, chat));
 			}
 			comp = tc.args(next);
 		} else
 			ChatItem.debug("Not valid comp class " + comp.getClass().getSimpleName() + " : " + comp);
 		List<Component> next = new ArrayList<>();
 		for (Component extra : comp.children()) {
-			next.add(checkComponent(extra, hover, itemName, playerName));
+			next.add(checkComponent(extra, hover, itemName, chat));
 		}
 		return comp.children(next);
 	}

@@ -69,14 +69,6 @@ general:
   # Format used with using /chatitem show
   command-format: "&6%name%'s item is %item%"
 
-  #  Here you can choose which commands will the plugin attempt to parse. Console commands will all be ignored,
-  # however player commands will be taken into consideration. To add a command, simply add an element to the list
-  # bellow containing an alias (or name) for that command.
-  #  It is enough to add only ONE alias for each command, and the others will automatically be supported. However,
-  # this is only available for plugin commands. If you're planning to add bukkit or mojang commands here, you'll have
-  # to manually specify ALL aliases for those.
-  commands:
-    - "msg"
   #  Here you can set when the players should see the no-permission message (defined in the 'Messages' section bellow).
   # 'normal' dictates whether the user should see the message when using the placeholder in normal chat, and 'command'
   # sets whether the user should see it when using the placeholder in a command.

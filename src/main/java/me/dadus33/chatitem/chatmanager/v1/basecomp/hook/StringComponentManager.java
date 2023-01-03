@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.ItemPlayer;
+import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
@@ -44,9 +44,9 @@ public class StringComponentManager implements IComponentManager {
 			jsonObject.addProperty("text", "");
 			jsonObject.add("extra", extra);
 			json = jsonObject.toString();
-		} else if(json == null) {
+		} else if (json == null) {
 			BaseComponent[] comp = packet.getContent().getSpecificModifier(BaseComponent[].class).readSafely(0);
-			if(comp != null)
+			if (comp != null)
 				return ComponentSerializer.toString(comp);
 		}
 		return json;
@@ -62,26 +62,22 @@ public class StringComponentManager implements IComponentManager {
 	}
 
 	@Override
-	public Object manageItem(Player p, ItemPlayer itemPlayer, ChatItemPacket packet, ItemStack item, Storage c)
-			throws Exception {
-		String itemName = ChatManager.getNameOfItem(itemPlayer.getPlayer(), item, c);
-		return manage(p, itemPlayer, packet, itemName, Utils.createItemHover(item));
+	public Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, Storage c) throws Exception {
+		return manage(p, chat, packet, ChatManager.getNameOfItem(chat.getPlayer(), item, c), Utils.createItemHover(item));
 	}
 
 	@Override
-	public Object manageEmpty(Player p, ItemPlayer itemPlayer, ChatItemPacket packet, Storage c) {
+	public Object manageEmpty(Player p, Chat chat, ChatItemPacket packet, Storage c) {
 		ComponentBuilder builder = new ComponentBuilder("");
 		c.HAND_TOOLTIP.forEach(s -> builder.append(s));
-		Player sender = itemPlayer.getPlayer();
-		String handName = c.HAND_NAME.replace("{name}", sender.getName()).replace("{display-name}",
-				sender.getDisplayName());
-		return manage(p, itemPlayer, packet, handName, Utils.createTextHover(builder.create()));
+		Player sender = chat.getPlayer();
+		String handName = c.HAND_NAME.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName());
+		return manage(p, chat, packet, handName, Utils.createTextHover(builder.create()));
 	}
 
-	private Object manage(Player p, ItemPlayer itemPlayer, ChatItemPacket packet, String replacement,
-			HoverEvent hover) {
+	private Object manage(Player p, Chat chat, ChatItemPacket packet, String replacement, HoverEvent hover) {
 		BaseComponent[] components = packet.getContent().getSpecificModifier(BaseComponent[].class).readSafely(0);
-		if(components == null) {
+		if (components == null) {
 			String json = packet.getContent().getStrings().readSafely(0);
 			if (json != null && json.startsWith("[") && json.endsWith("]")) { // if used as array instead of json obj
 				JsonArray extra = new JsonArray();
@@ -106,8 +102,7 @@ public class StringComponentManager implements IComponentManager {
 			}
 		}
 		ChatItem.debug("Checking for " + components.length + " components");
-		Arrays.asList(components)
-				.forEach(comp -> checkComponent(comp, hover, replacement, itemPlayer.getPlayer().getName()));
+		Arrays.asList(components).forEach(comp -> checkComponent(comp, hover, replacement, chat));
 		try {
 			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(ComponentSerializer.toString(components)));
 		} catch (Exception e) {
@@ -116,27 +111,26 @@ public class StringComponentManager implements IComponentManager {
 		return packet.getPacket();
 	}
 
-	private void checkComponent(BaseComponent comp, HoverEvent hover, String itemName, String playerName) {
+	private void checkComponent(BaseComponent comp, HoverEvent hover, String itemName, Chat chat) {
 		if (comp instanceof TextComponent) {
 			TextComponent tc = (TextComponent) comp;
 			if (ChatManager.containsSeparator(tc.getText())) {
 				ChatItem.debug("Changing text " + tc.getText() + " to " + itemName);
-				tc.setText(ChatManager.replaceSeparator(tc.getText(), "", playerName));
+				tc.setText(ChatManager.replaceSeparator(chat, tc.getText(), itemName));
 				tc.setHoverEvent(hover);
 				List<BaseComponent> extra = new ArrayList<>();
-				for(BaseComponent legacyExtra : TextComponent.fromLegacyText(itemName, tc.getColor())) {
+				for (BaseComponent legacyExtra : TextComponent.fromLegacyText(itemName, tc.getColor())) {
 					extra.add(legacyExtra);
 				}
-				if(tc.getExtra() != null)
+				if (tc.getExtra() != null)
 					extra.addAll(tc.getExtra());
 				tc.setExtra(extra);
 			} else
-				ChatItem.debug("No insert of text without separator: " + tc.getText() + " (legacy: " + tc.toLegacyText()
-						+ ")");
+				ChatItem.debug("No insert of text without separator: " + tc.getText() + " (legacy: " + tc.toLegacyText() + ")");
 		}
 		if (comp.getExtra() != null) {
 			for (BaseComponent extra : comp.getExtra()) {
-				checkComponent(extra, hover, itemName, playerName);
+				checkComponent(extra, hover, itemName, chat);
 			}
 		}
 	}

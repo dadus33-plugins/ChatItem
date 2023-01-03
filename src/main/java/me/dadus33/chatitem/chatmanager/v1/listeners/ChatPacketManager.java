@@ -1,8 +1,5 @@
 package me.dadus33.chatitem.chatmanager.v1.listeners;
 
-import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR;
-import static me.dadus33.chatitem.chatmanager.ChatManager.SEPARATOR_STR;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -22,6 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.ItemPlayer;
+import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
@@ -52,32 +50,31 @@ public class ChatPacketManager extends PacketHandler {
 		this.manager = manager;
 		try {
 			for (Method m : PacketUtils.CHAT_SERIALIZER.getDeclaredMethods()) {
-				if (m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(PacketUtils.COMPONENT_CLASS)
-						&& m.getReturnType().equals(String.class)) {
+				if (m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(PacketUtils.COMPONENT_CLASS) && m.getReturnType().equals(String.class)) {
 					serializerGetJson = m;
 					break;
 				}
 			}
 			if (serializerGetJson == null)
-				ChatItem.getInstance().getLogger().warning(
-						"Failed to find JSON serializer in class: " + PacketUtils.CHAT_SERIALIZER.getCanonicalName());
+				ChatItem.getInstance().getLogger().warning("Failed to find JSON serializer in class: " + PacketUtils.CHAT_SERIALIZER.getCanonicalName());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		for(IComponentManager getter : Arrays.asList(new IChatBaseComponentManager(), new ComponentNMSManager(), new StringComponentManager())) {
+
+		for (IComponentManager getter : Arrays.asList(new IChatBaseComponentManager(), new ComponentNMSManager(), new StringComponentManager())) {
 			tryRegister(getter);
 		}
 		try {
-			if(Class.forName("net.kyori.adventure.text.Component") != null)
+			if (Class.forName("net.kyori.adventure.text.Component") != null)
 				tryRegister(new AdventureComponentManager());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		ChatItem.getInstance().getLogger().info("Loaded " + componentManager.size() + " getter for base components.");
 		ChatItem.debug("ComponentManager: " + String.join(", ", componentManager.stream().map(IComponentManager::getClass).map(Class::getSimpleName).collect(Collectors.toList())));
 	}
-	
+
 	private void tryRegister(IComponentManager getter) {
-		if(getter.hasConditions())
+		if (getter.hasConditions())
 			componentManager.add(getter);
 	}
 
@@ -93,7 +90,7 @@ public class ChatPacketManager extends PacketHandler {
 		String json = "{}";
 		IComponentManager choosedGetter = null;
 		if (version.isNewerOrEquals(Version.V1_19)) {
-			if(packet.getIntegers().readSafely(0, 0) > 1) { // not parsed chat message type
+			if (packet.getIntegers().readSafely(0, 0) > 1) { // not parsed chat message type
 				ChatItem.debug("Invalid int: " + packet.getIntegers().read(0));
 				return;
 			}
@@ -101,33 +98,25 @@ public class ChatPacketManager extends PacketHandler {
 			json = choosedGetter.getBaseComponentAsJSON(e); // if null, will be re-checked so anyway
 		} else if (version.isNewerOrEquals(Version.V1_12)) {
 			// only if action bar messages are supported
-			try {
-				if (((Enum<?>) packet
-						.getSpecificModifier(PacketUtils.getNmsClass("ChatMessageType", "network.chat.")).read(0))
-								.name().equals("GAME_INFO")) {
-					return; // It's an actionbar message, ignoring
-				}
-			} catch (Exception exc) {
-				exc.printStackTrace();
-			}
-		} else if (version.isNewerOrEquals(Version.V1_8) && packet.getBytes().readSafely(0) == (byte) 2) {
+			if (((Enum<?>) packet.getSpecificModifier(PacketUtils.getNmsClass("ChatMessageType", "network.chat.")).read(0)).name().equals("GAME_INFO"))
+				return; // It's an actionbar message, ignoring
+		} else if (version.isNewerOrEquals(Version.V1_8) && packet.getBytes().readSafely(0) == (byte) 2)
 			return; // It's an actionbar message, ignoring
-		}
-		if(json == null || choosedGetter == null) {
-			for(IComponentManager getters : componentManager) {
+		if (json == null || choosedGetter == null) {
+			for (IComponentManager getters : componentManager) {
 				String tmpJson = getters.getBaseComponentAsJSON(e);
-				if(tmpJson != null) {
+				if (tmpJson != null) {
 					json = ChatManager.fixSeparator(tmpJson);
 					choosedGetter = getters;
-					if(ChatManager.containsSeparator(json))
+					if (ChatManager.containsSeparator(json))
 						break; // be sure it's valid one
 				}
 			}
 		}
-		if(json == null || choosedGetter == null) {
+		if (json == null || choosedGetter == null) {
 			ChatItem.debug("Can't find valid json getter or json itself");
 			ChatItem.debug("String: " + packet.getStrings().getContent());
-			for(Field f : e.getPacket().getClass().getDeclaredFields()) {
+			for (Field f : e.getPacket().getClass().getDeclaredFields()) {
 				f.setAccessible(true);
 				try {
 					ChatItem.debug(f.getName() + ": " + f.get(e.getPacket()));
@@ -137,40 +126,31 @@ public class ChatPacketManager extends PacketHandler {
 			}
 			return; // can't find something
 		}
-		ChatItem.debug("Found with " + choosedGetter.getClass().getName());
-		String toReplace = null;
-		if (json.lastIndexOf(SEPARATOR) != -1)
-			toReplace = ((Object) SEPARATOR).toString();
-		if (json.lastIndexOf(SEPARATOR_STR) != -1)
-			toReplace = SEPARATOR_STR;
-		if (toReplace == null) { // if the message doesn't contain the BELL separator
+		if (!ChatManager.containsSeparator(json)) { // if the message doesn't contain the BELL separator
 			ChatItem.debug("Not containing bell " + json);
 			return;
 		}
-		String name = choosedGetter.getNameFromMessage(json, toReplace);
-		if (name == null) { // something went really bad, so we run away and hide (AKA the player left or is
+		ChatItem.debug("Found with " + choosedGetter.getClass().getName());
+		Chat chat = choosedGetter.getChat(json);
+		if (chat == null) { // something went really bad, so we run away and hide (AKA the player left or is
 			// on another server)
-			ChatItem.debug("Name null for " + json);
+			ChatItem.debug("Chat null for " + json);
 			return;
 		}
-		Player itemPlayer = Bukkit.getPlayer(name);
-		//String localJson = choosedGetter.removePlaceholdersAndName(json, toReplace, itemPlayer);
-		//ChatItem.debug("Local json: " + localJson);
-		IComponentManager fchoosedGetter = choosedGetter;
-		e.setCancelled(true); // We cancel the packet as we're going to resend it anyways (ignoring listeners
-		// this time)
+		Player itemPlayer = chat.getPlayer();
+		IComponentManager getter = choosedGetter;
+		e.setCancelled(true); // We cancel the packet as we're going to resends it anyways
 		Bukkit.getScheduler().runTaskAsynchronously(ChatItem.getInstance(), () -> {
 			Player p = e.getPlayer();
 			String message = null;
 			try {
 				ItemStack item = ChatManager.getUsableItem(itemPlayer);
-				ItemPlayer ip = ItemPlayer.getPlayer(p);
 				if (!ItemUtils.isEmpty(item)) {
 					ItemStack copy = item.clone();
 
-					if (ip.isBuggedClient()) {
+					if (ItemPlayer.getPlayer(p).isBuggedClient()) { // if the guy that will receive it is bugged
 						String act = getStorage().BUGGED_CLIENT_ACTION;
-						List<String> tooltip;// = act.equalsIgnoreCase("nothing") ? new ArrayList<>() : null;
+						List<String> tooltip;
 						if (act.equalsIgnoreCase("tooltip"))
 							tooltip = getStorage().BUGGED_CLIENTS_TOOLTIP;
 						else if (act.equalsIgnoreCase("item"))
@@ -180,21 +160,19 @@ public class ChatPacketManager extends PacketHandler {
 							tooltip.addAll(getStorage().BUGGED_CLIENTS_TOOLTIP);
 						} else
 							tooltip = new ArrayList<>();
-						message = JSONManipulator.getInstance().parseEmpty(fchoosedGetter.getBaseComponentAsJSON(e),
-								ChatManager.styleItem(p, copy, getStorage()), tooltip, itemPlayer);
+						message = JSONManipulator.getInstance().parseEmpty(getter.getBaseComponentAsJSON(e), ChatManager.styleItem(p, copy, getStorage()), tooltip, chat.getPlayer());
 						if (!manager.supportsChatComponentApi()) {
 							ChatItem.debug("Use basic for 1.7 lunar");
 							packet.getChatComponents().write(0, jsonToChatComponent(message));
 						} else {
 							ChatItem.debug("Use baseComponent for 1.7 lunar");
-							packet.getSpecificModifier(BaseComponent[].class).write(0,
-									ComponentSerializer.parse(message));
+							packet.getSpecificModifier(BaseComponent[].class).write(0, ComponentSerializer.parse(message));
 						}
 						lastSentPacket = e.getPacket();
 						PacketUtils.sendPacket(p, lastSentPacket);
 						return;
 					}
-					if(copy.hasItemMeta()) {
+					if (copy.hasItemMeta()) {
 						ItemMeta meta = copy.getItemMeta();
 						if (meta instanceof BookMeta) { // filtering written books
 							BookMeta bm = (BookMeta) copy.getItemMeta();
@@ -212,14 +190,14 @@ public class ChatPacketManager extends PacketHandler {
 							copy.setItemMeta(bsm);
 						}
 					}
-					lastSentPacket = fchoosedGetter.manageItem(p, ip, e, item, getStorage());
+					lastSentPacket = getter.manageItem(p, chat, e, item, getStorage());
 				} else {
 					if (!getStorage().HAND_DISABLED) {
-						lastSentPacket = fchoosedGetter.manageEmpty(p, ip, e, getStorage());
+						lastSentPacket = getter.manageEmpty(p, chat, e, getStorage());
 					}
 				}
-				if(lastSentPacket == null)
-					ChatItem.debug("(v1) No packet to sent with manager " + fchoosedGetter.getClass().getName());
+				if (lastSentPacket == null)
+					ChatItem.debug("(v1) No packet to sent with manager " + getter.getClass().getName());
 				else
 					PacketUtils.sendPacket(p, lastSentPacket);
 			} catch (Exception e1) {
