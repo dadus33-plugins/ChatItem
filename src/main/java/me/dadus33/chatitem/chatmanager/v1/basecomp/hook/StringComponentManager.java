@@ -69,9 +69,9 @@ public class StringComponentManager implements IComponentManager {
 	@Override
 	public Object manageEmpty(Player p, Chat chat, ChatItemPacket packet, Storage c) {
 		ComponentBuilder builder = new ComponentBuilder("");
-		c.HAND_TOOLTIP.forEach(s -> builder.append(s));
+		c.tooltipHand.forEach(s -> builder.append(s));
 		Player sender = chat.getPlayer();
-		String handName = c.HAND_NAME.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName());
+		String handName = c.handName.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName());
 		return manage(p, chat, packet, handName, Utils.createTextHover(builder.create()));
 	}
 

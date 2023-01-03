@@ -25,33 +25,32 @@ import com.google.gson.JsonPrimitive;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.utils.PacketUtils;
-import me.dadus33.chatitem.utils.Reflect;
+import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.Version;
 
 public class JSONManipulator {
-	
+
 	private static JSONManipulator instance = new JSONManipulator();
-	
+
 	public static JSONManipulator getInstance() {
 		return instance;
 	}
+
 	private static final List<String> SKIPPED = Arrays.asList("HSTRY_ENCHANTS");
 
 	public static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
 	public static final Class<?> NMS_ITEM_STACK_CLASS = getNmsClass("ItemStack", "world.item.");
-	public static final Method AS_NMS_COPY = Reflect.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
+	public static final Method AS_NMS_COPY = ReflectionUtils.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
 	public static final Class<?> NBT_TAG_COMPOUND = getNmsClass("NBTTagCompound", "nbt.");
-	public static final Method SAVE_NMS_ITEM_STACK_METHOD = Reflect.getMethod(NMS_ITEM_STACK_CLASS, NBT_TAG_COMPOUND,
-			NBT_TAG_COMPOUND);
-	public static final Field MAP = Reflect.getField(NBT_TAG_COMPOUND, "map", "x");
+	public static final Method SAVE_NMS_ITEM_STACK_METHOD = ReflectionUtils.getMethod(NMS_ITEM_STACK_CLASS, NBT_TAG_COMPOUND, NBT_TAG_COMPOUND);
+	public static final Field MAP = ReflectionUtils.getField(NBT_TAG_COMPOUND, "map", "x");
 
 	private static final ConcurrentHashMap<Map.Entry<Version, ItemStack>, JsonObject> STACKS = new ConcurrentHashMap<>();
 
 	private JsonObject itemTooltip;
 	private JsonArray classicTooltip;
 
-	public String parse(String json, ItemStack item, String replacement, int protocol)
-			throws Exception {
+	public String parse(String json, ItemStack item, String replacement, int protocol) throws Exception {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		final AbstractMap.SimpleEntry<Version, ItemStack> p = new AbstractMap.SimpleEntry<>(Version.getVersion(protocol), item);
 
@@ -60,24 +59,26 @@ public class JSONManipulator {
 			JsonArray use = Translator.toJson(replacement); // We get the json representation of the old color
 															// formatting method
 			ChatItem.debug("Remplacement: " + replacement + " use: " + use.toString());
-			// There's no public clone method for JSONObjects so we need to parse them every time
+			// There's no public clone method for JSONObjects so we need to parse them every
+			// time
 			JsonObject hover = new JsonObject();
 			hover.addProperty("action", "show_item");
 
-			// Get the JSON representation of the item (well, not really JSON, but rather a string representation of NBT data)
+			// Get the JSON representation of the item (well, not really JSON, but rather a
+			// string representation of NBT data)
 			hover.addProperty("value", stringifyItem(item));
 
-			if(use.size() == 1) {
+			if (use.size() == 1) {
 				JsonElement extraElement = use.get(0);
-				if(extraElement.isJsonPrimitive())
+				if (extraElement.isJsonPrimitive())
 					wrapper.addProperty("text", extraElement.getAsString());
-				else if(extraElement.isJsonObject())
+				else if (extraElement.isJsonObject())
 					wrapper.addProperty("text", extraElement.getAsJsonObject().get("text").getAsString());
 				else
 					wrapper.add("extra", use); // add it only if
-			} else if(!use.isEmpty())
+			} else if (!use.isEmpty())
 				wrapper.add("extra", use); // add it only if
-			if(!wrapper.has("text"))
+			if (!wrapper.has("text"))
 				wrapper.addProperty("text", ""); // The text field is compulsory, even if it's empty
 			wrapper.add("hoverEvent", hover);
 
@@ -87,7 +88,7 @@ public class JSONManipulator {
 			// We remove it later when no longer needed to save memory
 			Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), () -> STACKS.remove(p), 100L);
 		}
-		if(obj.size() == 1 && obj.has("text")) {
+		if (obj.size() == 1 && obj.has("text")) {
 			itemTooltip.add("text", obj.get("text"));
 			ChatItem.debug("[JsonManipulator] Parsed quick: " + obj.toString() + ", wrapper: " + itemTooltip);
 			return itemTooltip.toString().replace(Character.toString(ChatManager.SEPARATOR), "").replace(ChatManager.SEPARATOR_STR, "");
@@ -103,15 +104,13 @@ public class JSONManipulator {
 	public String parseEmpty(String json, String repl, List<String> tooltip, Player sender) {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		JsonArray array = obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray();
-		JsonArray use = Translator
-				.toJson(repl.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
+		JsonArray use = Translator.toJson(repl.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
 		JsonObject hover = JsonParser.parseString("{\"action\":\"show_text\", \"value\": \"\"}").getAsJsonObject();
 
 		StringBuilder oneLineTooltip = new StringBuilder("");
 		int index = 0;
 		for (String m : tooltip) {
-			oneLineTooltip
-					.append(m.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
+			oneLineTooltip.append(m.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
 			++index;
 			if (index != tooltip.size()) {
 				oneLineTooltip.append('\n');
@@ -148,7 +147,7 @@ public class JSONManipulator {
 					jar = parseArray(element.getAsJsonArray(), tooltip);
 					replacer.set(i, jar);
 				}
-			} else if(element.isJsonPrimitive() && isComplex) {
+			} else if (element.isJsonPrimitive() && isComplex) {
 				ChatItem.debug("[JSONManipulator] Put " + element + " to trash as it's primitive with complex things");
 				// ignore
 			} else {
@@ -158,7 +157,7 @@ public class JSONManipulator {
 		}
 		return replacer;
 	}
-	
+
 	private void addParsedJsonObjectToArray(JsonObject o, JsonArray rep, JsonElement tooltip) {
 		JsonElement text = o.get("text");
 		if (text == null) {
@@ -167,7 +166,7 @@ public class JSONManipulator {
 				JsonArray jar = el.getAsJsonArray();
 				if (jar.size() != 0) {
 					JsonArray tmpArray = parseArray(jar, tooltip);
-					if(!tmpArray.isEmpty())
+					if (!tmpArray.isEmpty())
 						o.add("extra", tmpArray);
 					else
 						o.remove("extra");
@@ -183,7 +182,7 @@ public class JSONManipulator {
 					JsonArray jar = el.getAsJsonArray();
 					if (!jar.isEmpty()) {
 						JsonArray tmpArray = parseArray(jar, tooltip);
-						if(!tmpArray.isEmpty())
+						if (!tmpArray.isEmpty())
 							o.add("extra", tmpArray);
 						else
 							o.remove("extra");
@@ -196,25 +195,25 @@ public class JSONManipulator {
 
 		addParsedStringToArray(text.getAsString(), rep, o, tooltip);
 	}
-	
+
 	private void addParsedStringToArray(String msg, JsonArray rep, JsonElement o, JsonElement tooltip) {
 		ChatItem.debug("Checking " + msg + " > " + rep + ", o: " + o);
-		if(!ChatManager.containsSeparator(msg)) {
+		if (!ChatManager.containsSeparator(msg)) {
 			rep.add(o);
 			return;
 		}
 		String current = "";
 		boolean wasSep = false;
-		for(String parts : msg.split("")) {
-			if(ChatManager.equalsSeparator(parts)) {
-				if(!current.isEmpty()) {
+		for (String parts : msg.split("")) {
+			if (ChatManager.equalsSeparator(parts)) {
+				if (!current.isEmpty()) {
 					rep.add(current);
 					current = "";
 				}
 				rep.add(tooltip);
 				wasSep = true;
-			} else if(wasSep) {
-				if(parts == " ") { // sep finished
+			} else if (wasSep) {
+				if (parts == " ") { // sep finished
 					wasSep = false;
 					current += parts;
 				}
@@ -222,7 +221,7 @@ public class JSONManipulator {
 				current += parts;
 			}
 		}
-		if(!current.isEmpty())
+		if (!current.isEmpty())
 			rep.add(current);
 	}
 
@@ -245,7 +244,7 @@ public class JSONManipulator {
 		String id = nmsMap.get("id").toString().replace("\"", "");
 		Object realTag = nmsMap.get("tag");
 		if (JSONManipulator.NBT_TAG_COMPOUND.isInstance(realTag)) { // We need to make sure this is indeed an
-																			// NBTTagCompound
+																	// NBTTagCompound
 			Map<String, Object> realMap = (Map<String, Object>) JSONManipulator.MAP.get(realTag);
 			Set<Map.Entry<String, Object>> entrySet = realMap.entrySet();
 			for (Map.Entry<String, Object> entry : entrySet) {
@@ -270,13 +269,13 @@ public class JSONManipulator {
 		boolean first = true;
 		sb.append(",tag:{"); // Start of the tag
 		for (Map.Entry<String, String> entry : entrySet) {
-			if(SKIPPED.contains(entry.getKey()))
+			if (SKIPPED.contains(entry.getKey()))
 				continue;
 			if (!first)
 				sb.append(",");
 			first = false;
 			if (!entry.getKey().isEmpty()) {
-				if(entry.getKey().contains(";"))
+				if (entry.getKey().contains(";"))
 					sb.append("\"" + entry.getKey() + "\"");
 				else
 					sb.append(entry.getKey());

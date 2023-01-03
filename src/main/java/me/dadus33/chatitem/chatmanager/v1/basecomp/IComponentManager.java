@@ -95,7 +95,7 @@ public interface IComponentManager {
 	}
 	
 	default Object manageEmpty(Player p, Chat chat, ChatItemPacket packet, Storage c) {
-		String message = JSONManipulator.getInstance().parseEmpty(getBaseComponentAsJSON(packet), c.HAND_NAME, c.HAND_TOOLTIP, chat.getPlayer());
+		String message = JSONManipulator.getInstance().parseEmpty(getBaseComponentAsJSON(packet), c.handName, c.tooltipHand, chat.getPlayer());
 		if (message != null) {
 			ChatItem.debug("(v1) Writing empty message: " + message);
 			writeJson(packet, message);

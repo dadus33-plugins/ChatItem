@@ -46,12 +46,12 @@ public class ChatItem extends JavaPlugin {
         if (pl.getConfig().getKeys(false).isEmpty())
             pl.saveDefaultConfig();
         pl.reloadConfig();
-        String oldChatManager = pl.storage.MANAGER;
+        String oldChatManager = pl.storage.manager;
         pl.storage = new Storage(pl.getConfig());
         pl.chooseManagers();
-        if (!pl.storage.RELOAD_MESSAGE.isEmpty())
-            sender.sendMessage(pl.storage.RELOAD_MESSAGE);
-        if (!oldChatManager.equalsIgnoreCase(pl.storage.MANAGER))
+        if (!pl.storage.messageReload.isEmpty())
+            sender.sendMessage(pl.storage.messageReload);
+        if (!oldChatManager.equalsIgnoreCase(pl.storage.manager))
             sender.sendMessage(ChatColor.GOLD + "Changing the manager with command reloading CAN produce issue. It's mostly suggested to restart after finding the better manager for you.");
     }
 
@@ -60,7 +60,7 @@ public class ChatItem extends JavaPlugin {
     }
 
     public static void debug(String msg) {
-        if (getInstance().getStorage().DEBUG)
+        if (getInstance().getStorage().debug)
             getInstance().getLogger().info("[Debug] " + msg.replace(ChatManager.SEPARATOR, 'S').replace(ChatManager.SEPARATOR_END, 'E'));
     }
 
@@ -68,7 +68,7 @@ public class ChatItem extends JavaPlugin {
         this.chatManager.forEach((cm) -> cm.unload(this));
         this.chatManager.clear();
         PluginManager pm = getServer().getPluginManager();
-        String managerName = getStorage().MANAGER;
+        String managerName = getStorage().manager;
 
         switch (managerName.toLowerCase(Locale.ROOT)) {
             case "both":
@@ -143,13 +143,9 @@ public class ChatItem extends JavaPlugin {
         	getLogger().info("Load " + plugins.toString() + " support.");
         
 
-        getServer().getMessenger().registerIncomingPluginChannel(this, brandChannelName, (chan, p, msg) -> {
-            String client = new String(msg).substring(1);
-            ChatItem.debug("Detected client " + client + " for " + p.getName());
-            ItemPlayer.getPlayer(p).setClientName(client);
-        });
+        getServer().getMessenger().registerIncomingPluginChannel(this, brandChannelName, (chan, p, msg) -> ItemPlayer.getPlayer(p).setClientName(new String(msg).substring(1)));
 
-        if (storage.CHECK_UPDATE) {
+        if (storage.checkUpdate) {
             getServer().getScheduler().runTaskAsynchronously(this, () -> {
                 String urlName = "https://api.spigotmc.org/legacy/update.php?resource=19064";
                 String content = Utils.getFromURL(urlName);
@@ -161,9 +157,8 @@ public class ChatItem extends JavaPlugin {
                 SemVer latestVersion = SemVer.parse(content);
                 if (latestVersion != null && latestVersion.isNewerThan(currentVersion)) {
                     hasNewVersion = !content.equalsIgnoreCase(getDescription().getVersion());
-                    if (hasNewVersion) {
-                        getLogger().info(storage.JOIN_UPDATE_MESSAGE);
-                    }
+                    if (hasNewVersion)
+                        getLogger().info(storage.updateMessage);
                 }
             });
         }

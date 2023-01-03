@@ -82,7 +82,7 @@ public class ChatListener implements Listener {
 		if (e.isCancelled()) {
 			if (ChatItem.getInstance().getChatManager().size() == 1) { // only chat
 				String msg = e.getMessage().toLowerCase();
-				for (String rep : c.PLACEHOLDERS) {
+				for (String rep : c.placeholders) {
 					if (msg.contains(rep)) {
 						ChatItem.debug("You choose 'chat' manager but it seems to don't be the good choice. More informations here: https://github.com/dadus33-plugins/ChatItem/wiki");
 						return;
@@ -98,12 +98,12 @@ public class ChatListener implements Listener {
 			if(chat == null)
 				ChatItem.debug("Chat for message " + e.getMessage() + "can't be found");
 			else {
-				e.setMessage(ChatManager.replaceSeparator(chat, e.getMessage(), getStorage().PLACEHOLDERS.get(0)));
+				e.setMessage(ChatManager.replaceSeparator(chat, e.getMessage(), getStorage().placeholders.get(0)));
 				chat.remove();
 			}
 		}
 		String placeholder = null;
-		for (String rep : c.PLACEHOLDERS) {
+		for (String rep : c.placeholders) {
 			if (e.getMessage().contains(rep)) {
 				placeholder = rep;
 				break;
@@ -120,12 +120,12 @@ public class ChatListener implements Listener {
 		e.setCancelled(true);
 		String format = e.getFormat();
 		String msg, defMsg = e.getMessage();
-		for (String rep : c.PLACEHOLDERS) {
+		for (String rep : c.placeholders) {
 			defMsg = defMsg.replace(rep, Character.toString(ChatManager.SEPARATOR));
 		}
-		if (Utils.countMatches(defMsg, Character.toString(ChatManager.SEPARATOR)) > getStorage().LIMIT) {
-			if (!getStorage().LIMIT_MESSAGE.isEmpty())
-				p.sendMessage(getStorage().LIMIT_MESSAGE);
+		if (Utils.countMatches(defMsg, Character.toString(ChatManager.SEPARATOR)) > getStorage().limit) {
+			if (!getStorage().messageLimit.isEmpty())
+				p.sendMessage(getStorage().messageLimit);
 			return;
 		}
 		if (format.contains("%1$s") || format.contains("%2$s")) {
@@ -141,7 +141,7 @@ public class ChatListener implements Listener {
 		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format + " to " + e.getRecipients().size() + " players");
 		if (!e.getRecipients().isEmpty()) // should not appear
 			e.getRecipients().forEach((pl) -> showItem(pl, p, item, msg));
-		if (c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown"))
+		if (c.cooldown > 0 && !p.hasPermission("chatitem.ignore-cooldown"))
 			ChatManager.applyCooldown(p);
 	}
 
@@ -212,11 +212,11 @@ public class ChatListener implements Listener {
 			// itemComponent.event(new HoverEvent(Action.SHOW_ITEM, itemBaseComponent));
 			appendToComponentBuilder(builder, itemComponent.create());
 		} else {
-			String handName = c.HAND_NAME;
+			String handName = c.handName;
 			ComponentBuilder handComp = new ComponentBuilder("");
 			ComponentBuilder handTooltip = new ComponentBuilder("");
-			int stay = c.HAND_TOOLTIP.size();
-			for (String line : c.HAND_TOOLTIP) {
+			int stay = c.tooltipHand.size();
+			for (String line : c.tooltipHand) {
 				stay--;
 				handTooltip.append(ColorManager.fixColor(line.replace("{name}", origin.getName()).replace("{display-name}", origin.getDisplayName())));
 				if (stay > 0)

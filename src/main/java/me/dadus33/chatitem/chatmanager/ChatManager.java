@@ -140,11 +140,11 @@ public abstract class ChatManager {
 	 * @return the name of item
 	 */
 	public static String styleItem(Player p, ItemStack item, Storage c) {
-		String replacer = c.NAME_FORMAT;
-		String amount = c.AMOUNT_FORMAT;
+		String replacer = c.nameFormat;
+		String amount = c.amountFormat;
 		boolean dname = item.hasItemMeta() && item.getItemMeta().hasDisplayName();
 		if (item.getAmount() == 1) {
-			if (c.FORCE_ADD_AMOUNT) {
+			if (c.addAmountForced) {
 				amount = amount.replace(TIMES, "1");
 				replacer = replacer.replace(AMOUNT, amount);
 			} else {
@@ -157,7 +157,7 @@ public abstract class ChatManager {
 		if (dname) {
 			String trp = item.getItemMeta().getDisplayName();
 			ChatItem.debug("trp: " + trp);
-			if (c.COLOR_IF_ALREADY_COLORED) {
+			if (c.colorIfColored) {
 				replacer = replacer.replace(NAME, ChatColor.stripColor(trp));
 			} else {
 				replacer = replacer.replace(NAME, trp);
@@ -178,10 +178,10 @@ public abstract class ChatManager {
 	 */
 	public static String getNameOfItem(Player p, ItemStack item, Storage c) {
 		if (ItemUtils.isEmpty(item)) {
-			if (c.HAND_DISABLED)
-				return c.PLACEHOLDERS.get(0);
+			if (c.handDisabled)
+				return c.placeholders.get(0);
 			else
-				return c.HAND_NAME;
+				return c.handName;
 		}
 		return styleItem(p, item, c);
 	}
@@ -194,7 +194,7 @@ public abstract class ChatManager {
 		if (seconds < 3600) {
 			StringBuilder builder = new StringBuilder();
 			int minutes = (int) seconds / 60;
-			builder.append(minutes).append(c.MINUTES);
+			builder.append(minutes).append(c.minutes);
 			int secs = (int) seconds - minutes * 60;
 			if (secs != 0) {
 				builder.append(" ").append(secs).append(c.SECONDS);
@@ -203,10 +203,10 @@ public abstract class ChatManager {
 		}
 		StringBuilder builder = new StringBuilder();
 		int hours = (int) seconds / 3600;
-		builder.append(hours).append(c.HOURS);
+		builder.append(hours).append(c.hours);
 		int minutes = (int) (seconds / 60) - (hours * 60);
 		if (minutes != 0) {
-			builder.append(" ").append(minutes).append(c.MINUTES);
+			builder.append(" ").append(minutes).append(c.minutes);
 		}
 		int secs = (int) (seconds - ((seconds / 60) * 60));
 		if (secs != 0) {
@@ -217,43 +217,43 @@ public abstract class ChatManager {
 
 	public static boolean canShowItem(Player p, ItemStack item, @Nullable Cancellable e) {
 		Storage c = ChatItem.getInstance().getStorage();
-		if (c.PERMISSION_ENABLED && !p.hasPermission(c.PERMISSION_NAME)) {
-			if (!c.LET_MESSAGE_THROUGH) {
+		if (c.permissionEnabled && !p.hasPermission(c.permissionName)) {
+			if (!c.letMessageThrough) {
 				if (e != null)
 					e.setCancelled(true);
 			}
-			if (!c.NO_PERMISSION_MESSAGE.isEmpty() && c.SHOW_NO_PERM_NORMAL) {
-				sendIfNeed(p, c.NO_PERMISSION_MESSAGE);
+			if (!c.messageNoPermission.isEmpty() && c.showNoPermissionMessage) {
+				sendIfNeed(p, c.messageNoPermission);
 			}
 			return false;
 		}
 		if (item.getType().equals(Material.AIR)) {
-			if (c.DENY_IF_NO_ITEM) {
+			if (c.denyIfNoItem) {
 				if (e != null)
 					e.setCancelled(true);
-				if (!c.DENY_MESSAGE.isEmpty())
-					sendIfNeed(p, c.DENY_MESSAGE);
+				if (!c.messageDeny.isEmpty())
+					sendIfNeed(p, c.messageDeny);
 				return false;
 			}
-			if (c.HAND_DISABLED) {
+			if (c.handDisabled) {
 				return false;
 			}
 		}
-		if (c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
+		if (c.cooldown > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
 			if (COOLDOWNS.containsKey(p.getUniqueId())) {
 				long start = COOLDOWNS.get(p.getUniqueId());
 				long current = System.currentTimeMillis() / 1000;
 				long elapsed = current - start;
-				if (elapsed >= c.COOLDOWN) {
+				if (elapsed >= c.cooldown) {
 					COOLDOWNS.remove(p.getUniqueId());
 				} else {
-					if (!c.LET_MESSAGE_THROUGH) {
+					if (!c.letMessageThrough) {
 						if (e != null)
 							e.setCancelled(true);
 					}
-					if (!c.COOLDOWN_MESSAGE.isEmpty()) {
-						long left = (start + c.COOLDOWN) - current;
-						sendIfNeed(p, c.COOLDOWN_MESSAGE.replace(LEFT, ChatManager.calculateTime(left)));
+					if (!c.messageCooldown.isEmpty()) {
+						long left = (start + c.cooldown) - current;
+						sendIfNeed(p, c.messageCooldown.replace(LEFT, ChatManager.calculateTime(left)));
 					}
 					ChatItem.debug("Cooldown");
 					return false;

@@ -70,9 +70,9 @@ public class AdventureComponentManager implements IComponentManager {
 	@Override
 	public Object manageEmpty(Player p, Chat chat, ChatItemPacket packet, Storage c) {
 		Component builder = Component.text("");
-		c.HAND_TOOLTIP.forEach(s -> builder.append(Component.text(s)));
+		c.tooltipHand.forEach(s -> builder.append(Component.text(s)));
 		Player sender = chat.getPlayer();
-		String handName = c.HAND_NAME.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName());
+		String handName = c.handName.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName());
 		return manage(p, chat, packet, handName, HoverEvent.showText(builder));
 	}
 

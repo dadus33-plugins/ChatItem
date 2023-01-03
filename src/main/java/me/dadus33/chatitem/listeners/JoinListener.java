@@ -23,8 +23,8 @@ public class JoinListener implements Listener {
 			return;
 		ChatItem pl = ChatItem.getInstance();
 		if(pl.isHasNewVersion()) {
-			TextComponent text = new TextComponent(pl.getStorage().JOIN_UPDATE_MESSAGE);
-			text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(new ComponentBuilder(pl.getStorage().JOIN_UPDATE_HOVER).create())));
+			TextComponent text = new TextComponent(pl.getStorage().updateMessage);
+			text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(new ComponentBuilder(pl.getStorage().updateHover).create())));
 			text.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/19064/"));
 			p.spigot().sendMessage(text);
 		}

@@ -42,33 +42,33 @@ public class InventoryListener implements Listener {
 				ChatItem.reload(p);
 			}
 		} else if(type.equals(ItemUtils.INK_SAC)) {
-			setInConfig("general.color-if-already-colored", c.COLOR_IF_ALREADY_COLORED = !c.COLOR_IF_ALREADY_COLORED);
+			setInConfig("general.color-if-already-colored", c.colorIfColored = !c.colorIfColored);
 			open(p);
 		} else if(type.equals(Material.REDSTONE)) {
-			setInConfig("general.deny-if-no-item", c.DENY_IF_NO_ITEM = !c.DENY_IF_NO_ITEM);
+			setInConfig("general.deny-if-no-item", c.denyIfNoItem = !c.denyIfNoItem);
 			open(p);
 		} else if(type.equals(Material.STICK)) {
-			setInConfig("general.hand.disabled", c.HAND_DISABLED = !c.HAND_DISABLED);
+			setInConfig("general.hand.disabled", c.handDisabled = !c.handDisabled);
 			open(p);
 		} else if(type.equals(Material.BOOK)) {
-			setInConfig("general.check-update", c.CHECK_UPDATE = !c.CHECK_UPDATE);
+			setInConfig("general.check-update", c.checkUpdate = !c.checkUpdate);
 			open(p);
 		} else if(type.equals(ItemUtils.FIREWORK_CHARGE)) {
-			setInConfig("debug", c.DEBUG = !c.DEBUG);
+			setInConfig("debug", c.debug = !c.debug);
 			open(p);
 		} else if(type.equals(Material.IRON_DOOR)) {
 			if(e.getClick().equals(ClickType.RIGHT))
-				c.LIMIT--;
+				c.limit--;
 			else if(e.getClick().equals(ClickType.LEFT))
-				c.LIMIT++;
-			setInConfig("general.limit-per-message", c.LIMIT);
+				c.limit++;
+			setInConfig("general.limit-per-message", c.limit);
 			open(p);
 		} else if(type.equals(Material.APPLE)) {
 			if(e.getClick().equals(ClickType.RIGHT))
-				c.COOLDOWN--;
+				c.cooldown--;
 			else if(e.getClick().equals(ClickType.LEFT))
-				c.COOLDOWN++;
-			setInConfig("general.cooldown", c.COOLDOWN);
+				c.cooldown++;
+			setInConfig("general.cooldown", c.cooldown);
 			open(p);
 		}
 	}
@@ -91,16 +91,16 @@ public class InventoryListener implements Listener {
 			holder.keyBySlot.put(slot, manager);
 			inv.setItem(slot++, getManagerItem(manager));
 		}
-		inv.setItem(slot + 1, getManagerItem("actual", "%manager%", Messages.getMessage("admin-inv.manager." + c.MANAGER + ".name")));
+		inv.setItem(slot + 1, getManagerItem("actual", "%manager%", Messages.getMessage("admin-inv.manager." + c.manager + ".name")));
 		
-		inv.setItem(8, getBoolChangeItem(ItemUtils.FIREWORK_CHARGE, "debug", c.DEBUG));
+		inv.setItem(8, getBoolChangeItem(ItemUtils.FIREWORK_CHARGE, "debug", c.debug));
 
-		inv.setItem(18, getBoolChangeItem(ItemUtils.INK_SAC, "color-if-already-colored", c.COLOR_IF_ALREADY_COLORED));
-		inv.setItem(19, getBoolChangeItem(Material.REDSTONE, "deny-no-item", c.DENY_IF_NO_ITEM));
-		inv.setItem(20, getBoolChangeItem(Material.STICK, "hand-disabled", c.HAND_DISABLED));
-		inv.setItem(21, getAmountChangeItem(Material.IRON_DOOR, "limit-per-message", c.LIMIT));
-		inv.setItem(22, getAmountChangeItem(Material.APPLE, "cooldown", c.COOLDOWN));
-		inv.setItem(23, getBoolChangeItem(Material.BOOK, "check-update", c.CHECK_UPDATE));
+		inv.setItem(18, getBoolChangeItem(ItemUtils.INK_SAC, "color-if-already-colored", c.colorIfColored));
+		inv.setItem(19, getBoolChangeItem(Material.REDSTONE, "deny-no-item", c.denyIfNoItem));
+		inv.setItem(20, getBoolChangeItem(Material.STICK, "hand-disabled", c.handDisabled));
+		inv.setItem(21, getAmountChangeItem(Material.IRON_DOOR, "limit-per-message", c.limit));
+		inv.setItem(22, getAmountChangeItem(Material.APPLE, "cooldown", c.cooldown));
+		inv.setItem(23, getBoolChangeItem(Material.BOOK, "check-update", c.checkUpdate));
 		
 		inv.setItem(26, createItem(ItemUtils.MATERIAL_CLOSE, Messages.getMessage("admin-inv.close")));
 		p.openInventory(inv);

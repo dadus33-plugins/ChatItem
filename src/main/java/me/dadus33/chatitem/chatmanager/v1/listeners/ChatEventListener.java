@@ -36,7 +36,7 @@ public class ChatEventListener implements Listener {
 		}
 		boolean found = false;
 		final String oldMsg = e.getMessage();
-		for (String rep : getStorage().PLACEHOLDERS) {
+		for (String rep : getStorage().placeholders) {
 			if (oldMsg.contains(rep)) {
 				found = true;
 				break;
@@ -51,14 +51,14 @@ public class ChatEventListener implements Listener {
 		ItemStack item = ChatManager.getUsableItem(p);
 		if (!ChatManager.canShowItem(p, item, e))
 			return;
-		String s = e.getMessage(), firstPlaceholder = getStorage().PLACEHOLDERS.get(0);
-		for (String placeholder : getStorage().PLACEHOLDERS) {
+		String s = e.getMessage(), firstPlaceholder = getStorage().placeholders.get(0);
+		for (String placeholder : getStorage().placeholders) {
 			s = s.replace(placeholder, firstPlaceholder);
 		}
-		if (Utils.countMatches(s, firstPlaceholder) > getStorage().LIMIT) {
+		if (Utils.countMatches(s, firstPlaceholder) > getStorage().limit) {
 			e.setCancelled(true);
-			if (!getStorage().LIMIT_MESSAGE.isEmpty())
-				p.sendMessage(getStorage().LIMIT_MESSAGE);
+			if (!getStorage().messageLimit.isEmpty())
+				p.sendMessage(getStorage().messageLimit);
 			return;
 		}
 

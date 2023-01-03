@@ -149,15 +149,15 @@ public class ChatPacketManager extends PacketHandler {
 					ItemStack copy = item.clone();
 
 					if (ItemPlayer.getPlayer(p).isBuggedClient()) { // if the guy that will receive it is bugged
-						String act = getStorage().BUGGED_CLIENT_ACTION;
+						String act = getStorage().buggedClientAction;
 						List<String> tooltip;
 						if (act.equalsIgnoreCase("tooltip"))
-							tooltip = getStorage().BUGGED_CLIENTS_TOOLTIP;
+							tooltip = getStorage().tooltipBuggedClient;
 						else if (act.equalsIgnoreCase("item"))
 							tooltip = ChatManager.getMaxLinesFromItem(p, copy);
 						else if (act.equalsIgnoreCase("show_both")) {
 							tooltip = ChatManager.getMaxLinesFromItem(p, copy);
-							tooltip.addAll(getStorage().BUGGED_CLIENTS_TOOLTIP);
+							tooltip.addAll(getStorage().tooltipBuggedClient);
 						} else
 							tooltip = new ArrayList<>();
 						message = JSONManipulator.getInstance().parseEmpty(getter.getBaseComponentAsJSON(e), ChatManager.styleItem(p, copy, getStorage()), tooltip, chat.getPlayer());
@@ -192,7 +192,7 @@ public class ChatPacketManager extends PacketHandler {
 					}
 					lastSentPacket = getter.manageItem(p, chat, e, item, getStorage());
 				} else {
-					if (!getStorage().HAND_DISABLED) {
+					if (!getStorage().handDisabled) {
 						lastSentPacket = getter.manageEmpty(p, chat, e, getStorage());
 					}
 				}
