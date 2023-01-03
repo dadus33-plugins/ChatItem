@@ -5,6 +5,7 @@ import static me.dadus33.chatitem.utils.PacketUtils.getNmsClass;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ public class JSONManipulator {
 	public static JSONManipulator getInstance() {
 		return instance;
 	}
+	private static final List<String> SKIPPED = Arrays.asList("HSTRY_ENCHANTS");
 
 	public static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
 	public static final Class<?> NMS_ITEM_STACK_CLASS = getNmsClass("ItemStack", "world.item.");
@@ -268,6 +270,8 @@ public class JSONManipulator {
 		boolean first = true;
 		sb.append(",tag:{"); // Start of the tag
 		for (Map.Entry<String, String> entry : entrySet) {
+			if(SKIPPED.contains(entry.getKey()))
+				continue;
 			if (!first)
 				sb.append(",");
 			first = false;
