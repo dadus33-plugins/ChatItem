@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.bukkit.entity.Player;
 
+import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.ItemPlayer;
 import me.dadus33.chatitem.utils.Utils;
 
@@ -25,14 +26,15 @@ public class Chat {
 	public static Chat getFrom(String message) {
 		boolean found = false;
 		String id = "";
-		for(char c : message.toCharArray()) {
-			if(found)
-				id += c;
-			else if(c == ChatManager.SEPARATOR)
+		for(char c : ChatManager.fixSeparator(message).toCharArray()) {
+			if(c == ChatManager.SEPARATOR)
 				found = true;
 			else if(c == ChatManager.SEPARATOR_END)
 				break;
+			else if(found)
+				id += c;
 		}
+		ChatItem.debug("Search in " + message + ", id found: " + id);
 		return (id != "" && Utils.isInteger(id)) ? Chat.getChat(Integer.parseInt(id)).orElse(null) : null;
 	}
 

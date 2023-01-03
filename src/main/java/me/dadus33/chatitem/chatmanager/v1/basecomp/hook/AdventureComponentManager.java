@@ -46,10 +46,8 @@ public class AdventureComponentManager implements IComponentManager {
 	@Override
 	public String getBaseComponentAsJSON(ChatItemPacket packet) {
 		Component comp = packet.getContent().getSpecificModifier(Component.class).readSafely(0);
-		if (comp == null) {
-			ChatItem.debug("The component is null.");
+		if (comp == null)
 			return null;
-		}
 		String json = GsonComponentSerializer.gson().serialize(comp);
 		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
 		ChatItem.debug("AdventureJSON : " + json);
