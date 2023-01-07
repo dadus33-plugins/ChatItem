@@ -134,7 +134,7 @@ public class ChatItem extends JavaPlugin {
         chooseManagers();
 
         StringJoiner plugins = new StringJoiner(", ");
-        if (pm.getPlugin("DiscordSRV") != null) {
+        if (pm.isPluginEnabled("DiscordSRV")) {
             discordSrvSupport = true;
             plugins.add("DiscordSRV");
         }

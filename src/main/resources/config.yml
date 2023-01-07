@@ -24,6 +24,8 @@ general:
   # The placeholders to display an item in chat.
   placeholders:
     - "[i]"
+    - "{i}"
+    - "[item]"
     - "{item}"
   # The format of the item placeholders.
   name-format: "&b&l&o{name} {amount}&r"
