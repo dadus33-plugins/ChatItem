@@ -49,7 +49,6 @@ public class ColorManager {
 			return "";
 		StringBuilder str = new StringBuilder();
 		if (isHexColor(input)) { // x mean it's an hex
-			ChatItem.debug("Removing char x at begin: " + input.substring(1));
 			input = input.substring(1);
 			if (input.length() >= 6) { // at least hex
 				str.append(ChatColor.of("#" + input.substring(0, 6))); // get first hex color code
@@ -70,7 +69,6 @@ public class ColorManager {
 		if (input == null || input.isEmpty())
 			return ChatColor.RESET;
 		if (isHexColor(input)) { // x mean it's an hex
-			ChatItem.debug("Removing char x at begin: " + input.substring(1));
 			if (input.length() >= 7) { // at least hex, and 7 because we count the "x"
 				return ChatColor.of("#" + input.substring(1, 7)); // get first hex color code
 			} else
@@ -106,8 +104,6 @@ public class ColorManager {
 							text += ColorManager.getColor(colorCode);
 						else {
 							text += ColorManager.getColor(colorCode.substring(0, 7)); // only the hex code
-							ChatItem.debug("Adding color for " + colorCode.substring(7, colorCode.length()) + " (in "
-									+ colorCode + ")");
 							text += ColorManager.getColorString(colorCode.substring(7, colorCode.length()));
 						}
 					} else if (colorCode.length() == 1) // if only one color code

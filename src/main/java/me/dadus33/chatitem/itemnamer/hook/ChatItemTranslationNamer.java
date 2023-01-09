@@ -17,7 +17,7 @@ public class ChatItemTranslationNamer implements INamer {
 
 	@Override
 	public String getName(Player p, ItemStack item, Storage storage) {
-		HashMap<Short, String> translationSection = storage.TRANSLATIONS.get(item.getType().name());
+		HashMap<Short, String> translationSection = storage.translations.get(item.getType().name());
 		if (translationSection != null) {
 			@SuppressWarnings("deprecation")
 			String translated = translationSection.get(item.getDurability());

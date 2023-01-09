@@ -18,7 +18,7 @@ public class ItemDisplayNamer implements INamer {
 	public String getName(Player p, ItemStack item, Storage storage) {
 		if(item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
 			String name = item.getItemMeta().getDisplayName();
-			return storage.COLOR_IF_ALREADY_COLORED ? ChatColor.stripColor(name) : name;
+			return storage.colorIfColored ? ChatColor.stripColor(name) : name;
 		}
 		return null;
 	}

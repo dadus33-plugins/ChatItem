@@ -30,17 +30,19 @@ public abstract class ChatManager {
 	private final static String LEFT = "{remaining}";
 	public final static char SEPARATOR = ((char) 0x0007);
 	public final static String SEPARATOR_STR = "\\u0007";
+	public final static char SEPARATOR_END = ((char) 0x0008);
+	public final static String SEPARATOR_END_STR = "\\u0008";
 
-	public static String replaceSeparator(String message, String replacement) {
-		return replaceSeparator(message, replacement, "");
+	public static String removeSeparator(String message) {
+		return fixSeparator(message).replace(Character.toString(SEPARATOR), "").replace(Character.toString(SEPARATOR_END), "");
 	}
 
-	public static String replaceSeparator(String message, String replacement, String playerName) {
-		return fixSeparator(message).replace(Character.toString(ChatManager.SEPARATOR) + playerName, replacement);
+	public static String replaceSeparator(Chat chat, String message, String replacement) {
+		return fixSeparator(message).replace(Character.toString(SEPARATOR) + (chat != null ? chat.getId() : "") + Character.toString(SEPARATOR_END), replacement);
 	}
-	
+
 	public static String fixSeparator(String s) {
-		return s == null ? "" : s.replace(ChatManager.SEPARATOR_STR, Character.toString(ChatManager.SEPARATOR));
+		return s == null ? "" : s.replace(SEPARATOR_STR, Character.toString(SEPARATOR)).replace(SEPARATOR_END_STR, Character.toString(SEPARATOR_END));
 	}
 
 	public static boolean equalsSeparator(String s) {
@@ -50,25 +52,13 @@ public abstract class ChatManager {
 	public static boolean containsSeparator(String s) {
 		return s != null && (s.contains(SEPARATOR_STR) || s.contains(Character.toString(SEPARATOR)));
 	}
-	
-	public static boolean endsWithSeparator(String s) {
-		return s != null && (s.endsWith(SEPARATOR_STR) || s.endsWith(Character.toString(SEPARATOR)));
+
+	public static boolean equalsSeparatorEnd(String s) {
+		return s != null && (s.equalsIgnoreCase(SEPARATOR_END_STR) || s.equalsIgnoreCase(Character.toString(SEPARATOR_END)));
 	}
-	
-	public static String[] splitWithSeparator(String msg) {
-		List<String> list = new ArrayList<>();
-		String current = "";
-		for(String s : msg.split("")) {
-			if(equalsSeparator(s)) {
-				if(!current.isEmpty())
-					list.add(current);
-				current = "";
-			} else
-				current += s;
-		}
-		if(!current.isEmpty())
-			list.add(current);
-		return list.toArray(new String[] {});
+
+	public static boolean containsSeparatorEnd(String s) {
+		return s != null && (s.contains(SEPARATOR_END_STR) || s.contains(Character.toString(SEPARATOR_END)));
 	}
 
 	protected Storage s;
@@ -90,7 +80,7 @@ public abstract class ChatManager {
 	}
 
 	public abstract void unload(ChatItem pl);
-	
+
 	/**
 	 * Get the item in hand as usable one.<br>
 	 * Will include, in lore, all informations from other plugins.
@@ -100,25 +90,23 @@ public abstract class ChatManager {
 	 */
 	public static ItemStack getUsableItem(Player p) {
 		ItemStack item = HandItem.getBetterItem(p).clone();
-		/*if(ChatItem.ecoEnchantsSupport) {
-			List<String> addLore = EcoEnchantsSupport.getLores(item);
-			if(!addLore.isEmpty()) {
-				ItemMeta meta = item.getItemMeta();
-				List<String> lores = meta.hasLore() ? meta.getLore() : new ArrayList<>();
-				for(int i = 0; i < addLore.size(); i++)
-					lores.add(i, addLore.get(i));
-				
-				meta.setLore(lores);
-				item.setItemMeta(meta);
-				ChatItem.debug("Added " + addLore.size() + " lores from EcoEnchants");
-			} else
-				ChatItem.debug("No lore to add from EcoEnchants");
-		}*/
+		/*
+		 * if(ChatItem.ecoEnchantsSupport) { List<String> addLore =
+		 * EcoEnchantsSupport.getLores(item); if(!addLore.isEmpty()) { ItemMeta meta =
+		 * item.getItemMeta(); List<String> lores = meta.hasLore() ? meta.getLore() :
+		 * new ArrayList<>(); for(int i = 0; i < addLore.size(); i++) lores.add(i,
+		 * addLore.get(i));
+		 * 
+		 * meta.setLore(lores); item.setItemMeta(meta); ChatItem.debug("Added " +
+		 * addLore.size() + " lores from EcoEnchants"); } else
+		 * ChatItem.debug("No lore to add from EcoEnchants"); }
+		 */
 		return item;
 	}
 
 	/**
-	 * Get all lores lines of an item, to replace the show_item action which is not working with ViaBackwards
+	 * Get all lores lines of an item, to replace the show_item action which is not
+	 * working with ViaBackwards
 	 * 
 	 * @param item the item to get lines from
 	 * @return all lores
@@ -127,8 +115,7 @@ public abstract class ChatManager {
 		List<String> lines = new ArrayList<>();
 		if (item.hasItemMeta()) {
 			ItemMeta meta = item.getItemMeta();
-			lines.add(meta.hasDisplayName() ? meta.getDisplayName()
-					: NamerManager.getName(p, item, ChatItem.getInstance().getStorage()));
+			lines.add(meta.hasDisplayName() ? meta.getDisplayName() : NamerManager.getName(p, item, ChatItem.getInstance().getStorage()));
 			if (meta.hasEnchants()) {
 				meta.getEnchants().forEach((enchant, lvl) -> {
 					lines.add(ChatColor.RESET + Utils.getEnchantName(enchant) + " " + Utils.toRoman(lvl));
@@ -141,22 +128,23 @@ public abstract class ChatManager {
 		}
 		return lines;
 	}
-	
+
 	/**
 	 * Get the name of item according to player & config<br>
-	 * Prefer use {@link #getNameOfItem(Player, ItemStack, Storage)} if you want take in count the empty item
-	 *  
-	 * @param p the player
+	 * Prefer use {@link #getNameOfItem(Player, ItemStack, Storage)} if you want
+	 * take in count the empty item
+	 * 
+	 * @param p    the player
 	 * @param item the item
-	 * @param c the config
+	 * @param c    the config
 	 * @return the name of item
 	 */
 	public static String styleItem(Player p, ItemStack item, Storage c) {
-		String replacer = c.NAME_FORMAT;
-		String amount = c.AMOUNT_FORMAT;
+		String replacer = c.nameFormat;
+		String amount = c.amountFormat;
 		boolean dname = item.hasItemMeta() && item.getItemMeta().hasDisplayName();
 		if (item.getAmount() == 1) {
-			if (c.FORCE_ADD_AMOUNT) {
+			if (c.addAmountForced) {
 				amount = amount.replace(TIMES, "1");
 				replacer = replacer.replace(AMOUNT, amount);
 			} else {
@@ -169,7 +157,7 @@ public abstract class ChatManager {
 		if (dname) {
 			String trp = item.getItemMeta().getDisplayName();
 			ChatItem.debug("trp: " + trp);
-			if (c.COLOR_IF_ALREADY_COLORED) {
+			if (c.colorIfColored) {
 				replacer = replacer.replace(NAME, ChatColor.stripColor(trp));
 			} else {
 				replacer = replacer.replace(NAME, trp);
@@ -183,17 +171,17 @@ public abstract class ChatManager {
 	/**
 	 * Get the name of item according to player & config
 	 * 
-	 * @param p the player that is owner of item
+	 * @param p    the player that is owner of item
 	 * @param item the item
-	 * @param c the config
+	 * @param c    the config
 	 * @return the name of item or hand
 	 */
 	public static String getNameOfItem(Player p, ItemStack item, Storage c) {
-		if(ItemUtils.isEmpty(item)) {
-			if(c.HAND_DISABLED)
-				return c.PLACEHOLDERS.get(0);
+		if (ItemUtils.isEmpty(item)) {
+			if (c.handDisabled)
+				return c.placeholders.get(0);
 			else
-				return c.HAND_NAME;
+				return c.handName;
 		}
 		return styleItem(p, item, c);
 	}
@@ -206,7 +194,7 @@ public abstract class ChatManager {
 		if (seconds < 3600) {
 			StringBuilder builder = new StringBuilder();
 			int minutes = (int) seconds / 60;
-			builder.append(minutes).append(c.MINUTES);
+			builder.append(minutes).append(c.minutes);
 			int secs = (int) seconds - minutes * 60;
 			if (secs != 0) {
 				builder.append(" ").append(secs).append(c.SECONDS);
@@ -215,10 +203,10 @@ public abstract class ChatManager {
 		}
 		StringBuilder builder = new StringBuilder();
 		int hours = (int) seconds / 3600;
-		builder.append(hours).append(c.HOURS);
+		builder.append(hours).append(c.hours);
 		int minutes = (int) (seconds / 60) - (hours * 60);
 		if (minutes != 0) {
-			builder.append(" ").append(minutes).append(c.MINUTES);
+			builder.append(" ").append(minutes).append(c.minutes);
 		}
 		int secs = (int) (seconds - ((seconds / 60) * 60));
 		if (secs != 0) {
@@ -229,43 +217,43 @@ public abstract class ChatManager {
 
 	public static boolean canShowItem(Player p, ItemStack item, @Nullable Cancellable e) {
 		Storage c = ChatItem.getInstance().getStorage();
-		if (c.PERMISSION_ENABLED && !p.hasPermission(c.PERMISSION_NAME)) {
-			if (!c.LET_MESSAGE_THROUGH) {
-				if(e != null)
+		if (c.permissionEnabled && !p.hasPermission(c.permissionName)) {
+			if (!c.letMessageThrough) {
+				if (e != null)
 					e.setCancelled(true);
 			}
-			if (!c.NO_PERMISSION_MESSAGE.isEmpty() && c.SHOW_NO_PERM_NORMAL) {
-				sendIfNeed(p, c.NO_PERMISSION_MESSAGE);
+			if (!c.messageNoPermission.isEmpty() && c.showNoPermissionMessage) {
+				sendIfNeed(p, c.messageNoPermission);
 			}
 			return false;
 		}
 		if (item.getType().equals(Material.AIR)) {
-			if (c.DENY_IF_NO_ITEM) {
-				if(e != null)
+			if (c.denyIfNoItem) {
+				if (e != null)
 					e.setCancelled(true);
-				if (!c.DENY_MESSAGE.isEmpty())
-					sendIfNeed(p, c.DENY_MESSAGE);
+				if (!c.messageDeny.isEmpty())
+					sendIfNeed(p, c.messageDeny);
 				return false;
 			}
-			if (c.HAND_DISABLED) {
+			if (c.handDisabled) {
 				return false;
 			}
 		}
-		if (c.COOLDOWN > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
+		if (c.cooldown > 0 && !p.hasPermission("chatitem.ignore-cooldown")) {
 			if (COOLDOWNS.containsKey(p.getUniqueId())) {
 				long start = COOLDOWNS.get(p.getUniqueId());
 				long current = System.currentTimeMillis() / 1000;
 				long elapsed = current - start;
-				if (elapsed >= c.COOLDOWN) {
+				if (elapsed >= c.cooldown) {
 					COOLDOWNS.remove(p.getUniqueId());
 				} else {
-					if (!c.LET_MESSAGE_THROUGH) {
-						if(e != null)
+					if (!c.letMessageThrough) {
+						if (e != null)
 							e.setCancelled(true);
 					}
-					if (!c.COOLDOWN_MESSAGE.isEmpty()) {
-						long left = (start + c.COOLDOWN) - current;
-						sendIfNeed(p, c.COOLDOWN_MESSAGE.replace(LEFT, ChatManager.calculateTime(left)));
+					if (!c.messageCooldown.isEmpty()) {
+						long left = (start + c.cooldown) - current;
+						sendIfNeed(p, c.messageCooldown.replace(LEFT, ChatManager.calculateTime(left)));
 					}
 					ChatItem.debug("Cooldown");
 					return false;
@@ -275,23 +263,23 @@ public abstract class ChatManager {
 		LAST_INFO_MESSAGE.put(p.getUniqueId(), System.currentTimeMillis()); // prevent showing item then send cooldown error message
 		return true;
 	}
-	
+
 	private static void sendIfNeed(Player p, String msg) {
 		Long time = LAST_INFO_MESSAGE.remove(p.getUniqueId());
-		if(time != null) {
+		if (time != null) {
 			long diff = System.currentTimeMillis() - time;
-			if(diff < 100)
+			if (diff < 100)
 				return; // don't show message
 		}
 		p.sendMessage(msg);
 		LAST_INFO_MESSAGE.put(p.getUniqueId(), System.currentTimeMillis());
 	}
-	
+
 	public static void clear(Player p) {
 		COOLDOWNS.remove(p.getUniqueId());
 		LAST_INFO_MESSAGE.remove(p.getUniqueId());
 	}
-	
+
 	public static void applyCooldown(Player p) {
 		COOLDOWNS.put(p.getUniqueId(), System.currentTimeMillis() / 1000);
 	}
