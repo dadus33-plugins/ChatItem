@@ -3,7 +3,9 @@ package me.dadus33.chatitem.chatmanager.v2;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.annotation.Nullable;
@@ -138,9 +140,9 @@ public class ChatListener implements Listener {
 		Bukkit.getConsoleSender().sendMessage(loggedMessage); // show in log
 		if (ChatItem.discordSrvSupport)
 			DiscordSrvSupport.sendChatMessage(p, defMsg.replace(ChatManager.SEPARATOR + "", itemName).replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName()));
-		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format + " to " + e.getRecipients().size() + " players");
-		if (!e.getRecipients().isEmpty()) // should not appear
-			e.getRecipients().forEach((pl) -> showItem(pl, p, item, msg));
+		Set<Player> recipients = e.getRecipients().isEmpty() ? new HashSet<>(Bukkit.getOnlinePlayers()) : e.getRecipients();
+		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format + " to " + recipients.size() + " players");
+		recipients.forEach((pl) -> showItem(pl, p, item, msg));
 		if (c.cooldown > 0 && !p.hasPermission("chatitem.ignore-cooldown"))
 			ChatManager.applyCooldown(p);
 	}
