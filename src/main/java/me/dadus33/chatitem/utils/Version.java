@@ -84,6 +84,8 @@ public enum Version {
 	}
 
 	public static String stringifyAdress(InetSocketAddress address) {
+		if(address == null)
+			return "0.0.0.0:0";
 		String port = String.valueOf(address.getPort());
 		String ip = address.getAddress().getHostAddress();
 		return ip + ":" + port;
