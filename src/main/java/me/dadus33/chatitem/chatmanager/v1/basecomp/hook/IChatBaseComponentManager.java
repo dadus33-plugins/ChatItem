@@ -22,15 +22,13 @@ public class IChatBaseComponentManager implements IComponentManager {
 			Class<?> chatSerializer = PacketUtils.CHAT_SERIALIZER;
 			fromJson = chatSerializer.getMethod("a", String.class);
 			for (Method m : chatSerializer.getDeclaredMethods()) {
-				if (m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(PacketUtils.COMPONENT_CLASS)
-						&& m.getReturnType().equals(String.class)) {
+				if (m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(PacketUtils.COMPONENT_CLASS) && m.getReturnType().equals(String.class)) {
 					serializerGetJson = m;
 					break;
 				}
 			}
 			if (serializerGetJson == null)
-				ChatItem.getInstance().getLogger().warning(
-						"Failed to find JSON serializer in class: " + chatSerializer.getCanonicalName());
+				ChatItem.getInstance().getLogger().warning("Failed to find JSON serializer in class: " + chatSerializer.getCanonicalName());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -65,20 +63,15 @@ public class IChatBaseComponentManager implements IComponentManager {
 					if (packetClass.getSimpleName().equalsIgnoreCase("ClientboundSystemChatPacket")) {
 						for (Constructor<?> cons : packetClass.getConstructors()) {
 							if (cons.getParameterCount() == 6) {
-								Object newPacket = cons.newInstance(chatComponent, Optional.empty(),
-										content.getIntegers().readSafely(0, 0),
-										content.getSpecificModifier(
-												PacketUtils.getNmsClass("ChatSender", "network.chat.")).read(0),
-										content.getSpecificModifier(Instant.class).read(0),
+								Object newPacket = cons.newInstance(chatComponent, Optional.empty(), content.getIntegers().readSafely(0, 0),
+										content.getSpecificModifier(PacketUtils.getNmsClass("ChatSender", "network.chat.")).read(0), content.getSpecificModifier(Instant.class).read(0),
 										ReflectionUtils.getObject(packet.getPacket(), "f"));
 								packet.setPacket(newPacket);
 							}
 						}
-						throw new UnsupportedOperationException("Failed to find valid constructor for packet "
-								+ packetClass.getSimpleName() + ". Please report this.");
+						throw new UnsupportedOperationException("Failed to find valid constructor for packet " + packetClass.getSimpleName() + ". Please report this.");
 					} else {
-						throw new UnsupportedOperationException("The packet " + packetClass.getSimpleName()
-								+ " isn't supported by the IChatBaseComponentManager. Please report this.");
+						throw new UnsupportedOperationException("The packet " + packetClass.getSimpleName() + " isn't supported by the IChatBaseComponentManager. Please report this.");
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

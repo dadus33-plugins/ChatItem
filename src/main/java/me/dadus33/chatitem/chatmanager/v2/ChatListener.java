@@ -100,7 +100,7 @@ public class ChatListener implements Listener {
 			if(chat == null)
 				ChatItem.debug("Chat for message " + e.getMessage() + " can't be found");
 			else {
-				e.setMessage(ChatManager.replaceSeparator(chat, e.getMessage(), getStorage().placeholders.get(0)));
+				e.setMessage(ChatManager.replaceSeparator(chat, e.getMessage(), c.placeholders.get(0)));
 				chat.remove();
 			}
 		}
@@ -155,8 +155,8 @@ public class ChatListener implements Listener {
 		for (char args : msg.toCharArray()) {
 			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
-					ChatItem.debug("Append " + text);
-					appendToComponentBuilder(builder, new ComponentBuilder(text).color(color).create());
+					ChatItem.debug("Append '" + text + "' (len: " + text.length() + ")");
+					appendToComponentBuilder(builder, createComponent(text, color));
 					text = "";
 				}
 				waiting = true; // waiting for color code
@@ -201,7 +201,7 @@ public class ChatListener implements Listener {
 			}
 		}
 		if (!text.isEmpty())
-			appendToComponentBuilder(builder, new ComponentBuilder(text).color(color).create());
+			appendToComponentBuilder(builder, createComponent(text, color));
 		to.spigot().sendMessage(builder.create());
 	}
 
@@ -271,11 +271,7 @@ public class ChatListener implements Listener {
 			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
 					ChatItem.debug("Append while fixing name " + (ColorManager.isHexColor(color) && builder.getParts().isEmpty() ? ColorManager.removeColorAtBegin(text) : text));
-					ComponentBuilder littleBuilder = new ComponentBuilder(ColorManager.isHexColor(color) ? ColorManager.removeColorAtBegin(text) : text).color(color);
-					if (item != null) { // add to all possible sub parts
-						littleBuilder.event(Utils.createItemHover(item));
-					}
-					appendToComponentBuilder(builder, littleBuilder.create());
+					appendToComponentBuilder(builder, createComponent(ColorManager.isHexColor(color) ? ColorManager.removeColorAtBegin(text) : text, color, item));
 					text = "";
 				}
 				waiting = true; // waiting for color code
@@ -314,12 +310,21 @@ public class ChatListener implements Listener {
 			}
 		}
 		if (!text.isEmpty()) {
-			ComponentBuilder littleBuilder = new ComponentBuilder(text).color(color);
-			if (item != null) { // add to all possible sub parts
-				littleBuilder.event(Utils.createItemHover(item));
-			}
-			appendToComponentBuilder(builder, littleBuilder.create());
+			appendToComponentBuilder(builder, createComponent(text, color, item));
 		}
 		return builder.create();
+	}
+
+	private static BaseComponent[] createComponent(String text, ChatColor color) {
+		return createComponent(text, color, null);
+	}
+	
+	private static BaseComponent[] createComponent(String text, ChatColor color, ItemStack item) {
+		ComponentBuilder littleBuilder = new ComponentBuilder(text);
+		if(color != null && color != ChatColor.RESET) // don't add reset thing
+			littleBuilder.color(color);
+		if (item != null) // add to all possible sub parts
+			littleBuilder.event(Utils.createItemHover(item));
+		return littleBuilder.create();
 	}
 }
