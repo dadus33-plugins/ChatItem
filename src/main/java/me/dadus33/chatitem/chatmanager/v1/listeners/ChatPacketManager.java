@@ -127,7 +127,7 @@ public class ChatPacketManager extends PacketHandler {
 			return; // can't find something
 		}
 		if (!ChatManager.containsSeparator(json)) { // if the message doesn't contain the BELL separator
-			ChatItem.debug("Not containing bell " + json);
+			ChatItem.debug("Not containing bell " + json + " (manager: " + choosedGetter.getClass().getName() + ")");
 			return;
 		}
 		ChatItem.debug("Found with " + choosedGetter.getClass().getName());

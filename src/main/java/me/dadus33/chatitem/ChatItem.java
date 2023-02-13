@@ -108,7 +108,7 @@ public class ChatItem extends JavaPlugin {
     }
 
     private List<String> getPluginThatRequirePacket() {
-        return Arrays.asList("DeluxeChat", "HexNicks", "VentureChat");
+        return Arrays.asList("DeluxeChat", "HexNicks", "VentureChat", "ItemsAdder");
     }
 
     @Override
