@@ -213,10 +213,8 @@ public class JSONManipulator {
 				rep.add(tooltip);
 				wasSep = true;
 			} else if (wasSep) {
-				if (parts == " ") { // sep finished
+				if (ChatManager.equalsSeparatorEnd(parts)) // sep finished
 					wasSep = false;
-					current += parts;
-				}
 			} else {
 				current += parts;
 			}

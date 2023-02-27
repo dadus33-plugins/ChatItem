@@ -30,8 +30,8 @@ public abstract class ChatManager {
 	private final static String LEFT = "{remaining}";
 	public final static char SEPARATOR = ((char) 0x0007);
 	public final static String SEPARATOR_STR = "\\u0007";
-	public final static char SEPARATOR_END = ((char) 0x0008);
-	public final static String SEPARATOR_END_STR = "\\u0008";
+	public final static char SEPARATOR_END = ((char) 0x0003);
+	public final static String SEPARATOR_END_STR = "\\u0003";
 
 	public static String removeSeparator(String message) {
 		return fixSeparator(message).replace(Character.toString(SEPARATOR), "").replace(Character.toString(SEPARATOR_END), "");
