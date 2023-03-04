@@ -151,7 +151,7 @@ public class ChatListener implements Listener {
 		ComponentBuilder builder = new ComponentBuilder("");
 		ChatColor color = ChatColor.WHITE;
 		String colorCode = "", text = "";
-		boolean waiting = false;
+		boolean waiting = false, removing = false;
 		for (char args : msg.toCharArray()) {
 			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
@@ -194,7 +194,10 @@ public class ChatListener implements Listener {
 					appendToComponentBuilder(builder, fixColorComponent(text, color));
 					addItem(builder, to, origin, item);
 					text = "";
-				} else {
+					removing = true;
+				} else if(args == ChatManager.SEPARATOR_END) {
+					removing = false;
+				} else if(!removing) { // not removing content
 					// basic text, not waiting for code after '§'
 					text += args;
 				}
