@@ -194,7 +194,8 @@ public class ChatListener implements Listener {
 					appendToComponentBuilder(builder, fixColorComponent(text, color));
 					addItem(builder, to, origin, item);
 					text = "";
-					removing = true;
+					if(ChatManager.containsSeparatorEnd(msg))
+						removing = true;
 				} else if(args == ChatManager.SEPARATOR_END) {
 					removing = false;
 				} else if(!removing) { // not removing content
