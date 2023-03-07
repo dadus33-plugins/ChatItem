@@ -8,11 +8,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
+import me.dadus33.chatitem.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class JoinListener implements Listener {
 
@@ -24,7 +22,7 @@ public class JoinListener implements Listener {
 		ChatItem pl = ChatItem.getInstance();
 		if(pl.isHasNewVersion()) {
 			TextComponent text = new TextComponent(pl.getStorage().updateMessage);
-			text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(new ComponentBuilder(pl.getStorage().updateHover).create())));
+			text.setHoverEvent(Utils.createTextHover(pl.getStorage().updateHover));
 			text.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/19064/"));
 			p.spigot().sendMessage(text);
 		}
