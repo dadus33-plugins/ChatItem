@@ -115,16 +115,14 @@ public class StringComponentManager implements IComponentManager {
 		if (comp instanceof TextComponent) {
 			TextComponent tc = (TextComponent) comp;
 			if (ChatManager.containsSeparator(tc.getText())) {
-				ChatItem.debug("Changing text " + tc.getText() + " to " + itemName);
+				ChatItem.debug("Changing text " + tc.getText() + " to " + itemName + ", extra: " + (tc.getExtra() == null ? "-" : tc.getExtra().size()));
 				tc.setText(ChatManager.replaceSeparator(chat, tc.getText(), itemName));
 				tc.setHoverEvent(hover);
-				List<BaseComponent> extra = new ArrayList<>();
-				for (BaseComponent legacyExtra : TextComponent.fromLegacyText(itemName, tc.getColor())) {
-					extra.add(legacyExtra);
-				}
+				List<BaseComponent> extra = new ArrayList<>(Arrays.asList(TextComponent.fromLegacyText(itemName, tc.getColor())));
 				if (tc.getExtra() != null)
 					extra.addAll(tc.getExtra());
 				tc.setExtra(extra);
+				return;
 			} else
 				ChatItem.debug("No insert of text without separator: " + tc.getText() + " (legacy: " + tc.toLegacyText() + ")");
 		}
