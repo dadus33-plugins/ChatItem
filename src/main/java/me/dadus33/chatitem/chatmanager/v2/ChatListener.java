@@ -155,7 +155,11 @@ public class ChatListener implements Listener {
 		for (char args : msg.toCharArray()) {
 			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
-					ChatItem.debug("Append '" + text + "' (len: " + text.length() + ")");
+					ChatItem.debug("Append '" + text.replace(ChatColor.COLOR_CHAR, '&') + "' (len: " + text.length() + ")");
+					if(text.length() > 2 && text.startsWith("§") && text.substring(2) == ChatColor.stripColor(text)
+							&& color != null && color != ChatColor.WHITE) {
+						text = text.substring(2); // remove some code which should not be here
+					}
 					appendToComponentBuilder(builder, createComponent(text, color));
 					text = "";
 				}
