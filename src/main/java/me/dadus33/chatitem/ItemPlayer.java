@@ -73,7 +73,7 @@ public class ItemPlayer {
 	}
 	
 	public boolean isBuggedClient() {
-		return getVersion().equals(Version.V1_7) && getClientName().toLowerCase().contains("lunarclient");
+		return (getVersion().equals(Version.V1_7) && getClientName().toLowerCase().contains("lunarclient")) || (!getVersion().isNewerOrEquals(Version.V1_15) && Version.getVersion().isNewerOrEquals(Version.V1_16));
 	}
 	
 	@Override

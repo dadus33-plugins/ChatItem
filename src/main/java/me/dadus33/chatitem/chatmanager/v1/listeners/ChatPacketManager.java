@@ -37,8 +37,6 @@ import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Version;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 
 public class ChatPacketManager extends PacketHandler {
 
@@ -160,16 +158,10 @@ public class ChatPacketManager extends PacketHandler {
 						} else
 							tooltip = new ArrayList<>();
 						message = JSONManipulator.getInstance().parseEmpty(getter.getBaseComponentAsJSON(e), ChatManager.styleItem(p, copy, getStorage()), tooltip, chat.getPlayer());
-						if (!manager.supportsChatComponentApi()) {
-							ChatItem.debug("Use basic for 1.7 lunar");
-							packet.getChatComponents().write(0, jsonToChatComponent(message));
-						} else {
-							ChatItem.debug("Use baseComponent for 1.7 lunar");
-							packet.getSpecificModifier(BaseComponent[].class).write(0, ComponentSerializer.parse(message));
+						if(message != null) {
+							getter.writeJson(e, message);
 						}
 						lastSentPacket = e.getPacket();
-						PacketUtils.sendPacket(p, lastSentPacket);
-						return;
 					}
 					if (copy.hasItemMeta()) {
 						ItemMeta meta = copy.getItemMeta();
@@ -203,15 +195,6 @@ public class ChatPacketManager extends PacketHandler {
 				e1.printStackTrace();
 			}
 		});
-	}
-
-	private Object jsonToChatComponent(String json) {
-		try {
-			return PacketUtils.CHAT_SERIALIZER.getMethod("a", String.class).invoke(null, json);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	private void stripData(ItemStack i) {
