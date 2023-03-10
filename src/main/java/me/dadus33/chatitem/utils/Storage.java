@@ -16,10 +16,10 @@ public class Storage {
 
     public final HashMap<String, HashMap<Short, String>> translations = new HashMap<>();
     public final String handName, nameFormat, amountFormat, commandFormat, manager, permissionName, buggedClientAction;
-    public final String messageNoPermission, messageDeny, messageReload, messageCooldown, messageLimit;
+    public final String messageNoPermission, messageDeny, messageReload, messageCooldown, messageLimit, messageIgnoredItem;
     public final String SECONDS, minutes, hours;
     public final String updateMessage, updateHover;
-    public final List<String> placeholders, tooltipHand, tooltipBuggedClient;
+    public final List<String> placeholders, tooltipHand, tooltipBuggedClient, ignoredItems;
     public boolean colorIfColored, addAmountForced, letMessageThrough, denyIfNoItem, debug,
             handDisabled, showNoPermissionMessage, checkUpdate, permissionEnabled;
     public int configVersion, limit, cooldown;
@@ -60,6 +60,7 @@ public class Storage {
         tooltipHand = conf.getStringList("general.hand.tooltip").stream().map(Storage::color).collect(Collectors.toList());
         buggedClientAction = conf.getString("general.bugged_client.action", "show_both");
         tooltipBuggedClient = conf.getStringList("general.bugged_client.tooltip").stream().map(Storage::color).collect(Collectors.toList());
+        ignoredItems = conf.getStringList("general.ignored_items");
         checkUpdate = conf.getBoolean("general.check-update", true);
         messageDeny = color(conf.getString("messages.deny-message", "&c&lYou have no item in hand!"));
         messageReload = color(conf.getString("messages.reload-success", "&b&lSuccessful reload!"));
@@ -71,6 +72,7 @@ public class Storage {
                 "&cA new version of ChatItem is available. &aClick here to download."));
         updateHover = color(conf.getString("messages.join-update.hover", "&6Click to go to spigot page !"));
         messageLimit = color(conf.getString("messages.limit-message", "&c&lYou can only add 8 item placeholders per message!"));
+        messageIgnoredItem = color(conf.getString("messages.ignored-item", "&cThis item is not allowed to be showed."));
 
         SECONDS = color(conf.getString("messages.seconds", " seconds"));
         minutes = color(conf.getString("messages.minutes", " minutes"));

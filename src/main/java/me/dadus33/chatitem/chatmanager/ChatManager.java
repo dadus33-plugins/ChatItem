@@ -260,6 +260,11 @@ public abstract class ChatManager {
 				}
 			}
 		}
+		for(String ignored : c.ignoredItems) {
+			if(item.getType().name().toLowerCase().contains(ignored.toLowerCase())) {
+				return false;
+			}
+		}
 		
 		LAST_INFO_MESSAGE.put(p.getUniqueId(), System.currentTimeMillis()); // prevent showing item then send cooldown error message
 		return true;
