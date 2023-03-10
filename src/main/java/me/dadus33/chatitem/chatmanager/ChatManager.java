@@ -260,6 +260,7 @@ public abstract class ChatManager {
 				}
 			}
 		}
+		
 		LAST_INFO_MESSAGE.put(p.getUniqueId(), System.currentTimeMillis()); // prevent showing item then send cooldown error message
 		return true;
 	}

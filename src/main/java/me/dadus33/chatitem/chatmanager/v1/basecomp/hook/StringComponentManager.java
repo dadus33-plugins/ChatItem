@@ -118,7 +118,7 @@ public class StringComponentManager implements IComponentManager {
 				ChatItem.debug("Changing text " + tc.getText() + " to " + itemName + ", extra: " + (tc.getExtra() == null ? "-" : tc.getExtra().size()));
 				tc.setText(ChatManager.replaceSeparator(chat, tc.getText(), itemName));
 				tc.setHoverEvent(hover);
-				List<BaseComponent> extra = new ArrayList<>(Arrays.asList(TextComponent.fromLegacyText(itemName, tc.getColor())));
+				List<BaseComponent> extra = new ArrayList<>(Arrays.asList(TextComponent.fromLegacyText(ChatManager.replaceSeparator(chat, tc.getText(), itemName), tc.getColor())));
 				if (tc.getExtra() != null)
 					extra.addAll(tc.getExtra());
 				tc.setExtra(extra);
