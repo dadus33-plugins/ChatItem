@@ -87,6 +87,9 @@ general:
   #  The cooldown, in seconds, between allowing players to send messages with items. Setting this to 0
   # will remove the cooldown entirely.
   cooldown: 60
+  # All items that are not allowed to be showed
+  ignored_items:
+  - "AIR"
   # Check if the plugin have update
   check-update: true
  
@@ -104,6 +107,8 @@ messages:
   no-permission: "&c&lI'm sorry, but you are not allowed to use the placeholder in chat!"
   # The message sent if the player uses more placeholders than configured in one message.
   limit-message: "&c&lYou can only add 8 item placeholders per message!"
+  # When trying to show item that is ignored
+  ignored-item: "&cThis item is not allowed to be showed."
   # All message about the update of the plugin
   join-update:
     message: "&cA new version of ChatItem is available. &aClick here to download."
