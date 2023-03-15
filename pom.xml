@@ -109,7 +109,7 @@
         <dependency>
             <groupId>com.github.GeyserMC</groupId>
             <artifactId>opennbt</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -139,7 +139,7 @@
         <dependency>
             <groupId>com.willfp</groupId>
             <artifactId>EcoEnchants</artifactId>
-            <version>9.17.3</version>
+            <version>9.17.5</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
