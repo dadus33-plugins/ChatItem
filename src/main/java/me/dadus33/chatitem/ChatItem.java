@@ -23,6 +23,7 @@ import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v2.ChatListenerChatManager;
 import me.dadus33.chatitem.commands.CIReloadCommand;
 import me.dadus33.chatitem.commands.ChatItemCommand;
+import me.dadus33.chatitem.hook.ChatControlSupport;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.listeners.JoinListener;
@@ -137,6 +138,10 @@ public class ChatItem extends JavaPlugin {
         if (pm.isPluginEnabled("DiscordSRV")) {
             discordSrvSupport = true;
             plugins.add("DiscordSRV");
+        }
+        if (pm.isPluginEnabled("ChatControl")) {
+        	ChatControlSupport.init(this);
+            plugins.add("ChatControl");
         }
 
         if(plugins.length() > 0)

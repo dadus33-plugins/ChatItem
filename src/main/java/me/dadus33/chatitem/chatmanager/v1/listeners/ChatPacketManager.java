@@ -135,6 +135,8 @@ public class ChatPacketManager extends PacketHandler {
 			return;
 		}
 		Player itemPlayer = chat.getPlayer();
+		if (getStorage().cooldown > 0 && !itemPlayer.hasPermission("chatitem.ignore-cooldown"))
+			ChatManager.applyCooldown(itemPlayer);
 		IComponentManager getter = choosedGetter;
 		e.setCancelled(true); // We cancel the packet as we're going to resends it anyways
 		Bukkit.getScheduler().runTaskAsynchronously(ChatItem.getInstance(), () -> {
