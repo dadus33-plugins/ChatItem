@@ -145,7 +145,7 @@
         <dependency>
             <groupId>com.github.kangarko</groupId>
             <artifactId>ChatControl-Free</artifactId>
-            <version>master-SNAPSHOT</version>
+            <version>5.9.5</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
