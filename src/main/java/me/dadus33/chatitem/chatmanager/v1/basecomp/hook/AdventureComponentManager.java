@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.ChatItem;
@@ -48,15 +49,19 @@ public class AdventureComponentManager implements IComponentManager {
 		Component comp = packet.getContent().getSpecificModifier(Component.class).readSafely(0);
 		if (comp == null)
 			return null;
-		String json = GsonComponentSerializer.gson().serialize(comp);
-		JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
-		ChatItem.debug("AdventureJSON : " + json);
-		if (jsonObj.has("with")) {
-			JsonObject next = new JsonObject();
-			next.add("extra", jsonObj.get("with"));
-			return next.toString();
+		try {
+			String json = GsonComponentSerializer.gson().serialize(comp);
+			JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
+			ChatItem.debug("AdventureJSON : " + json);
+			if (jsonObj.has("with")) {
+				JsonObject next = new JsonObject();
+				next.add("extra", jsonObj.get("with"));
+				return next.toString();
+			}
+			return json;
+		} catch (JsonParseException e) { // ignore this and just let skip this
+			return null;
 		}
-		return json;
 	}
 
 	@Override
