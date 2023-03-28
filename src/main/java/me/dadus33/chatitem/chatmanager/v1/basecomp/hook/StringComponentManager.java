@@ -93,6 +93,7 @@ public class StringComponentManager implements IComponentManager {
 				jsonObject.add("extra", extra);
 				json = jsonObject.toString();
 			}
+			ChatItem.debug("[StringComponentManager] Using JSON " + json);
 			try {
 				components = ComponentSerializer.parse(json);
 			} catch (Exception e) {
@@ -115,10 +116,11 @@ public class StringComponentManager implements IComponentManager {
 		if (comp instanceof TextComponent) {
 			TextComponent tc = (TextComponent) comp;
 			if (ChatManager.containsSeparator(tc.getText())) {
-				ChatItem.debug("Changing text " + tc.getText() + " to " + itemName + ", extra: " + (tc.getExtra() == null ? "-" : tc.getExtra().size()));
-				tc.setText(ChatManager.replaceSeparator(chat, tc.getText(), itemName));
+				String oldText = tc.getText();
+				ChatItem.debug("Changing text " + oldText + " to " + itemName + ", extra: " + (tc.getExtra() == null ? "-" : tc.getExtra().size()));
+				tc.setText(ChatManager.replaceSeparator(chat, oldText, itemName));
 				tc.setHoverEvent(hover);
-				List<BaseComponent> extra = new ArrayList<>(Arrays.asList(TextComponent.fromLegacyText(ChatManager.replaceSeparator(chat, tc.getText(), itemName), tc.getColor())));
+				List<BaseComponent> extra = new ArrayList<>(Arrays.asList(TextComponent.fromLegacyText(ChatManager.replaceSeparator(chat, oldText, itemName), tc.getColor())));
 				if (tc.getExtra() != null)
 					extra.addAll(tc.getExtra());
 				tc.setExtra(extra);
