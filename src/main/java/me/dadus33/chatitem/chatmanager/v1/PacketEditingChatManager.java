@@ -67,23 +67,21 @@ public class PacketEditingChatManager extends ChatManager {
 	}
 
 	public static Object createSystemChatPacket(String json) throws Exception {
-		Class<?> packetClass = PacketUtils.getNmsClass("ClientboundSystemChatPacket", "network.protocol.game.");
+		Class<?> packetClass = PacketUtils.getNmsClass("ClientboundSystemChatPacket", "network.protocol.game.", "PacketPlayOutChat");
 		for (Constructor<?> cons : packetClass.getDeclaredConstructors()) {
 			if (!cons.isAccessible())
 				cons.setAccessible(true);
-			if (cons.getParameterCount() == 2 && cons.getParameterTypes()[0].equals(String.class)
-					&& cons.getParameterTypes()[1].equals(int.class)) { // "string, int"
+			if (cons.getParameterCount() == 2 && cons.getParameterTypes()[0].equals(String.class) && cons.getParameterTypes()[1].equals(int.class)) { // "string, int"
 				return cons.newInstance(json, 1);
 			} else if (cons.getParameterCount() == 3 && cons.getParameterTypes()[1].equals(String.class)) { // "component", "string", <something not checked>
 				Class<?> secondParam = cons.getParameterTypes()[2];
-				if(secondParam.equals(int.class)) // "component", "string", "int"
+				if (secondParam.equals(int.class)) // "component", "string", "int"
 					return cons.newInstance(null, json, 1);
-				else if(secondParam.equals(boolean.class)) // "component", "string", "boolean"
+				else if (secondParam.equals(boolean.class)) // "component", "string", "boolean"
 					return cons.newInstance(null, json, false);
 			}
 		}
-		ChatItem.getInstance().getLogger()
-				.warning("Can't create a new packet for json " + json + ": no constructor found.");
+		ChatItem.getInstance().getLogger().warning("Can't create a new packet for json " + json + ": no constructor found.");
 		return null;
 	}
 }

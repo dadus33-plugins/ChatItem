@@ -23,6 +23,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
@@ -50,7 +51,7 @@ public class JSONManipulator {
 	private JsonObject itemTooltip;
 	private JsonArray classicTooltip;
 
-	public String parse(String json, ItemStack item, String replacement, int protocol) throws Exception {
+	public String parse(Chat chat, String json, ItemStack item, String replacement, int protocol) throws Exception {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		final AbstractMap.SimpleEntry<Version, ItemStack> p = new AbstractMap.SimpleEntry<>(Version.getVersion(protocol), item);
 
@@ -91,7 +92,7 @@ public class JSONManipulator {
 		if (obj.size() == 1 && obj.has("text")) {
 			itemTooltip.add("text", obj.get("text"));
 			ChatItem.debug("[JsonManipulator] Parsed quick: " + obj.toString() + ", wrapper: " + itemTooltip);
-			return itemTooltip.toString().replace(Character.toString(ChatManager.SEPARATOR), "").replace(ChatManager.SEPARATOR_STR, "");
+			return ChatManager.replaceSeparator(chat, itemTooltip.toString(), replacement);
 		}
 		obj.add("extra", parseArray(obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray(), itemTooltip));
 		if (!obj.has("text")) {

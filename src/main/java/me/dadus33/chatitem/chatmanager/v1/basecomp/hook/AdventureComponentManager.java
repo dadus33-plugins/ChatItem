@@ -14,6 +14,7 @@ import com.google.gson.JsonParser;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatManager;
+import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent.ContentModifier;
@@ -88,8 +89,11 @@ public class AdventureComponentManager implements IComponentManager {
 		}
 		comp = checkComponent(comp, hover, replacement, chat);
 		ChatItem.debug("Result: " + GsonComponentSerializer.gson().serialize(comp));
-		modifier.write(0, comp);
-		packet.setPacket(modifier.getObj());
+		try {
+			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(GsonComponentSerializer.gson().serialize(comp)));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return packet.getPacket();
 	}
 

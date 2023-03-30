@@ -1,5 +1,6 @@
 package me.dadus33.chatitem.chatmanager.v1.basecomp.hook;
 
+import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.utils.PacketUtils;
@@ -27,7 +28,7 @@ public class ComponentNMSManager implements IComponentManager {
 	@Override
 	public void writeJson(ChatItemPacket packet, String json) {
 		try {
-			packet.getContent().getChatComponents().write(0, PacketUtils.CHAT_SERIALIZER.getMethod("a", String.class).invoke(null, json));
+			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(json));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

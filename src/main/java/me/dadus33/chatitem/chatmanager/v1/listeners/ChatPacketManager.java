@@ -24,8 +24,6 @@ import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.AdventureComponentManager;
-import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.ComponentNMSManager;
-import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.IChatBaseComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.PCMComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.StringComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
@@ -60,7 +58,7 @@ public class ChatPacketManager extends PacketHandler {
 			e.printStackTrace();
 		}
 
-		for (IComponentManager getter : Arrays.asList(new StringComponentManager(), new IChatBaseComponentManager(), new ComponentNMSManager(), new PCMComponentManager())) {
+		for (IComponentManager getter : Arrays.asList(new StringComponentManager(), /*new IChatBaseComponentManager(), new ComponentNMSManager(),*/ new PCMComponentManager())) {
 			tryRegister(getter);
 		}
 		try {
@@ -83,7 +81,7 @@ public class ChatPacketManager extends PacketHandler {
 			return;
 		if (lastSentPacket != null && lastSentPacket == e.getPacket())
 			return; // prevent infinite loop
-		ChatItem.debug("Checking: " + e.getPacket().getClass().getSimpleName().replace("net.minecraft.network.protocol.", "nms.p.").replace("net.minecraft.", "nm.") + " to " + e.getPlayername());
+		ChatItem.debug("Checking: " + e.getPacket().getClass().getSimpleName() + " to " + e.getPlayername());
 		PacketContent packet = e.getContent();
 		Version version = Version.getVersion();
 		String json = "{}";

@@ -46,7 +46,7 @@ public interface IComponentManager {
 	}
 
 	default Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, Storage c) throws Exception {
-		String message = JSONManipulator.getInstance().parse(getBaseComponentAsJSON(packet), item, ChatManager.styleItem(chat.getPlayer(), item, c),
+		String message = JSONManipulator.getInstance().parse(chat, getBaseComponentAsJSON(packet), item, ChatManager.styleItem(chat.getPlayer(), item, c),
 				ItemPlayer.getPlayer(p).getProtocolVersion());
 		if (message != null) {
 			ChatItem.debug("(v1) Writing message: " + message);
