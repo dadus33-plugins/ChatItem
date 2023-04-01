@@ -34,8 +34,8 @@ public class AdventureComponentManager implements IComponentManager {
 	public boolean hasConditions() {
 		try {
 			for (String cl : Arrays.asList("net.kyori.adventure.text.Component", "net.kyori.adventure.text.serializer.gson.GsonComponentSerializer"))
-				Class.forName(cl);
-		} catch (Exception e) { // can't support this, adventure comp not found
+				Class.forName(cl); 
+		} catch (Throwable e) { // can't support this, adventure comp not found
 			ChatItem.debug("Can't load AdventureComponentManager : " + e.getMessage());
 			return false;
 		}
