@@ -1,12 +1,12 @@
 package me.dadus33.chatitem.chatmanager.v1.basecomp.hook;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
-import java.util.Optional;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
+import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent.ContentModifier;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 
@@ -44,12 +44,23 @@ public class PCMComponentManager implements IComponentManager {
 	@Override
 	public void writeJson(ChatItemPacket packet, String json) {
 		try {
-			Optional<Object> chatComp = Optional.of(PacketUtils.CHAT_SERIALIZER.getMethod("a", String.class).invoke(null, json));
+			Object chatComp = PacketUtils.CHAT_SERIALIZER.getMethod("a", String.class).invoke(null, json);
 			Class<?> pcmClass = PacketUtils.getNmsClass("PlayerChatMessage", "network.chat.");
-			Object pcm = packet.getContent().getSpecificModifier(pcmClass).readSafely(0);
-			Field f = ReflectionUtils.getFirstFieldWith(pcm.getClass(), Optional.class);
-			f.setAccessible(true);
-			f.set(pcm, chatComp);
+			ContentModifier<Object> pcmModifier = packet.getContent().getSpecificModifier((Class<Object>) pcmClass);
+			Object pcm = ReflectionUtils.getMethod(pcmClass, pcmClass, PacketUtils.COMPONENT_CLASS).invoke(pcmModifier.readSafely(0), chatComp);
+			for(Constructor<?> cons : packet.getPacket().getClass().getConstructors()) {
+				if(cons.getParameterCount() <= 1)
+					continue;
+				Object[] params = new Object[cons.getParameterCount()];
+				for(int i = 0; i < params.length; i++) {
+					Class<?> cls = cons.getParameterTypes()[i];
+					if(cls.equals(pcmClass)) {
+						params[i] = pcm;
+					} else
+						params[i] = packet.getContent().getSpecificModifier(cls).readSafely(0);
+				}
+				packet.setPacket(cons.newInstance(params));
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
