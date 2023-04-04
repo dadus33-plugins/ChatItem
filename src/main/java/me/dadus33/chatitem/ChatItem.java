@@ -50,6 +50,7 @@ public class ChatItem extends JavaPlugin {
         String oldChatManager = pl.storage.manager;
         pl.storage = new Storage(pl.getConfig());
         pl.chooseManagers();
+        Translation.load(pl);
         if (!pl.storage.messageReload.isEmpty())
             sender.sendMessage(pl.storage.messageReload);
         if (!oldChatManager.equalsIgnoreCase(pl.storage.manager))
@@ -147,6 +148,7 @@ public class ChatItem extends JavaPlugin {
         if(plugins.length() > 0)
         	getLogger().info("Load " + plugins.toString() + " support.");
         
+        Translation.load(this);
 
         getServer().getMessenger().registerIncomingPluginChannel(this, brandChannelName, (chan, p, msg) -> ItemPlayer.getPlayer(p).setClientName(new String(msg).substring(1)));
 

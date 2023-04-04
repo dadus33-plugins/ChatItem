@@ -1,8 +1,6 @@
 package me.dadus33.chatitem.utils;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
@@ -14,8 +12,7 @@ import me.dadus33.chatitem.ChatItem;
 
 public class Storage {
 
-    public final HashMap<String, HashMap<Short, String>> translations = new HashMap<>();
-    public final String handName, nameFormat, amountFormat, commandFormat, manager, permissionName, buggedClientAction;
+    public final String handName, nameFormat, amountFormat, commandFormat, manager, permissionName, buggedClientAction, language;
     public final String messageNoPermission, messageDeny, messageReload, messageCooldown, messageLimit, messageIgnoredItem;
     public final String SECONDS, minutes, hours;
     public final String updateMessage, updateHover;
@@ -30,17 +27,7 @@ public class Storage {
         configVersion = conf.getInt("config-version", 13);
         checkConfigVersion();
         this.manager = conf.getString("manager", "auto");
-        Set<String> keys = conf.getConfigurationSection("translations").getKeys(false);
-        for (String key : keys) {
-            HashMap<Short, String> entry = new HashMap<>();
-            Set<String> subKeys = conf.getConfigurationSection("translations.".concat(key)).getKeys(false);
-            for (String subKey : subKeys) {
-                entry.put(Short.parseShort(subKey),
-                        color(conf.getString("translations.".concat(key).concat(".").concat(subKey))));
-            }
-
-            translations.put(key, entry);
-        }
+        language = conf.getString("general.language", "en_us");
         debug = conf.getBoolean("debug", false);
         placeholders = ImmutableList.copyOf(conf.getStringList("general.placeholders"));
         nameFormat = color(conf.getString("general.name-format", "&b&l&o{name} {amount}&r"));

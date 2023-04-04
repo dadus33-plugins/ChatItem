@@ -1,0 +1,1110 @@
+STONE:
+  0: "Stone"
+  1: "Granite"
+  2: "Polished Granite"
+  3: "Diorite"
+  4: "Polished Diorite"
+  5: "Andesite"
+  6: "Polished Andesite"
+GRASS:
+  0: "Grass"
+DIRT:
+  0: "Dirt"
+  1: "Coarse Dirt"
+  2: "Podzol"
+COBBLESTONE:
+  0: "Cobblestone"
+WOOD:
+  0: "Oak Plank"
+  1: "Spruce Plank"
+  2: "Birch Plank"
+  3: "Jungle Plank"
+  4: "Acacia Plank"
+  5: "Dark Oak Plank"
+SAPLING:
+  0: "Oak Sapling"
+  1: "Spruce Sapling"
+  2: "Birch Sapling"
+  3: "Jungle Sapling"
+  4: "Acacia Sapling"
+  5: "Dark Oak Sapling"
+BEDROCK:
+  0: "Bedrock"
+WATER:
+  0: "Water"
+STATIONARY_WATER:
+  0: "Stationary Water"
+LAVA:
+  0: "Lava"
+STATIONARY_LAVA:
+  0: "Stationary Lava"
+SAND:
+  0: "Sand"
+  1: "Red Sand"
+GRAVEL:
+  0: "Gravel"
+GOLD_ORE:
+  0: "Gold Ore"
+IRON_ORE:
+  0: "Iron Ore"
+COAL_ORE:
+  0: "Coal Ore"
+LOG:
+  0: "Oak Log"
+  1: "Spruce Log"
+  2: "Birch Log"
+  3: "Jungle Log"
+LEAVES:
+  0: "Oak Leaves"
+  1: "Spruce Leaves"
+  2: "Birch Leaves"
+  3: "Jungle Leaves"
+SPONGE:
+  0: "Sponge"
+  1: "Wet Sponge"
+GLASS:
+  0: "Glass"
+LAPIS_ORE:
+  0: "Lapis Lazuli Ore"
+LAPIS_BLOCK:
+  0: "Lapis Lazuli Block"
+DISPENSER:
+  0: "Dispenser"
+SANDSTONE:
+  0: "Sandstone"
+  1: "Chiseled Sandstone"
+  2: "Smooth Sandstone"
+NOTE_BLOCK:
+  0: "Note Block"
+BED_BLOCK:
+  0: "Bed"
+POWERED_RAIL:
+  0: "Powered Rail"
+DETECTOR_RAIL:
+  0: "Detector Rail"
+PISTON_STICKY_BASE:
+  0: "Sticky Piston"
+WEB:
+  0: "Cobweb"
+LONG_GRASS:
+  0: "Dead Shrub"
+  1: "Tall Grass"
+  2: "Fern"
+DEAD_BUSH:
+  0: "Dead Bush"
+PISTON_BASE:
+  0: "Piston"
+PISTON_EXTENSION:
+  0: "Piston Extension"
+WOOL:
+  0: "White Wool"
+  1: "Orange Wool"
+  2: "Magenta Wool"
+  3: "Light Blue Wool"
+  4: "Yellow Wool"
+  5: "Lime Wool"
+  6: "Pink Wool"
+  7: "Gray Wool"
+  8: "Light Gray Wool"
+  9: "Cyan Wool"
+  10: "Purple Wool"
+  11: "Blue Wool"
+  12: "Brown Wool"
+  13: "Dark Green Wool"
+  14: "Red Wool"
+  15: "Black Wool"
+PISTON_MOVING_PIECE:
+  0: "Piston (moving piece)"
+YELLOW_FLOWER:
+  0: "Dandelion"
+RED_ROSE:
+  0: "Poppy"
+  1: "Blue Orchid"
+  2: "Allium"
+  3: "Azure Bluet"
+  4: "Red Tulip"
+  5: "Orange Tulip"
+  6: "White Tulip"
+  7: "Pink Tulip"
+  8: "Oxeye Daisy"
+BROWN_MUSHROOM:
+  0: "Brown Mushroom"
+RED_MUSHROOM:
+  0: "Red Mushroom"
+GOLD_BLOCK:
+  0: "Block of Gold"
+IRON_BLOCK:
+  0: "Block of Iron"
+DOUBLE_STEP:
+  0: "Stone Double Slab"
+  1: "Sandstone Double Slab"
+  2: "Wooden Double Slab"
+  3: "Cobblestone Double Slab"
+  4: "Brick Double Slab"
+  5: "Stone Brick Double Slab"
+  6: "Nether Brick Double Slab"
+  7: "Quartz Double Slab"
+  8: "Smooth Stone Double Slab"
+  9: "Smooth Sandstone Double Slab"
+STEP:
+  0: "Stone Slab"
+  1: "Sandstone Slab"
+  2: "Wooden Stone Slab"
+  3: "Cobblestone Slab"
+  4: "Brick Slab"
+  5: "Stone Brick Slab"
+  6: "Nether Brick Slab"
+  7: "Quartz Slab"
+BRICK:
+  0: "Bricks"
+TNT:
+  0: "TNT"
+BOOKSHELF:
+  0: "Bookshelf"
+MOSSY_COBBLESTONE:
+  0: "Moss Stone"
+OBSIDIAN:
+  0: "Obsidian"
+TORCH:
+  0: "Torch"
+FIRE:
+  0: "Fire"
+MOB_SPAWNER:
+  0: "Monster Spawner"
+  50: "Creeper Spawner"
+  51: "Skeleton Spawner"
+  52: "Spider Spawner"
+  53: "Giant Spawner"
+  54: "Zombie Spawner"
+  55: "Slime Spawner"
+  56: "Ghast Spawner"
+  57: "Zombie Pigman Spawner"
+  58: "Enderman Spawner"
+  59: "Cave Spider Spawner"
+  60: "Silverfish Spawner"
+  61: "Blaze Spawner"
+  62: "Magma Cube Spawner"
+  63: "Ender Dragon Spawner"
+  90: "Pig Spawner"
+  91: "Sheep Spawner"
+  92: "Cow Spawner"
+  93: "Chicken Spawner"
+  94: "Squid Spawner"
+  95: "Wolf Spawner"
+  96: "Mooshroom Spawner"
+  97: "Snow Golem Spawner"
+  98: "Ocelot Spawner"
+  99: "Iron Golem Spawner"
+  120: "Villager Spawner"
+WOOD_STAIRS:
+  0: "Oak Plank Stairs"
+CHEST:
+  0: "Chest"
+REDSTONE_WIRE:
+  0: "Redstone Wire"
+DIAMOND_ORE:
+  0: "Diamond Ore"
+DIAMOND_BLOCK:
+  0: "Block of Diamond"
+WORKBENCH:
+  0: "Crafting Table"
+CROPS:
+  0: "Wheat"
+SOIL:
+  0: "Farmland"
+FURNACE:
+  0: "Furnace"
+BURNING_FURNACE:
+  0: "Burning Furnace"
+SIGN_POST:
+  0: "Sign Post"
+WOODEN_DOOR:
+  0: "Wooden Door"
+LADDER:
+  0: "Ladder"
+RAILS:
+  0: "Rails"
+COBBLESTONE_STAIRS:
+  0: "Cobblestone Stairs"
+WALL_SIGN:
+  0: "Wall Sign"
+LEVER:
+  0: "Lever"
+STONE_PLATE:
+  0: "Stone Pressure Plate"
+IRON_DOOR_BLOCK:
+  0: "Iron Door"
+WOOD_PLATE:
+  0: "Wooden Pressure Plate"
+REDSTONE_ORE:
+  0: "Redstone Ore"
+GLOWING_REDSTONE_ORE:
+  0: "Glowing Redstone Ore"
+REDSTONE_TORCH_OFF:
+  0: "Redstone Torch (off)"
+REDSTONE_TORCH_ON:
+  0: "Redstone Torch (on)"
+STONE_BUTTON:
+  0: "Button"
+SNOW:
+  0: "Snow"
+ICE:
+  0: "Ice"
+SNOW_BLOCK:
+  0: "Snow Block"
+CACTUS:
+  0: "Cactus"
+CLAY:
+  0: "Clay Block"
+SUGAR_CANE_BLOCK:
+  0: "Sugar Cane"
+JUKEBOX:
+  0: "Jukebox"
+FENCE:
+  0: "Fence"
+PUMPKIN:
+  0: "Pumpkin"
+NETHERRACK:
+  0: "Netherrack"
+SOUL_SAND:
+  0: "Soul Sand"
+GLOWSTONE:
+  0: "Glowstone Block"
+PORTAL:
+  0: "Portal"
+JACK_O_LANTERN:
+  0: "Jack o'Lantern"
+CAKE_BLOCK:
+  0: "Cake Block"
+DIODE_BLOCK_OFF:
+  0: "Redstone Repeater (off)"
+DIODE_BLOCK_ON:
+  0: "Redstone Repeater (on)"
+LOCKED_CHEST:
+  0: "Locked Chest"
+STAINED_GLASS:
+  0: "White Stained Glass"
+  1: "Orange Stained Glass"
+  2: "Magenta Stained Glass"
+  3: "Light Blue Stained Glass"
+  4: "Yellow Stained Glass"
+  5: "Lime Stained Glass"
+  6: "Pink Stained Glass"
+  7: "Gray Stained Glass"
+  8: "Light Gray Stained Glass"
+  9: "Cyan Stained Glass"
+  10: "Purple Stained Glass"
+  11: "Blue Stained Glass"
+  12: "Brown Stained Glass"
+  13: "Green Stained Glass"
+  14: "Red Stained Glass"
+  15: "Black Stained Glass"
+TRAP_DOOR:
+  0: "Trapdoor"
+MONSTER_EGGS:
+  0: "Stone (Silverfish)"
+  1: "Cobblestone (Silverfish)"
+  2: "Stone Brick (Silverfish)"
+SMOOTH_BRICK:
+  0: "Stone Bricks"
+  1: "Mossy Stone Bricks"
+  2: "Cracked Stone Bricks"
+  3: "Circle Stone Bricks"
+HUGE_MUSHROOM_1:
+  0: "Huge Brown Mushroom"
+HUGE_MUSHROOM_2:
+  0: "Huge Red Mushroom"
+IRON_FENCE:
+  0: "Iron Bars"
+THIN_GLASS:
+  0: "Glass Pane"
+MELON_BLOCK:
+  0: "Melon"
+PUMPKIN_STEM:
+  0: "Pumpkin Stem"
+MELON_STEM:
+  0: "Melon Stem"
+VINE:
+  0: "Vines"
+FENCE_GATE:
+  0: "Fence Gate"
+BRICK_STAIRS:
+  0: "Brick Stairs"
+SMOOTH_STAIRS:
+  0: "Stone Brick Stairs"
+MYCEL:
+  0: "Mycelium"
+WATER_LILY:
+  0: "Lily Pad"
+NETHER_BRICK:
+  0: "Nether Brick"
+NETHER_FENCE:
+  0: "Nether Brick Fence"
+NETHER_BRICK_STAIRS:
+  0: "Nether Brick Stairs"
+NETHER_WARTS:
+  0: "Nether Wart"
+ENCHANTMENT_TABLE:
+  0: "Enchantment Table"
+BREWING_STAND:
+  0: "Brewing Stand"
+CAULDRON:
+  0: "Cauldron"
+ENDER_PORTAL:
+  0: "End Portal"
+ENDER_PORTAL_FRAME:
+  0: "End Portal Frame"
+ENDER_STONE:
+  0: "End Stone"
+DRAGON_EGG:
+  0: "Dragon Egg"
+REDSTONE_LAMP_OFF:
+  0: "Redstone Lamp (off)"
+REDSTONE_LAMP_ON:
+  0: "Redstone Lamp (on)"
+WOOD_DOUBLE_STEP:
+  0: "Oak Plank Double Slab"
+  1: "Pine Plank Double Slab"
+  2: "Birch Plank Double Slab"
+  3: "Jungle Plank Double Slab"
+  4: "Acacia Plank Double Slab"
+  5: "Dark Oak Plank Double Slab"
+WOOD_STEP:
+  0: "Oak Plank Slab"
+  1: "Pine Plank Slab"
+  2: "Birch Plank Slab"
+  3: "Jungle Plank Slab"
+  4: "Acacia Plank Slab"
+  5: "Dark Oak Plank Slab"
+COCOA:
+  0: "Cocoa Plant"
+SANDSTONE_STAIRS:
+  0: "Sandstone Stairs"
+EMERALD_ORE:
+  0: "Emerald Ore"
+ENDER_CHEST:
+  0: "Ender Chest"
+TRIPWIRE_HOOK:
+  0: "Tripwire Hook"
+TRIPWIRE:
+  0: "Tripwire"
+EMERALD_BLOCK:
+  0: "Block of Emerald"
+SPRUCE_WOOD_STAIRS:
+  0: "Pine Plank Stairs"
+BIRCH_WOOD_STAIRS:
+  0: "Birch Plank Stairs"
+JUNGLE_WOOD_STAIRS:
+  0: "Jungle Plank Stairs"
+COMMAND:
+  0: "Command Block"
+BEACON:
+  0: "Beacon"
+COBBLE_WALL:
+  0: "Cobblestone Wall"
+  1: "Mossy Cobblestone Wall"
+FLOWER_POT:
+  0: "Flower Pot"
+  1: "Rose Flower Pot"
+  2: "Dandelion Flower Pot"
+  3: "Oak Sapling Flower Pot"
+  4: "Spruce Sapling Flower Pot"
+  5: "Birch Sapling Flower Pot"
+  6: "Jungle Sapling Flower Pot"
+  7: "Red Mushroom Flower Pot"
+  8: "Brown Mushroom Flower Pot"
+  9: "Cactus Flower Pot"
+  10: "Dead Bush Flower Pot"
+  11: "Fern Flower Pot"
+CARROT:
+  0: "Carrots"
+POTATO:
+  0: "Potatoes"
+WOOD_BUTTON:
+  0: "Wooden Button"
+SKULL:
+  0: "Head"
+ANVIL:
+  0: "Anvil"
+  1: "Anvil"
+  2: "Anvil"
+  3: "Anvil"
+  4: "Slightly Damaged Anvil"
+  5: "Slightly Damaged Anvil"
+  6: "Slightly Damaged Anvil"
+  7: "Slightly Damaged Anvil"
+  8: "Very Damaged Anvil"
+  9: "Very Damaged Anvil"
+  10: "Very Damaged Anvil"
+  11: "Very Damaged Anvil"
+TRAPPED_CHEST:
+  0: "Trapped Chest"
+GOLD_PLATE:
+  0: "Weighted Pressure Plate (Light)"
+IRON_PLATE:
+  0: "Weighted Pressure Plate (Heavy)"
+REDSTONE_COMPARATOR_OFF:
+  0: "Redstone Comparator (inactive)"
+REDSTONE_COMPARATOR_ON:
+  0: "Redstone Comparator (active)"
+DAYLIGHT_DETECTOR:
+  0: "Daylight Sensor"
+REDSTONE_BLOCK:
+  0: "Block of Redstone"
+QUARTZ_ORE:
+  0: "Nether Quartz Ore"
+HOPPER:
+  0: "Hopper"
+QUARTZ_BLOCK:
+  0: "Block of Quartz"
+  1: "Chiseled Quartz Block"
+  2: "Pillar Quartz Block"
+  3: "Pillar Quartz Block"
+  4: "Pillar Quartz Block"
+QUARTZ_STAIRS:
+  0: "Quartz Stairs"
+ACTIVATOR_RAIL:
+  0: "Activator Rail"
+DROPPER:
+  0: "Dropper"
+STAINED_CLAY:
+  0: "White Stained Clay"
+  1: "Orange Stained Clay"
+  2: "Magenta Stained Clay"
+  3: "Light Blue Stained Clay"
+  4: "Yellow Stained Clay"
+  5: "Lime Stained Clay"
+  6: "Pink Stained Clay"
+  7: "Gray Stained Clay"
+  8: "Light Gray Stained Clay"
+  9: "Cyan Stained Clay"
+  10: "Purple Stained Clay"
+  11: "Blue Stained Clay"
+  12: "Brown Stained Clay"
+  13: "Green Stained Clay"
+  14: "Red Stained Clay"
+  15: "Black Stained Clay"
+STAINED_GLASS_PANE:
+  0: "White Stained Glass Pane"
+  1: "Orange Stained Glass Pane"
+  2: "Magenta Stained Glass Pane"
+  3: "Light Blue Stained Glass Pane"
+  4: "Yellow Stained Glass Pane"
+  5: "Lime Stained Glass Pane"
+  6: "Pink Stained Glass Pane"
+  7: "Gray Stained Glass Pane"
+  8: "Light Gray Stained Glass Pane"
+  9: "Cyan Stained Glass Pane"
+  10: "Purple Stained Glass Pane"
+  11: "Blue Stained Glass Pane"
+  12: "Brown Stained Glass Pane"
+  13: "Green Stained Glass Pane"
+  14: "Red Stained Glass Pane"
+  15: "Black Stained Glass Pane"
+LEAVES_2:
+  0: "Acacia Leaves"
+  1: "Dark Oak Leaves"
+ACACIA_STAIRS:
+  0: "Acacia Wood Stairs"
+DARK_OAK_STAIRS:
+  0: "Dark Oak Wood Stairs"
+LOG_2:
+  0: "Acacia Log"
+  1: "Dark Oak Log"
+HAY_BLOCK:
+  0: "Hay Bale"
+CARPET:
+  0: "White Carpet"
+  1: "Orange Carpet"
+  2: "Magenta Carpet"
+  3: "Light Blue Carpet"
+  4: "Yellow Carpet"
+  5: "Lime Carpet"
+  6: "Pink Carpet"
+  7: "Gray Carpet"
+  8: "Light Gray Carpet"
+  9: "Cyan Carpet"
+  10: "Purple Carpet"
+  11: "Blue Carpet"
+  12: "Brown Carpet"
+  13: "Green Carpet"
+  14: "Red Carpet"
+  15: "Black Carpet"
+HARD_CLAY:
+  0: "Hardened Clay"
+COAL_BLOCK:
+  0: "Block of Coal"
+PACKED_ICE:
+  0: "Packed Ice"
+DOUBLE_PLANT:
+  0: "Sunflower"
+  1: "Lilac"
+  2: "Double Tallgrass"
+  3: "Large Fern"
+  4: "Rose Bush"
+  5: "Peony"
+  8: "Large Plant Top"
+  9: "Large Plant Top"
+  10: "Large Plant Top"
+  11: "Large Plant Top"
+  12: "Large Plant Top"
+  13: "Large Plant Top"
+## Items ##"
+IRON_SPADE:
+  0: "Iron Shovel"
+IRON_PICKAXE:
+  0: "Iron Pickaxe"
+IRON_AXE:
+  0: "Iron Axe"
+FLINT_AND_STEEL:
+  0: "Flint and Steel"
+APPLE:
+  0: "Red Apple"
+BOW:
+  0: "Bow"
+ARROW:
+  0: "Arrow"
+COAL:
+  0: "Coal"
+  1: "Charcoal"
+DIAMOND:
+  0: "Diamond"
+IRON_INGOT:
+  0: "Iron Ingot"
+GOLD_INGOT:
+  0: "Gold Ingot"
+IRON_SWORD:
+  0: "Iron Sword"
+WOOD_SWORD:
+  0: "Wooden Sword"
+WOOD_SPADE:
+  0: "Wooden Shovel"
+WOOD_PICKAXE:
+  0: "Wooden Pickaxe"
+WOOD_AXE:
+  0: "Wooden Axe"
+STONE_SWORD:
+  0: "Stone Sword"
+STONE_SPADE:
+  0: "Stone Shovel"
+STONE_PICKAXE:
+  0: "Stone Pickaxe"
+STONE_AXE:
+  0: "Stone Axe"
+DIAMOND_SWORD:
+  0: "Diamond Sword"
+DIAMOND_SPADE:
+  0: "Diamond Shovel"
+DIAMOND_PICKAXE:
+  0: "Diamond Pickaxe"
+DIAMOND_AXE:
+  0: "Diamond Axe"
+STICK:
+  0: "Stick"
+BOWL:
+  0: "Bowl"
+MUSHROOM_SOUP:
+  0: "Mushroom Soup"
+GOLD_SWORD:
+  0: "Gold Sword"
+GOLD_SPADE:
+  0: "Gold Shovel"
+GOLD_PICKAXE:
+  0: "Gold Pickaxe"
+GOLD_AXE:
+  0: "Gold Axe"
+STRING:
+  0: "String"
+FEATHER:
+  0: "Feather"
+SULPHUR:
+  0: "Gunpowder"
+WOOD_HOE:
+  0: "Wooden Hoe"
+STONE_HOE:
+  0: "Stone Hoe"
+IRON_HOE:
+  0: "Iron Hoe"
+DIAMOND_HOE:
+  0: "Diamond Hoe"
+GOLD_HOE:
+  0: "Gold Hoe"
+SEEDS:
+  0: "Seeds"
+WHEAT:
+  0: "Wheat"
+BREAD:
+  0: "Bread"
+LEATHER_HELMET:
+  0: "Leather Cap"
+LEATHER_CHESTPLATE:
+  0: "Leather Tunic"
+LEATHER_LEGGINGS:
+  0: "Leather Pants"
+LEATHER_BOOTS:
+  0: "Leather Boots"
+CHAINMAIL_HELMET:
+  0: "Chain Helmet"
+CHAINMAIL_CHESTPLATE:
+  0: "Chain Chestplate"
+CHAINMAIL_LEGGINGS:
+  0: "Chain Leggings"
+CHAINMAIL_BOOTS:
+  0: "Chain Boots"
+IRON_HELMET:
+  0: "Iron Helmet"
+IRON_CHESTPLATE:
+  0: "Iron Chestplate"
+IRON_LEGGINGS:
+  0: "Iron Leggings"
+IRON_BOOTS:
+  0: "Iron Boots"
+DIAMOND_HELMET:
+  0: "Diamond Helmet"
+DIAMOND_CHESTPLATE:
+  0: "Diamond Chestplate"
+DIAMOND_LEGGINGS:
+  0: "Diamond Leggings"
+DIAMOND_BOOTS:
+  0: "Diamond Boots"
+GOLD_HELMET:
+  0: "Gold Helmet"
+GOLD_CHESTPLATE:
+  0: "Gold Chestplate"
+GOLD_LEGGINGS:
+  0: "Gold Leggings"
+GOLD_BOOTS:
+  0: "Gold Boots"
+FLINT:
+  0: "Flint"
+PORK:
+  0: "Raw Porkchop"
+GRILLED_PORK:
+  0: "Cooked Porkchop"
+PAINTING:
+  0: "Painting"
+GOLDEN_APPLE:
+  0: "Golden Apple"
+  1: "Super Golden Apple"
+SIGN:
+  0: "Sign"
+WOOD_DOOR:
+  0: "Wooden Door"
+BUCKET:
+  0: "Empty Bucket"
+WATER_BUCKET:
+  0: "Water Bucket"
+LAVA_BUCKET:
+  0: "Lava Bucket"
+MINECART:
+  0: "Minecart"
+SADDLE:
+  0: "Saddle"
+IRON_DOOR:
+  0: "Iron Door"
+REDSTONE:
+  0: "Redstone Dust"
+SNOW_BALL:
+  0: "Snowball"
+BOAT:
+  0: "Boat"
+LEATHER:
+  0: "Leather"
+MILK_BUCKET:
+  0: "Milk Bucket"
+CLAY_BRICK:
+  0: "Clay Brick"
+CLAY_BALL:
+  0: "Clay"
+SUGAR_CANE:
+  0: "Sugar Cane"
+PAPER:
+  0: "Paper"
+BOOK:
+  0: "Book"
+SLIME_BALL:
+  0: "Slimeball"
+STORAGE_MINECART:
+  0: "Minecart with Chest"
+POWERED_MINECART:
+  0: "Minecart with Furnace"
+EGG:
+  0: "Chicken Egg"
+COMPASS:
+  0: "Compass"
+FISHING_ROD:
+  0: "Fishing Rod"
+WATCH:
+  0: "Clock"
+GLOWSTONE_DUST:
+  0: "Glowstone Dust"
+RAW_FISH:
+  0: "Raw Fish"
+  1: "Raw Salmon"
+  2: "Clownfish"
+  3: "Pufferfish"
+COOKED_FISH:
+  0: "Cooked Salmon"
+INK_SACK:
+  0: "Ink Sac"
+  1: "Rose Red"
+  2: "Cactus Green"
+  3: "Cocoa Beans"
+  4: "Lapis Lazuli"
+  5: "Purple Dye"
+  6: "Cyan Dye"
+  7: "Light Gray Dye"
+  8: "Gray Dye"
+  9: "Pink Dye"
+  10: "Lime Dye"
+  11: "Dandelion Yellow"
+  12: "Light Blue Dye"
+  13: "Magenta Dye"
+  14: "Orange Dye"
+  15: "Bone Meal"
+BONE:
+  0: "Bone"
+SUGAR:
+  0: "Sugar"
+CAKE:
+  0: "Cake"
+BED:
+  0: "Bed"
+DIODE:
+  0: "Redstone Repeater"
+COOKIE:
+  0: "Cookie"
+MAP:
+  0: "Map"
+SHEARS:
+  0: "Shears"
+MELON:
+  0: "Melon Slice"
+PUMPKIN_SEEDS:
+  0: "Pumpkin Seeds"
+MELON_SEEDS:
+  0: "Melon Seeds"
+RAW_BEEF:
+  0: "Raw Beef"
+COOKED_BEEF:
+  0: "Steak"
+RAW_CHICKEN:
+  0: "Raw Chicken"
+COOKED_CHICKEN:
+  0: "Cooked Chicken"
+ROTTEN_FLESH:
+  0: "Rotten Flesh"
+ENDER_PEARL:
+  0: "Ender Pearl"
+BLAZE_ROD:
+  0: "Blaze Rod"
+GHAST_TEAR:
+  0: "Ghast Tear"
+GOLD_NUGGET:
+  0: "Gold Nugget"
+NETHER_STALK:
+  0: "Nether Wart"
+POTION:
+  # Regular Potions"
+  16: "Awkward Potion"
+  8192: "Mundane Potion"
+  8203: "Potion of Leaping (3:00)"
+  8235: "Potion of Leaping II (1:30)"
+  8267: "Potion of Leaping (8:00)"
+  8193: "Potion of Regeneration (0:45)"
+  8257: "Potion of Regeneration (2:00)"
+  8225: "Potion of Regeneration II (0:22)"
+  8289: "Potion of Regeneration II (1:00)"
+  8194: "Potion of Swiftness (3:00)"
+  8258: "Potion of Swiftness (8:00)"
+  8226: "Potion of Swiftness II (1:30)"
+  8195: "Potion of Fire Resistance (3:00)"
+  8227: "Potion of Fire Resistance (3:00)"
+  8259: "Potion of Fire Resistance (8:00)"
+  8196: "Potion of Poison (0:45)"
+  8260: "Potion of Poison (2:00)"
+  8228: "Potion of Poison II (0:22)"
+  8292: "Potion of Poison II (1:00)"
+  8197: "Potion of Healing"
+  8229: "Potion of Healing II"
+  8198: "Potion of Night Vision (3:00)"
+  8262: "Potion of Night Vision (8:00)"
+  8200: "Potion of Weakness (1:30)"
+  8264: "Potion of Weakness (4:00)"
+  8201: "Potion of Strength (3:00)"
+  8265: "Potion of Strength (8:00)"
+  8233: "Potion of Strength II (1:30)"
+  8297: "Potion of Strength II (4:00)"
+  8202: "Potion of Slowness (1:30)"
+  8266: "Potion of Slowness (4:00)"
+  8204: "Potion of Harming"
+  8236: "Potion of Harming II"
+  8205: "Potion of Water Breathing (3:00)"
+  8269: "Potion of Water Breathing (8:00)"
+  8206: "Potion of Invisibility (3:00)"
+  8270: "Potion of Invisibility (8:00)"
+  # Splash Potions"
+  16395: "Splash Potion of Leaping"
+  16427: "Splash Potion of Leaping II"
+  16459: "Extended Splash Potion of Leaping"
+  16385: "Splash Potion of Regeneration"
+  16417: "Splash Potion of Regeneration II"
+  16449: "Extended Splash Potion of Regeneration"
+  16386: "Splash Potion of Swiftness"
+  16418: "Splash Potion of Swiftness II"
+  16450: "Extended Splash Potion of Swiftness"
+  16387: "Splash Potion of Fire Resistance"
+  16419: "Splash Potion of Fire Resistance"
+  16451: "Extended Splash Potion of Fire Resistance"
+  16388: "Splash Potion of Poison"
+  16420: "Splash Potion of Poison II"
+  16452: "Extended Splash Potion of Poison"
+  16389: "Splash Potion of Instant Health"
+  16421: "Splash Potion of Instant Health II"
+  16453: "Splash Potion of Instant Health"
+  16390: "Splash Potion of Night Vision"
+  16422: "Splash Potion of Night Vision"
+  16454: "Extended Splash Potion of Night Vision"
+  16392: "Splash Potion of Weakness"
+  16424: "Splash Potion of Weakness II"
+  16456: "Extended Splash Potion of Weakness"
+  16393: "Splash Potion of Strength"
+  16425: "Splash Potion of Strength II"
+  16457: "Extended Splash Potion of Strength"
+  16394: "Splash Potion of Slowness"
+  16426: "Splash Potion of Slowness II"
+  16458: "Extended Splash Potion of Slowness"
+  16396: "Splash Potion of Harming"
+  16428: "Splash Potion of Harming II"
+  16460: "Extended Splash Potion of Harming"
+  16397: "Splash Potion of Water Breathing"
+  16429: "Splash Potion of Water Breathing"
+  16461: "Extended Splash Potion of Water Breathing"
+  16398: "Splash Potion of Invisibility"
+  16430: "Splash Potion of Invisibility"
+  16462: "Extended Splash Potion of Invisibility"
+GLASS_BOTTLE:
+  0: "Glass Bottle"
+SPIDER_EYE:
+  0: "Spider Eye"
+FERMENTED_SPIDER_EYE:
+  0: "Fermented Spider Eye"
+BLAZE_POWDER:
+  0: "Blaze Powder"
+MAGMA_CREAM:
+  0: "Magma Cream"
+BREWING_STAND_ITEM:
+  0: "Brewing Stand"
+CAULDRON_ITEM:
+  0: "Cauldron"
+EYE_OF_ENDER:
+  0: "Eye of Ender"
+SPECKLED_MELON:
+  0: "Glistering Melon"
+MONSTER_EGG:
+  0: "Spawn Egg"
+  50: "Creeper Spawn Egg"
+  51: "Skeleton Spawn Egg"
+  52: "Spider Spawn Egg"
+  54: "Zombie Spawn Egg"
+  55: "Slime Spawn Egg"
+  56: "Ghast Spawn Egg"
+  57: "Zombie Pigman Spawn Egg"
+  58: "Enderman Spawn Egg"
+  59: "Cave Spider Spawn Egg"
+  60: "Silverfish Spawn Egg"
+  61: "Blaze Spawn Egg"
+  62: "Magma Cube Spawn Egg"
+  63: "Ender Dragon Spawn Egg"
+  64: "Wither Spawn Egg"
+  65: "Bat Spawn Egg"
+  66: "Witch Spawn Egg"
+  90: "Pig Spawn Egg"
+  91: "Sheep Spawn Egg"
+  92: "Cow Spawn Egg"
+  93: "Chicken Spawn Egg"
+  94: "Squid Spawn Egg"
+  95: "Wolf Spawn Egg"
+  96: "Mooshroom Spawn Egg"
+  98: "Ocelot Spawn Egg"
+  99: "Iron Golem Spawn Egg"
+  100: "Horse Spawn Egg"
+  120: "Villager Spawn Egg"
+EXP_BOTTLE:
+  0: "Bottle o' Enchanting"
+FIREBALL:
+  0: "Fire Charge"
+WRITEABLE_BOOK:
+  0: "Book and Quill"
+WRITTEN_BOOK:
+  0: "Written Book"
+EMERALD:
+  0: "Emerald"
+ITEM_FRAME:
+  0: "Item Frame"
+FLOWER_POT_ITEM:
+  0: "Flower Pot"
+CARROT_ITEM:
+  0: "Carrot"
+POTATO_ITEM:
+  0: "Potato"
+BAKED_POTATO:
+  0: "Baked Potato"
+  1: "Baked Potato"
+POISONOUS_POTATO:
+  0: "Poisonous Potato"
+EMPTY_MAP:
+  0: "Empty Map"
+GOLDEN_CARROT:
+  0: "Golden Carrot"
+SKULL_ITEM:
+  0: "Skeleton Head"
+  1: "Wither Skeleton Head"
+  2: "Zombie Head"
+  3: "Human Head"
+  4: "Creeper Head"
+CARROT_STICK:
+  0: "Carrot on a Stick"
+NETHER_STAR:
+  0: "Nether Star"
+PUMPKIN_PIE:
+  0: "Pumpkin Pie"
+FIREWORK:
+  0: "Firework Rocket"
+FIREWORK_CHARGE:
+  0: "Firework Star"
+ENCHANTED_BOOK:
+  0: "Enchanted Book"
+REDSTONE_COMPARATOR:
+  0: "Redstone Comparator"
+NETHER_BRICK_ITEM:
+  0: "Nether Brick"
+QUARTZ:
+  0: "Nether Quartz"
+EXPLOSIVE_MINECART:
+  0: "Minecart with TNT"
+HOPPER_MINECART:
+  0: "Minecart with Hopper"
+IRON_BARDING:
+  0: "Iron Horse Armor"
+GOLD_BARDING:
+  0: "Gold Horse Armor"
+DIAMOND_BARDING:
+  0: "Diamond Horse Armor"
+LEASH:
+  0: "Lead"
+NAME_TAG:
+  0: "Name Tag"
+COMMAND_MINECART:
+  0: "Minecart with Command Block"
+GOLD_RECORD:
+  0: "13 Disc"
+GREEN_RECORD:
+  0: "Cat Disc"
+RECORD_3:
+  0: "Blocks Disc"
+RECORD_4:
+  0: "Chirp Disc"
+RECORD_5:
+  0: "Far Disc"
+RECORD_6:
+  0: "Mall Disc"
+RECORD_7:
+  0: "Mellohi Disc"
+RECORD_8:
+  0: "Stal Disc"
+RECORD_9:
+  0: "Strad Disc"
+RECORD_10:
+  0: "Ward Disc"
+RECORD_11:
+  0: "11 Disc"
+RECORD_12:
+  0: "Wait Disc"
+# 1.8 items
+SLIME_BLOCK:
+  0: "Slime Block"
+BARRIER:
+  0: "Barrier"
+STANDING_BANNER:
+  0: "Banner"
+WALL_BANNER:
+  0: "Banner"
+IRON_TRAPDOOR:
+  0: "Iron Trapdoor"
+PRISMARINE:
+  0: "Prismarine"
+SEA_LANTERN:
+  0: "Sea Lantern"
+DAYLIGHT_DETECTOR_INVERTED:
+  0: "Daylight Sensor"
+RED_SANDSTONE:
+  0: "Red Sandstone"
+RED_SANDSTONE_STAIRS:
+  0: "Red Sandstone Stairs"
+DOUBLE_STONE_SLAB2:
+  0: "Double Red Sandstone Slab"
+STONE_SLAB2:
+  0: "Red Sandstone Slab"
+SPRUCE_FENCE_GATE:
+  0: "Spruce Fence Gate"
+BIRCH_FENCE_GATE:
+  0: "Birch Fence Gate"
+JUNGLE_FENCE_GATE:
+  0: "Jungle Fence Gate"
+DARK_OAK_FENCE_GATE:
+  0: "Dark Oak Fence Gate"
+ACACIA_FENCE_GATE:
+  0: "Acacia Fence Gate"
+SPRUCE_FENCE:
+  0: "Spruce Fence"
+BIRCH_FENCE:
+  0: "Birch Fence"
+JUNGLE_FENCE:
+  0: "Jungle Fence"
+DARK_OAK_FENCE:
+  0: "Dark Oak Fence"
+ACACIA_FENCE:
+  0: "Acacia Fence"
+SPRUCE_DOOR:
+  0: "Spruce Door"
+BIRCH_DOOR:
+  0: "Birch Door"
+JUNGLE_DOOR:
+  0: "Jungle Door"
+ACACIA_DOOR:
+  0: "Acacia Door"
+DARK_OAK_DOOR:
+  0: "Dark Oak Door"
+PRISMARINE_SHARD:
+  0: "Prismarine Shard"
+PRISMARINE_CRYSTALS:
+  0: "Prismarine Crystals"
+RABBIT:
+  0: "Raw Rabbit"
+COOKED_RABBIT:
+  0: "Cooked Rabbit"
+RABBIT_STEW:
+  0: "Rabbit Stew"
+RABBIT_FOOT:
+  0: "Rabbit's Foot"
+RABBIT_HIDE:
+  0: "Rabbit Hide"
+ARMOR_STAND:
+  0: "Armor Stand"
+MUTTON:
+  0: "Raw Mutton"
+COOKED_MUTTON:
+  0: "Cooked Mutton"
+BANNER:
+  0: "Banner"
+SPRUCE_DOOR_ITEM:
+  0: "Spruce Door"
+BIRCH_DOOR_ITEM:
+  0: "Birch Door"
+JUNGLE_DOOR_ITEM:
+  0: "Jungle Door"
+ACACIA_DOOR_ITEM:
+  0: "Acacia Door"
+DARK_OAK_DOOR_ITEM:
+  0: "Dark Oak Door"

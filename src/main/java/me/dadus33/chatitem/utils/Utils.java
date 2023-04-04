@@ -1,7 +1,9 @@
 package me.dadus33.chatitem.utils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
@@ -9,12 +11,14 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -207,6 +211,21 @@ public class Utils {
 			return true;
 		} catch (Exception e) {
 			return false;
+		}
+	}
+
+	public static YamlConfiguration copyLoadFile(File folder, String filename, String baseFile) {
+		File legacyConfig = new File(folder, filename);
+		if(!legacyConfig.exists())
+			Utils.copyFile(baseFile, legacyConfig);
+		return YamlConfiguration.loadConfiguration(legacyConfig);
+	}
+	
+	public static void copyFile(String fileName, File dir) {
+		try (InputStream stream = ChatItem.getInstance().getResource(fileName)) {
+			Files.copy(stream, dir.toPath());
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

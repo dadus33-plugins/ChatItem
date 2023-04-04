@@ -142,7 +142,6 @@ public abstract class ChatManager {
 	public static String styleItem(Player p, ItemStack item, Storage c) {
 		String replacer = c.nameFormat;
 		String amount = c.amountFormat;
-		boolean dname = item.hasItemMeta() && item.getItemMeta().hasDisplayName();
 		if (item.getAmount() == 1) {
 			if (c.addAmountForced) {
 				amount = amount.replace(TIMES, "1");
@@ -154,7 +153,7 @@ public abstract class ChatManager {
 			amount = amount.replace(TIMES, String.valueOf(item.getAmount()));
 			replacer = replacer.replace(AMOUNT, amount);
 		}
-		if (dname) {
+		if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
 			String trp = item.getItemMeta().getDisplayName();
 			ChatItem.debug("trp: " + trp);
 			if (c.colorIfColored) {
