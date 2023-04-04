@@ -15,6 +15,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.Translation;
+import me.dadus33.chatitem.listeners.holder.AdminHolder;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.Storage;
@@ -24,7 +26,7 @@ public class InventoryListener implements Listener {
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 		if(e.getClickedInventory() == null || !(e.getWhoClicked() instanceof Player) || e.getCurrentItem() == null
-				|| !(e.getClickedInventory().getHolder() instanceof ChatItemAdminHolder))
+				|| !(e.getClickedInventory().getHolder() instanceof AdminHolder))
 			return;
 		e.setCancelled(true);
 		Player p = (Player) e.getWhoClicked();
@@ -33,8 +35,10 @@ public class InventoryListener implements Listener {
 		Storage c = ChatItem.getInstance().getStorage();
 		if(type.equals(ItemUtils.MATERIAL_CLOSE)) {
 			p.closeInventory();
+		} else if(type.equals(Material.BOOK)) {
+			TranslationInventoryListener.open(p, 0);
 		} else if(type.equals(Material.PAPER)) {
-			ChatItemAdminHolder holder = (ChatItemAdminHolder) e.getClickedInventory().getHolder();
+			AdminHolder holder = (AdminHolder) e.getClickedInventory().getHolder();
 			String key = holder.keyBySlot.get(e.getSlot());
 			if(key != null) {
 				setInConfig("manager", key);
@@ -50,7 +54,7 @@ public class InventoryListener implements Listener {
 		} else if(type.equals(Material.STICK)) {
 			setInConfig("general.hand.disabled", c.handDisabled = !c.handDisabled);
 			open(p);
-		} else if(type.equals(Material.BOOK)) {
+		} else if(type.equals(Material.BLAZE_ROD)) {
 			setInConfig("general.check-update", c.checkUpdate = !c.checkUpdate);
 			open(p);
 		} else if(type.equals(ItemUtils.FIREWORK_CHARGE)) {
@@ -80,7 +84,7 @@ public class InventoryListener implements Listener {
 	}
 	
 	public static void open(Player p) {
-		ChatItemAdminHolder holder = new ChatItemAdminHolder();
+		AdminHolder holder = new AdminHolder();
 		Storage c = ChatItem.getInstance().getStorage();
 		Inventory inv = Bukkit.createInventory(holder, 27, Messages.getMessage("admin-inv.name"));
 		for(int i = 0; i < inv.getSize(); i ++)
@@ -100,7 +104,9 @@ public class InventoryListener implements Listener {
 		inv.setItem(20, getBoolChangeItem(Material.STICK, "hand-disabled", c.handDisabled));
 		inv.setItem(21, getAmountChangeItem(Material.IRON_DOOR, "limit-per-message", c.limit));
 		inv.setItem(22, getAmountChangeItem(Material.APPLE, "cooldown", c.cooldown));
-		inv.setItem(23, getBoolChangeItem(Material.BOOK, "check-update", c.checkUpdate));
+		inv.setItem(23, getBoolChangeItem(Material.BLAZE_ROD, "check-update", c.checkUpdate));
+		inv.setItem(24, createItem(Material.BOOK, Messages.getMessage("admin-inv.language.name"),
+				Messages.getMessage("admin-inv.language.lore", "%name%", Translation.getMessages().get("language.name").getAsString())));
 		
 		inv.setItem(26, createItem(ItemUtils.MATERIAL_CLOSE, Messages.getMessage("admin-inv.close")));
 		p.openInventory(inv);

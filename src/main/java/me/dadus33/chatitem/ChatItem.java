@@ -27,6 +27,7 @@ import me.dadus33.chatitem.hook.ChatControlSupport;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.listeners.JoinListener;
+import me.dadus33.chatitem.listeners.TranslationInventoryListener;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.SemVer;
 import me.dadus33.chatitem.utils.Storage;
@@ -132,6 +133,7 @@ public class ChatItem extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new JoinListener(), this);
         pm.registerEvents(new InventoryListener(), this);
+        pm.registerEvents(new TranslationInventoryListener(), this);
 
         chooseManagers();
 

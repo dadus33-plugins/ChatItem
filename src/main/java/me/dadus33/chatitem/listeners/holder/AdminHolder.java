@@ -1,11 +1,11 @@
-package me.dadus33.chatitem.listeners;
+package me.dadus33.chatitem.listeners.holder;
 
 import java.util.HashMap;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-public class ChatItemAdminHolder implements InventoryHolder {
+public class AdminHolder implements InventoryHolder {
     
 	public final HashMap<Integer, String> keyBySlot = new HashMap<>();
 	

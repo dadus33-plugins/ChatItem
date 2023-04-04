@@ -12,7 +12,7 @@ import me.dadus33.chatitem.ChatItem;
 
 public class Storage {
 
-    public final String handName, nameFormat, amountFormat, commandFormat, manager, permissionName, buggedClientAction, language;
+    public String handName, nameFormat, amountFormat, commandFormat, manager, permissionName, buggedClientAction, language;
     public final String messageNoPermission, messageDeny, messageReload, messageCooldown, messageLimit, messageIgnoredItem;
     public final String SECONDS, minutes, hours;
     public final String updateMessage, updateHover;
@@ -27,7 +27,7 @@ public class Storage {
         configVersion = conf.getInt("config-version", 13);
         checkConfigVersion();
         this.manager = conf.getString("manager", "auto");
-        language = conf.getString("general.language", "en_us");
+        language = conf.getString("general.language", "en_gb");
         debug = conf.getBoolean("debug", false);
         placeholders = ImmutableList.copyOf(conf.getStringList("general.placeholders"));
         nameFormat = color(conf.getString("general.name-format", "&b&l&o{name} {amount}&r"));

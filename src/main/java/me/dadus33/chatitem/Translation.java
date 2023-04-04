@@ -34,13 +34,21 @@ public class Translation {
 		allLangsConfig = Utils.copyLoadFile(pl.getDataFolder(), "langs.yml", "langs.yml");
 
 		allLangsConfig.getStringList("all").forEach(langKey -> {
-			allLangs.put(langKey, JsonParser.parseReader(new InputStreamReader(pl.getResource("lang/" + langKey + ".json"))).getAsJsonObject().get("language.name").getAsString());
+			JsonObject content = JsonParser.parseReader(new InputStreamReader(pl.getResource("lang/" + langKey + ".json"))).getAsJsonObject();
+			allLangs.put(langKey, content.get("language.name").getAsString() + " (" + content.get("language.region").getAsString() + ")");
 		});
 		allLangs = allLangs.entrySet().stream().sorted(Entry.comparingByValue()).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-
 		loadLang(pl.getStorage().language);
 	}
 
+	public static HashMap<String, String> getAllLangs() {
+		return allLangs;
+	}
+	
+	public static JsonObject getMessages() {
+		return messages;
+	}
+	
 	public static void loadLang(String lang) {
 		ChatItem pl = ChatItem.getInstance();
 		File langFile = new File(folder, lang + ".json");

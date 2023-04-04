@@ -164,6 +164,9 @@ messages:
     cooldown: "&6Cooldown: &a%state%"
     debug: "&6Debug: &a%state%"
     check-update: "&6Check updates: &a%state%"
+    language:
+      name: "&6Change language"
+      lore: "&7Actual: &e%name%"
     # Change name and lore of all managers
     manager:
       both:
