@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.hook.EcoEnchantsSupport;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.Storage;
@@ -90,17 +91,22 @@ public abstract class ChatManager {
 	 */
 	public static ItemStack getUsableItem(Player p) {
 		ItemStack item = HandItem.getBetterItem(p).clone();
-		/*
-		 * if(ChatItem.ecoEnchantsSupport) { List<String> addLore =
-		 * EcoEnchantsSupport.getLores(item); if(!addLore.isEmpty()) { ItemMeta meta =
-		 * item.getItemMeta(); List<String> lores = meta.hasLore() ? meta.getLore() :
-		 * new ArrayList<>(); for(int i = 0; i < addLore.size(); i++) lores.add(i,
-		 * addLore.get(i));
-		 * 
-		 * meta.setLore(lores); item.setItemMeta(meta); ChatItem.debug("Added " +
-		 * addLore.size() + " lores from EcoEnchants"); } else
-		 * ChatItem.debug("No lore to add from EcoEnchants"); }
-		 */
+
+		if (ChatItem.ecoEnchantsSupport) {
+			List<String> addLore = EcoEnchantsSupport.getLores(item);
+			if (!addLore.isEmpty()) {
+				ItemMeta meta = item.getItemMeta();
+				List<String> lores = meta.hasLore() ? meta.getLore() : new ArrayList<>();
+				for (int i = 0; i < addLore.size(); i++)
+					lores.add(i, addLore.get(i));
+
+				meta.setLore(lores);
+				item.setItemMeta(meta);
+				ChatItem.debug("Added " + addLore.size() + " lores from EcoEnchants");
+			} else
+				ChatItem.debug("No lore to add from EcoEnchants");
+		}
+
 		return item;
 	}
 
@@ -259,12 +265,12 @@ public abstract class ChatManager {
 				}
 			}
 		}
-		for(String ignored : c.ignoredItems) {
-			if(item.getType().name().toLowerCase().contains(ignored.toLowerCase())) {
+		for (String ignored : c.ignoredItems) {
+			if (item.getType().name().toLowerCase().contains(ignored.toLowerCase())) {
 				return false;
 			}
 		}
-		
+
 		LAST_INFO_MESSAGE.put(p.getUniqueId(), System.currentTimeMillis()); // prevent showing item then send cooldown error message
 		return true;
 	}
