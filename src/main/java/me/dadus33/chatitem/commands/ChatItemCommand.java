@@ -20,11 +20,9 @@ import me.dadus33.chatitem.chatmanager.v2.ChatListener;
 import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.Storage;
+import me.dadus33.chatitem.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class ChatItemCommand implements CommandExecutor, TabExecutor {
 
@@ -69,8 +67,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 				TextComponent linkComp = new TextComponent(Storage.color(linkConfig.getString("message")));
 				String hover = Storage.color(linkConfig.getString("hover"));
 				if (hover != null)
-					linkComp.setHoverEvent(
-							new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(new ComponentBuilder(hover).create())));
+					linkComp.setHoverEvent(Utils.createTextHover(hover));
 				String link = linkConfig.getString("link");
 				if (link != null)
 					linkComp.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, link));

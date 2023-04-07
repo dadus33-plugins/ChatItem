@@ -71,12 +71,12 @@ public class Translation {
 
 	@SuppressWarnings("deprecation")
 	public static String get(ItemStack item) {
-		String key = "block.minecraft." + item.getType().name().toLowerCase().replace("_", ".");
+		String key = (item.getType().isBlock() ? "block" : "item") + ".minecraft." + item.getType().name().toLowerCase().replace("_", ".");
 		if (messages != null && messages.has(key)) {
 			return messages.get(key).getAsString();
 		} else
 			ChatItem.debug("Failed to find translation for " + key);
-		return legacy.getString(item.getType().name() + "." + item.getDurability(), item.getType().name().toLowerCase());
+		return legacy.getString(item.getType().name() + "." + item.getDurability(), item.getType().name().toLowerCase().replace("_", " "));
 	}
 
 	protected void thisMethodShouldNotBeUsed_InsteadToUpdateLangFileFromLocalInstall() throws Exception {
