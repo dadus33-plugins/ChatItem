@@ -69,8 +69,24 @@ public class PacketEditingChatManager extends ChatManager {
 	public static Object createSystemChatPacket(String json) throws Exception {
 		Class<?> packetClass = PacketUtils.getNmsClass("ClientboundSystemChatPacket", "network.protocol.game.", "PacketPlayOutChat");
 		for (Constructor<?> cons : packetClass.getDeclaredConstructors()) {
+			if(cons.getParameterCount() == 1) // only the serializer thing
+				continue;
 			if (!cons.isAccessible())
 				cons.setAccessible(true);
+			int nbPut = 0;
+			Object[] params = new Object[cons.getParameterCount()];
+			for(int i = 0; i < params.length; i++) {
+				if(cons.getParameterTypes()[i].getClass().equals(String.class)) {
+					params[i] = json;
+					nbPut++;
+				}
+			}
+			if(nbPut == 1)
+				return cons.newInstance(params);
+			else if(nbPut > 1)
+				ChatItem.getInstance().getLogger().warning("Some constructor seems to have too many string. Class: " + packetClass.getSimpleName());
+
+			// now check for basic method
 			if (cons.getParameterCount() == 2 && cons.getParameterTypes()[0].equals(String.class) && cons.getParameterTypes()[1].equals(int.class)) { // "string, int"
 				return cons.newInstance(json, 1);
 			} else if (cons.getParameterCount() == 3 && cons.getParameterTypes()[1].equals(String.class)) { // "component", "string", <something not checked>
