@@ -57,6 +57,8 @@ public class Translation {
 				Utils.copyFile("lang/" + lang + ".json", langFile);
 			} else {
 				pl.getLogger().severe("Failed to find lang file for " + lang);
+				if(lang != "en_gb")
+					loadLang("en_gb");
 				return;
 			}
 		}
