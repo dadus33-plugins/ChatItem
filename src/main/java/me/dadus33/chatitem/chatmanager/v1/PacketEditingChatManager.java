@@ -67,6 +67,17 @@ public class PacketEditingChatManager extends ChatManager {
 	}
 
 	public static Object createSystemChatPacket(String json) throws Exception {
+		Object packet = internalCreateSystemChatPacket(json);
+		if(packet != null)
+			return packet;
+		packet = internalCreateSystemChatPacket(PacketUtils.ICB_FROM_JSON.invoke(null, json));
+		if(packet != null)
+			return packet;
+		ChatItem.getInstance().getLogger().warning("Can't create a new packet for json " + json);
+		return null;
+	}
+	
+	private static Object internalCreateSystemChatPacket(Object obj) throws Exception {
 		Class<?> packetClass = PacketUtils.getNmsClass("ClientboundSystemChatPacket", "network.protocol.game.", "PacketPlayOutChat");
 		for (Constructor<?> cons : packetClass.getDeclaredConstructors()) {
 			if(cons.getParameterCount() == 1) // only the serializer thing
@@ -77,27 +88,28 @@ public class PacketEditingChatManager extends ChatManager {
 			Object[] params = new Object[cons.getParameterCount()];
 			for(int i = 0; i < params.length; i++) {
 				if(cons.getParameterTypes()[i].getClass().equals(String.class)) {
-					params[i] = json;
+					params[i] = obj;
 					nbPut++;
 				}
 			}
 			if(nbPut == 1)
 				return cons.newInstance(params);
 			else if(nbPut > 1)
-				ChatItem.getInstance().getLogger().warning("Some constructor seems to have too many string. Class: " + packetClass.getSimpleName());
+				ChatItem.getInstance().getLogger().warning("Some constructor seems to have too many " + obj.getClass().getSimpleName() + ". Class: " + packetClass.getSimpleName());
 
 			// now check for basic method
-			if (cons.getParameterCount() == 2 && cons.getParameterTypes()[0].equals(String.class) && cons.getParameterTypes()[1].equals(int.class)) { // "string, int"
-				return cons.newInstance(json, 1);
-			} else if (cons.getParameterCount() == 3 && cons.getParameterTypes()[1].equals(String.class)) { // "component", "string", <something not checked>
-				Class<?> secondParam = cons.getParameterTypes()[2];
-				if (secondParam.equals(int.class)) // "component", "string", "int"
-					return cons.newInstance(null, json, 1);
-				else if (secondParam.equals(boolean.class)) // "component", "string", "boolean"
-					return cons.newInstance(null, json, false);
+			if(obj instanceof String) {
+				if (cons.getParameterCount() == 2 && cons.getParameterTypes()[0].equals(String.class) && cons.getParameterTypes()[1].equals(int.class)) { // "string, int"
+					return cons.newInstance(obj, 1);
+				} else if (cons.getParameterCount() == 3 && cons.getParameterTypes()[1].equals(String.class)) { // "component", "string", <something not checked>
+					Class<?> secondParam = cons.getParameterTypes()[2];
+					if (secondParam.equals(int.class)) // "component", "string", "int"
+						return cons.newInstance(null, obj, 1);
+					else if (secondParam.equals(boolean.class)) // "component", "string", "boolean"
+						return cons.newInstance(null, obj, false);
+				}
 			}
 		}
-		ChatItem.getInstance().getLogger().warning("Can't create a new packet for json " + json + ": no constructor found.");
 		return null;
 	}
 }

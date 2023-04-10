@@ -1,5 +1,6 @@
 package me.dadus33.chatitem.utils;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +19,8 @@ public class PacketUtils {
 	public static final String OBC_PREFIX;
 	public static final boolean IS_THERMOS;
 	public static final Class<?> CHAT_SERIALIZER, COMPONENT_CLASS;
-
+	public static final Method ICB_FROM_JSON;
+	
 	/**
 	 * This Map is to reduce Reflection action which take more resources than just
 	 * RAM action
@@ -32,6 +34,7 @@ public class PacketUtils {
 		OBC_PREFIX = "org.bukkit.craftbukkit." + VERSION + ".";
 		CHAT_SERIALIZER = getNmsClass("IChatBaseComponent$ChatSerializer", "network.chat.", "ChatSerializer");
 		COMPONENT_CLASS = getNmsClass("IChatBaseComponent", "network.chat.");
+		ICB_FROM_JSON = getMethod("a", CHAT_SERIALIZER, String.class);
 	}
 
 	/**
@@ -197,5 +200,14 @@ public class PacketUtils {
 			e.printStackTrace();
 		}
 		return "{}";
+	}
+	
+	private static Method getMethod(String name, Class<?> clazz, Class<?>... params) {
+		try {
+			return clazz.getDeclaredMethod(name, params);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
