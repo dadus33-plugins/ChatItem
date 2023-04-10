@@ -84,9 +84,11 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] arg) {
 		List<String> list = new ArrayList<>();
 		String prefix = arg[arg.length - 1].toLowerCase(Locale.ROOT);
-		for (String s : Arrays.asList("help", "admin", "reload", "link", "show", "broadcast"))
-			if (prefix.isEmpty() || s.startsWith(prefix))
-				list.add(s);
-		return list.isEmpty() ? null : list;
+		if(arg.length <= 2) {
+			for (String s : Arrays.asList("help", "admin", "reload", "link", "show", "broadcast"))
+				if (prefix.isEmpty() || s.startsWith(prefix))
+					list.add(s);
+		}
+		return list;
 	}
 }
