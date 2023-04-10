@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.ItemPlayer;
+import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.hook.DiscordSrvSupport;
@@ -28,7 +29,6 @@ import me.dadus33.chatitem.utils.ColorManager;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
-import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;

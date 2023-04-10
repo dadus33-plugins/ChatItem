@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import me.dadus33.chatitem.utils.Storage;
+import me.dadus33.chatitem.Storage;
 
 public interface INamer {
 	

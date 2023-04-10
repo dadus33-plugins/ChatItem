@@ -1,4 +1,4 @@
-package me.dadus33.chatitem.utils;
+package me.dadus33.chatitem;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,8 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import com.google.common.collect.ImmutableList;
-
-import me.dadus33.chatitem.ChatItem;
 
 public class Storage {
 

@@ -11,12 +11,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.itemnamer.INamer.Priority;
 import me.dadus33.chatitem.itemnamer.hook.ChatItemTranslationNamer;
 import me.dadus33.chatitem.itemnamer.hook.DefaultNamer;
 import me.dadus33.chatitem.itemnamer.hook.ItemDisplayNamer;
 import me.dadus33.chatitem.itemnamer.hook.LangUtilsNamer;
-import me.dadus33.chatitem.utils.Storage;
 
 public class NamerManager {
 

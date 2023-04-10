@@ -12,11 +12,11 @@ import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.ItemPlayer;
+import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
-import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Utils;
 
 public interface IComponentManager {

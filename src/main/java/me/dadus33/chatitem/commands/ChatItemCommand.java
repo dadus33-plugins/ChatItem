@@ -15,11 +15,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v2.ChatListener;
 import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.utils.Messages;
-import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;

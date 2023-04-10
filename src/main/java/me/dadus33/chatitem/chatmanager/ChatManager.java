@@ -15,10 +15,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.hook.EcoEnchantsSupport;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.utils.ItemUtils;
-import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Utils;
 
 public abstract class ChatManager {

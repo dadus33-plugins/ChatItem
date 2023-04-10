@@ -6,13 +6,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.listeners.ChatEventListener;
 import me.dadus33.chatitem.chatmanager.v1.listeners.ChatPacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketManager;
 import me.dadus33.chatitem.utils.PacketUtils;
-import me.dadus33.chatitem.utils.Storage;
 
 public class PacketEditingChatManager extends ChatManager {
 

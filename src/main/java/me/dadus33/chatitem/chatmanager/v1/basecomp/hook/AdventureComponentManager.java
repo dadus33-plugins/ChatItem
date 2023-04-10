@@ -12,6 +12,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
@@ -19,7 +20,6 @@ import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent.ContentModifier;
 import me.dadus33.chatitem.utils.PacketUtils;
-import me.dadus33.chatitem.utils.Storage;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.Component;

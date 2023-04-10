@@ -4,8 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.ChatManager;
-import me.dadus33.chatitem.utils.Storage;
 
 public class ChatListenerChatManager extends ChatManager {
 

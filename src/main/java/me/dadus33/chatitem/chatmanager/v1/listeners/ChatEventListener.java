@@ -11,10 +11,10 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
-import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Utils;
 
 public class ChatEventListener implements Listener {

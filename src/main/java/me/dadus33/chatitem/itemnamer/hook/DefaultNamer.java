@@ -5,8 +5,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.itemnamer.INamer;
-import me.dadus33.chatitem.utils.Storage;
 
 public class DefaultNamer implements INamer {
 

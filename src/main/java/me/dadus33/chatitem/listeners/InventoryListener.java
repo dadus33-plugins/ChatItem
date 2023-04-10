@@ -15,11 +15,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.Translation;
 import me.dadus33.chatitem.listeners.holder.AdminHolder;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.Messages;
-import me.dadus33.chatitem.utils.Storage;
 
 public class InventoryListener implements Listener {
 

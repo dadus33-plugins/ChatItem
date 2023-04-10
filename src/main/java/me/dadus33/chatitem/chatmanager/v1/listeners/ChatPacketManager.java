@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.ItemPlayer;
+import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
@@ -35,7 +36,6 @@ import me.dadus33.chatitem.chatmanager.v1.packets.PacketHandler;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.PacketUtils;
-import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Version;
 
 public class ChatPacketManager extends PacketHandler {

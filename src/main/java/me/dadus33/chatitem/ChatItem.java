@@ -30,7 +30,6 @@ import me.dadus33.chatitem.listeners.JoinListener;
 import me.dadus33.chatitem.listeners.TranslationInventoryListener;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.SemVer;
-import me.dadus33.chatitem.utils.Storage;
 import me.dadus33.chatitem.utils.Utils;
 import me.dadus33.chatitem.utils.Version;
 
