@@ -139,7 +139,7 @@
         <dependency>
             <groupId>com.willfp</groupId>
             <artifactId>EcoEnchants</artifactId>
-            <version>8.57.2</version>
+            <version>10.2.5</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
