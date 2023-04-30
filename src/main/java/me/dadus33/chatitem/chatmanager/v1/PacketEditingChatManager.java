@@ -79,25 +79,13 @@ public class PacketEditingChatManager extends ChatManager {
 	
 	private static Object internalCreateSystemChatPacket(Object obj) throws Exception {
 		Class<?> packetClass = PacketUtils.getNmsClass("ClientboundSystemChatPacket", "network.protocol.game.", "PacketPlayOutChat");
+		Constructor<?> betterOne = null;
+		Object[] betterParam = null;
 		for (Constructor<?> cons : packetClass.getDeclaredConstructors()) {
-			if(cons.getParameterCount() == 1) // only the serializer thing
-				continue;
 			if (!cons.isAccessible())
 				cons.setAccessible(true);
-			int nbPut = 0;
-			Object[] params = new Object[cons.getParameterCount()];
-			for(int i = 0; i < params.length; i++) {
-				if(cons.getParameterTypes()[i].getClass().equals(String.class)) {
-					params[i] = obj;
-					nbPut++;
-				}
-			}
-			if(nbPut == 1)
-				return cons.newInstance(params);
-			else if(nbPut > 1)
-				ChatItem.getInstance().getLogger().warning("Some constructor seems to have too many " + obj.getClass().getSimpleName() + ". Class: " + packetClass.getSimpleName());
 
-			// now check for basic method
+			// check for basic method
 			if(obj instanceof String) {
 				if (cons.getParameterCount() == 2 && cons.getParameterTypes()[0].equals(String.class) && cons.getParameterTypes()[1].equals(int.class)) { // "string, int"
 					return cons.newInstance(obj, 1);
@@ -109,6 +97,28 @@ public class PacketEditingChatManager extends ChatManager {
 						return cons.newInstance(null, obj, false);
 				}
 			}
+			
+			int nbPut = 0;
+			Object[] params = new Object[cons.getParameterCount()];
+			for(int i = 0; i < params.length; i++) {
+				if(cons.getParameterTypes()[i].isAssignableFrom(obj.getClass())) {
+					params[i] = obj;
+					nbPut++;
+				}
+			}
+			if(nbPut == 1) {
+				if((betterOne == null && betterParam == null) || betterParam.length > params.length) {
+					betterOne = cons;
+					betterParam = params;
+					if(params.length == 1) // only what we need
+						break;
+					continue; // check for something better?
+				}
+			} else if(nbPut > 1)
+				ChatItem.getInstance().getLogger().warning("Some constructor seems to have too many " + obj.getClass().getSimpleName() + ". Class: " + packetClass.getSimpleName());
+		}
+		if(betterOne != null && betterParam != null) {
+			return betterOne.newInstance(betterParam);
 		}
 		return null;
 	}
