@@ -24,6 +24,7 @@ import me.dadus33.chatitem.chatmanager.v2.ChatListenerChatManager;
 import me.dadus33.chatitem.commands.CIReloadCommand;
 import me.dadus33.chatitem.commands.ChatItemCommand;
 import me.dadus33.chatitem.hook.ChatControlSupport;
+import me.dadus33.chatitem.hook.ChatManagerSupport;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.listeners.JoinListener;
@@ -144,6 +145,10 @@ public class ChatItem extends JavaPlugin {
         if (pm.isPluginEnabled("ChatControl")) {
         	ChatControlSupport.init(this);
             plugins.add("ChatControl");
+        }
+        if (pm.isPluginEnabled("ChatManager")) {
+        	ChatManagerSupport.init(this);
+            plugins.add("ChatManager");
         }
         if (pm.getPlugin("EcoEnchants") != null && pm.getPlugin("EcoEnchants").getDescription().getVersion().startsWith("8.")) {
             ecoEnchantsSupport = true;
