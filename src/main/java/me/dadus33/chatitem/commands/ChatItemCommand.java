@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,6 +27,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class ChatItemCommand implements CommandExecutor, TabExecutor {
 
+	private static final List<String> orders = Arrays.asList("packet", "chat", "both");
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player)) {
@@ -74,10 +77,62 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 				text.addExtra(linkComp);
 			}
 			p.spigot().sendMessage(text);
+		} else if (args[0].equalsIgnoreCase("select")) {
+			if(args.length == 1) {
+				p.sendMessage(ChatColor.GRAY + "----------" + ChatColor.GOLD + " ChatItem - Setup " + ChatColor.GRAY + "----------");
+				p.sendMessage(ChatColor.AQUA + "Welcome in the help of setup." + ChatColor.YELLOW + " Please follow step by simply answer to test.");
+				sendCheckSelectMessage(p, orders.get(0));
+			} else {
+				String tested = args[1];
+				if(!orders.contains(tested)) {
+					p.sendMessage(ChatColor.RED + "Unknow test for " + tested + ".");
+					return false;
+				}
+				if(args.length == 2) {
+					p.sendMessage(ChatColor.RED + "Can't find if it works");
+					return false;
+				}
+				if(args[2].equalsIgnoreCase("yes")) {
+					ChatManager.setTesting(null);
+					InventoryListener.setInConfig("manager", tested);
+					p.sendMessage(ChatColor.GREEN + "Perfect ! Updating config ...");
+					ChatItem.reload(p);
+				} else if(args[2].equalsIgnoreCase("no")) {
+					int index = orders.indexOf(tested);
+					if(orders.size() == (index + 1)) {
+						p.sendMessage(ChatColor.RED + "Sad. Sorry but nothing is available. I suggest you to come on discord for more help. Do '/chatitem link' for all links.");
+					} else {
+						p.sendMessage(ChatColor.RED + "Sad. Checking for next manager ...");
+						sendCheckSelectMessage(p, orders.get(index + 1));
+					}
+				} else {
+					p.sendMessage(ChatColor.RED + "Can't find if it works");
+				}
+			}
+			
 		} else {
 			Messages.sendMessage(p, "chatitem-cmd.help");
 		}
 		return false;
+	}
+	
+	private void sendCheckSelectMessage(Player p, String testing) {
+		ChatManager.setTesting(testing);
+		p.chat("Checking for " + testing + ": [i]");
+
+		Bukkit.getScheduler().runTaskLater(ChatItem.getInstance(), () -> {
+			TextComponent text = new TextComponent(ChatColor.GOLD + "Did it worked fine? ");
+			TextComponent agree = new TextComponent(ChatColor.GREEN + "Yes");
+			agree.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatitem select " + testing + " yes"));
+			agree.setHoverEvent(Utils.createTextHover(ChatColor.GRAY + "Click to say it worked fine"));
+			text.addExtra(agree);
+			text.addExtra(" ");
+			TextComponent decline = new TextComponent(ChatColor.RED + "No");
+			decline.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatitem select " + testing + " no"));
+			decline.setHoverEvent(Utils.createTextHover(ChatColor.GRAY + "Click to say it's not working as expected"));
+			text.addExtra(decline);
+			p.spigot().sendMessage(text);
+		}, 2);
 	}
 
 	@Override
@@ -85,7 +140,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 		List<String> list = new ArrayList<>();
 		String prefix = arg[arg.length - 1].toLowerCase(Locale.ROOT);
 		if(arg.length <= 2) {
-			for (String s : Arrays.asList("help", "admin", "reload", "link", "show", "broadcast"))
+			for (String s : Arrays.asList("help", "admin", "reload", "link", "show", "broadcast", "select"))
 				if (prefix.isEmpty() || s.startsWith(prefix))
 					list.add(s);
 		}

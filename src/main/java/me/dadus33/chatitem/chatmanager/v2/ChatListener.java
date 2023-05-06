@@ -80,6 +80,8 @@ public class ChatListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onChat(AsyncPlayerChatEvent e) {
+		if(ChatManager.isTestingEnabled() && !ChatManager.isTesting("chat"))
+			return;
 		Storage c = getStorage();
 		if (e.isCancelled()) {
 			if (ChatItem.getInstance().getChatManager().size() == 1) { // only chat

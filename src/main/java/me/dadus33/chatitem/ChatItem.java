@@ -52,10 +52,12 @@ public class ChatItem extends JavaPlugin {
 		pl.storage = new Storage(pl.getConfig());
 		pl.chooseManagers();
 		Translation.load(pl);
-		if (!pl.storage.messageReload.isEmpty())
-			sender.sendMessage(pl.storage.messageReload);
-		if (!oldChatManager.equalsIgnoreCase(pl.storage.manager))
-			sender.sendMessage(ChatColor.GOLD + "Changing the manager with command reloading CAN produce issue. It's mostly suggested to restart after finding the better manager for you.");
+		if(sender != null) {
+			if (!pl.storage.messageReload.isEmpty())
+				sender.sendMessage(pl.storage.messageReload);
+			if (!oldChatManager.equalsIgnoreCase(pl.storage.manager))
+				sender.sendMessage(ChatColor.GOLD + "Changing the manager with command reloading CAN produce issue. It's mostly suggested to restart after finding the better manager for you.");
+		}
 	}
 
 	public static ChatItem getInstance() {
@@ -121,8 +123,16 @@ public class ChatItem extends JavaPlugin {
 		getLogger().info("Detected server version: " + Version.getVersion().name().toLowerCase());
 
 		// Load config
-		if (!new File(getDataFolder(), "config.yml").exists())
+		if (!new File(getDataFolder(), "config.yml").exists()) {
+			getLogger().info("--------------");
+			getLogger().info("");
+			getLogger().info("Welcome on ChatItem !");
+			getLogger().info("If you need help for setup, USE: /chatitem select");
+			getLogger().info("Then follow steps.");
+			getLogger().info("");
+			getLogger().info("--------------");
 			saveDefaultConfig();
+		}
 		storage = new Storage(getConfig());
 
 		// Commands

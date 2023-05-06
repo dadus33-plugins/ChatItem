@@ -77,7 +77,7 @@ public class InventoryListener implements Listener {
 		}
 	}
 	
-	private void setInConfig(String key, Object val) {
+	public static void setInConfig(String key, Object val) {
 		ChatItem pl = ChatItem.getInstance();
 		pl.getConfig().set(key, val);
 		pl.saveConfig();

@@ -23,6 +23,7 @@ import me.dadus33.chatitem.utils.Utils;
 
 public abstract class ChatManager {
 
+	public static String inTest = null;
 	private final static HashMap<UUID, Long> COOLDOWNS = new HashMap<>();
 	private final static HashMap<UUID, Long> LAST_INFO_MESSAGE = new HashMap<>();
 	private final static String NAME = "{name}";
@@ -293,5 +294,17 @@ public abstract class ChatManager {
 
 	public static void applyCooldown(Player p) {
 		COOLDOWNS.put(p.getUniqueId(), System.currentTimeMillis() / 1000);
+	}
+	
+	public static boolean isTestingEnabled() {
+		return inTest != null;
+	}
+	
+	public static boolean isTesting(String actual) {
+		return inTest != null && (inTest == "both" || inTest.equalsIgnoreCase(actual));
+	}
+	
+	public static void setTesting(String actual) {
+		inTest = actual;
 	}
 }
