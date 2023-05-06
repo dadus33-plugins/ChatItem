@@ -36,175 +36,175 @@ import me.dadus33.chatitem.utils.Version;
 
 public class ChatItem extends JavaPlugin {
 
-    public final static int CFG_VER = 13;
-    public static boolean discordSrvSupport = false, ecoEnchantsSupport = false, hasNewVersion = false;
-    private static ChatItem instance;
-    private final String brandChannelName = Version.getVersion().isNewerOrEquals(Version.V1_13) ? "minecraft:brand" : "MC|Brand";
-    private final List<ChatManager> chatManager = new ArrayList<>();
-    private Storage storage;
+	public final static int CFG_VER = 13;
+	public static boolean discordSrvSupport = false, ecoEnchantsSupport = false, hasNewVersion = false;
+	private static ChatItem instance;
+	private final String brandChannelName = Version.getVersion().isNewerOrEquals(Version.V1_13) ? "minecraft:brand" : "MC|Brand";
+	private final List<ChatManager> chatManager = new ArrayList<>();
+	private Storage storage;
 
-    public static void reload(CommandSender sender) {
-        ChatItem pl = getInstance();
-        if (pl.getConfig().getKeys(false).isEmpty())
-            pl.saveDefaultConfig();
-        pl.reloadConfig();
-        String oldChatManager = pl.storage.manager;
-        pl.storage = new Storage(pl.getConfig());
-        pl.chooseManagers();
-        Translation.load(pl);
-        if (!pl.storage.messageReload.isEmpty())
-            sender.sendMessage(pl.storage.messageReload);
-        if (!oldChatManager.equalsIgnoreCase(pl.storage.manager))
-            sender.sendMessage(ChatColor.GOLD + "Changing the manager with command reloading CAN produce issue. It's mostly suggested to restart after finding the better manager for you.");
-    }
+	public static void reload(CommandSender sender) {
+		ChatItem pl = getInstance();
+		if (pl.getConfig().getKeys(false).isEmpty())
+			pl.saveDefaultConfig();
+		pl.reloadConfig();
+		String oldChatManager = pl.storage.manager;
+		pl.storage = new Storage(pl.getConfig());
+		pl.chooseManagers();
+		Translation.load(pl);
+		if (!pl.storage.messageReload.isEmpty())
+			sender.sendMessage(pl.storage.messageReload);
+		if (!oldChatManager.equalsIgnoreCase(pl.storage.manager))
+			sender.sendMessage(ChatColor.GOLD + "Changing the manager with command reloading CAN produce issue. It's mostly suggested to restart after finding the better manager for you.");
+	}
 
-    public static ChatItem getInstance() {
-        return instance;
-    }
+	public static ChatItem getInstance() {
+		return instance;
+	}
 
-    public static void debug(String msg) {
-        if (getInstance().getStorage().debug)
-            getInstance().getLogger().info("[Debug] " + msg.replace(ChatManager.SEPARATOR, 'S').replace(ChatManager.SEPARATOR_END, 'E'));
-    }
+	public static void debug(String msg) {
+		if (getInstance().getStorage().debug)
+			getInstance().getLogger().info("[Debug] " + msg.replace(ChatManager.SEPARATOR, 'S').replace(ChatManager.SEPARATOR_END, 'E'));
+	}
 
-    private void chooseManagers() {
-        this.chatManager.forEach((cm) -> cm.unload(this));
-        this.chatManager.clear();
-        PluginManager pm = getServer().getPluginManager();
-        String managerName = getStorage().manager;
+	private void chooseManagers() {
+		this.chatManager.forEach((cm) -> cm.unload(this));
+		this.chatManager.clear();
+		PluginManager pm = getServer().getPluginManager();
+		String managerName = getStorage().manager;
 
-        switch (managerName.toLowerCase(Locale.ROOT)) {
-            case "both":
-                this.chatManager.add(new PacketEditingChatManager(this));
-                this.chatManager.add(new ChatListenerChatManager(this));
-                getLogger().info("Manager automatically chosen: " + getVisualChatManagers());
-                break;
-            case "auto":
-                if (getPluginThatRequirePacket().stream().map(pm::getPlugin).anyMatch(Objects::nonNull) && Version.getVersion().isNewerThan(Version.V1_7))
-                    this.chatManager.add(new PacketEditingChatManager(this));
-                else
-                    this.chatManager.add(new ChatListenerChatManager(this));
-                getLogger().info("Manager automatically chosen: " + getVisualChatManagers());
-                break;
-            case "packet":
-                this.chatManager.add(new PacketEditingChatManager(this));
-                getLogger().info("Manager chosen: " + getVisualChatManagers());
-                break;
-            case "chat":
-                this.chatManager.add(new ChatListenerChatManager(this));
-                getLogger().info("Manager chosen: " + getVisualChatManagers());
-                break;
-            default:
-                getLogger().severe("----- WARN -----");
-                getLogger().severe("Failed to find manager: " + managerName + ".");
-                getLogger().severe("Please reset your config and/or check wiki for more information");
-                getLogger().severe("Using default manager: chat.");
-                getLogger().severe("----- WARN -----");
-                this.chatManager.add(new ChatListenerChatManager(this));
-                break;
-        }
+		switch (managerName.toLowerCase(Locale.ROOT)) {
+		case "both":
+			this.chatManager.add(new PacketEditingChatManager(this));
+			this.chatManager.add(new ChatListenerChatManager(this));
+			getLogger().info("Manager automatically chosen: " + getVisualChatManagers());
+			break;
+		case "auto":
+			if (getPluginThatRequirePacket().stream().map(pm::getPlugin).anyMatch(Objects::nonNull) && Version.getVersion().isNewerThan(Version.V1_7))
+				this.chatManager.add(new PacketEditingChatManager(this));
+			else
+				this.chatManager.add(new ChatListenerChatManager(this));
+			getLogger().info("Manager automatically chosen: " + getVisualChatManagers());
+			break;
+		case "packet":
+			this.chatManager.add(new PacketEditingChatManager(this));
+			getLogger().info("Manager chosen: " + getVisualChatManagers());
+			break;
+		case "chat":
+			this.chatManager.add(new ChatListenerChatManager(this));
+			getLogger().info("Manager chosen: " + getVisualChatManagers());
+			break;
+		default:
+			getLogger().severe("----- WARN -----");
+			getLogger().severe("Failed to find manager: " + managerName + ".");
+			getLogger().severe("Please reset your config and/or check wiki for more information");
+			getLogger().severe("Using default manager: chat.");
+			getLogger().severe("----- WARN -----");
+			this.chatManager.add(new ChatListenerChatManager(this));
+			break;
+		}
 
-        this.chatManager.forEach((cm) -> cm.load(this, getStorage()));
+		this.chatManager.forEach((cm) -> cm.load(this, getStorage()));
 
-        NamerManager.load(this);
-        PlayerNamerManager.load(this);
-    }
+		NamerManager.load(this);
+		PlayerNamerManager.load(this);
+	}
 
-    private List<String> getPluginThatRequirePacket() {
-        return Arrays.asList("DeluxeChat", "HexNicks", "VentureChat", "ItemsAdder");
-    }
+	private List<String> getPluginThatRequirePacket() {
+		return Arrays.asList("DeluxeChat", "HexNicks", "VentureChat", "ItemsAdder");
+	}
 
-    @Override
-    public void onEnable() {
-        //Save the instance (we're basically a singleton)
-        instance = this;
-        getLogger().info("Detected server version: " + Version.getVersion().name().toLowerCase());
+	@Override
+	public void onEnable() {
+		// Save the instance (we're basically a singleton)
+		instance = this;
+		getLogger().info("Detected server version: " + Version.getVersion().name().toLowerCase());
 
-        //Load config
-        if(!new File(getDataFolder(), "config.yml").exists())
-        	saveDefaultConfig();
-        storage = new Storage(getConfig());
+		// Load config
+		if (!new File(getDataFolder(), "config.yml").exists())
+			saveDefaultConfig();
+		storage = new Storage(getConfig());
 
-        //Commands
-        loadCommand(getCommand("cireload"), new CIReloadCommand());
-        loadCommand(getCommand("chatitem"), new ChatItemCommand());
+		// Commands
+		loadCommand(getCommand("cireload"), new CIReloadCommand());
+		loadCommand(getCommand("chatitem"), new ChatItemCommand());
 
-        // events
-        PluginManager pm = getServer().getPluginManager();
-        pm.registerEvents(new JoinListener(), this);
-        pm.registerEvents(new InventoryListener(), this);
-        pm.registerEvents(new TranslationInventoryListener(), this);
+		// events
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvents(new JoinListener(), this);
+		pm.registerEvents(new InventoryListener(), this);
+		pm.registerEvents(new TranslationInventoryListener(), this);
 
-        chooseManagers();
+		chooseManagers();
 
-        StringJoiner plugins = new StringJoiner(", ");
-        if (pm.isPluginEnabled("DiscordSRV")) {
-            discordSrvSupport = true;
-            plugins.add("DiscordSRV");
-        }
-        if (pm.isPluginEnabled("ChatControl")) {
-        	ChatControlSupport.init(this);
-            plugins.add("ChatControl");
-        }
-        if (pm.isPluginEnabled("ChatManager")) {
-        	ChatManagerSupport.init(this);
-            plugins.add("ChatManager");
-        }
-        if (pm.getPlugin("EcoEnchants") != null && pm.getPlugin("EcoEnchants").getDescription().getVersion().startsWith("8.")) {
-            ecoEnchantsSupport = true;
-            plugins.add("EcoEnchants");
-        }
+		StringJoiner plugins = new StringJoiner(", ");
+		if (pm.isPluginEnabled("DiscordSRV")) {
+			discordSrvSupport = true;
+			plugins.add("DiscordSRV");
+		}
+		if (pm.isPluginEnabled("ChatControl")) {
+			ChatControlSupport.init(this);
+			plugins.add("ChatControl");
+		}
+		if (pm.isPluginEnabled("ChatManager")) {
+			ChatManagerSupport.init(this);
+			plugins.add("ChatManager");
+		}
+		if (pm.isPluginEnabled("EcoEnchants") && pm.getPlugin("EcoEnchants").getDescription().getVersion().startsWith("8.")) {
+			ecoEnchantsSupport = true;
+			plugins.add("EcoEnchants");
+		}
 
-        if(plugins.length() > 0)
-        	getLogger().info("Load " + plugins.toString() + " support.");
-        
-        Translation.load(this);
+		if (plugins.length() > 0)
+			getLogger().info("Load " + plugins.toString() + " support.");
 
-        getServer().getMessenger().registerIncomingPluginChannel(this, brandChannelName, (chan, p, msg) -> ItemPlayer.getPlayer(p).setClientName(new String(msg).substring(1)));
+		Translation.load(this);
 
-        if (storage.checkUpdate) {
-            getServer().getScheduler().runTaskAsynchronously(this, () -> {
-                String urlName = "https://api.spigotmc.org/legacy/update.php?resource=19064";
-                String content = Utils.getFromURL(urlName);
-                if (Strings.isNullOrEmpty(content))
-                    return;
-                SemVer currentVersion = SemVer.parse(getDescription().getVersion());
-                if (currentVersion == null)
-                    return;
-                SemVer latestVersion = SemVer.parse(content);
-                if (latestVersion != null && latestVersion.isNewerThan(currentVersion)) {
-                    hasNewVersion = !content.equalsIgnoreCase(getDescription().getVersion());
-                    if (hasNewVersion)
-                        getLogger().info(storage.updateMessage);
-                }
-            });
-        }
-    }
+		getServer().getMessenger().registerIncomingPluginChannel(this, brandChannelName, (chan, p, msg) -> ItemPlayer.getPlayer(p).setClientName(new String(msg).substring(1)));
 
-    public void loadCommand(PluginCommand cmd, Object obj) {
-        if (obj instanceof CommandExecutor)
-            cmd.setExecutor((CommandExecutor) obj);
-        if (obj instanceof TabCompleter)
-            cmd.setTabCompleter((TabCompleter) obj);
-    }
+		if (storage.checkUpdate) {
+			getServer().getScheduler().runTaskAsynchronously(this, () -> {
+				String urlName = "https://api.spigotmc.org/legacy/update.php?resource=19064";
+				String content = Utils.getFromURL(urlName);
+				if (Strings.isNullOrEmpty(content))
+					return;
+				SemVer currentVersion = SemVer.parse(getDescription().getVersion());
+				if (currentVersion == null)
+					return;
+				SemVer latestVersion = SemVer.parse(content);
+				if (latestVersion != null && latestVersion.isNewerThan(currentVersion)) {
+					hasNewVersion = !content.equalsIgnoreCase(getDescription().getVersion());
+					if (hasNewVersion)
+						getLogger().info(storage.updateMessage);
+				}
+			});
+		}
+	}
 
-    public Storage getStorage() {
-        return storage;
-    }
+	public void loadCommand(PluginCommand cmd, Object obj) {
+		if (obj instanceof CommandExecutor)
+			cmd.setExecutor((CommandExecutor) obj);
+		if (obj instanceof TabCompleter)
+			cmd.setTabCompleter((TabCompleter) obj);
+	}
 
-    public List<ChatManager> getChatManager() {
-        return chatManager;
-    }
+	public Storage getStorage() {
+		return storage;
+	}
 
-    public String getVisualChatManagers() {
-        StringJoiner sj = new StringJoiner(", ");
-        for (ChatManager cm : chatManager) {
-            sj.add(cm.getName() + " (" + cm.getId() + ")");
-        }
-        return sj.toString();
-    }
+	public List<ChatManager> getChatManager() {
+		return chatManager;
+	}
 
-    public boolean isHasNewVersion() {
-        return hasNewVersion;
-    }
+	public String getVisualChatManagers() {
+		StringJoiner sj = new StringJoiner(", ");
+		for (ChatManager cm : chatManager) {
+			sj.add(cm.getName() + " (" + cm.getId() + ")");
+		}
+		return sj.toString();
+	}
+
+	public boolean isHasNewVersion() {
+		return hasNewVersion;
+	}
 }

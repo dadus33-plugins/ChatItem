@@ -65,6 +65,7 @@ public class AdventureComponentManager implements IComponentManager {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, Storage c) throws Exception {
 		String itemName = ChatManager.getNameOfItem(chat.getPlayer(), item, c);

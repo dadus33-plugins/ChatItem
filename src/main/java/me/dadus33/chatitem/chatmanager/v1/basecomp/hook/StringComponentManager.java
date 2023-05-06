@@ -1,8 +1,6 @@
 package me.dadus33.chatitem.chatmanager.v1.basecomp.hook;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -120,11 +118,6 @@ public class StringComponentManager implements IComponentManager {
 				ChatItem.debug("Changing text " + oldText + " to " + itemName + ", extra: " + (tc.getExtra() == null ? "-" : tc.getExtra().size()));
 				tc.setText(ChatManager.replaceSeparator(chat, oldText, itemName));
 				tc.setHoverEvent(hover);
-				List<BaseComponent> extra = new ArrayList<>(Arrays.asList(TextComponent.fromLegacyText(ChatManager.replaceSeparator(chat, oldText, itemName), tc.getColor())));
-				if (tc.getExtra() != null)
-					extra.addAll(tc.getExtra());
-				tc.setExtra(extra);
-				return;
 			} else
 				ChatItem.debug("No insert of text without separator: " + tc.getText() + " (legacy: " + tc.toLegacyText() + ")");
 		}
