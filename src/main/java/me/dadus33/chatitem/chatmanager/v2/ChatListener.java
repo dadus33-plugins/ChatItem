@@ -97,12 +97,8 @@ public class ChatListener implements Listener {
 		Player p = e.getPlayer();
 		if(ChatManager.containsSeparator(e.getMessage())) { // fix for v1
 			Chat chat = Chat.getFrom(e.getMessage());
-			if(chat == null)
-				ChatItem.debug("Chat for message " + e.getMessage() + " can't be found");
-			else {
+			if(chat != null)
 				e.setMessage(ChatManager.replaceSeparator(chat, e.getMessage(), c.placeholders.get(0)));
-				chat.remove();
-			}
 		}
 		String placeholder = null;
 		for (String rep : c.placeholders) {
