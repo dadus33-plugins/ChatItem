@@ -101,6 +101,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 					int index = orders.indexOf(tested);
 					if(orders.size() == (index + 1)) {
 						p.sendMessage(ChatColor.RED + "Sad. Sorry but nothing is available. I suggest you to come on discord for more help. Do '/chatitem link' for all links.");
+						ChatManager.setTesting(null);
 					} else {
 						p.sendMessage(ChatColor.RED + "Sad. Checking for next manager ...");
 						sendCheckSelectMessage(p, orders.get(index + 1));
