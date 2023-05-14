@@ -9,19 +9,19 @@ import me.dadus33.chatitem.ChatItem;
 public enum Version {
 	
 	// http://wiki.vg/Protocol_version_numbers
-	V1_7(0, 5, 0),
-	V1_8(6, 47, 1),
-	V1_9(49, 110, 2), // 1.9.X - Starts with 49 as 48 was an april fools update
-	V1_10(201, 210, 3), // 1.10.X - Starts with 201 because why not.
-	V1_11(301, 316, 4),
-	V1_12(317, 340, 5),
-	V1_13(341, 440, 6),
-	V1_14(100, 441, 500),
-	V1_15(100, 550, 578),
-	V1_16(100, 700, 754),
-	V1_17(100, 755, 756),
-	V1_18(100, 757, 758),
-	V1_19(100, 761, 1000),
+	V1_7(0, 5, 7),
+	V1_8(6, 47, 8),
+	V1_9(49, 110, 9), // 1.9.X - Starts with 49 as 48 was an april fools update
+	V1_10(201, 210, 10), // 1.10.X - Starts with 201 because why not.
+	V1_11(301, 316, 11),
+	V1_12(317, 340, 12),
+	V1_13(341, 440, 13),
+	V1_14(441, 500, 14),
+	V1_15(550, 578, 15),
+	V1_16(700, 754, 16),
+	V1_17(755, 756, 17),
+	V1_18(757, 758, 18),
+	V1_19(761, 1000, 19),
 	HIGHER(Integer.MAX_VALUE, -1, Integer.MAX_VALUE);
 
 	// Latest version should always have the upper limit set to Integer.MAX_VALUE so
