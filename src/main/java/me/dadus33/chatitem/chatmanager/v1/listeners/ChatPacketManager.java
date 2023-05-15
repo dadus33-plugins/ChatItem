@@ -91,10 +91,10 @@ public class ChatPacketManager extends PacketHandler {
 		String json = "{}";
 		IComponentManager choosedGetter = null;
 		if (version.isNewerOrEquals(Version.V1_19)) {
-			if (packet.getIntegers().readSafely(0, 0) > 1) { // not parsed chat message type
+			/*if (packet.getIntegers().readSafely(0, 0) > 1) { // not parsed chat message type
 				ChatItem.debug("Invalid int: " + packet.getIntegers().read(0));
 				return;
-			}
+			}*/
 			choosedGetter = new StringComponentManager();
 			json = choosedGetter.getBaseComponentAsJSON(e); // if null, will be re-checked so anyway
 		} else if (version.isNewerOrEquals(Version.V1_12)) {

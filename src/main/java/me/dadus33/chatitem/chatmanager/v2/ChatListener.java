@@ -168,12 +168,13 @@ public class ChatListener implements Listener {
 				if (args == 'r' && colorCode.isEmpty()) {
 					color = ChatColor.RESET;
 					continue;
+				} else if(args == 'x') {
+					if(!colorCode.isEmpty()) {
+						color = ColorManager.getColor(colorCode);
+						colorCode = ""; // clean for previous things
+					}
 				}
-				if (args == 'x' && !colorCode.isEmpty()) {
-					text += ColorManager.getColorString(colorCode);
-					colorCode = "x";
-				} else
-					colorCode += args; // a color by itself
+				colorCode += args;
 			} else {
 				waiting = false;
 				if (!colorCode.isEmpty()) {
