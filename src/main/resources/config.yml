@@ -92,7 +92,7 @@ general:
   - "AIR"
   # Check if the plugin have update
   check-update: true
-  language: "en_us"
+  language: "en_gb"
  
  
 #  Messages section. You can disable any of them by simply leaving them empty, like this: ""

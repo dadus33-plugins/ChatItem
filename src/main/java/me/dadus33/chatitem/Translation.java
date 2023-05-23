@@ -73,7 +73,7 @@ public class Translation {
 
 	@SuppressWarnings("deprecation")
 	public static String get(ItemStack item) {
-		String key = (item.getType().isBlock() ? "block" : "item") + ".minecraft." + item.getType().name().toLowerCase().replace("_", ".");
+		String key = (item.getType().isBlock() ? "block" : "item") + ".minecraft." + item.getType().name().toLowerCase();
 		if (messages != null && messages.has(key)) {
 			return messages.get(key).getAsString();
 		} else
