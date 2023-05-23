@@ -89,7 +89,7 @@ general:
   cooldown: 60
   # All items that are not allowed to be showed
   ignored_items:
-  - "AIR"
+  - "SOME_ITEM"
   # Check if the plugin have update
   check-update: true
   language: "en_gb"
