@@ -11,7 +11,6 @@ public class HexNicksV2PlayerNamer implements IPlayerNamer {
 
 	@Override
 	public BaseComponent[] getName(Player p) {
-
 		return BungeeComponentSerializer.get().serialize(Nicks.api().getStoredNick(p).join());
 	}
 
