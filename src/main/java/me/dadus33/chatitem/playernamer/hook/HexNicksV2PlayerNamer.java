@@ -7,7 +7,7 @@ import me.dadus33.chatitem.playernamer.IPlayerNamer;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 
-public class HexNicksPlayerNamer implements IPlayerNamer {
+public class HexNicksV2PlayerNamer implements IPlayerNamer {
 
 	@Override
 	public BaseComponent[] getName(Player p) {
