@@ -60,7 +60,7 @@ public class ChatPacketManager extends PacketHandler {
 			e.printStackTrace();
 		}
 
-		for (IComponentManager getter : Arrays.asList(new StringComponentManager(), new IChatBaseComponentManager(), new ComponentNMSManager(), new PCMComponentManager())) {
+		for (IComponentManager getter : Arrays.asList(new StringComponentManager(), /*new IChatBaseComponentManager(),*/ new ComponentNMSManager(), new PCMComponentManager())) {
 			tryRegister(getter);
 		}
 		try {
