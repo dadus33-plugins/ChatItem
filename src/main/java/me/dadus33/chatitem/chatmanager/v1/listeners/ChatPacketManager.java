@@ -59,7 +59,7 @@ public class ChatPacketManager extends PacketHandler {
 			e.printStackTrace();
 		}
 
-		for (IComponentManager getter : Arrays.asList(new StringComponentManager(), /*new IChatBaseComponentManager(),*/ new ComponentNMSManager(), new PCMComponentManager())) {
+		for (IComponentManager getter : Arrays.asList(new StringComponentManager(), new ComponentNMSManager(), new PCMComponentManager())) {
 			tryRegister(getter);
 		}
 		try {
@@ -110,7 +110,8 @@ public class ChatPacketManager extends PacketHandler {
 					choosedGetter = getters;
 					if (ChatManager.containsSeparator(json))
 						break; // be sure it's valid one
-				}
+				} else
+					ChatItem.debug("Null JSON for manager " + getters.getClass().getSimpleName());
 			}
 		}
 		if (json == null || choosedGetter == null) {

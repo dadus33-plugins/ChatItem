@@ -178,6 +178,8 @@ public class PacketUtils {
 		}
 	}
 
+	private static Method getNbtMethod;
+	
 	/**
 	 * Converts an {@link org.bukkit.inventory.ItemStack} to a Json string for
 	 * sending with {@link net.md_5.bungee.api.chat.BaseComponent}'s.
@@ -187,11 +189,21 @@ public class PacketUtils {
 	 */
 	public static String getNbtTag(ItemStack item) {
 		try {
-			Object nmsStack = JSONManipulator.AS_NMS_COPY.invoke(null, item);
-			Version v = Version.getVersion();
-			Object tag = getNmsClass("ItemStack", "world.item.")
-					.getMethod(v.equals(Version.V1_18) ? "t" : (v.isNewerOrEquals(Version.V1_19) ? "u" : "getTag"))
-					.invoke(nmsStack);
+			if(getNbtMethod == null) {
+				Class<?> itemClass = getNmsClass("ItemStack", "world.item.");
+				Version v = Version.getVersion();
+				if(v.isNewerOrEquals(Version.V1_20))
+					getNbtMethod = itemClass.getDeclaredMethod("w");
+				else if(v.equals(Version.V1_19))
+					getNbtMethod = itemClass.getDeclaredMethod("u");
+				else if(v.equals(Version.V1_18))
+					getNbtMethod = itemClass.getDeclaredMethod("t");
+				else
+					getNbtMethod = itemClass.getDeclaredMethod("getTag");
+				
+				getNbtMethod.setAccessible(true);
+			}
+			Object tag = getNbtMethod.invoke(JSONManipulator.AS_NMS_COPY.invoke(null, item));
 			return tag == null ? "{}" : tag.toString();
 		} catch (Exception e) {
 			e.printStackTrace();

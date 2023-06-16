@@ -14,7 +14,7 @@ public class ComponentNMSManager implements IComponentManager {
 
 	@Override
 	public String getBaseComponentAsJSON(ChatItemPacket packet) {
-		Object chatBaseComp = packet.getContent().getSpecificModifier(PacketUtils.COMPONENT_CLASS).readSafely(0);
+		Object chatBaseComp = packet.getContent().getChatComponents().readSafely(0);
 		if (chatBaseComp != null) {
 			try {
 				return PacketUtils.CHAT_SERIALIZER.getMethod("a", PacketUtils.COMPONENT_CLASS).invoke(null, chatBaseComp).toString();
