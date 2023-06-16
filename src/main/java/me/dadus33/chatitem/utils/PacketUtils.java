@@ -138,10 +138,7 @@ public class PacketUtils {
 	public static Object getPlayerConnection(Player p) {
 		try {
 			Object entityPlayer = getEntityPlayer(p);
-			if (Version.getVersion().isNewerOrEquals(Version.V1_17))
-				return entityPlayer.getClass().getField("b").get(entityPlayer);
-			else
-				return entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
+			return ReflectionUtils.getFirstWith(entityPlayer, entityPlayer.getClass(), getNmsClass("PlayerConnection", "server.network."));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

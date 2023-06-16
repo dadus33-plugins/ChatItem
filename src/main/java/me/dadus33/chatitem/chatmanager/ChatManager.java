@@ -16,7 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.Storage;
-import me.dadus33.chatitem.hook.EcoEnchantsSupport;
+import me.dadus33.chatitem.hook.EcoEnchantsV8Support;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.Utils;
@@ -94,7 +94,7 @@ public abstract class ChatManager {
 		ItemStack item = HandItem.getBetterItem(p).clone();
 
 		if (ChatItem.ecoEnchantsSupport) {
-			List<String> addLore = EcoEnchantsSupport.getLores(item);
+			List<String> addLore = EcoEnchantsV8Support.getLores(item);
 			if (!addLore.isEmpty()) {
 				ItemMeta meta = item.getItemMeta();
 				List<String> lores = meta.hasLore() ? meta.getLore() : new ArrayList<>();

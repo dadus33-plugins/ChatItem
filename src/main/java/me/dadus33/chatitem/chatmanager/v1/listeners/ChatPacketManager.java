@@ -26,7 +26,6 @@ import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.AdventureComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.ComponentNMSManager;
-import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.IChatBaseComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.PCMComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.hook.StringComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;

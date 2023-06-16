@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import com.willfp.ecoenchants.display.EnchantmentCache;
 import com.willfp.ecoenchants.enchantments.util.EnchantChecks;
 
-public class EcoEnchantsSupport {
+public class EcoEnchantsV8Support {
 
 	public static List<String> getLores(ItemStack item) {
 		List<String> lores = new ArrayList<>();
