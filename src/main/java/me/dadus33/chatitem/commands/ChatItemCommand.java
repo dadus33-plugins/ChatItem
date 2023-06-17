@@ -38,9 +38,9 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 		Player p = (Player) sender;
 		if (args.length == 0) {
 			Messages.sendMessage(p, "chatitem-cmd.help");
-		} else if (args[0].equalsIgnoreCase("admin")) {
+		} else if (args[0].equalsIgnoreCase("admin") && p.hasPermission("chatitem.reload")) {
 			InventoryListener.open(p);
-		} else if (args[0].equalsIgnoreCase("reload")) {
+		} else if (args[0].equalsIgnoreCase("reload") && p.hasPermission("chatitem.reload")) {
 			ChatItem.reload(sender);
 		} else if (args[0].equalsIgnoreCase("show")) {
 			Player cible = args.length == 1 ? p : Bukkit.getPlayer(args[1]);
