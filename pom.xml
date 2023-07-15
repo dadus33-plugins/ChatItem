@@ -14,10 +14,6 @@
 
     <repositories>
         <repository>
-            <id>majek-repo</id>
-            <url>https://repo.majek.dev/releases/</url>
-        </repository>
-        <repository>
             <id>Bungeecord</id>
             <url>https://repo.md-5.net/content/groups/public/</url>
         </repository>
@@ -123,8 +119,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>dev.majek</groupId>
-            <artifactId>hexnicks</artifactId>
+            <groupId>com.github.MajekDev</groupId>
+            <artifactId>HexNicks</artifactId>
             <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
