@@ -1,4 +1,4 @@
-package me.dadus33.chatitem.hook;
+package me.dadus33.chatitem.hook.ecoenchants;
 
 import java.util.ArrayList;
 import java.util.List;

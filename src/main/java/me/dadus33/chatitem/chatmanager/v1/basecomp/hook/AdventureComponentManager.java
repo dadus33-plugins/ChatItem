@@ -67,7 +67,7 @@ public class AdventureComponentManager implements IComponentManager {
 
 	@Override
 	public Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, Storage c) throws Exception {
-		String itemName = ChatManager.getNameOfItem(chat.getPlayer(), item, c);
+		String itemName = ChatManager.getNameOfItem(chat.getPlayer(), item, c);ChatItem.debug("NBT tag: " + PacketUtils.getNbtTag(item));;
 		return manage(p, chat, packet, itemName, HoverEvent.showItem(Key.key(item.getType().getKey().getKey()), item.getAmount(), BinaryTagHolder.of(PacketUtils.getNbtTag(item))));
 	}
 

@@ -25,6 +25,7 @@ import me.dadus33.chatitem.commands.CIReloadCommand;
 import me.dadus33.chatitem.commands.ChatItemCommand;
 import me.dadus33.chatitem.hook.ChatControlSupport;
 import me.dadus33.chatitem.hook.ChatManagerSupport;
+import me.dadus33.chatitem.hook.ecoenchants.EcoEnchantsSupport;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.listeners.JoinListener;
@@ -37,7 +38,7 @@ import me.dadus33.chatitem.utils.Version;
 public class ChatItem extends JavaPlugin {
 
 	public final static int CFG_VER = 13;
-	public static boolean discordSrvSupport = false, ecoEnchantsSupport = false, hasNewVersion = false;
+	public static boolean discordSrvSupport = false, hasNewVersion = false;
 	private static ChatItem instance;
 	private final String brandChannelName = Version.getVersion().isNewerOrEquals(Version.V1_13) ? "minecraft:brand" : "MC|Brand";
 	private final List<ChatManager> chatManager = new ArrayList<>();
@@ -160,8 +161,7 @@ public class ChatItem extends JavaPlugin {
 			ChatManagerSupport.init(this);
 			plugins.add("ChatManager");
 		}
-		if (pm.isPluginEnabled("EcoEnchants") && pm.getPlugin("EcoEnchants").getDescription().getVersion().startsWith("8.")) {
-			ecoEnchantsSupport = true;
+		if (pm.isPluginEnabled("EcoEnchants") && EcoEnchantsSupport.load()) {
 			plugins.add("EcoEnchants");
 		}
 
