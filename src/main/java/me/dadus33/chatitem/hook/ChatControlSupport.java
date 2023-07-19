@@ -1,15 +1,18 @@
 package me.dadus33.chatitem.hook;
 
-import org.mineacademy.chatcontrol.settings.Settings;
-
 import me.dadus33.chatitem.ChatItem;
 
 public class ChatControlSupport {
 
 	public static void init(ChatItem pl) {
-		Settings.Chat.Grammar.CAPITALIZE = false;
-		Settings.Chat.Grammar.INSERT_DOT = false;
+		try {
+			Class<?> clz = Class.forName("org.mineacademy.chatcontrol.settings.Settings$Chat$Grammar");
+			clz.getField("CAPITALIZE").setBoolean(null, false);
+			clz.getField("INSERT_DOT").setBoolean(null, false);
+			pl.getLogger().info("Loaded ChatControl support by disabling 2 options in 'Chat.Grammar' config.");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
-		pl.getLogger().info("Loaded ChatControl support by disabling 2 options in 'Chat.Grammar' config.");
 	}
 }
