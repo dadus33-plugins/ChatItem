@@ -89,6 +89,8 @@ public class PacketEditingChatManager extends ChatManager {
 			if(obj instanceof String) {
 				if (cons.getParameterCount() == 2 && cons.getParameterTypes()[0].equals(String.class) && cons.getParameterTypes()[1].equals(int.class)) { // "string, int"
 					return cons.newInstance(obj, 1);
+				} else if (cons.getParameterCount() == 2 && cons.getParameterTypes()[0].equals(String.class) && cons.getParameterTypes()[1].equals(boolean.class)) { // "string, boolean"
+					return cons.newInstance(obj, false); // false for no overlay
 				} else if (cons.getParameterCount() == 3 && cons.getParameterTypes()[1].equals(String.class)) { // "component", "string", <something not checked>
 					Class<?> secondParam = cons.getParameterTypes()[2];
 					if (secondParam.equals(int.class)) // "component", "string", "int"
