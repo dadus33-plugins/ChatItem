@@ -13,6 +13,7 @@ import me.dadus33.chatitem.chatmanager.v1.listeners.ChatPacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketManager;
 import me.dadus33.chatitem.utils.PacketUtils;
+import me.dadus33.chatitem.utils.ReflectionUtils;
 
 public class PacketEditingChatManager extends ChatManager {
 
@@ -79,6 +80,7 @@ public class PacketEditingChatManager extends ChatManager {
 	
 	private static Object internalCreateSystemChatPacket(Object obj) throws Exception {
 		Class<?> packetClass = PacketUtils.getNmsClass("ClientboundSystemChatPacket", "network.protocol.game.", "PacketPlayOutChat");
+		Class<?> chatMessageTypeClass = PacketUtils.isClassExist("net.minecraft.network.chat.ChatMessageType") ? PacketUtils.getNmsClass("ChatMessageType", "network.chat.") : null;
 		Constructor<?> betterOne = null;
 		Object[] betterParam = null;
 		for (Constructor<?> cons : packetClass.getDeclaredConstructors()) {
@@ -106,6 +108,8 @@ public class PacketEditingChatManager extends ChatManager {
 				if(cons.getParameterTypes()[i].isAssignableFrom(obj.getClass())) {
 					params[i] = obj;
 					nbPut++;
+				} else if(cons.getParameterTypes()[i].isAssignableFrom(chatMessageTypeClass)) {
+					params[i] = getChatMessageType();
 				}
 			}
 			if(nbPut == 1) {
@@ -123,5 +127,10 @@ public class PacketEditingChatManager extends ChatManager {
 			return betterOne.newInstance(betterParam);
 		}
 		return null;
+	}
+	
+	private static Object getChatMessageType() throws Exception {
+		Class<?> c = PacketUtils.getNmsClass("ChatMessageType", "network.chat.");
+		return ReflectionUtils.getMethod(c, c, byte.class).invoke(null, (byte) 0);
 	}
 }
