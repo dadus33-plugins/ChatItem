@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -141,7 +142,7 @@ public class ChatPacketManager extends PacketHandler {
 			ChatManager.applyCooldown(itemPlayer);
 		IComponentManager getter = choosedGetter;
 		e.setCancelled(true); // We cancel the packet as we're going to resends it anyways
-		Bukkit.getScheduler().runTaskAsynchronously(ChatItem.getInstance(), () -> {
+		CompletableFuture.runAsync(() -> {
 			Player p = e.getPlayer();
 			String message = null;
 			try {

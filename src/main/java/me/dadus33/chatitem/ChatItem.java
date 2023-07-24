@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.concurrent.CompletableFuture;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -173,7 +175,7 @@ public class ChatItem extends JavaPlugin {
 		getServer().getMessenger().registerIncomingPluginChannel(this, brandChannelName, (chan, p, msg) -> ItemPlayer.getPlayer(p).setClientName(new String(msg).substring(1)));
 
 		if (storage.checkUpdate) {
-			getServer().getScheduler().runTaskAsynchronously(this, () -> {
+			CompletableFuture.runAsync(() -> {
 				String urlName = "https://api.spigotmc.org/legacy/update.php?resource=19064";
 				String content = Utils.getFromURL(urlName);
 				if (Strings.isNullOrEmpty(content))
