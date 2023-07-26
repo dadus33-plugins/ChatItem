@@ -60,12 +60,12 @@ public class StringComponentManager implements IComponentManager {
 	}
 
 	@Override
-	public Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, Storage c) throws Exception {
+	public Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, String json, Storage c) throws Exception {
 		return manage(p, chat, packet, ChatManager.getNameOfItem(chat.getPlayer(), item, c), Utils.createItemHover(item));
 	}
 
 	@Override
-	public Object manageEmpty(Player p, Chat chat, ChatItemPacket packet, Storage c) {
+	public Object manageEmpty(Player p, Chat chat, ChatItemPacket packet, String json, Storage c) {
 		ComponentBuilder builder = new ComponentBuilder("");
 		c.tooltipHand.forEach(s -> builder.append(s));
 		Player sender = chat.getPlayer();

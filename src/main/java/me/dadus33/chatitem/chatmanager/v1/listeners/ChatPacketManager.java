@@ -141,6 +141,7 @@ public class ChatPacketManager extends PacketHandler {
 		if (getStorage().cooldown > 0 && !itemPlayer.hasPermission("chatitem.ignore-cooldown"))
 			ChatManager.applyCooldown(itemPlayer);
 		IComponentManager getter = choosedGetter;
+		String fjson = json;
 		e.setCancelled(true); // We cancel the packet as we're going to resends it anyways
 		CompletableFuture.runAsync(() -> {
 			Player p = e.getPlayer();
@@ -186,10 +187,10 @@ public class ChatPacketManager extends PacketHandler {
 							copy.setItemMeta(bsm);
 						}
 					}
-					lastSentPacket = getter.manageItem(p, chat, e, item, getStorage());
+					lastSentPacket = getter.manageItem(p, chat, e, item, fjson, getStorage());
 				} else {
 					if (!getStorage().handDisabled) {
-						lastSentPacket = getter.manageEmpty(p, chat, e, getStorage());
+						lastSentPacket = getter.manageEmpty(p, chat, e, fjson, getStorage());
 					}
 				}
 				if (lastSentPacket == null)

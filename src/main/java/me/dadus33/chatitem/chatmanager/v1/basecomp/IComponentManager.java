@@ -45,8 +45,8 @@ public interface IComponentManager {
 		return null;
 	}
 
-	default Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, Storage c) throws Exception {
-		String message = JSONManipulator.getInstance().parse(chat, getBaseComponentAsJSON(packet), item, ChatManager.styleItem(chat.getPlayer(), item, c),
+	default Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, String json, Storage c) throws Exception {
+		String message = JSONManipulator.getInstance().parse(chat, json, item, ChatManager.styleItem(chat.getPlayer(), item, c),
 				ItemPlayer.getPlayer(p).getProtocolVersion());
 		if (message != null) {
 			ChatItem.debug("(v1) Writing message: " + message);
@@ -55,8 +55,8 @@ public interface IComponentManager {
 		return packet.getPacket();
 	}
 
-	default Object manageEmpty(Player p, Chat chat, ChatItemPacket packet, Storage c) {
-		String message = JSONManipulator.getInstance().parseEmpty(getBaseComponentAsJSON(packet), c.handName, c.tooltipHand, chat.getPlayer());
+	default Object manageEmpty(Player p, Chat chat, ChatItemPacket packet, String json, Storage c) {
+		String message = JSONManipulator.getInstance().parseEmpty(json, c.handName, c.tooltipHand, chat.getPlayer());
 		if (message != null) {
 			ChatItem.debug("(v1) Writing empty message: " + message);
 			writeJson(packet, message);
