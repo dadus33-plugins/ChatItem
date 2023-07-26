@@ -11,7 +11,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.ItemPlayer;
 import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatManager;
@@ -46,8 +45,11 @@ public interface IComponentManager {
 	}
 
 	default Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, String json, Storage c) throws Exception {
-		String message = JSONManipulator.getInstance().parse(chat, json, item, ChatManager.styleItem(chat.getPlayer(), item, c),
-				ItemPlayer.getPlayer(p).getProtocolVersion());
+		String message;
+		if (Utils.isBeforeChatJson(p))
+			message = JSONManipulator.getInstance().parseEmpty(json, ChatManager.styleItem(chat.getPlayer(), item, c), ChatManager.getMaxLinesFromItem(p, item), chat.getPlayer());
+		else
+			message = JSONManipulator.getInstance().parse(chat, json, item, ChatManager.styleItem(chat.getPlayer(), item, c));
 		if (message != null) {
 			ChatItem.debug("(v1) Writing message: " + message);
 			writeJson(packet, message);
@@ -82,11 +84,11 @@ public interface IComponentManager {
 			}
 			if (jsonObj.has("text")) {
 				JsonElement text = jsonObj.get("text");
-				if(text.isJsonObject() && searchInObject(text.getAsJsonObject()))
+				if (text.isJsonObject() && searchInObject(text.getAsJsonObject()))
 					return getWithId();
-				else if(text.isJsonArray() && searchInExtra(text.getAsJsonArray()))
+				else if (text.isJsonArray() && searchInExtra(text.getAsJsonArray()))
 					return getWithId();
-				else if(text.isJsonPrimitive() && searchInString(text.getAsString()))
+				else if (text.isJsonPrimitive() && searchInString(text.getAsString()))
 					return getWithId();
 			}
 			return null;

@@ -61,7 +61,7 @@ public class StringComponentManager implements IComponentManager {
 
 	@Override
 	public Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, String json, Storage c) throws Exception {
-		return manage(p, chat, packet, ChatManager.getNameOfItem(chat.getPlayer(), item, c), Utils.createItemHover(item));
+		return manage(p, chat, packet, ChatManager.getNameOfItem(chat.getPlayer(), item, c), Utils.createItemHover(item, p));
 	}
 
 	@Override

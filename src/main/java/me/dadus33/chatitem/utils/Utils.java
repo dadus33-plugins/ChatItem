@@ -24,7 +24,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
+import me.dadus33.chatitem.playerversion.PlayerVersionManager;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -156,8 +158,18 @@ public class Utils {
 		return b;
 	}
 	
+	public static boolean isBeforeChatJson(Player p) {
+		return !PlayerVersionManager.getPlayerVersionAdapter().getPlayerVersion(p).isNewerOrEquals(Version.V1_16) && Version.getVersion().isNewerOrEquals(Version.V1_16);
+	}
+	
 	@SuppressWarnings("deprecation")
-	public static HoverEvent createItemHover(ItemStack item) {
+	public static HoverEvent createItemHover(ItemStack item, Player to) {
+		if(isBeforeChatJson(to)) {
+			ComponentBuilder comp = new ComponentBuilder("");
+			for(String line : ChatManager.getMaxLinesFromItem(to, item))
+				comp.append(line + "\n");
+			return createTextHover(comp.create());
+		}
 		if(Version.getVersion().isNewerOrEquals(Version.V1_13)) {
 			return new HoverEvent(HoverEvent.Action.SHOW_ITEM, new Item(item.getType().getKey().getKey(), item.getAmount(), ItemTag.ofNbt(PacketUtils.getNbtTag(item))));
 		} else {

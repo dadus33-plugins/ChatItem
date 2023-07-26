@@ -4,7 +4,6 @@ import static me.dadus33.chatitem.utils.PacketUtils.getNmsClass;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +26,6 @@ import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
-import me.dadus33.chatitem.utils.Version;
 
 public class JSONManipulator {
 
@@ -46,17 +44,16 @@ public class JSONManipulator {
 	public static final Method SAVE_NMS_ITEM_STACK_METHOD = ReflectionUtils.getMethod(NMS_ITEM_STACK_CLASS, NBT_TAG_COMPOUND, NBT_TAG_COMPOUND);
 	public static final Field MAP = ReflectionUtils.getField(NBT_TAG_COMPOUND, "map", "x");
 
-	private static final ConcurrentHashMap<Map.Entry<Version, ItemStack>, JsonObject> STACKS = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<ItemStack, JsonObject> STACKS = new ConcurrentHashMap<>();
 
 	private JsonObject itemTooltip;
 	private JsonArray classicTooltip;
 
-	public String parse(Chat chat, String json, ItemStack item, String replacement, int protocol) throws Exception {
+	public String parse(Chat chat, String json, ItemStack item, String replacement) throws Exception {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
-		final AbstractMap.SimpleEntry<Version, ItemStack> p = new AbstractMap.SimpleEntry<>(Version.getVersion(protocol), item);
 
 		JsonObject wrapper = new JsonObject(); // Create a wrapper object for the whole array
-		if ((itemTooltip = STACKS.get(p)) == null) {
+		if ((itemTooltip = STACKS.get(item)) == null) {
 			JsonArray use = Translator.toJson(replacement); // We get the json representation of the old color
 															// formatting method
 			ChatItem.debug("Remplacement: " + replacement + " use: " + use.toString());
@@ -84,10 +81,10 @@ public class JSONManipulator {
 			wrapper.add("hoverEvent", hover);
 
 			itemTooltip = wrapper; // Save the tooltip for later use when we encounter a placeholder
-			STACKS.put(p, itemTooltip); // Save it in the cache too so when parsing other packets with the same item
+			STACKS.put(item, itemTooltip); // Save it in the cache too so when parsing other packets with the same item
 										// (and client version) we no longer have to create it again
 			// We remove it later when no longer needed to save memory
-			Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), () -> STACKS.remove(p), 100L);
+			Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), () -> STACKS.remove(item), 100L);
 		}
 		if (obj.size() == 1 && obj.has("text")) {
 			itemTooltip.add("text", obj.get("text"));

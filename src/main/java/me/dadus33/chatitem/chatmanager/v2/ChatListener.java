@@ -158,7 +158,7 @@ public class ChatListener implements Listener {
 							&& color != null && color != ChatColor.WHITE) {
 						text = text.substring(2); // remove some code which should not be here
 					}
-					appendToComponentBuilder(builder, createComponent(text, color));
+					appendToComponentBuilder(builder, createComponent(to, text, color));
 					text = "";
 				}
 				waiting = true; // waiting for color code
@@ -194,7 +194,7 @@ public class ChatListener implements Listener {
 				}
 				if (args == ChatManager.SEPARATOR) {
 					// here put the item
-					appendToComponentBuilder(builder, fixColorComponent(text, color));
+					appendToComponentBuilder(builder, fixColorComponent(to, text, color));
 					addItem(builder, to, origin, item);
 					text = "";
 					if(ChatManager.containsSeparatorEnd(msg))
@@ -208,7 +208,7 @@ public class ChatListener implements Listener {
 			}
 		}
 		if (!text.isEmpty())
-			appendToComponentBuilder(builder, createComponent(text, color));
+			appendToComponentBuilder(builder, createComponent(to, text, color));
 		to.spigot().sendMessage(builder.create());
 	}
 
@@ -216,7 +216,7 @@ public class ChatListener implements Listener {
 		Storage c = ChatItem.getInstance().getStorage();
 		if (!ItemUtils.isEmpty(item)) {
 			ComponentBuilder itemComponent = new ComponentBuilder("");
-			appendToComponentBuilder(itemComponent, fixColorComponent(ChatManager.getNameOfItem(to, item, c), ChatColor.WHITE, item));
+			appendToComponentBuilder(itemComponent, fixColorComponent(to, ChatManager.getNameOfItem(to, item, c), ChatColor.WHITE, item));
 			ChatItem.debug("Item for " + to.getName() + " (ver: " + ItemPlayer.getPlayer(to).getVersion().name() + ") : " + PacketUtils.getNbtTag(item));
 			// itemComponent.event(new HoverEvent(Action.SHOW_ITEM, itemBaseComponent));
 			appendToComponentBuilder(builder, itemComponent.create());
@@ -266,11 +266,11 @@ public class ChatListener implements Listener {
 		}
 	}
 
-	public static BaseComponent[] fixColorComponent(String message, ChatColor color) {
-		return fixColorComponent(message, color, null);
+	public static BaseComponent[] fixColorComponent(Player to, String message, ChatColor color) {
+		return fixColorComponent(to, message, color, null);
 	}
 
-	public static BaseComponent[] fixColorComponent(String message, ChatColor color, @Nullable ItemStack item) {
+	public static BaseComponent[] fixColorComponent(Player to, String message, ChatColor color, @Nullable ItemStack item) {
 		ComponentBuilder builder = new ComponentBuilder("");
 		String colorCode = "", text = "";
 		boolean waiting = false;
@@ -278,7 +278,7 @@ public class ChatListener implements Listener {
 			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
 					ChatItem.debug("Append while fixing name " + (ColorManager.isHexColor(color) && builder.getParts().isEmpty() ? ColorManager.removeColorAtBegin(text) : text));
-					appendToComponentBuilder(builder, createComponent(ColorManager.isHexColor(color) ? ColorManager.removeColorAtBegin(text) : text, color, item));
+					appendToComponentBuilder(builder, createComponent(to, ColorManager.isHexColor(color) ? ColorManager.removeColorAtBegin(text) : text, color, item));
 					text = "";
 				}
 				waiting = true; // waiting for color code
@@ -317,21 +317,21 @@ public class ChatListener implements Listener {
 			}
 		}
 		if (!text.isEmpty()) {
-			appendToComponentBuilder(builder, createComponent(text, color, item));
+			appendToComponentBuilder(builder, createComponent(to, text, color, item));
 		}
 		return builder.create();
 	}
 
-	private static BaseComponent[] createComponent(String text, ChatColor color) {
-		return createComponent(text, color, null);
+	private static BaseComponent[] createComponent(Player to, String text, ChatColor color) {
+		return createComponent(to, text, color, null);
 	}
 	
-	private static BaseComponent[] createComponent(String text, ChatColor color, ItemStack item) {
+	private static BaseComponent[] createComponent(Player to, String text, ChatColor color, ItemStack item) {
 		ComponentBuilder littleBuilder = new ComponentBuilder(text);
 		if(color != null && color != ChatColor.RESET) // don't add reset thing
 			littleBuilder.color(color);
 		if (item != null) // add to all possible sub parts
-			littleBuilder.event(Utils.createItemHover(item));
+			littleBuilder.event(Utils.createItemHover(item, to));
 		return littleBuilder.create();
 	}
 }
