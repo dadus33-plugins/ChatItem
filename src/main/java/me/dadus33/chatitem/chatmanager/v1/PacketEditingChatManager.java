@@ -108,7 +108,7 @@ public class PacketEditingChatManager extends ChatManager {
 				if(cons.getParameterTypes()[i].isAssignableFrom(obj.getClass())) {
 					params[i] = obj;
 					nbPut++;
-				} else if(cons.getParameterTypes()[i].isAssignableFrom(chatMessageTypeClass)) {
+				} else if(chatMessageTypeClass != null && cons.getParameterTypes()[i].isAssignableFrom(chatMessageTypeClass)) {
 					params[i] = getChatMessageType();
 				}
 			}
