@@ -42,7 +42,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 			InventoryListener.open(p);
 		} else if (args[0].equalsIgnoreCase("reload") && p.hasPermission("chatitem.reload")) {
 			ChatItem.reload(sender);
-		} else if (args[0].equalsIgnoreCase("show")) {
+		} else if (args[0].equalsIgnoreCase("show") && ChatItem.getInstance().getStorage().cmdShow) {
 			Player cible = args.length == 1 ? p : Bukkit.getPlayer(args[1]);
 			if(cible == null) {
 				Messages.sendMessage(p, "player-not-found", "%arg%", args[1]);
@@ -51,7 +51,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 			Storage c = ChatItem.getInstance().getStorage();
 			ItemStack item = ChatManager.getUsableItem(cible);
 			ChatListener.showItem(p, cible, item, c.commandFormat.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
-		} else if (args[0].equalsIgnoreCase("broadcast")) {
+		} else if (args[0].equalsIgnoreCase("broadcast") && ChatItem.getInstance().getStorage().cmdBroadcast) {
 			Player cible = args.length == 1 ? p : Bukkit.getPlayer(args[1]);
 			if(cible == null) {
 				Messages.sendMessage(p, "player-not-found", "%arg%", args[1]);
@@ -77,7 +77,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 				text.addExtra(linkComp);
 			}
 			p.spigot().sendMessage(text);
-		} else if (args[0].equalsIgnoreCase("select")) {
+		} else if (args[0].equalsIgnoreCase("select") && p.hasPermission("chatitem.reload")) {
 			if(args.length == 1) {
 				p.sendMessage(ChatColor.GRAY + "----------" + ChatColor.GOLD + " ChatItem - Setup " + ChatColor.GRAY + "----------");
 				p.sendMessage(ChatColor.AQUA + "Welcome in the help of setup." + ChatColor.YELLOW + " Please follow step by simply answer to test.");
@@ -141,7 +141,16 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 		List<String> list = new ArrayList<>();
 		String prefix = arg[arg.length - 1].toLowerCase(Locale.ROOT);
 		if(arg.length <= 2) {
-			for (String s : Arrays.asList("help", "admin", "reload", "link", "show", "broadcast", "select"))
+			if(sender.hasPermission("chatitem.reload")) {
+				for (String s : Arrays.asList("admin", "reload", "select"))
+					if (prefix.isEmpty() || s.startsWith(prefix))
+						list.add(s);
+			}
+			if (ChatItem.getInstance().getStorage().cmdShow && (prefix.isEmpty() || "show".startsWith(prefix)))
+				list.add("show");
+			if (ChatItem.getInstance().getStorage().cmdBroadcast && (prefix.isEmpty() || "broadcast".startsWith(prefix)))
+				list.add("broadcast");
+			for (String s : Arrays.asList("help", "link"))
 				if (prefix.isEmpty() || s.startsWith(prefix))
 					list.add(s);
 		}

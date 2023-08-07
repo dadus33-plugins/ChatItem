@@ -15,7 +15,7 @@ public class Storage {
 	public final String SECONDS, minutes, hours;
 	public final String updateMessage, updateHover;
 	public final List<String> placeholders, tooltipHand, tooltipBuggedClient, ignoredItems;
-	public boolean colorIfColored, addAmountForced, letMessageThrough, denyIfNoItem, debug, handDisabled, showNoPermissionMessage, checkUpdate, permissionEnabled;
+	public boolean colorIfColored, addAmountForced, letMessageThrough, denyIfNoItem, debug, handDisabled, showNoPermissionMessage, checkUpdate, permissionEnabled, cmdBroadcast, cmdShow;
 	public int configVersion, limit, cooldown;
 	private FileConfiguration conf;
 
@@ -46,6 +46,8 @@ public class Storage {
 		tooltipBuggedClient = conf.getStringList("general.bugged_client.tooltip").stream().map(Storage::color).collect(Collectors.toList());
 		ignoredItems = conf.getStringList("general.ignored_items");
 		checkUpdate = conf.getBoolean("general.check-update", true);
+		checkUpdate = conf.getBoolean("general.sub-commands.broadcast", true);
+		checkUpdate = conf.getBoolean("general.sub-commands.show", true);
 		messageDeny = color(conf.getString("messages.deny-message", "&c&lYou have no item in hand!"));
 		messageReload = color(conf.getString("messages.reload-success", "&b&lSuccessful reload!"));
 		messageNoPermission = color(conf.getString("messages.no-permission", "&c&lI'm sorry, but you are not allowed to use the placeholder in chat!"));

@@ -93,6 +93,9 @@ general:
   # Check if the plugin have update
   check-update: true
   language: "en_gb"
+  sub-commands:
+    broadcast: true
+    show: true
  
  
 #  Messages section. You can disable any of them by simply leaving them empty, like this: ""
