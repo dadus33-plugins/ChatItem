@@ -206,8 +206,12 @@
                                     <shadedPattern>me.dadus33.libs.gson</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>net.kyori.adventure.text.serializer.bungeecord</pattern>
-                                    <shadedPattern>me.dadus33.libs.kyori.serializer.bungeecord</shadedPattern>
+                                    <pattern>net.kyori</pattern>
+                                    <shadedPattern>me.dadus33.libs.kyori</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.github.steveice10.opennbt</pattern>
+                                    <shadedPattern>me.dadus33.libs.opennbt</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>
