@@ -46,8 +46,8 @@ public class Storage {
 		tooltipBuggedClient = conf.getStringList("general.bugged_client.tooltip").stream().map(Storage::color).collect(Collectors.toList());
 		ignoredItems = conf.getStringList("general.ignored_items");
 		checkUpdate = conf.getBoolean("general.check-update", true);
-		checkUpdate = conf.getBoolean("general.sub-commands.broadcast", true);
-		checkUpdate = conf.getBoolean("general.sub-commands.show", true);
+		cmdShow = conf.getBoolean("general.sub-commands.broadcast", true);
+		cmdBroadcast = conf.getBoolean("general.sub-commands.show", true);
 		messageDeny = color(conf.getString("messages.deny-message", "&c&lYou have no item in hand!"));
 		messageReload = color(conf.getString("messages.reload-success", "&b&lSuccessful reload!"));
 		messageNoPermission = color(conf.getString("messages.no-permission", "&c&lI'm sorry, but you are not allowed to use the placeholder in chat!"));
@@ -61,7 +61,6 @@ public class Storage {
 		minutes = color(conf.getString("messages.minutes", " minutes"));
 		hours = color(conf.getString("messages.hours", " hours"));
 		colorStringList(tooltipHand);
-
 	}
 
 	public static String color(String s) {
