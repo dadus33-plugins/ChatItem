@@ -124,7 +124,7 @@ public interface IComponentManager {
 				else if (found)
 					id += c;
 			}
-			return false;
+			return id != "" && Utils.isInteger(id) && Chat.getChat(Integer.parseInt(id)).isPresent();
 		}
 	}
 }
