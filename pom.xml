@@ -151,7 +151,7 @@
         <dependency>
             <groupId>com.github.Auxilor</groupId>
             <artifactId>EcoEnchants</artifactId>
-            <version>10.35.3</version>
+            <version>10.36.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
