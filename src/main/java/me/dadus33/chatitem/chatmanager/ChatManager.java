@@ -149,18 +149,7 @@ public abstract class ChatManager {
 			amount = amount.replace(TIMES, String.valueOf(item.getAmount()));
 			replacer = replacer.replace(AMOUNT, amount);
 		}
-		if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-			String trp = item.getItemMeta().getDisplayName();
-			ChatItem.debug("trp: " + trp);
-			if (c.colorIfColored) {
-				replacer = replacer.replace(NAME, ChatColor.stripColor(trp));
-			} else {
-				replacer = replacer.replace(NAME, trp);
-			}
-		} else {
-			replacer = replacer.replace(NAME, NamerManager.getName(p, item, c));
-		}
-		return replacer;
+		return replacer.replace(NAME, NamerManager.getName(p, item, c));
 	}
 
 	/**

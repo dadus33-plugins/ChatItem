@@ -229,7 +229,7 @@ public class Utils {
 	public static YamlConfiguration copyLoadFile(File folder, String filename, String baseFile) {
 		File legacyConfig = new File(folder, filename);
 		if(!legacyConfig.exists())
-			Utils.copyFile(baseFile, legacyConfig);
+			copyFile(baseFile, legacyConfig);
 		return YamlConfiguration.loadConfiguration(legacyConfig);
 	}
 	

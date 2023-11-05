@@ -30,7 +30,7 @@ public interface INamer {
 	 */
 	String getName(Player p, ItemStack item, Storage storage);
 	
-	enum Priority {
+	public enum Priority {
 		MAJOR(4),
 		IMPORTANT(3),
 		MEDIUM(2),
