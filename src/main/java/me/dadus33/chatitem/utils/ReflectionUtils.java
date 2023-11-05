@@ -139,6 +139,19 @@ public class ReflectionUtils {
 	 * @return the field (or null if not found)
 	 * @throws Exception if something gone wrong
 	 */
+	public static <T> T getFirstWith(Object from, Class<T> searchingFor) throws Exception {
+		return getFirstWith(from, from.getClass(), searchingFor);
+	}
+
+	/**
+	 * Get the first object which have the searching for class type
+	 * 
+	 * @param from the object where we will try to find the field
+	 * @param clazz the class that have to define the field
+	 * @param searchingFor the class of the required field
+	 * @return the field (or null if not found)
+	 * @throws Exception if something gone wrong
+	 */
 	public static <T> T getFirstWith(Object from, Class<?> clazz, Class<T> searchingFor) throws Exception {
 		for (Field f : clazz.getDeclaredFields()) {
 			if (f.getType().equals(searchingFor) && !Modifier.isStatic(f.getModifiers())) {
@@ -146,6 +159,8 @@ public class ReflectionUtils {
 				return (T) f.get(from);
 			}
 		}
+		if(!clazz.getSuperclass().equals(Object.class))
+			return getFirstWith(from, clazz.getSuperclass(), searchingFor);
 		return null;
 	}
 

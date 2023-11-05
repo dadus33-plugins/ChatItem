@@ -87,8 +87,8 @@ public class INC2Channel extends ChannelAbstract {
 	@Override
 	public Channel getChannel(Player p) throws Exception {
 		Object playerConnection = getPlayerConnection(p);
-		Object networkManager = ReflectionUtils.getFirstWith(playerConnection, playerConnection.getClass(), PacketUtils.getNmsClass("NetworkManager", "network."));
-		return ReflectionUtils.getFirstWith(networkManager, networkManager.getClass(), Channel.class);
+		Object networkManager = ReflectionUtils.getFirstWith(playerConnection, PacketUtils.getNmsClass("NetworkManager", "network."));
+		return ReflectionUtils.getFirstWith(networkManager, Channel.class);
 	}
 
 	private class ChannelHandlerSent extends ChannelOutboundHandlerAdapter {
