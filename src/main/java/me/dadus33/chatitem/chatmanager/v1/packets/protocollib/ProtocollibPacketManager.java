@@ -13,7 +13,6 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.chatmanager.v1.listeners.HandshakeListener;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
@@ -46,7 +45,6 @@ public class ProtocollibPacketManager extends PacketManager {
 		        	e.setCancelled(packet.isCancelled());
 			}
 		});
-		protocolManager.addPacketListener(new HandshakeListener(pl));
 	}
 	
 	@Override
