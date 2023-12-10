@@ -26,6 +26,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 public class AdventureComponentManager implements IComponentManager {
@@ -103,7 +104,9 @@ public class AdventureComponentManager implements IComponentManager {
 			TextComponent tc = (TextComponent) comp;
 			if (ChatManager.containsSeparator(tc.content())) {
 				ChatItem.debug("Changing text " + tc.content() + " to " + itemName);
+				TextColor color = tc.color();
 				comp = tc.content(ChatManager.replaceSeparator(chat, tc.content(), itemName)).hoverEvent(hover);
+				comp.append(Component.text("").color(color)); // reset color
 			} else
 				ChatItem.debug("No insert of text without separator: " + tc.content());
 		} else if(comp instanceof TranslatableComponent) {
