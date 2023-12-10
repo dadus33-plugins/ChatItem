@@ -3,12 +3,10 @@ package me.dadus33.chatitem.chatmanager.v1;
 import java.lang.reflect.Constructor;
 
 import org.bukkit.Bukkit;
-import org.bukkit.event.HandlerList;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.ChatManager;
-import me.dadus33.chatitem.chatmanager.v1.listeners.ChatEventListener;
 import me.dadus33.chatitem.chatmanager.v1.listeners.ChatPacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketManager;
@@ -19,12 +17,10 @@ public class PacketEditingChatManager extends ChatManager {
 
 	private boolean baseComponentAvailable = true;
 	private final ChatItemPacketManager packetManager;
-	private final ChatEventListener chatEventListener;
 	private final ChatPacketManager chatPacketManager;
 
 	public PacketEditingChatManager(ChatItem pl) {
 		packetManager = new ChatItemPacketManager(pl);
-		chatEventListener = new ChatEventListener(this);
 		chatPacketManager = new ChatPacketManager(this);
 
 		// Check for existence of BaseComponent class (only on spigot)
@@ -49,7 +45,6 @@ public class PacketEditingChatManager extends ChatManager {
 	public void load(ChatItem pl, Storage s) {
 		super.load(pl, s);
 
-		Bukkit.getPluginManager().registerEvents(chatEventListener, pl);
 		PacketManager pm = packetManager.getPacketManager();
 		pm.addHandler(chatPacketManager);
 		Bukkit.getOnlinePlayers().forEach(pm::addPlayer); // add actual online players
@@ -57,7 +52,6 @@ public class PacketEditingChatManager extends ChatManager {
 
 	@Override
 	public void unload(ChatItem pl) {
-		HandlerList.unregisterAll(chatEventListener);
 		PacketManager pm = packetManager.getPacketManager();
 		pm.removeHandler(chatPacketManager);
 		pm.stop();

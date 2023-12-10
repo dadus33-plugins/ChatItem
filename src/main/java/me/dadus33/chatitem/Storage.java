@@ -6,16 +6,14 @@ import java.util.stream.Collectors;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import com.google.common.collect.ImmutableList;
-
 public class Storage {
 
 	public String handName, nameFormat, amountFormat, commandFormat, manager, permissionName, buggedClientAction, language;
 	public final String messageNoPermission, messageDeny, messageReload, messageCooldown, messageLimit, messageIgnoredItem;
 	public final String SECONDS, minutes, hours;
 	public final String updateMessage, updateHover;
-	public final List<String> placeholders, tooltipHand, tooltipBuggedClient, ignoredItems;
-	public boolean colorIfColored, addAmountForced, letMessageThrough, denyIfNoItem, debug, handDisabled, showNoPermissionMessage, checkUpdate, permissionEnabled, cmdBroadcast, cmdShow;
+	public final List<String> tooltipHand, tooltipBuggedClient, ignoredItems;
+	public boolean colorIfColored, addAmountForced, letMessageThrough, debug, handDisabled, showNoPermissionMessage, checkUpdate, permissionEnabled, cmdBroadcast, cmdShow;
 	public int configVersion, limit, cooldown;
 	private FileConfiguration conf;
 
@@ -26,14 +24,12 @@ public class Storage {
 		this.manager = conf.getString("manager", "auto");
 		language = conf.getString("general.language", "en_gb");
 		debug = conf.getBoolean("debug", false);
-		placeholders = ImmutableList.copyOf(conf.getStringList("general.placeholders"));
 		nameFormat = color(conf.getString("general.name-format", "&b&l&o{name} {amount}&r"));
 		amountFormat = color(conf.getString("general.amount-format", "x{times}"));
 		commandFormat = color(conf.getString("general.command-format", "&6%name%'s item is %item%"));
 		colorIfColored = conf.getBoolean("general.color-if-already-colored", true);
 		letMessageThrough = conf.getBoolean("general.let-message-through", true);
 		addAmountForced = conf.getBoolean("general.force-add-amount", true);
-		denyIfNoItem = conf.getBoolean("general.deny-if-no-item", false);
 		limit = conf.getInt("general.limit", 8);
 		cooldown = conf.getInt("general.cooldown", 60);
 		showNoPermissionMessage = conf.getBoolean("general.show-no-permission-message.normal", true);

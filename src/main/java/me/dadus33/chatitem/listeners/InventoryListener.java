@@ -48,9 +48,6 @@ public class InventoryListener implements Listener {
 		} else if(type.equals(ItemUtils.INK_SAC)) {
 			setInConfig("general.color-if-already-colored", c.colorIfColored = !c.colorIfColored);
 			open(p);
-		} else if(type.equals(Material.REDSTONE)) {
-			setInConfig("general.deny-if-no-item", c.denyIfNoItem = !c.denyIfNoItem);
-			open(p);
 		} else if(type.equals(Material.STICK)) {
 			setInConfig("general.hand.disabled", c.handDisabled = !c.handDisabled);
 			open(p);
@@ -100,7 +97,6 @@ public class InventoryListener implements Listener {
 		inv.setItem(8, getBoolChangeItem(ItemUtils.FIREWORK_CHARGE, "debug", c.debug));
 
 		inv.setItem(18, getBoolChangeItem(ItemUtils.INK_SAC, "color-if-already-colored", c.colorIfColored));
-		inv.setItem(19, getBoolChangeItem(Material.REDSTONE, "deny-no-item", c.denyIfNoItem));
 		inv.setItem(20, getBoolChangeItem(Material.STICK, "hand-disabled", c.handDisabled));
 		inv.setItem(21, getAmountChangeItem(Material.IRON_DOOR, "limit-per-message", c.limit));
 		inv.setItem(22, getAmountChangeItem(Material.APPLE, "cooldown", c.cooldown));

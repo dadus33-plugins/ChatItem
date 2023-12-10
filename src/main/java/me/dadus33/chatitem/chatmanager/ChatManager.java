@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.ItemSlot;
 import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.hook.ecoenchants.EcoEnchantsSupport;
 import me.dadus33.chatitem.itemnamer.NamerManager;
@@ -90,9 +91,12 @@ public abstract class ChatManager {
 	 * @param p the player
 	 * @return the usable item
 	 */
-	public static ItemStack getUsableItem(Player p) {
-		ItemStack item = HandItem.getBetterItem(p).clone();
-
+	public static ItemStack getUsableItem(Player p, ItemSlot slot) {
+		if(slot == null)
+			return null;
+		ItemStack item = HandItem.getBetterItem(p, slot).clone();
+		if(slot.isDenyIfNoItem() && ItemUtils.isEmpty(item))
+			return null;
 		if (EcoEnchantsSupport.hasSupport()) {
 			item = EcoEnchantsSupport.manageItem(item);
 		}
@@ -163,7 +167,7 @@ public abstract class ChatManager {
 	public static String getNameOfItem(Player p, ItemStack item, Storage c) {
 		if (ItemUtils.isEmpty(item)) {
 			if (c.handDisabled)
-				return c.placeholders.get(0);
+				return ItemSlot.HAND.getPlaceholders().get(0);
 			else
 				return c.handName;
 		}
@@ -199,7 +203,9 @@ public abstract class ChatManager {
 		return builder.toString();
 	}
 
-	public static boolean canShowItem(Player p, ItemStack item, @Nullable Cancellable e) {
+	public static boolean canShowItem(Player p, ItemStack item, ItemSlot slot, @Nullable Cancellable e) {
+		if(item == null)
+			return false;
 		Storage c = ChatItem.getInstance().getStorage();
 		if (c.permissionEnabled && !p.hasPermission(c.permissionName)) {
 			if (!c.letMessageThrough) {
@@ -212,7 +218,7 @@ public abstract class ChatManager {
 			return false;
 		}
 		if (item.getType().equals(Material.AIR)) {
-			if (c.denyIfNoItem) {
+			if (slot.isDenyIfNoItem()) {
 				if (e != null)
 					e.setCancelled(true);
 				if (!c.messageDeny.isEmpty())

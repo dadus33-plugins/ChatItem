@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.ItemPlayer;
+import me.dadus33.chatitem.ItemSlot;
 import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatManager;
@@ -86,10 +87,12 @@ public class ChatListener implements Listener {
 		if (e.isCancelled()) {
 			if (ChatItem.getInstance().getChatManager().size() == 1) { // only chat
 				String msg = e.getMessage().toLowerCase();
-				for (String rep : c.placeholders) {
-					if (msg.contains(rep)) {
-						ChatItem.debug("You choose 'chat' manager but it seems to don't be the good choice. More informations here: https://github.com/dadus33-plugins/ChatItem/wiki");
-						return;
+				for(ItemSlot slot : ItemSlot.values()) {
+					for (String rep : slot.getPlaceholders()) {
+						if (msg.contains(rep)) {
+							ChatItem.debug("You choose 'chat' manager but it seems to don't be the good choice. More informations here: https://github.com/dadus33-plugins/ChatItem/wiki");
+							return;
+						}
 					}
 				}
 			}
@@ -100,34 +103,25 @@ public class ChatListener implements Listener {
 		if(ChatManager.containsSeparator(e.getMessage())) { // fix for v1
 			Chat chat = Chat.getFrom(e.getMessage());
 			if(chat != null)
-				e.setMessage(ChatManager.replaceSeparator(chat, e.getMessage(), c.placeholders.get(0)));
+				e.setMessage(ChatManager.replaceSeparator(chat, e.getMessage(), chat.getSlot().getPlaceholders().get(0)));
 		}
-		String placeholder = null;
-		for (String rep : c.placeholders) {
-			if (e.getMessage().contains(rep)) {
-				placeholder = rep;
-				break;
-			}
-		}
-
-		if (placeholder == null) { // if not found
+		ItemSlot slot = ItemSlot.getItemSlotFromMessage(e.getMessage());
+		if (slot == null) { // if not found
 			ChatItem.debug("(v2) Can't found placeholder in: " + e.getMessage() + " > " + PlayerNamerManager.getPlayerNamer().getName(p));
 			return;
 		}
-		ItemStack item = ChatManager.getUsableItem(p);
-		if (!ChatManager.canShowItem(p, item, e))
+		ItemStack item = ChatManager.getUsableItem(p, slot);
+		if (!ChatManager.canShowItem(p, item, slot, e))
 			return;
 		e.setCancelled(true);
 		String format = e.getFormat();
-		String msg, defMsg = e.getMessage();
-		for (String rep : c.placeholders) {
-			defMsg = defMsg.replace(rep, Character.toString(ChatManager.SEPARATOR));
-		}
+		String defMsg = slot.replacePlaceholdersToSeparator(e.getMessage());
 		if (Utils.countMatches(defMsg, Character.toString(ChatManager.SEPARATOR)) > getStorage().limit) {
 			if (!getStorage().messageLimit.isEmpty())
 				p.sendMessage(getStorage().messageLimit);
 			return;
 		}
+		String msg;
 		if (format.contains("%1$s") || format.contains("%2$s")) {
 			msg = (format.contains("%2$s") ? String.format(format, p.getDisplayName(), defMsg) : String.format(format, p.getDisplayName()));
 		} else {

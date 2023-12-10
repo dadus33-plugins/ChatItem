@@ -147,7 +147,7 @@ public class ChatPacketManager extends PacketHandler {
 			Player p = e.getPlayer();
 			String message = null;
 			try {
-				ItemStack item = ChatManager.getUsableItem(itemPlayer);
+				ItemStack item = ChatManager.getUsableItem(itemPlayer, chat.getSlot());
 				if (!ItemUtils.isEmpty(item)) {
 					ItemStack copy = item.clone();
 

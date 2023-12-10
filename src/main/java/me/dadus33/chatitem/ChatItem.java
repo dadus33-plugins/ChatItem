@@ -19,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.base.Strings;
 
+import me.dadus33.chatitem.chatmanager.ChatEventListener;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v2.ChatListenerChatManager;
@@ -146,6 +147,7 @@ public class ChatItem extends JavaPlugin {
 		pm.registerEvents(new JoinListener(), this);
 		pm.registerEvents(new InventoryListener(), this);
 		pm.registerEvents(new TranslationInventoryListener(), this);
+		pm.registerEvents(new ChatEventListener(), this);
 
 		chooseManagers();
 

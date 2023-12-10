@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.ItemPlayer;
+import me.dadus33.chatitem.ItemSlot;
 import me.dadus33.chatitem.utils.Utils;
 
 public class Chat {
@@ -20,8 +21,8 @@ public class Chat {
 			return CHAT.stream().filter(o -> o.getId() == id).findFirst();
 		}
 	}
-	public static Chat create(Player p, String message) {
-		return new Chat(actualId++, p, message);
+	public static Chat create(Player p, String message, ItemSlot slot) {
+		return new Chat(actualId++, p, message, slot);
 	}
 	public static Chat getFrom(String message) {
 		boolean found = false;
@@ -42,12 +43,14 @@ public class Chat {
 	private final int id;
 	private final Player p;
 	private final String message;
+	private final ItemSlot slot;
 	
-	public Chat(int id, Player p, String message) {
+	public Chat(int id, Player p, String message, ItemSlot slot) {
 		this.time = System.currentTimeMillis();
 		this.id = id;
 		this.p = p;
 		this.message = message;
+		this.slot = slot;
 		CHAT.add(this);
 	}
 	
@@ -65,6 +68,10 @@ public class Chat {
 	
 	public String getMessage() {
 		return message;
+	}
+	
+	public ItemSlot getSlot() {
+		return slot;
 	}
 	
 	public ItemPlayer getItemPlayer() {

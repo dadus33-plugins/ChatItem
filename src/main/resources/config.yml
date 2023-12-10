@@ -27,6 +27,38 @@ general:
     - "{i}"
     - "[item]"
     - "{item}"
+  other-placeholders:
+    # Show what is in the head
+    helmet:
+      # Enable it or not
+      enabled: true
+      # Disallow showing empty item
+      deny-if-no-item: true
+      # Placeholders to use in chat
+      keys:
+      - "[head]"
+      - "{head}"
+    # Show the CHESTPLATE not the enderchest or whatever
+    chestplate:
+      enabled: true
+      deny-if-no-item: true
+      keys:
+      - "[chest]"
+      - "{chest}"
+    # Show leggings
+    leggings:
+      enabled: true
+      deny-if-no-item: true
+      keys:
+      - "[legs]"
+      - "{legs}"
+    # Show what is their feets
+    boots:
+      enabled: false
+      deny-if-no-item: true
+      keys:
+      - "[feet]"
+      - "{feet}"
   # The format of the item placeholders.
   name-format: "&b&l&o{name}{amount}&r"
   # The format of the {amount} placeholder.

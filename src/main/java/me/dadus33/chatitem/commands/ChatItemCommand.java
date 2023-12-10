@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.ItemSlot;
 import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v2.ChatListener;
@@ -49,7 +50,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 				return false;
 			}
 			Storage c = ChatItem.getInstance().getStorage();
-			ItemStack item = ChatManager.getUsableItem(cible);
+			ItemStack item = ChatManager.getUsableItem(cible, ItemSlot.HAND);
 			ChatListener.showItem(p, cible, item, c.commandFormat.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
 		} else if (args[0].equalsIgnoreCase("broadcast") && ChatItem.getInstance().getStorage().cmdBroadcast) {
 			Player cible = args.length == 1 ? p : Bukkit.getPlayer(args[1]);
@@ -58,7 +59,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 				return false;
 			}
 			Storage c = ChatItem.getInstance().getStorage();
-			ItemStack item = ChatManager.getUsableItem(cible);
+			ItemStack item = ChatManager.getUsableItem(cible, ItemSlot.HAND);
 			for(Player all : Bukkit.getOnlinePlayers())
 				ChatListener.showItem(all, cible, item, c.commandFormat.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
 		} else if (args[0].equalsIgnoreCase("link") || args[0].equalsIgnoreCase("links")) {
