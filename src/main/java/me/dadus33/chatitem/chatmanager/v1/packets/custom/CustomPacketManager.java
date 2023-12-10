@@ -1,8 +1,8 @@
 package me.dadus33.chatitem.chatmanager.v1.packets.custom;
 
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -39,11 +39,11 @@ public class CustomPacketManager extends PacketManager implements Listener {
 		pl.getServer().getPluginManager().registerEvents(this, pl);
 		
 		// we wait the start server
-		Bukkit.getScheduler().runTaskLater(pl, () -> {
+		CompletableFuture.runAsync(() -> {
 			isStarted = true;
 			for(Player p : Utils.getOnlinePlayers())
 				addPlayer(p);
-		}, 20);
+		});
 	}
 	
 	public Plugin getPlugin() {
