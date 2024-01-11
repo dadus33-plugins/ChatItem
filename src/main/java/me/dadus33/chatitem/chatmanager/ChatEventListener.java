@@ -8,7 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.ItemSlot;
@@ -35,8 +34,8 @@ public class ChatEventListener implements Listener {
 			ChatItem.debug("(v1) not found placeholders in: " + e.getMessage());
 			return;
 		}
-		ItemStack item = ChatManager.getUsableItem(p, slot);
-		if (!ChatManager.canShowItem(p, item, slot, e))
+		ChatAction action = ChatManager.getChatAction(slot, p);
+		if(action.isItem() && !ChatManager.canShowItem(p, action.getItem(), slot, e))
 			return;
 		String s = slot.replacePlaceholdersToSeparator(e.getMessage());
 		if (Utils.countMatches(s, Character.toString(ChatManager.SEPARATOR)) > getStorage().limit) {

@@ -59,6 +59,19 @@ general:
       keys:
       - "[feet]"
       - "{feet}"
+    inventory:
+      enabled: true
+      deny-if-no-item: true
+      keys:
+      - "[inv]"
+      - "{inv}"
+    enderchest:
+      enabled: true
+      deny-if-no-item: true
+      keys:
+      - "[ec]"
+      - "{ec}"
+
   # The format of the item placeholders.
   name-format: "&b&l&o{name}{amount}&r"
   # The format of the {amount} placeholder.
@@ -246,3 +259,10 @@ messages:
   hours: " hours"
   enabled: "&aEnabled"
   disabled: "&cDisabled"
+  inventory:
+    name: "%cible%'s inventory"
+    chat: "%cible%'s inventory"
+    hover: "&7Click to see inventory"
+  enderchest:
+    chat: "%cible%'s enderchest"
+    hover: "&7Click to see enderchest"

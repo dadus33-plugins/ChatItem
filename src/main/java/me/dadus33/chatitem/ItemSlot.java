@@ -6,18 +6,29 @@ import me.dadus33.chatitem.chatmanager.ChatManager;
 
 public enum ItemSlot {
 
-	HAND(true, ""), HELMET(false, "helmet"), CHESTPLATE(false, "chestplate"), LEGGINGS(false, "leggings"), BOOTS(false, "boots");
+	HAND(true, "", false),
+	HELMET(false, "helmet", false),
+	CHESTPLATE(false, "chestplate", false),
+	LEGGINGS(false, "leggings", false),
+	BOOTS(false, "boots", false),
+	INVENTORY(false, "inventory", true),
+	ENDERCHEST(false, "enderchest", true);
 	
-	private final boolean basic;
+	private final boolean basic, command;
 	private final String key;
 	
-	private ItemSlot(boolean basic, String key) {
+	private ItemSlot(boolean basic, String key, boolean command) {
 		this.basic = basic;
+		this.command = command;
 		this.key = key;
 	}
 	
 	public boolean isBasic() {
 		return basic;
+	}
+	
+	public boolean isCommand() {
+		return command;
 	}
 	
 	public List<String> getPlaceholders() {

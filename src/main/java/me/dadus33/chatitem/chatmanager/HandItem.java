@@ -17,8 +17,7 @@ public class HandItem {
 				ItemStack main = p.getInventory().getItemInMainHand();
 				if(!ItemUtils.isEmpty(main))
 					return main;
-				ItemStack off = p.getInventory().getItemInOffHand();
-				return ItemUtils.isEmpty(off) ? main : off;
+				return p.getInventory().getItemInOffHand();
 			}
 			return p.getItemInHand();
 		case HELMET:
@@ -29,6 +28,10 @@ public class HandItem {
 			return p.getInventory().getLeggings();
 		case BOOTS:
 			return p.getInventory().getBoots();
+		case ENDERCHEST:
+			break;
+		case INVENTORY:
+			break;
 		}
 		return null; // should never happen
 	}

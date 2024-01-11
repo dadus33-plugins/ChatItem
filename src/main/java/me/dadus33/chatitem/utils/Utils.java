@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -28,6 +29,7 @@ import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.playerversion.PlayerVersionManager;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.ItemTag;
@@ -36,8 +38,9 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class Utils {
 
-	private final static TreeMap<Integer, String> ROMAN_KEYS = new TreeMap<>();
-	private final static HashMap<String, String> ENCHANTS_NAMES = new HashMap<>();
+	private static final Pattern UUID_PATTERN = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
+	private static final TreeMap<Integer, String> ROMAN_KEYS = new TreeMap<>();
+	private static final HashMap<String, String> ENCHANTS_NAMES = new HashMap<>();
 
 	static {
 		ROMAN_KEYS.put(1000, "M");
@@ -190,6 +193,10 @@ public class Utils {
 		}
 	}
 	
+	public static ClickEvent createRunCommand(String command) {
+		return new ClickEvent(ClickEvent.Action.RUN_COMMAND, command);
+	}
+	
 	public static boolean isInteger(String s) {
 		try {
 			Integer.parseInt(s);
@@ -224,6 +231,10 @@ public class Utils {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+	
+	public static boolean isUUID(String s) {
+		return s != null && UUID_PATTERN.matcher(s.toLowerCase()).matches();
 	}
 
 	public static YamlConfiguration copyLoadFile(File folder, String filename, String baseFile) {

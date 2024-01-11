@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.annotation.Nullable;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,11 +21,13 @@ import me.dadus33.chatitem.ItemPlayer;
 import me.dadus33.chatitem.ItemSlot;
 import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.Chat;
+import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.hook.DiscordSrvSupport;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.ColorManager;
 import me.dadus33.chatitem.utils.ItemUtils;
+import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.Utils;
@@ -110,8 +110,8 @@ public class ChatListener implements Listener {
 			ChatItem.debug("(v2) Can't found placeholder in: " + e.getMessage() + " > " + PlayerNamerManager.getPlayerNamer().getName(p));
 			return;
 		}
-		ItemStack item = ChatManager.getUsableItem(p, slot);
-		if (!ChatManager.canShowItem(p, item, slot, e))
+		ChatAction action = ChatManager.getChatAction(slot, p);
+		if(action.isItem() && !ChatManager.canShowItem(p, action.getItem(), slot, e))
 			return;
 		e.setCancelled(true);
 		String format = e.getFormat();
@@ -127,19 +127,19 @@ public class ChatListener implements Listener {
 		} else {
 			msg = format.replace(e.getMessage(), defMsg);
 		}
-		String itemName = ChatManager.getNameOfItem(p, item, c);
+		String itemName = ChatManager.getNameForChatAction(p, action, c);
 		String loggedMessage = msg.replace(ChatManager.SEPARATOR + "", itemName).replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName());
 		Bukkit.getConsoleSender().sendMessage(loggedMessage); // show in log
 		if (ChatItem.discordSrvSupport)
 			DiscordSrvSupport.sendChatMessage(p, defMsg.replace(ChatManager.SEPARATOR + "", itemName).replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName()));
 		Set<Player> recipients = e.getRecipients().isEmpty() ? new HashSet<>(Bukkit.getOnlinePlayers()) : e.getRecipients();
 		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format + " to " + recipients.size() + " players");
-		recipients.forEach((pl) -> showItem(pl, p, item, msg));
+		recipients.forEach((pl) -> showItem(pl, p, action, msg));
 		if (c.cooldown > 0 && !p.hasPermission("chatitem.ignore-cooldown"))
 			ChatManager.applyCooldown(p);
 	}
 
-	public static void showItem(Player to, Player origin, ItemStack item, String msg) {
+	public static void showItem(Player to, Player origin, ChatAction action, String msg) {
 		ComponentBuilder builder = new ComponentBuilder("");
 		ChatColor color = ChatColor.WHITE;
 		String colorCode = "", text = "";
@@ -188,8 +188,11 @@ public class ChatListener implements Listener {
 				}
 				if (args == ChatManager.SEPARATOR) {
 					// here put the item
-					appendToComponentBuilder(builder, fixColorComponent(to, text, color));
-					addItem(builder, to, origin, item);
+					appendToComponentBuilder(builder, fixColorComponent(to, text, color, action));
+					if(action.isItem())
+						addItem(builder, to, origin, action.getItem(), action);
+					else
+						addCommand(builder, to, origin, action.getCommand(), action);
 					text = "";
 					if(ChatManager.containsSeparatorEnd(msg))
 						removing = true;
@@ -206,11 +209,11 @@ public class ChatListener implements Listener {
 		to.spigot().sendMessage(builder.create());
 	}
 
-	public static void addItem(ComponentBuilder builder, Player to, Player origin, ItemStack item) {
+	public static void addItem(ComponentBuilder builder, Player to, Player origin, ItemStack item, ChatAction action) {
 		Storage c = ChatItem.getInstance().getStorage();
 		if (!ItemUtils.isEmpty(item)) {
 			ComponentBuilder itemComponent = new ComponentBuilder("");
-			appendToComponentBuilder(itemComponent, fixColorComponent(to, ChatManager.getNameOfItem(to, item, c), ChatColor.WHITE, item));
+			appendToComponentBuilder(itemComponent, fixColorComponent(to, ChatManager.getNameOfItem(to, item, c), ChatColor.WHITE, action));
 			ChatItem.debug("Item for " + to.getName() + " (ver: " + ItemPlayer.getPlayer(to).getVersion().name() + ") : " + PacketUtils.getNbtTag(item));
 			// itemComponent.event(new HoverEvent(Action.SHOW_ITEM, itemBaseComponent));
 			appendToComponentBuilder(builder, itemComponent.create());
@@ -239,6 +242,12 @@ public class ChatListener implements Listener {
 		}
 	}
 
+	public static void addCommand(ComponentBuilder builder, Player to, Player origin, String command, ChatAction action) {
+		ComponentBuilder itemComponent = new ComponentBuilder("");
+		appendToComponentBuilder(itemComponent, fixColorComponent(to, Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", origin.getName()), ChatColor.WHITE, action));
+		appendToComponentBuilder(builder, itemComponent.create());
+	}
+
 	public static void appendToComponentBuilder(ComponentBuilder builder, BaseComponent[] comps) {
 		if (shouldUseAppendMethod) {
 			try {
@@ -260,11 +269,7 @@ public class ChatListener implements Listener {
 		}
 	}
 
-	public static BaseComponent[] fixColorComponent(Player to, String message, ChatColor color) {
-		return fixColorComponent(to, message, color, null);
-	}
-
-	public static BaseComponent[] fixColorComponent(Player to, String message, ChatColor color, @Nullable ItemStack item) {
+	public static BaseComponent[] fixColorComponent(Player to, String message, ChatColor color, ChatAction action) {
 		ComponentBuilder builder = new ComponentBuilder("");
 		String colorCode = "", text = "";
 		boolean waiting = false;
@@ -272,7 +277,7 @@ public class ChatListener implements Listener {
 			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
 					ChatItem.debug("Append while fixing name " + (ColorManager.isHexColor(color) && builder.getParts().isEmpty() ? ColorManager.removeColorAtBegin(text) : text));
-					appendToComponentBuilder(builder, createComponent(to, ColorManager.isHexColor(color) ? ColorManager.removeColorAtBegin(text) : text, color, item));
+					appendToComponentBuilder(builder, createComponent(to, ColorManager.isHexColor(color) ? ColorManager.removeColorAtBegin(text) : text, color, action));
 					text = "";
 				}
 				waiting = true; // waiting for color code
@@ -311,7 +316,7 @@ public class ChatListener implements Listener {
 			}
 		}
 		if (!text.isEmpty()) {
-			appendToComponentBuilder(builder, createComponent(to, text, color, item));
+			appendToComponentBuilder(builder, createComponent(to, text, color, action));
 		}
 		return builder.create();
 	}
@@ -320,12 +325,16 @@ public class ChatListener implements Listener {
 		return createComponent(to, text, color, null);
 	}
 	
-	private static BaseComponent[] createComponent(Player to, String text, ChatColor color, ItemStack item) {
+	private static BaseComponent[] createComponent(Player to, String text, ChatColor color, ChatAction action) {
 		ComponentBuilder littleBuilder = new ComponentBuilder(text);
 		if(color != null && color != ChatColor.RESET) // don't add reset thing
 			littleBuilder.color(color);
-		if (item != null) // add to all possible sub parts
-			littleBuilder.event(Utils.createItemHover(item, to));
+		if (action.isItem())
+			littleBuilder.event(Utils.createItemHover(action.getItem(), to));
+		else {
+			littleBuilder.event(Utils.createTextHover(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover")));
+			littleBuilder.event(Utils.createRunCommand(action.getCommand()));
+		}
 		return littleBuilder.create();
 	}
 }

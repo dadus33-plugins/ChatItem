@@ -100,8 +100,14 @@ public abstract class ChatManager {
 		if (EcoEnchantsSupport.hasSupport()) {
 			item = EcoEnchantsSupport.manageItem(item);
 		}
-
 		return item;
+	}
+	
+	public static ChatAction getChatAction(ItemSlot slot, Player p) {
+		if(slot.isCommand()) {
+			return new ChatAction(slot, "/chatitem seeinv " + slot.name().toLowerCase() + " " + p.getUniqueId());
+		}
+		return new ChatAction(slot, getUsableItem(p, slot));
 	}
 
 	/**
@@ -172,6 +178,20 @@ public abstract class ChatManager {
 				return c.handName;
 		}
 		return styleItem(p, item, c);
+	}
+	
+	public static String getNameForChatAction(Player p, ChatAction action, Storage c) {
+		if(action.isItem()) {
+			ItemStack item = action.getItem();
+			if (ItemUtils.isEmpty(item)) {
+				if (c.handDisabled)
+					return ItemSlot.HAND.getPlaceholders().get(0);
+				else
+					return c.handName;
+			}
+			return styleItem(p, item, c);
+		}
+		return "";
 	}
 
 	public static String calculateTime(long seconds) {

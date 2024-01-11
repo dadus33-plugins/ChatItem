@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,8 +17,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.InventoryShower;
 import me.dadus33.chatitem.ItemSlot;
 import me.dadus33.chatitem.Storage;
+import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v2.ChatListener;
 import me.dadus33.chatitem.listeners.InventoryListener;
@@ -51,7 +54,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 			}
 			Storage c = ChatItem.getInstance().getStorage();
 			ItemStack item = ChatManager.getUsableItem(cible, ItemSlot.HAND);
-			ChatListener.showItem(p, cible, item, c.commandFormat.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
+			ChatListener.showItem(p, cible, new ChatAction(ItemSlot.HAND, item), c.commandFormat.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
 		} else if (args[0].equalsIgnoreCase("broadcast") && ChatItem.getInstance().getStorage().cmdBroadcast) {
 			Player cible = args.length == 1 ? p : Bukkit.getPlayer(args[1]);
 			if(cible == null) {
@@ -61,7 +64,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 			Storage c = ChatItem.getInstance().getStorage();
 			ItemStack item = ChatManager.getUsableItem(cible, ItemSlot.HAND);
 			for(Player all : Bukkit.getOnlinePlayers())
-				ChatListener.showItem(all, cible, item, c.commandFormat.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
+				ChatListener.showItem(all, cible, new ChatAction(ItemSlot.HAND, item), c.commandFormat.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
 		} else if (args[0].equalsIgnoreCase("link") || args[0].equalsIgnoreCase("links")) {
 			ConfigurationSection config = ChatItem.getInstance().getConfig()
 					.getConfigurationSection("messages.chatitem-cmd.links");
@@ -111,7 +114,19 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 					p.sendMessage(ChatColor.RED + "Can't find if it works");
 				}
 			}
-			
+		} else if (args[0].equalsIgnoreCase("seeinv")) {
+			if(args.length == 3 && Utils.isUUID(args[2])) {
+				Player cible = Bukkit.getPlayer(UUID.fromString(args[2]));
+				if(cible == null || !cible.isOnline()) {
+					Messages.sendMessage(p, "player-not-found", "%arg%", args[2]);
+					return false;
+				}
+				if(args[1].equalsIgnoreCase("inventory")) {
+					InventoryShower.showInventory(p, cible);
+				} else if(args[1].equalsIgnoreCase("enderchest")) {
+					InventoryShower.showEnderchest(p, cible);
+				}
+			} // else just ignore 
 		} else {
 			Messages.sendMessage(p, "chatitem-cmd.help");
 		}
