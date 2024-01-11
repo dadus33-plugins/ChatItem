@@ -9,9 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,7 +21,9 @@ import com.google.gson.JsonPrimitive;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.Chat;
+import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
+import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 
@@ -44,58 +44,61 @@ public class JSONManipulator {
 	public static final Method SAVE_NMS_ITEM_STACK_METHOD = ReflectionUtils.getMethod(NMS_ITEM_STACK_CLASS, NBT_TAG_COMPOUND, NBT_TAG_COMPOUND);
 	public static final Field MAP = ReflectionUtils.getField(NBT_TAG_COMPOUND, "map", "x");
 
-	private static final ConcurrentHashMap<ItemStack, JsonObject> STACKS = new ConcurrentHashMap<>();
-
-	private JsonObject itemTooltip;
 	private JsonArray classicTooltip;
 
-	public String parse(Chat chat, String json, ItemStack item, String replacement) throws Exception {
+	public String parse(Chat chat, String json, ChatAction action, String replacement) throws Exception {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 
 		JsonObject wrapper = new JsonObject(); // Create a wrapper object for the whole array
-		if ((itemTooltip = STACKS.get(item)) == null) {
-			JsonArray use = Translator.toJson(replacement); // We get the json representation of the old color
-															// formatting method
-			ChatItem.debug("Remplacement: " + replacement + " use: " + use.toString());
-			// There's no public clone method for JSONObjects so we need to parse them every
-			// time
-			JsonObject hover = new JsonObject();
+		JsonArray use = Translator.toJson(replacement); // We get the json representation of the old color
+														// formatting method
+		ChatItem.debug("Remplacement: " + replacement + " use: " + use.toString());
+		// There's no public clone method for JSONObjects so we need to parse them every
+		// time
+		JsonObject hover = new JsonObject();
+		if (action.isItem()) {
 			hover.addProperty("action", "show_item");
 
 			// Get the JSON representation of the item (well, not really JSON, but rather a
 			// string representation of NBT data)
-			hover.addProperty("value", stringifyItem(item));
+			hover.addProperty("value", stringifyItem(action.getItem()));
+		} else {
+			hover.addProperty("action", "show_text");
 
-			if (use.size() == 1) {
-				JsonElement extraElement = use.get(0);
-				if (extraElement.isJsonPrimitive())
-					wrapper.addProperty("text", extraElement.getAsString());
-				else if (extraElement.isJsonObject())
-					wrapper.addProperty("text", extraElement.getAsJsonObject().get("text").getAsString());
-				else
-					wrapper.add("extra", use); // add it only if
-			} else if (!use.isEmpty())
+			// Get the JSON representation of the item (well, not really JSON, but rather a
+			// string representation of NBT data)
+			hover.addProperty("value", parseEmpty(json, replacement, Arrays.asList(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover")), chat.getPlayer()));
+
+			JsonObject click = new JsonObject();
+			click.addProperty("action", "run_command");
+			click.addProperty("value", action.getCommand());
+			wrapper.add("clickEvent", click);
+		}
+
+		if (use.size() == 1) {
+			JsonElement extraElement = use.get(0);
+			if (extraElement.isJsonPrimitive())
+				wrapper.addProperty("text", extraElement.getAsString());
+			else if (extraElement.isJsonObject())
+				wrapper.addProperty("text", extraElement.getAsJsonObject().get("text").getAsString());
+			else
 				wrapper.add("extra", use); // add it only if
-			if (!wrapper.has("text"))
-				wrapper.addProperty("text", ""); // The text field is compulsory, even if it's empty
-			wrapper.add("hoverEvent", hover);
+		} else if (!use.isEmpty())
+			wrapper.add("extra", use); // add it only if
+		if (!wrapper.has("text"))
+			wrapper.addProperty("text", ""); // The text field is compulsory, even if it's empty
+		wrapper.add("hoverEvent", hover);
 
-			itemTooltip = wrapper; // Save the tooltip for later use when we encounter a placeholder
-			STACKS.put(item, itemTooltip); // Save it in the cache too so when parsing other packets with the same item
-										// (and client version) we no longer have to create it again
-			// We remove it later when no longer needed to save memory
-			Bukkit.getScheduler().runTaskLaterAsynchronously(ChatItem.getInstance(), () -> STACKS.remove(item), 100L);
-		}
 		if (obj.size() == 1 && obj.has("text")) {
-			itemTooltip.add("text", obj.get("text"));
-			ChatItem.debug("[JsonManipulator] Parsed quick: " + obj.toString() + ", wrapper: " + itemTooltip);
-			return ChatManager.replaceSeparator(chat, itemTooltip.toString(), replacement);
+			wrapper.add("text", obj.get("text"));
+			ChatItem.debug("[JsonManipulator] Parsed quick: " + obj.toString() + ", wrapper: " + wrapper);
+			return ChatManager.replaceSeparator(chat, wrapper.toString(), replacement);
 		}
-		obj.add("extra", parseArray(obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray(), itemTooltip));
+		obj.add("extra", parseArray(obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray(), wrapper));
 		if (!obj.has("text")) {
 			obj.addProperty("text", "");
 		}
-		ChatItem.debug("Parsed array for item: " + obj.toString() + ", wrapper: " + itemTooltip);
+		ChatItem.debug("Parsed array for item: " + obj.toString() + ", wrapper: " + wrapper);
 		return obj.toString();
 	}
 

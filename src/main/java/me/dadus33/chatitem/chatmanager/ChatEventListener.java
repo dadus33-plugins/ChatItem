@@ -45,7 +45,7 @@ public class ChatEventListener implements Listener {
 			return;
 		}
 
-		Chat c = Chat.create(p, oldMsg, slot);
+		Chat c = Chat.create(p, oldMsg, action);
 		ChatItem.debug("(v1) Set placeholder to message " + c);
 		e.setMessage(s.replace(Character.toString(ChatManager.SEPARATOR), SEPARATOR + Integer.toString(c.getId()) + SEPARATOR_END));
 		e.setFormat(e.getFormat().replace(oldMsg, e.getMessage())); // set own message for plugin that already put the message into the format

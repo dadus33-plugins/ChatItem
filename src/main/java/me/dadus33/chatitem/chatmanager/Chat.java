@@ -21,8 +21,8 @@ public class Chat {
 			return CHAT.stream().filter(o -> o.getId() == id).findFirst();
 		}
 	}
-	public static Chat create(Player p, String message, ItemSlot slot) {
-		return new Chat(actualId++, p, message, slot);
+	public static Chat create(Player p, String message, ChatAction action) {
+		return new Chat(actualId++, p, message, action);
 	}
 	public static Chat getFrom(String message) {
 		boolean found = false;
@@ -43,14 +43,14 @@ public class Chat {
 	private final int id;
 	private final Player p;
 	private final String message;
-	private final ItemSlot slot;
+	private final ChatAction action;
 	
-	public Chat(int id, Player p, String message, ItemSlot slot) {
+	public Chat(int id, Player p, String message, ChatAction action) {
 		this.time = System.currentTimeMillis();
 		this.id = id;
 		this.p = p;
 		this.message = message;
-		this.slot = slot;
+		this.action = action;
 		CHAT.add(this);
 	}
 	
@@ -71,7 +71,11 @@ public class Chat {
 	}
 	
 	public ItemSlot getSlot() {
-		return slot;
+		return action.getSlot();
+	}
+	
+	public ChatAction getAction() {
+		return action;
 	}
 	
 	public ItemPlayer getItemPlayer() {

@@ -49,7 +49,7 @@ public interface IComponentManager {
 		if (Utils.isBeforeChatJson(p))
 			message = JSONManipulator.getInstance().parseEmpty(json, ChatManager.styleItem(chat.getPlayer(), item, c), ChatManager.getMaxLinesFromItem(p, item), chat.getPlayer());
 		else
-			message = JSONManipulator.getInstance().parse(chat, json, item, ChatManager.styleItem(chat.getPlayer(), item, c));
+			message = JSONManipulator.getInstance().parse(chat, json, chat.getAction(), ChatManager.styleItem(chat.getPlayer(), item, c));
 		if (message != null) {
 			ChatItem.debug("(v1) Writing message: " + message);
 			writeJson(packet, message);
