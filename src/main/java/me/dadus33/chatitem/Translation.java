@@ -34,8 +34,12 @@ public class Translation {
 		allLangsConfig = Utils.copyLoadFile(pl.getDataFolder(), "langs.yml", "langs.yml");
 
 		allLangsConfig.getStringList("all").forEach(langKey -> {
-			JsonObject content = JsonParser.parseReader(new InputStreamReader(pl.getResource("lang/" + langKey + ".json"))).getAsJsonObject();
-			allLangs.put(langKey, content.get("language.name").getAsString() + " (" + content.get("language.region").getAsString() + ")");
+			try {
+				JsonObject content = JsonParser.parseReader(new InputStreamReader(pl.getResource("lang/" + langKey + ".json"))).getAsJsonObject();
+				allLangs.put(langKey, content.get("language.name").getAsString() + " (" + content.get("language.region").getAsString() + ")");
+			} catch (Exception e) {
+				pl.getLogger().severe("Failed to load lang with key " + langKey + " : " + e.getMessage() + " (" + e.getStackTrace()[0].toString() + ")");
+			}
 		});
 		allLangs = allLangs.entrySet().stream().sorted(Entry.comparingByValue()).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 		loadLang(pl.getStorage().language);
