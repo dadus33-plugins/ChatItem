@@ -266,3 +266,7 @@ messages:
   enderchest:
     chat: "%cible%'s enderchest"
     hover: "&7Click to see enderchest"
+
+# If ChatItem send message using DiscordSRV
+# This option will be ignored if you don't have it
+discord-srv-send-our: true

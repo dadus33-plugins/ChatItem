@@ -20,6 +20,7 @@ import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent.ContentModifier;
+import me.dadus33.chatitem.hook.DiscordSrvSupport;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.PacketUtils;
 import net.kyori.adventure.key.Key;
@@ -106,6 +107,8 @@ public class AdventureComponentManager implements IComponentManager {
 			return null;
 		}
 		comp = checkComponent(comp, hover, click, replacement, chat);
+		if(ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage())
+			DiscordSrvSupport.sendChatMessage(p, comp, null);
 		ChatItem.debug("Result: " + GsonComponentSerializer.gson().serialize(comp));
 		try {
 			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(GsonComponentSerializer.gson().serialize(comp)));

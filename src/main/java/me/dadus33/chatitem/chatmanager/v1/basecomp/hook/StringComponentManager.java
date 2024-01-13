@@ -18,6 +18,7 @@ import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
+import me.dadus33.chatitem.hook.DiscordSrvSupport;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.Utils;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -123,6 +124,9 @@ public class StringComponentManager implements IComponentManager {
 		}
 		ChatItem.debug("Checking for " + components.length + " components");
 		Arrays.asList(components).forEach(comp -> checkComponent(comp, hover, click, replacement, chat));
+
+		if(ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage())
+			DiscordSrvSupport.sendChatMessage(p, TextComponent.toLegacyText(components), null);
 		try {
 			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(ComponentSerializer.toString(components)));
 		} catch (Exception e) {

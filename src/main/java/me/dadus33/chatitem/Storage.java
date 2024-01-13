@@ -13,7 +13,7 @@ public class Storage {
 	public final String SECONDS, minutes, hours;
 	public final String updateMessage, updateHover;
 	public final List<String> tooltipHand, tooltipBuggedClient, ignoredItems;
-	public boolean colorIfColored, addAmountForced, letMessageThrough, debug, handDisabled, showNoPermissionMessage, checkUpdate, permissionEnabled, cmdBroadcast, cmdShow;
+	public boolean colorIfColored, addAmountForced, letMessageThrough, debug, handDisabled, showNoPermissionMessage, checkUpdate, permissionEnabled, cmdBroadcast, cmdShow, discordSrvSendMsg;
 	public int configVersion, limit, cooldown;
 	private FileConfiguration conf;
 
@@ -52,6 +52,7 @@ public class Storage {
 		updateHover = color(conf.getString("messages.join-update.hover", "&6Click to go to spigot page !"));
 		messageLimit = color(conf.getString("messages.limit-message", "&c&lYou can only add 8 item placeholders per message!"));
 		messageIgnoredItem = color(conf.getString("messages.ignored-item", "&cThis item is not allowed to be showed."));
+		discordSrvSendMsg = conf.getBoolean("discord-srv-send-our", true);
 
 		SECONDS = color(conf.getString("messages.seconds", " seconds"));
 		minutes = color(conf.getString("messages.minutes", " minutes"));

@@ -27,6 +27,9 @@ public class ComponentNMSManager implements IComponentManager {
 
 	@Override
 	public void writeJson(ChatItemPacket packet, String json) {
+		// Not compatible with that for now
+		//if(ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage())
+		//	DiscordSrvSupport.sendChatMessage(p, comp, null);
 		try {
 			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(json));
 		} catch (Exception e) {
