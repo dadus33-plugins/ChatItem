@@ -12,12 +12,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.Translation;
 import me.dadus33.chatitem.listeners.holder.AdminHolder;
+import me.dadus33.chatitem.listeners.holder.CustomInventoryHolder;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.Messages;
 
@@ -25,8 +27,16 @@ public class InventoryListener implements Listener {
 
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
-		if(e.getClickedInventory() == null || !(e.getWhoClicked() instanceof Player) || e.getCurrentItem() == null
-				|| !(e.getClickedInventory().getHolder() instanceof AdminHolder))
+		if(e.getClickedInventory() == null || !(e.getWhoClicked() instanceof Player) || e.getCurrentItem() == null)
+			return;
+		InventoryHolder holder = e.getClickedInventory().getHolder();
+		if(holder == null)
+			return;
+		if(holder instanceof CustomInventoryHolder) {
+			e.setCancelled(true);
+			return;
+		}
+		if(!(holder instanceof AdminHolder))
 			return;
 		e.setCancelled(true);
 		Player p = (Player) e.getWhoClicked();
@@ -38,8 +48,7 @@ public class InventoryListener implements Listener {
 		} else if(type.equals(Material.BOOK)) {
 			TranslationInventoryListener.open(p, 0);
 		} else if(type.equals(Material.PAPER)) {
-			AdminHolder holder = (AdminHolder) e.getClickedInventory().getHolder();
-			String key = holder.keyBySlot.get(e.getSlot());
+			String key = ((AdminHolder) holder).keyBySlot.get(e.getSlot());
 			if(key != null) {
 				setInConfig("manager", key);
 				p.closeInventory();

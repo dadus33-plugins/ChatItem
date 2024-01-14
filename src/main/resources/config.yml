@@ -264,6 +264,7 @@ messages:
     chat: "%cible%'s inventory"
     hover: "&7Click to see inventory"
   enderchest:
+    name: "%cible%'s enderchest"
     chat: "%cible%'s enderchest"
     hover: "&7Click to see enderchest"
 

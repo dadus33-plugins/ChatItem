@@ -152,7 +152,7 @@ public class ChatListener implements Listener {
 							&& color != null && color != ChatColor.WHITE) {
 						text = text.substring(2); // remove some code which should not be here
 					}
-					appendToComponentBuilder(builder, createComponent(to, text, color));
+					appendToComponentBuilder(builder, createComponent(to, text, color, action));
 					text = "";
 				}
 				waiting = true; // waiting for color code
@@ -205,7 +205,7 @@ public class ChatListener implements Listener {
 			}
 		}
 		if (!text.isEmpty())
-			appendToComponentBuilder(builder, createComponent(to, text, color));
+			appendToComponentBuilder(builder, createComponent(to, text, color, action));
 		to.spigot().sendMessage(builder.create());
 	}
 
@@ -319,10 +319,6 @@ public class ChatListener implements Listener {
 			appendToComponentBuilder(builder, createComponent(to, text, color, action));
 		}
 		return builder.create();
-	}
-
-	private static BaseComponent[] createComponent(Player to, String text, ChatColor color) {
-		return createComponent(to, text, color, null);
 	}
 	
 	private static BaseComponent[] createComponent(Player to, String text, ChatColor color, ChatAction action) {
