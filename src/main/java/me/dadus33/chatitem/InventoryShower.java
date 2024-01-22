@@ -33,9 +33,10 @@ public class InventoryShower {
 	}
 	
 	public static void showEnderchest(Player p, Player cible) {
-		Inventory inv = Bukkit.createInventory(new CustomInventoryHolder(), 27, Messages.getMessage("enderchest.name", "%cible%", cible.getName()));
-		ItemStack[] items = cible.getEnderChest().getContents();
-		for(int i = 0; i < 27; i++)
+		Inventory ec = cible.getEnderChest();
+		Inventory inv = Bukkit.createInventory(new CustomInventoryHolder(), ec.getSize(), Messages.getMessage("enderchest.name", "%cible%", cible.getName()));
+		ItemStack[] items = ec.getContents();
+		for(int i = 0; i < ec.getSize(); i++)
 			inv.setItem(i, items[i]);
 		p.openInventory(inv);
 	}
