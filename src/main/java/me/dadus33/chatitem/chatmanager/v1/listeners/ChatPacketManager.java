@@ -142,6 +142,7 @@ public class ChatPacketManager extends PacketHandler {
 			ChatManager.applyCooldown(itemPlayer);
 		IComponentManager getter = choosedGetter;
 		String fjson = json;
+		ChatItem.debug("Final json used: " + fjson);
 		e.setCancelled(true); // We cancel the packet as we're going to resends it anyways
 		CompletableFuture.runAsync(() -> {
 			Player p = e.getPlayer();

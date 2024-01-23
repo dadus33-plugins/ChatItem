@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
@@ -250,5 +251,12 @@ public class Utils {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static String arrayToString(Object[] a) {
+		StringJoiner sj = new StringJoiner(", ");
+		for(Object o : a)
+			sj.add(o == null ? "null" : o.toString());
+		return sj.toString();
 	}
 }

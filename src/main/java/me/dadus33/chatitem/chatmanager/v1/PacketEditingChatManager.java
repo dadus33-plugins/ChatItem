@@ -12,6 +12,7 @@ import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
+import me.dadus33.chatitem.utils.Utils;
 
 public class PacketEditingChatManager extends ChatManager {
 
@@ -104,7 +105,8 @@ public class PacketEditingChatManager extends ChatManager {
 					nbPut++;
 				} else if(chatMessageTypeClass != null && cons.getParameterTypes()[i].isAssignableFrom(chatMessageTypeClass)) {
 					params[i] = getChatMessageType();
-				}
+				} else if(cons.getParameterTypes()[i].isAssignableFrom(boolean.class)) // need to set primitivesan
+					params[i] = false;
 			}
 			if(nbPut == 1) {
 				if((betterOne == null && betterParam == null) || betterParam.length > params.length) {
@@ -118,7 +120,12 @@ public class PacketEditingChatManager extends ChatManager {
 				ChatItem.getInstance().getLogger().warning("Some constructor seems to have too many " + obj.getClass().getSimpleName() + ". Class: " + packetClass.getSimpleName());
 		}
 		if(betterOne != null && betterParam != null) {
-			return betterOne.newInstance(betterParam);
+			try {
+				return betterOne.newInstance(betterParam);
+			} catch (IllegalArgumentException e) {
+				ChatItem.getInstance().getLogger().warning("Failed to create a new packet to send. " + betterOne.getParameterCount() + " (" + Utils.arrayToString(betterOne.getParameterTypes()) + "). Params: " + Utils.arrayToString(betterParam));
+				return null;
+			}
 		}
 		return null;
 	}

@@ -1,5 +1,7 @@
 package me.dadus33.chatitem.chatmanager.v1.basecomp.hook;
 
+import com.google.gson.JsonParser;
+
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
@@ -17,7 +19,10 @@ public class ComponentNMSManager implements IComponentManager {
 		Object chatBaseComp = packet.getContent().getChatComponents().readSafely(0);
 		if (chatBaseComp != null) {
 			try {
-				return PacketUtils.CHAT_SERIALIZER.getMethod("a", PacketUtils.COMPONENT_CLASS).invoke(null, chatBaseComp).toString();
+				Object o = PacketUtils.CHAT_SERIALIZER.getMethod("a", PacketUtils.COMPONENT_CLASS).invoke(null, chatBaseComp);
+				if(o != null && o instanceof String && JsonParser.parseString((String) o).isJsonObject()) {
+					return (String) o;
+				}
 			} catch (Exception exc) {
 				exc.printStackTrace();
 			}
