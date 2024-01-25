@@ -149,7 +149,10 @@ public class JSONManipulator {
 					replacer.set(i, jar);
 				}
 			} else if (element.isJsonPrimitive() && isComplex) {
-				ChatItem.debug("[JSONManipulator] Put " + element + " to trash as it's primitive with complex things");
+				if(ChatManager.containsSeparator(element.getAsString())) {
+					addParsedStringToArray(element.getAsString(), replacer, element, tooltip);
+				} else
+					ChatItem.debug("[JSONManipulator] Put " + element + " to trash as it's primitive with complex things");
 				// ignore
 			} else {
 				addParsedStringToArray(element.getAsString(), replacer, element, tooltip);

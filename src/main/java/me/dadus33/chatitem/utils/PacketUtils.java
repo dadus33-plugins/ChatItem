@@ -1,5 +1,6 @@
 package me.dadus33.chatitem.utils;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 
 public class PacketUtils {
@@ -212,5 +214,23 @@ public class PacketUtils {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static void printPacketToDebug(Object packet) {
+		if(!ChatItem.hasDebug())
+			return;
+		if(packet == null) {
+			ChatItem.debug("Packet is null");
+			return;
+		}
+		ChatItem.debug("Packet with Class: " + packet.getClass().getSimpleName());
+		for (Field f : packet.getClass().getDeclaredFields()) {
+			f.setAccessible(true);
+			try {
+				ChatItem.debug(f.getName() + ": " + f.get(packet));
+			} catch (Exception exc) {
+				exc.printStackTrace();
+			}
+		}
 	}
 }

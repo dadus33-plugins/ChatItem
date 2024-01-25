@@ -71,6 +71,9 @@ public class ChatItem extends JavaPlugin {
 		if (getInstance().getStorage().debug)
 			getInstance().getLogger().info("[Debug] " + msg.replace(ChatManager.SEPARATOR, 'S').replace(ChatManager.SEPARATOR_END, 'E'));
 	}
+	public static boolean hasDebug() {
+		return getInstance().getStorage().debug;
+	}
 
 	private void chooseManagers() {
 		this.chatManager.forEach((cm) -> cm.unload(this));

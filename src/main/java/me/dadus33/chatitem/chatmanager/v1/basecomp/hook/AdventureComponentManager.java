@@ -16,7 +16,6 @@ import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
-import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent.ContentModifier;
@@ -110,11 +109,12 @@ public class AdventureComponentManager implements IComponentManager {
 		if(ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage())
 			DiscordSrvSupport.sendChatMessage(p, comp, null);
 		ChatItem.debug("Result: " + GsonComponentSerializer.gson().serialize(comp));
-		try {
+		packet.getContent().getSpecificModifier(Component.class).write(0, comp);
+		/*try {
 			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(GsonComponentSerializer.gson().serialize(comp)));
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 		return packet.getPacket();
 	}
 

@@ -74,7 +74,7 @@ public class PacketEditingChatManager extends ChatManager {
 	}
 	
 	private static Object internalCreateSystemChatPacket(Object obj) throws Exception {
-		Class<?> packetClass = PacketUtils.getNmsClass("ClientboundSystemChatPacket", "network.protocol.game.", "PacketPlayOutChat");
+		Class<?> packetClass = PacketUtils.getNmsClass("ClientboundPlayerChatPacket", "network.protocol.game.", "ClientboundSystemChatPacket", "PacketPlayOutChat");
 		Class<?> chatMessageTypeClass = PacketUtils.isClassExist("net.minecraft.network.chat.ChatMessageType") ? PacketUtils.getNmsClass("ChatMessageType", "network.chat.") : null;
 		Constructor<?> betterOne = null;
 		Object[] betterParam = null;
@@ -105,8 +105,10 @@ public class PacketEditingChatManager extends ChatManager {
 					nbPut++;
 				} else if(chatMessageTypeClass != null && cons.getParameterTypes()[i].isAssignableFrom(chatMessageTypeClass)) {
 					params[i] = getChatMessageType();
-				} else if(cons.getParameterTypes()[i].isAssignableFrom(boolean.class)) // need to set primitivesan
+				} else if(cons.getParameterTypes()[i].isAssignableFrom(boolean.class)) // need to set primitives
 					params[i] = false;
+				else if(cons.getParameterTypes()[i].isAssignableFrom(int.class)) // need to set primitives
+					params[i] = 0;
 			}
 			if(nbPut == 1) {
 				if((betterOne == null && betterParam == null) || betterParam.length > params.length) {

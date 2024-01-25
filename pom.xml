@@ -134,7 +134,7 @@
             <groupId>net.kyori</groupId>
             <artifactId>adventure-platform-bukkit</artifactId>
             <version>4.3.0</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.discordsrv</groupId>
@@ -151,7 +151,7 @@
         <dependency>
             <groupId>com.github.Auxilor</groupId>
             <artifactId>EcoEnchants</artifactId>
-            <version>10.39.1</version>
+            <version>12.2.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -204,10 +204,6 @@
                                 <relocation>
                                     <pattern>com.google.gson</pattern>
                                     <shadedPattern>me.dadus33.libs.gson</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>net.kyori</pattern>
-                                    <shadedPattern>me.dadus33.libs.kyori</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.github.steveice10.opennbt</pattern>

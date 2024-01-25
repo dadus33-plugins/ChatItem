@@ -36,6 +36,8 @@ public class ComponentNMSManager implements IComponentManager {
 		//if(ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage())
 		//	DiscordSrvSupport.sendChatMessage(p, comp, null);
 		try {
+			PacketUtils.printPacketToDebug(packet.getPacket());
+			PacketUtils.printPacketToDebug(PacketEditingChatManager.createSystemChatPacket(json));
 			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(json));
 		} catch (Exception e) {
 			e.printStackTrace();
