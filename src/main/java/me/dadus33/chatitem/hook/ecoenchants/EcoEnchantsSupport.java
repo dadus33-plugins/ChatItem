@@ -23,8 +23,12 @@ public class EcoEnchantsSupport {
 			supportedVersion = 8;
 		else if(ver.startsWith("10."))
 			supportedVersion = 10;
+		else if(ver.startsWith("11."))
+			supportedVersion = 11;
+		else if(ver.startsWith("12."))
+			supportedVersion = 12;
 		else {
-			ChatItem.getInstance().getLogger().info("Failed to find support version for EcoEnchants " + ver);
+			ChatItem.getInstance().getLogger().warning("Failed to find support version for EcoEnchants " + ver);
 			return false;
 		}
 		return true;
@@ -44,7 +48,7 @@ public class EcoEnchantsSupport {
 				ChatItem.debug("Added " + addLore.size() + " lores from EcoEnchants");
 			} else
 				ChatItem.debug("No lore to add from EcoEnchants");
-		} else if(supportedVersion == 10) {
+		} else if(supportedVersion >= 10) {
 			EcoEnchantsV10Support.display(item);
 		}
 		return item;

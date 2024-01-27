@@ -1,5 +1,6 @@
 package me.dadus33.chatitem.hook.ecoenchants;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,7 +15,7 @@ public class EcoEnchantsV10Support {
 	public static EnchantDisplay getEnchantDisplay() {
 		if (enchantDisplay == null) {
 			try {
-				enchantDisplay = EnchantDisplay.class.getConstructor(EcoEnchantsPlugin.class).newInstance(EcoEnchantsPlugin.getInstance());
+				enchantDisplay = EnchantDisplay.class.getConstructor(EcoEnchantsPlugin.class).newInstance(Bukkit.getPluginManager().getPlugin("EcoEnchants"));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
