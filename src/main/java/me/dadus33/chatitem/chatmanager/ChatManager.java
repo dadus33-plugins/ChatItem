@@ -94,7 +94,11 @@ public abstract class ChatManager {
 	public static ItemStack getUsableItem(Player p, ItemSlot slot) {
 		if(slot == null)
 			return null;
-		ItemStack item = HandItem.getBetterItem(p, slot).clone();
+		ItemStack betterItem = HandItem.getBetterItem(p, slot);
+		if(betterItem == null)
+			return null;
+		
+		ItemStack item = betterItem.clone();
 		if(slot.isDenyIfNoItem() && ItemUtils.isEmpty(item))
 			return null;
 		if (EcoEnchantsSupport.hasSupport()) {
