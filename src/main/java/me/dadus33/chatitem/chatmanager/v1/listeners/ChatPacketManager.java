@@ -187,7 +187,7 @@ public class ChatPacketManager extends PacketHandler {
 						lastSentPacket = getter.manageEmpty(p, chat, e, fjson, getStorage());
 					}
 				}
-				if (lastSentPacket == null)
+				if (lastSentPacket == null) // maybe sent by the manager directly
 					ChatItem.debug("(v1) No packet to sent with manager " + getter.getClass().getName());
 				else
 					PacketUtils.sendPacket(p, lastSentPacket);
