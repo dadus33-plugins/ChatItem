@@ -67,7 +67,7 @@ public class JSONManipulator {
 
 			// Get the JSON representation of the item (well, not really JSON, but rather a
 			// string representation of NBT data)
-			hover.addProperty("value", parseEmpty(json, replacement, Arrays.asList(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover")), chat.getPlayer()));
+			hover.addProperty("value", parseEmpty(json, replacement, Arrays.asList(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", chat.getItemPlayer().getPlayer().getName())), chat.getPlayer()));
 
 			JsonObject click = new JsonObject();
 			click.addProperty("action", "run_command");
