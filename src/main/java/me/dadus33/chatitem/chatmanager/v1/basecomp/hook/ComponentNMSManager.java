@@ -39,8 +39,6 @@ public class ComponentNMSManager implements IComponentManager {
 			ChatItem.debug("(v1 ComponentNMS) Can't send message to discord");
 		//	DiscordSrvSupport.sendChatMessage(p, comp, null);
 		try {
-			PacketUtils.printPacketToDebug(packet.getPacket());
-			PacketUtils.printPacketToDebug(PacketEditingChatManager.createSystemChatPacket(json));
 			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(json));
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -61,8 +61,20 @@ public class PacketEditingChatManager extends ChatManager {
 	public boolean supportsChatComponentApi() {
 		return baseComponentAvailable;
 	}
+	
+	private static String checkPacketSize(String packet, int maxSize) {
+		int size = packet.getBytes().length;
+		while(size > maxSize) {
+			packet = packet.replaceFirst("  ", " ");
+			if(size == packet.getBytes().length)
+				break; // could not fix myself
+			size = packet.getBytes().length;
+		}
+		return packet;
+	}
 
 	public static Object createSystemChatPacket(String json) throws Exception {
+		json = checkPacketSize(json, 150000);
 		Object packet = internalCreateSystemChatPacket(json);
 		if(packet != null)
 			return packet;
