@@ -28,11 +28,13 @@ import me.dadus33.chatitem.commands.ChatItemCommand;
 import me.dadus33.chatitem.hook.ChatControlSupport;
 import me.dadus33.chatitem.hook.ChatManagerSupport;
 import me.dadus33.chatitem.hook.ecoenchants.EcoEnchantsSupport;
+import me.dadus33.chatitem.invsee.InvShower;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.listeners.JoinListener;
 import me.dadus33.chatitem.listeners.TranslationInventoryListener;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
+import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.SemVer;
 import me.dadus33.chatitem.utils.Utils;
 import me.dadus33.chatitem.utils.Version;
@@ -55,6 +57,7 @@ public class ChatItem extends JavaPlugin {
 		pl.storage = new Storage(pl.getConfig());
 		pl.chooseManagers();
 		Translation.load(pl);
+		InvShower.getInvShower().clear();
 		if(sender != null) {
 			if (!pl.storage.messageReload.isEmpty())
 				sender.sendMessage(pl.storage.messageReload);
@@ -159,11 +162,11 @@ public class ChatItem extends JavaPlugin {
 			discordSrvSupport = true;
 			plugins.add("DiscordSRV");
 		}
-		if (pm.isPluginEnabled("ChatControl")) {
+		if (pm.isPluginEnabled("ChatControl") && ReflectionUtils.isClassExist("org.mineacademy.chatcontrol.settings.Settings")) {
 			ChatControlSupport.init(this);
 			plugins.add("ChatControl");
 		}
-		if (pm.isPluginEnabled("ChatManager")) {
+		if (pm.isPluginEnabled("ChatManager") && ReflectionUtils.isClassExist("me.h1dd3nxn1nja.chatmanager.Main")) {
 			ChatManagerSupport.init(this);
 			plugins.add("ChatManager");
 		}

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,12 +16,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.InventoryShower;
 import me.dadus33.chatitem.ItemSlot;
 import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v2.ChatListener;
+import me.dadus33.chatitem.invsee.InvShower;
 import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.Utils;
@@ -115,16 +114,12 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 				}
 			}
 		} else if (args[0].equalsIgnoreCase("seeinv")) {
-			if(args.length == 3 && Utils.isUUID(args[2])) {
-				Player cible = Bukkit.getPlayer(UUID.fromString(args[2]));
-				if(cible == null || !cible.isOnline()) {
-					Messages.sendMessage(p, "player-not-found", "%arg%", args[2]);
-					return false;
-				}
-				if(args[1].equalsIgnoreCase("inventory")) {
-					InventoryShower.showInventory(p, cible);
-				} else if(args[1].equalsIgnoreCase("enderchest")) {
-					InventoryShower.showEnderchest(p, cible);
+			if(args.length == 2 && Utils.isUUID(args[1])) {
+				InvShower inv = InvShower.get(args[1]);
+				if(inv == null) {
+					Messages.sendMessage(p, "seeinv_not_found");
+				} else {
+					inv.open(p);
 				}
 			} // else just ignore 
 		} else {

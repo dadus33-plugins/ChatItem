@@ -62,12 +62,16 @@ general:
     inventory:
       enabled: true
       deny-if-no-item: true
+      # Time in seconds before the placeholder expire
+      time-expire: 1800
       keys:
       - "[inv]"
       - "{inv}"
     enderchest:
       enabled: true
       deny-if-no-item: true
+      # Time in seconds before the placeholder expire
+      time-expire: 1800
       keys:
       - "[ec]"
       - "{ec}"
@@ -259,6 +263,7 @@ messages:
   hours: " hours"
   enabled: "&aEnabled"
   disabled: "&cDisabled"
+  seeinv_not_found: "&cImpossible to find this inventory. Are you coming too late ?"
   inventory:
     name: "%cible%'s inventory"
     chat: "%cible%'s inventory"

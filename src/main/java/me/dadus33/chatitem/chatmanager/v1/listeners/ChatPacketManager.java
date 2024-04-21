@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -174,7 +172,7 @@ public class ChatPacketManager extends PacketHandler {
 							if (bsm.hasBlockState() && bsm.getBlockState() instanceof ShulkerBox) {
 								ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
 								for (ItemStack itemInv : sb.getInventory()) {
-									stripData(itemInv);
+									ItemUtils.stripData(itemInv);
 								}
 								bsm.setBlockState(sb);
 							}
@@ -187,7 +185,7 @@ public class ChatPacketManager extends PacketHandler {
 						lastSentPacket = getter.manageEmpty(p, chat, e, fjson, getStorage());
 					}
 				}
-				if (lastSentPacket == null)
+				if (lastSentPacket == null) // maybe sent by the manager directly
 					ChatItem.debug("(v1) No packet to sent with manager " + getter.getClass().getName());
 				else
 					PacketUtils.sendPacket(p, lastSentPacket);
@@ -195,24 +193,6 @@ public class ChatPacketManager extends PacketHandler {
 				e1.printStackTrace();
 			}
 		});
-	}
-
-	private void stripData(ItemStack i) {
-		if (i == null) {
-			return;
-		}
-		if (i.getType().equals(Material.AIR)) {
-			return;
-		}
-		if (!i.hasItemMeta()) {
-			return;
-		}
-		ItemMeta im = Bukkit.getItemFactory().getItemMeta(i.getType());
-		ItemMeta original = i.getItemMeta();
-		if (original.hasDisplayName()) {
-			im.setDisplayName(original.getDisplayName());
-		}
-		i.setItemMeta(im);
 	}
 
 	public Storage getStorage() {

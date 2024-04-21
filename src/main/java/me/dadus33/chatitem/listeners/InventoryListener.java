@@ -1,12 +1,9 @@
 package me.dadus33.chatitem.listeners;
 
-import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.Storage;
-import me.dadus33.chatitem.Translation;
-import me.dadus33.chatitem.listeners.holder.AdminHolder;
-import me.dadus33.chatitem.listeners.holder.CustomInventoryHolder;
-import me.dadus33.chatitem.utils.ItemUtils;
-import me.dadus33.chatitem.utils.Messages;
+import static me.dadus33.chatitem.utils.ItemUtils.createItem;
+
+import java.util.Arrays;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,9 +15,14 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
-
-import static me.dadus33.chatitem.utils.ItemUtils.createItem;
+import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.Storage;
+import me.dadus33.chatitem.Translation;
+import me.dadus33.chatitem.listeners.holder.AdminHolder;
+import me.dadus33.chatitem.listeners.holder.ChatItemHolder;
+import me.dadus33.chatitem.listeners.holder.CustomInventoryHolder;
+import me.dadus33.chatitem.utils.ItemUtils;
+import me.dadus33.chatitem.utils.Messages;
 
 public class InventoryListener implements Listener {
 
@@ -28,18 +30,18 @@ public class InventoryListener implements Listener {
 	public void onClick(InventoryClickEvent e) {
 		Player p = (Player) e.getWhoClicked();
 
-		InventoryHolder openInventoryHolder = p.getOpenInventory().getTopInventory().getHolder();
-
-		if (openInventoryHolder instanceof CustomInventoryHolder) {
-			e.setCancelled(true);
-			return;
-		}
-
-		if(e.getClickedInventory() == null || !(e.getWhoClicked() instanceof Player) || e.getCurrentItem() == null)
+		if(e.getClickedInventory() == null || !(e.getWhoClicked() instanceof Player))
 			return;
 		InventoryHolder holder = e.getClickedInventory().getHolder();
-		if(holder == null)
+		if(holder == null || !(holder instanceof ChatItemHolder)) {
+			if(e.getClick().equals(ClickType.DOUBLE_CLICK) && p.getOpenInventory() != null && p.getOpenInventory().getTopInventory() != null) {
+				Inventory top = p.getOpenInventory().getTopInventory();
+				if(top.getHolder() != null && top.getHolder() instanceof ChatItemHolder) {
+					e.setCancelled(true);
+				}
+			}
 			return;
+		}
 		if(holder instanceof CustomInventoryHolder) {
 			e.setCancelled(true);
 			return;
@@ -47,7 +49,8 @@ public class InventoryListener implements Listener {
 		if(!(holder instanceof AdminHolder))
 			return;
 		e.setCancelled(true);
-
+		if(e.getCurrentItem() == null)
+			return;
 		ItemStack item = e.getCurrentItem();
 		Material type = item.getType();
 		Storage c = ChatItem.getInstance().getStorage();

@@ -22,6 +22,7 @@ import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent.ContentModifier;
 import me.dadus33.chatitem.hook.DiscordSrvSupport;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.PacketUtils;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.Component;
@@ -33,7 +34,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 public class AdventureComponentManager implements IComponentManager {
-
+	
 	@Override
 	public boolean hasConditions() {
 		try {
@@ -108,14 +109,12 @@ public class AdventureComponentManager implements IComponentManager {
 		comp = checkComponent(comp, hover, click, replacement, chat);
 		if(ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage())
 			DiscordSrvSupport.sendChatMessage(p, comp, null);
-		ChatItem.debug("Result: " + GsonComponentSerializer.gson().serialize(comp));
-		packet.getContent().getSpecificModifier(Component.class).write(0, comp);
-		/*try {
-			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(GsonComponentSerializer.gson().serialize(comp)));
+		try {
+			((Audience) Audience.class.getDeclaredMethod("audience", Audience.class).invoke(null, p)).sendMessage(comp);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}*/
-		return packet.getPacket();
+		}
+		return null; // send by manager
 	}
 
 	private Component checkComponent(Component comp, HoverEvent<?> hover, ClickEvent click, String itemName, Chat chat) {

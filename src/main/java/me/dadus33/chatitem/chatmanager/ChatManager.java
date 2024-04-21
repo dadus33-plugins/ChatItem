@@ -1,6 +1,7 @@
 package me.dadus33.chatitem.chatmanager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -9,18 +10,25 @@ import javax.annotation.Nullable;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.ItemSlot;
 import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.hook.ecoenchants.EcoEnchantsSupport;
+import me.dadus33.chatitem.invsee.InvShower;
+import me.dadus33.chatitem.invsee.hook.EnderChestShower;
+import me.dadus33.chatitem.invsee.hook.PlayerInventoryShower;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.Utils;
+import me.dadus33.chatitem.utils.Version;
 
 public abstract class ChatManager {
 
@@ -94,18 +102,41 @@ public abstract class ChatManager {
 	public static ItemStack getUsableItem(Player p, ItemSlot slot) {
 		if(slot == null)
 			return null;
-		ItemStack item = HandItem.getBetterItem(p, slot).clone();
+		ItemStack betterItem = HandItem.getBetterItem(p, slot);
+		if(betterItem == null)
+			return null;
+		
+		ItemStack item = betterItem.clone();
 		if(slot.isDenyIfNoItem() && ItemUtils.isEmpty(item))
 			return null;
 		if (EcoEnchantsSupport.hasSupport()) {
 			item = EcoEnchantsSupport.manageItem(item);
+		} else if (item.hasItemMeta()) {
+			ItemMeta meta = item.getItemMeta();
+			if (meta instanceof BookMeta) { // filtering written books
+				BookMeta bm = (BookMeta) item.getItemMeta();
+				bm.setPages(Collections.emptyList());
+				item.setItemMeta(bm);
+			} else if (meta instanceof BlockStateMeta && Version.getVersion().isNewerOrEquals(Version.V1_9)) { // if it's a block
+				BlockStateMeta bsm = (BlockStateMeta) item.getItemMeta();
+				if (bsm.hasBlockState() && bsm.getBlockState() instanceof ShulkerBox) {
+					ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
+					for (ItemStack itemInv : sb.getInventory()) {
+						ItemUtils.stripData(itemInv);
+					}
+					bsm.setBlockState(sb);
+				}
+				item.setItemMeta(bsm);
+			}
 		}
 		return item;
 	}
 	
 	public static ChatAction getChatAction(ItemSlot slot, Player p) {
 		if(slot.isCommand()) {
-			return new ChatAction(slot, "/chatitem seeinv " + slot.name().toLowerCase() + " " + p.getUniqueId());
+			UUID uuid = UUID.randomUUID();
+			InvShower.add(uuid.toString(), slot == ItemSlot.INVENTORY ? new PlayerInventoryShower(p) : new EnderChestShower(p));
+			return new ChatAction(slot, "/chatitem seeinv " + uuid.toString());
 		}
 		return new ChatAction(slot, getUsableItem(p, slot));
 	}

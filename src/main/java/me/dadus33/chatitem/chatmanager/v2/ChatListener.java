@@ -79,7 +79,7 @@ public class ChatListener implements Listener {
 		return manage.getStorage();
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onChat(AsyncPlayerChatEvent e) {
 		if(ChatManager.isTestingEnabled() && !ChatManager.isTesting("chat"))
 			return;

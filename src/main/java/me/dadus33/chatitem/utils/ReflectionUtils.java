@@ -182,4 +182,13 @@ public class ReflectionUtils {
 		}
 		return null;
 	}
+	
+	public static boolean isClassExist(String name) {
+		try {
+			Class.forName(name);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }

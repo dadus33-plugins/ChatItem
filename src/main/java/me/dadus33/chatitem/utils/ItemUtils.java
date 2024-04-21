@@ -3,6 +3,7 @@ package me.dadus33.chatitem.utils;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -86,7 +87,29 @@ public class ItemUtils {
 		return stack;
 	}
 	
+	public static ItemStack copyIfExist(ItemStack item) {
+		return isEmpty(item) ? null : item.clone();
+	}
+	
 	public static boolean isEmpty(ItemStack item) {
 		return item == null || item.getType().equals(Material.AIR);
+	}
+
+	public static void stripData(ItemStack i) {
+		if (i == null) {
+			return;
+		}
+		if (i.getType().equals(Material.AIR)) {
+			return;
+		}
+		if (!i.hasItemMeta()) {
+			return;
+		}
+		ItemMeta im = Bukkit.getItemFactory().getItemMeta(i.getType());
+		ItemMeta original = i.getItemMeta();
+		if (original.hasDisplayName()) {
+			im.setDisplayName(original.getDisplayName());
+		}
+		i.setItemMeta(im);
 	}
 }
