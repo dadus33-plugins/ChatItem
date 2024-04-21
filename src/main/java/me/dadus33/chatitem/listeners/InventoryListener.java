@@ -1,9 +1,13 @@
 package me.dadus33.chatitem.listeners;
 
-import static me.dadus33.chatitem.utils.ItemUtils.createItem;
-
-import java.util.Arrays;
-
+import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.Storage;
+import me.dadus33.chatitem.Translation;
+import me.dadus33.chatitem.listeners.holder.AdminHolder;
+import me.dadus33.chatitem.listeners.holder.ChatItemHolder;
+import me.dadus33.chatitem.listeners.holder.CustomInventoryHolder;
+import me.dadus33.chatitem.utils.ItemUtils;
+import me.dadus33.chatitem.utils.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,20 +19,22 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.Storage;
-import me.dadus33.chatitem.Translation;
-import me.dadus33.chatitem.listeners.holder.AdminHolder;
-import me.dadus33.chatitem.listeners.holder.ChatItemHolder;
-import me.dadus33.chatitem.listeners.holder.CustomInventoryHolder;
-import me.dadus33.chatitem.utils.ItemUtils;
-import me.dadus33.chatitem.utils.Messages;
+import java.util.Arrays;
+
+import static me.dadus33.chatitem.utils.ItemUtils.createItem;
 
 public class InventoryListener implements Listener {
 
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 		Player p = (Player) e.getWhoClicked();
+
+		InventoryHolder openInventoryHolder = p.getOpenInventory().getTopInventory().getHolder();
+
+		if (openInventoryHolder instanceof CustomInventoryHolder) {
+			e.setCancelled(true);
+			return;
+		}
 
 		if(e.getClickedInventory() == null || !(e.getWhoClicked() instanceof Player))
 			return;
