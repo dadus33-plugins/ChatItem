@@ -8,11 +8,11 @@ You can:
 - [ ![Come on discord](https://img.shields.io/badge/chat-on_discord-7289da.svg) ](https://discord.gg/yng5PPf62h)
 - [Check the wiki](https://github.com/dadus33-plugins/ChatItem/wiki)
 
-# Item not well showed in chat
+# Item doesn't show up well in chat
 
-You can try to do `/chatitem admin` then select different paper item. It will change how the plugin try to add item in chat.
+You can do `/chatitem admin` then select one of the other paper items in the menu. It will change how the plugin tries to display items in chat.
 
-**If you already have issue, please do**:
+**If you still have an issue, please do**:
 1) Do `/chatitem admin` then select on "Debug" item at top right
 2) Try to use ChatItem in chat
 3) Come on discord [here](https://discord.gg/yng5PPf62h) or in private message: `Elikill58#0743`
