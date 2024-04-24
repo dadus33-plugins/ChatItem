@@ -6,6 +6,7 @@ import org.bukkit.event.Event;
 import github.scarsz.discordsrv.DiscordSRV;
 import me.dadus33.chatitem.ChatItem;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 public class DiscordSrvSupport {
 	
@@ -15,17 +16,11 @@ public class DiscordSrvSupport {
 
 	public static void sendChatMessage(Player p, String message, Event e) {
 		DiscordSRV pl = DiscordSRV.getPlugin();
-		if (DiscordSRV.config().getBooleanElse("UseModernPaperChatEvent", false) && pl.isModernChatEventAvailable()) {
-			return;
-		}
 		pl.processChatMessage(p, message, pl.getOptionalChannel("global"), false, e);
 	}
 
 	public static void sendChatMessage(Player p, Component message, Event e) {
 		DiscordSRV pl = DiscordSRV.getPlugin();
-		if (DiscordSRV.config().getBooleanElse("UseModernPaperChatEvent", false) && pl.isModernChatEventAvailable()) {
-			return;
-		}
-		pl.processChatMessage(p, message, pl.getOptionalChannel("global"), false, e);
+		pl.processChatMessage(p, github.scarsz.discordsrv.dependencies.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserialize(GsonComponentSerializer.gson().serialize(message)), pl.getOptionalChannel("global"), false, e);
 	}
 }
