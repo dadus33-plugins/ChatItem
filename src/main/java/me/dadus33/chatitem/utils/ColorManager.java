@@ -8,6 +8,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class ColorManager {
 
+	public static final char COLOR_CHAR = '§';
 	public static final List<String> COLORS = Arrays.asList("4", "c", "6", "e", "2", "a", "b", "3", "1", "9", "d", "5", "f", "7", "8", "0");
 	
 	public static boolean isHexColor(ChatColor c) {
@@ -82,7 +83,7 @@ public class ColorManager {
 		String colorCode = "", text = "";
 		boolean waiting = false;
 		for (char args : message.toCharArray()) {
-			if (args == '§') { // begin of color
+			if (args == COLOR_CHAR) { // begin of color
 				waiting = true; // waiting for color code
 			} else if (waiting) { // if waiting for code and valid str
 				// if it's hexademical value and with enough space for full color

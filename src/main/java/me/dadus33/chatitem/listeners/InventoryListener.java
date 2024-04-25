@@ -1,16 +1,7 @@
 package me.dadus33.chatitem.listeners;
 
-import me.dadus33.chatitem.ChatItem;
-import me.dadus33.chatitem.Storage;
-import me.dadus33.chatitem.Translation;
-import me.dadus33.chatitem.listeners.holder.AdminHolder;
-import me.dadus33.chatitem.listeners.holder.ChatItemHolder;
-import me.dadus33.chatitem.listeners.holder.CustomInventoryHolder;
-import me.dadus33.chatitem.utils.ItemUtils;
-import me.dadus33.chatitem.utils.Messages;
-import me.dadus33.chatitem.utils.PacketUtils;
+import java.util.Arrays;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,9 +12,15 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
-
-import static me.dadus33.chatitem.utils.ItemUtils.createItem;
+import me.dadus33.chatitem.ChatItem;
+import me.dadus33.chatitem.Storage;
+import me.dadus33.chatitem.Translation;
+import me.dadus33.chatitem.listeners.holder.AdminHolder;
+import me.dadus33.chatitem.listeners.holder.ChatItemHolder;
+import me.dadus33.chatitem.listeners.holder.CustomInventoryHolder;
+import me.dadus33.chatitem.utils.ItemUtils;
+import me.dadus33.chatitem.utils.Messages;
+import me.dadus33.chatitem.utils.PacketUtils;
 
 public class InventoryListener implements Listener {
 
@@ -112,9 +109,9 @@ public class InventoryListener implements Listener {
 	public static void open(Player p) {
 		AdminHolder holder = new AdminHolder();
 		Storage c = ChatItem.getInstance().getStorage();
-		Inventory inv = Bukkit.createInventory(holder, 27, Messages.getMessage("admin-inv.name"));
+		Inventory inv = ChatItem.getPlatform().createInventory(holder, 27, Messages.getMessage("admin-inv.name"));
 		for (int i = 0; i < inv.getSize(); i++)
-			inv.setItem(i, createItem(ItemUtils.WHITE_STAINED_GLASS, "-"));
+			inv.setItem(i, ChatItem.getPlatform().createItemStack(ItemUtils.WHITE_STAINED_GLASS, "-"));
 
 		int slot = 0;
 		for (String manager : Arrays.asList("all", "auto", "packet", "chat", "paper")) {
@@ -133,26 +130,27 @@ public class InventoryListener implements Listener {
 		inv.setItem(21, getAmountChangeItem(Material.IRON_DOOR, "limit-per-message", c.limit));
 		inv.setItem(22, getAmountChangeItem(Material.APPLE, "cooldown", c.cooldown));
 		inv.setItem(23, getBoolChangeItem(Material.BLAZE_ROD, "check-update", c.checkUpdate));
-		inv.setItem(24, createItem(Material.BOOK, Messages.getMessage("admin-inv.language.name"), Messages.getMessage(
-				"admin-inv.language.lore", "%name%", Translation.getMessages().get("language.name").getAsString())));
+		inv.setItem(24, ChatItem.getPlatform().createTranslatedItemStack(Material.BOOK, "admin-inv.language", "%name%",
+				Translation.getMessage("language.name")));
 
-		inv.setItem(26, createItem(ItemUtils.MATERIAL_CLOSE, Messages.getMessage("admin-inv.close")));
+		inv.setItem(26, ChatItem.getPlatform().createItemStack(ItemUtils.MATERIAL_CLOSE,
+				Messages.getMessage("admin-inv.close")));
 		p.openInventory(inv);
 	}
 
 	private static ItemStack getBoolChangeItem(Material type, String key, boolean b) {
-		return createItem(type,
+		return ChatItem.getPlatform().createItemStack(type,
 				Messages.getMessage("admin-inv." + key, "%state%", Messages.getMessage(b ? "enabled" : "disabled")),
 				Messages.getMessageList("admin-inv.bool-lore"));
 	}
 
 	private static ItemStack getAmountChangeItem(Material type, String key, int amount) {
-		return createItem(type, Messages.getMessage("admin-inv." + key, "%state%", amount),
+		return ChatItem.getPlatform().createItemStack(type, Messages.getMessage("admin-inv." + key, "%state%", amount),
 				Messages.getMessageList("admin-inv.amount-lore"));
 	}
 
 	private static ItemStack getManagerItem(String manager, Object... placeholders) {
-		return createItem(Material.PAPER, Messages.getMessage("admin-inv.manager." + manager + ".name", placeholders),
-				Messages.getMessageList("admin-inv.manager." + manager + ".lore", placeholders));
+		return ChatItem.getPlatform().createTranslatedItemStack(Material.PAPER, "admin-inv.manager." + manager,
+				placeholders);
 	}
 }

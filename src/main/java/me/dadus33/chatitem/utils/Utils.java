@@ -120,7 +120,7 @@ public class Utils {
 			connection.setUseCaches(true);
 			connection.setConnectTimeout(5000);
 			connection.setReadTimeout(5000);
-			connection.setRequestProperty("User-Agent", "ChatItem " + pl.getDescription().getVersion());
+			connection.setRequestProperty("User-Agent", "ChatItem");
 			connection.setDoOutput(true);
 			connection.setRequestMethod("GET");
 			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));

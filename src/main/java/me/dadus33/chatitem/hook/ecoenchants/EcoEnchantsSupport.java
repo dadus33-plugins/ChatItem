@@ -18,7 +18,7 @@ public class EcoEnchantsSupport {
 	}
 	
 	public static boolean load() {
-		String ver = Bukkit.getPluginManager().getPlugin("EcoEnchants").getDescription().getVersion();
+		String ver = ChatItem.getPlatform().getPluginVersion(Bukkit.getPluginManager().getPlugin("EcoEnchants"));
 		if(ver.startsWith("8."))
 			supportedVersion = 8;
 		else if(ver.startsWith("10."))
@@ -34,6 +34,7 @@ public class EcoEnchantsSupport {
 		return true;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static ItemStack manageItem(ItemStack item) {
 		if(supportedVersion == 8) {
 			List<String> addLore = EcoEnchantsV8Support.getLores(item);

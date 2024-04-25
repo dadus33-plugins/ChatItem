@@ -8,7 +8,6 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
@@ -26,10 +25,12 @@ import me.dadus33.chatitem.invsee.InvShower;
 import me.dadus33.chatitem.invsee.hook.EnderChestShower;
 import me.dadus33.chatitem.invsee.hook.PlayerInventoryShower;
 import me.dadus33.chatitem.itemnamer.NamerManager;
+import me.dadus33.chatitem.utils.Colors;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.Utils;
 import me.dadus33.chatitem.utils.Version;
 
+@SuppressWarnings("deprecation")
 public abstract class ChatManager {
 
 	public static String inTest = null;
@@ -155,7 +156,7 @@ public abstract class ChatManager {
 			lines.add(meta.hasDisplayName() ? meta.getDisplayName() : NamerManager.getName(p, item, ChatItem.getInstance().getStorage()));
 			if (meta.hasEnchants()) {
 				meta.getEnchants().forEach((enchant, lvl) -> {
-					lines.add(ChatColor.RESET + Utils.getEnchantName(enchant) + " " + Utils.toRoman(lvl));
+					lines.add(Colors.RESET + Utils.getEnchantName(enchant) + " " + Utils.toRoman(lvl));
 				});
 			}
 			if (meta.hasLore())
@@ -206,7 +207,7 @@ public abstract class ChatManager {
 			if (c.handDisabled)
 				return ItemSlot.HAND.getPlaceholders().get(0);
 			else
-				return c.handName.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName());
+				return getHandName(p);
 		}
 		return styleItem(p, item, c);
 	}
@@ -218,11 +219,15 @@ public abstract class ChatManager {
 				if (c.handDisabled)
 					return ItemSlot.HAND.getPlaceholders().get(0);
 				else
-					return c.handName.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName());
+					return getHandName(p);
 			}
 			return styleItem(p, item, c);
 		}
 		return "";
+	}
+	
+	public static String getHandName(Player p) {
+		return ChatItem.getInstance().getStorage().handName.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName());
 	}
 
 	public static String calculateTime(long seconds) {

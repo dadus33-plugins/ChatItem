@@ -2,12 +2,12 @@ package me.dadus33.chatitem.invsee.hook;
 
 import java.util.HashMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.invsee.InvShower;
 import me.dadus33.chatitem.listeners.holder.CustomInventoryHolder;
 import me.dadus33.chatitem.utils.ItemUtils;
@@ -34,10 +34,10 @@ public class PlayerInventoryShower extends InvShower {
 	
 	@Override
 	public void open(Player p) {
-		Inventory inv = Bukkit.createInventory(new CustomInventoryHolder(), 54, Messages.getMessage("inventory.name", "%cible%", name));
+		Inventory inv = ChatItem.getPlatform().createInventory(new CustomInventoryHolder(), 54, Messages.getMessage("inventory.name", "%cible%", name));
 		
 		for(int i = 0; i < 18; i++)
-			inv.setItem(i, ItemUtils.createItem(ItemUtils.getMaterialWithCompatibility("BROWN_STAINED_GLASS_PANE", "STAINED_GLASS_PANE"), ""));
+			inv.setItem(i, ItemUtils.ITEM_EMPTY_BROWN);
 		
 		inv.setItem(2, new ItemStack(ItemUtils.getMaterialWithCompatibility("EXPERIENCE_BOTTLE", "EXP_BOTTLE"), level == 0 ? 1 : (level >= 64 ? 64 : level)));
 		

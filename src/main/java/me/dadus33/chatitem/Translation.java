@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -51,6 +52,11 @@ public class Translation {
 	
 	public static JsonObject getMessages() {
 		return messages;
+	}
+	
+	public static String getMessage(String key) {
+		JsonElement result = messages.get(key);
+		return result == null ? "" : result.getAsString();
 	}
 	
 	public static void loadLang(String lang) {

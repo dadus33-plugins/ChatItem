@@ -102,6 +102,7 @@ public class JSONManipulator {
 		return obj.toString();
 	}
 
+	@SuppressWarnings("deprecation")
 	public String parseEmpty(String json, String repl, List<String> tooltip, Player sender) {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		JsonArray array = obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray();

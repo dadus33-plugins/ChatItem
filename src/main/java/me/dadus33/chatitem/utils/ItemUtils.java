@@ -1,14 +1,12 @@
 package me.dadus33.chatitem.utils;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import me.dadus33.chatitem.ChatItem;
 
 public class ItemUtils {
 
@@ -25,8 +23,11 @@ public class ItemUtils {
 	public static final Material BIRCH_WOOD_STAIRS = getMaterialWithCompatibility("BIRCH_WOOD_STAIRS", "BIRCH_STAIRS");
 	
 	// colored items
-	public static final Material GRAY_STAINED_GLASS_PANE = getMaterialWithCompatibility("STAINED_GLASS_PANE", "GRAY_STAINED_GLASS_PANE");
-	public static final Material WHITE_STAINED_GLASS = getMaterialWithCompatibility("STAINED_GLASS_PANE", "WHITE_STAINED_GLASS_PANE");
+	public static final Material BROWN_STAINED_GLASS_PANE = getMaterialWithCompatibility("BROWN_STAINED_GLASS_PANE", "STAINED_GLASS_PANE");
+	public static final Material GRAY_STAINED_GLASS_PANE = getMaterialWithCompatibility("GRAY_STAINED_GLASS_PANE", "STAINED_GLASS_PANE");
+	public static final Material WHITE_STAINED_GLASS = getMaterialWithCompatibility("WHITE_STAINED_GLASS_PANE", "STAINED_GLASS_PANE");
+	
+	public static final ItemStack ITEM_EMPTY_BROWN = ChatItem.getPlatform().createItemStack(BROWN_STAINED_GLASS_PANE, "");
 	
 	public static Material getMaterialWithCompatibility(String... tempMat) {
 		for(String s : tempMat) {
@@ -39,42 +40,6 @@ public class ItemUtils {
 			} catch (NoSuchFieldException e) {}
 		}
 		return null;
-	}
-
-	public static ItemStack createItem(Material m, String name, String... lore) {
-		return createItem(m, name, 1, lore);
-	}
-
-	public static ItemStack createItem(Material m, String name, int quantite, String... lore) {
-		ItemStack item = new ItemStack(m, quantite);
-		ItemMeta meta = (ItemMeta) item.getItemMeta();
-		meta.setDisplayName(ChatColor.RESET + name);
-		meta.setLore(Arrays.asList(lore));
-		item.setItemMeta(meta);
-		return item;
-	}
-
-	public static ItemStack createItem(Material m, String name, List<String> lore) {
-		return createItem(m, name, 1, lore);
-	}
-
-	public static ItemStack createItem(Material m, String name, int quantite, List<String> lore) {
-		ItemStack item = new ItemStack(m, quantite);
-		ItemMeta meta = (ItemMeta) item.getItemMeta();
-		meta.setDisplayName(ChatColor.RESET + name);
-		meta.setLore(lore);
-		item.setItemMeta(meta);
-		return item;
-	}
-
-	@SuppressWarnings("deprecation")
-	public static ItemStack createItem(Material m, String name, int amount, byte b, String... lore) {
-		ItemStack item = new ItemStack(m, amount, b);
-		ItemMeta meta = (ItemMeta) item.getItemMeta();
-		meta.setDisplayName(ChatColor.RESET + name);
-		meta.setLore(Arrays.asList(lore));
-		item.setItemMeta(meta);
-		return item;
 	}
 	
 	public static ItemStack hideAttributes(ItemStack stack) {
@@ -95,6 +60,7 @@ public class ItemUtils {
 		return item == null || item.getType().equals(Material.AIR);
 	}
 
+	@SuppressWarnings("deprecation")
 	public static void stripData(ItemStack i) {
 		if (i == null) {
 			return;

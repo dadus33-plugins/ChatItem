@@ -36,6 +36,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 
+@SuppressWarnings("deprecation")
 public class ChatListener implements Listener {
 
 	private static Method saveMethod;

@@ -3,8 +3,9 @@ package me.dadus33.chatitem;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
+
+import me.dadus33.chatitem.utils.Colors;
 
 public class Storage {
 
@@ -63,7 +64,7 @@ public class Storage {
 	}
 
 	public static String color(String s) {
-		return s == null || s.isEmpty() ? s : ChatColor.translateAlternateColorCodes('&', s);
+		return s == null || s.isEmpty() ? s : Colors.translateAlternateColorCodes('&', s);
 	}
 
 	private static void colorStringList(List<String> input) {
@@ -76,10 +77,10 @@ public class Storage {
 		int latestVersion = ChatItem.CFG_VER;
 		if (latestVersion != configVersion) {
 			ChatItem pl = ChatItem.getInstance();
-			pl.getLogger().warning(ChatColor.RED + "ChatItem detected an older or invalid configuration file. Replacing it with the default config...");
+			pl.getLogger().warning("ChatItem detected an older or invalid configuration file. Replacing it with the default config...");
 			performOverwrite();
 			conf = pl.getConfig();
-			pl.getLogger().warning(ChatColor.RED + "Replacement complete!");
+			pl.getLogger().warning("Replacement complete!");
 		}
 	}
 

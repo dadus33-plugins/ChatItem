@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -34,7 +33,11 @@ import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.listeners.JoinListener;
 import me.dadus33.chatitem.listeners.TranslationInventoryListener;
+import me.dadus33.chatitem.platform.IPlatform;
+import me.dadus33.chatitem.platform.hook.PaperPlatform;
+import me.dadus33.chatitem.platform.hook.SpigotPlatform;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
+import me.dadus33.chatitem.utils.Colors;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.SemVer;
@@ -43,6 +46,10 @@ import me.dadus33.chatitem.utils.Version;
 
 public class ChatItem extends JavaPlugin {
 
+	private static final IPlatform platform = PacketUtils.IS_PAPER ? new PaperPlatform() : new SpigotPlatform();
+	public static IPlatform getPlatform() {
+		return platform;
+	}
 	public final static int CFG_VER = 13;
 	public static boolean discordSrvSupport = false, hasNewVersion = false;
 	private static ChatItem instance;
@@ -64,7 +71,7 @@ public class ChatItem extends JavaPlugin {
 			if (!pl.storage.messageReload.isEmpty())
 				sender.sendMessage(pl.storage.messageReload);
 			if (!oldChatManager.equalsIgnoreCase(pl.storage.manager))
-				sender.sendMessage(ChatColor.GOLD + "Changing the manager with command reloading CAN produce issue. It's mostly suggested to restart after finding the better manager for you.");
+				sender.sendMessage(Colors.GOLD + "Changing the manager with command reloading CAN produce issue. It's mostly suggested to restart after finding the better manager for you.");
 		}
 	}
 
@@ -198,12 +205,12 @@ public class ChatItem extends JavaPlugin {
 				String content = Utils.getFromURL(urlName);
 				if (Strings.isNullOrEmpty(content))
 					return;
-				SemVer currentVersion = SemVer.parse(getDescription().getVersion());
+				SemVer currentVersion = SemVer.parse(getPlatform().getPluginVersion(this));
 				if (currentVersion == null)
 					return;
 				SemVer latestVersion = SemVer.parse(content);
 				if (latestVersion != null && latestVersion.isNewerThan(currentVersion)) {
-					hasNewVersion = !content.equalsIgnoreCase(getDescription().getVersion());
+					hasNewVersion = !content.equalsIgnoreCase(getPlatform().getPluginVersion(this));
 					if (hasNewVersion)
 						getLogger().info(storage.updateMessage);
 				}

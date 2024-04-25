@@ -14,6 +14,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class JoinListener implements Listener {
 
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();

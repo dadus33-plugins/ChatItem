@@ -78,14 +78,13 @@ public class StringComponentManager implements IComponentManager {
 	public Object manageEmpty(Player p, Chat chat, ChatItemPacket packet, String json, Storage c) {
 		ComponentBuilder builder = new ComponentBuilder("");
 		c.tooltipHand.forEach(s -> builder.append(s));
-		Player sender = chat.getPlayer();
 		HoverEvent hover;
 		ClickEvent click;
 		String rep;
 		ChatAction action = chat.getAction();
 		if (action.isItem()) {
 			hover = Utils.createTextHover(builder.create());
-			rep = c.handName.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName());
+			rep = ChatManager.getHandName(p);
 			click = null;
 		} else {
 			hover = Utils.createTextHover(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", chat.getPlayer().getName()));

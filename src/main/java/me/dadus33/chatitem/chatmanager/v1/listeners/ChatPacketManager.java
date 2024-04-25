@@ -75,6 +75,7 @@ public class ChatPacketManager extends PacketHandler {
 			ChatItem.debug("Component " + getter.getClass().getSimpleName() + " doesn't answer conditions");
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onSend(ChatItemPacket e) {
 		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT))

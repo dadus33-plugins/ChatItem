@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.itemnamer.INamer;
 
+@SuppressWarnings("deprecation")
 public class ItemDisplayNamer implements INamer {
 
 	@Override

@@ -23,7 +23,7 @@ public class PlayerNamerManager {
 
 
 		if (plugin != null) {
-			char majorVersion = plugin.getDescription().getVersion().charAt(0);
+			char majorVersion = ChatItem.getPlatform().getPluginVersion(plugin).charAt(0);
 
 			if (majorVersion == '3')
 				setPlayerNamer(new HexNicksV3PlayerNamer());
