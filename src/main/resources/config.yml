@@ -221,11 +221,12 @@ messages:
       lore: "&7Actual: &e%name%"
     # Change name and lore of all managers
     manager:
-      both:
-        name: "&6Use both manager&7: &aPacket & Chat"
+      all:
+        name: "&6Use all manager&7: &aPacket, Chat & Paper"
         lore:
-        - "&aTry both manager. Very usefull when you have lot of plugins"
+        - "&aTry all managers to be sure at least one success. Default options."
         - "&eIt enable to use ChatItem for all type of messages"
+        - "&eShould works with all types of plugins. (Previously named 'both' instead of 'all')"
         - ""
         - "&7Since ChatItem v2.1"
       auto:

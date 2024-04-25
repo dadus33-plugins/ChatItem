@@ -22,6 +22,8 @@ public class Storage {
 		configVersion = conf.getInt("config-version", 13);
 		checkConfigVersion();
 		this.manager = conf.getString("manager", "auto");
+		if(manager == "both")
+			manager = "all";
 		language = conf.getString("general.language", "en_gb");
 		debug = conf.getBoolean("debug", false);
 		nameFormat = color(conf.getString("general.name-format", "&b&l&o{name} {amount}&r"));

@@ -38,92 +38,94 @@ public class InventoryListener implements Listener {
 			return;
 		}
 
-		if(e.getClickedInventory() == null || !(e.getWhoClicked() instanceof Player))
+		if (e.getClickedInventory() == null || !(e.getWhoClicked() instanceof Player))
 			return;
 		InventoryHolder holder = e.getClickedInventory().getHolder();
-		if(holder == null || !(holder instanceof ChatItemHolder)) {
-			if(e.getClick().equals(ClickType.DOUBLE_CLICK) && p.getOpenInventory() != null && p.getOpenInventory().getTopInventory() != null) {
+		if (holder == null || !(holder instanceof ChatItemHolder)) {
+			if (e.getClick().equals(ClickType.DOUBLE_CLICK) && p.getOpenInventory() != null
+					&& p.getOpenInventory().getTopInventory() != null) {
 				Inventory top = p.getOpenInventory().getTopInventory();
-				if(top.getHolder() != null && top.getHolder() instanceof ChatItemHolder) {
+				if (top.getHolder() != null && top.getHolder() instanceof ChatItemHolder) {
 					e.setCancelled(true);
 				}
 			}
 			return;
 		}
-		if(holder instanceof CustomInventoryHolder) {
+		if (holder instanceof CustomInventoryHolder) {
 			e.setCancelled(true);
 			return;
 		}
-		if(!(holder instanceof AdminHolder))
+		if (!(holder instanceof AdminHolder))
 			return;
 		e.setCancelled(true);
-		if(e.getCurrentItem() == null)
+		if (e.getCurrentItem() == null)
 			return;
 		ItemStack item = e.getCurrentItem();
 		Material type = item.getType();
 		Storage c = ChatItem.getInstance().getStorage();
-		if(type.equals(ItemUtils.MATERIAL_CLOSE)) {
+		if (type.equals(ItemUtils.MATERIAL_CLOSE)) {
 			p.closeInventory();
-		} else if(type.equals(Material.BOOK)) {
+		} else if (type.equals(Material.BOOK)) {
 			TranslationInventoryListener.open(p, 0);
-		} else if(type.equals(Material.PAPER)) {
+		} else if (type.equals(Material.PAPER)) {
 			String key = ((AdminHolder) holder).keyBySlot.get(e.getSlot());
-			if(key != null) {
+			if (key != null) {
 				setInConfig("manager", key);
 				p.closeInventory();
 				ChatItem.reload(p);
 			}
-		} else if(type.equals(ItemUtils.INK_SAC)) {
+		} else if (type.equals(ItemUtils.INK_SAC)) {
 			setInConfig("general.color-if-already-colored", c.colorIfColored = !c.colorIfColored);
 			open(p);
-		} else if(type.equals(Material.STICK)) {
+		} else if (type.equals(Material.STICK)) {
 			setInConfig("general.hand.disabled", c.handDisabled = !c.handDisabled);
 			open(p);
-		} else if(type.equals(Material.BLAZE_ROD)) {
+		} else if (type.equals(Material.BLAZE_ROD)) {
 			setInConfig("general.check-update", c.checkUpdate = !c.checkUpdate);
 			open(p);
-		} else if(type.equals(ItemUtils.FIREWORK_CHARGE)) {
+		} else if (type.equals(ItemUtils.FIREWORK_CHARGE)) {
 			setInConfig("debug", c.debug = !c.debug);
 			open(p);
-		} else if(type.equals(Material.IRON_DOOR)) {
-			if(e.getClick().equals(ClickType.RIGHT))
+		} else if (type.equals(Material.IRON_DOOR)) {
+			if (e.getClick().equals(ClickType.RIGHT))
 				c.limit--;
-			else if(e.getClick().equals(ClickType.LEFT))
+			else if (e.getClick().equals(ClickType.LEFT))
 				c.limit++;
 			setInConfig("general.limit-per-message", c.limit);
 			open(p);
-		} else if(type.equals(Material.APPLE)) {
-			if(e.getClick().equals(ClickType.RIGHT))
+		} else if (type.equals(Material.APPLE)) {
+			if (e.getClick().equals(ClickType.RIGHT))
 				c.cooldown--;
-			else if(e.getClick().equals(ClickType.LEFT))
+			else if (e.getClick().equals(ClickType.LEFT))
 				c.cooldown++;
 			setInConfig("general.cooldown", c.cooldown);
 			open(p);
 		}
 	}
-	
+
 	public static void setInConfig(String key, Object val) {
 		ChatItem pl = ChatItem.getInstance();
 		pl.getConfig().set(key, val);
 		pl.saveConfig();
 	}
-	
+
 	public static void open(Player p) {
 		AdminHolder holder = new AdminHolder();
 		Storage c = ChatItem.getInstance().getStorage();
 		Inventory inv = Bukkit.createInventory(holder, 27, Messages.getMessage("admin-inv.name"));
-		for(int i = 0; i < inv.getSize(); i ++)
+		for (int i = 0; i < inv.getSize(); i++)
 			inv.setItem(i, createItem(ItemUtils.WHITE_STAINED_GLASS, "-"));
-		
+
 		int slot = 0;
-		for(String manager : Arrays.asList("both", "auto", "packet", "chat", "paper")) {
-			if(manager == "paper" && !PacketUtils.IS_PAPER)
+		for (String manager : Arrays.asList("all", "auto", "packet", "chat", "paper")) {
+			if (manager == "paper" && !PacketUtils.IS_PAPER)
 				continue;
 			holder.keyBySlot.put(slot, manager);
 			inv.setItem(slot++, getManagerItem(manager));
 		}
-		inv.setItem(slot + 1, getManagerItem("actual", "%manager%", Messages.getMessage("admin-inv.manager." + c.manager + ".name")));
-		
+		inv.setItem(slot + 1,
+				getManagerItem("actual", "%manager%", Messages.getMessage("admin-inv.manager." + c.manager + ".name")));
+
 		inv.setItem(8, getBoolChangeItem(ItemUtils.FIREWORK_CHARGE, "debug", c.debug));
 
 		inv.setItem(18, getBoolChangeItem(ItemUtils.INK_SAC, "color-if-already-colored", c.colorIfColored));
@@ -131,21 +133,24 @@ public class InventoryListener implements Listener {
 		inv.setItem(21, getAmountChangeItem(Material.IRON_DOOR, "limit-per-message", c.limit));
 		inv.setItem(22, getAmountChangeItem(Material.APPLE, "cooldown", c.cooldown));
 		inv.setItem(23, getBoolChangeItem(Material.BLAZE_ROD, "check-update", c.checkUpdate));
-		inv.setItem(24, createItem(Material.BOOK, Messages.getMessage("admin-inv.language.name"),
-				Messages.getMessage("admin-inv.language.lore", "%name%", Translation.getMessages().get("language.name").getAsString())));
-		
+		inv.setItem(24, createItem(Material.BOOK, Messages.getMessage("admin-inv.language.name"), Messages.getMessage(
+				"admin-inv.language.lore", "%name%", Translation.getMessages().get("language.name").getAsString())));
+
 		inv.setItem(26, createItem(ItemUtils.MATERIAL_CLOSE, Messages.getMessage("admin-inv.close")));
 		p.openInventory(inv);
 	}
-	
+
 	private static ItemStack getBoolChangeItem(Material type, String key, boolean b) {
-		return createItem(type, Messages.getMessage("admin-inv." + key, "%state%", Messages.getMessage(b ? "enabled" : "disabled")), Messages.getMessageList("admin-inv.bool-lore"));
+		return createItem(type,
+				Messages.getMessage("admin-inv." + key, "%state%", Messages.getMessage(b ? "enabled" : "disabled")),
+				Messages.getMessageList("admin-inv.bool-lore"));
 	}
-	
+
 	private static ItemStack getAmountChangeItem(Material type, String key, int amount) {
-		return createItem(type, Messages.getMessage("admin-inv." + key, "%state%", amount), Messages.getMessageList("admin-inv.amount-lore"));
+		return createItem(type, Messages.getMessage("admin-inv." + key, "%state%", amount),
+				Messages.getMessageList("admin-inv.amount-lore"));
 	}
-	
+
 	private static ItemStack getManagerItem(String manager, Object... placeholders) {
 		return createItem(Material.PAPER, Messages.getMessage("admin-inv.manager." + manager + ".name", placeholders),
 				Messages.getMessageList("admin-inv.manager." + manager + ".lore", placeholders));
