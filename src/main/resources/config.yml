@@ -252,6 +252,14 @@ messages:
         - "&eIt's more optimized than others manager"
         - ""
         - "&7Since ChatItem v2.0"
+      paper:
+        name: "&6Use paper messaging"
+        lore:
+        - "&aPaper has his own messaging system."
+        - "&aChatItem can you this system to be easier to manage"
+        - "&eAdapted for paper user, and could be used with more plugin that others"
+        - ""
+        - "&7Since ChatItem v2.6"
       # The item that show the actual manager
       actual:
         name: '&6Actual manager: %manager%'
