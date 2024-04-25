@@ -225,6 +225,14 @@ public class ChatItem extends JavaPlugin {
 	public List<ChatManager> getChatManager() {
 		return chatManager;
 	}
+	
+	public boolean isManagerEnabled(String id) {
+		for (ChatManager cm : chatManager) {
+			if(cm.getId().equalsIgnoreCase(id))
+				return true;
+		}
+		return false;
+	}
 
 	public String getVisualChatManagers() {
 		StringJoiner sj = new StringJoiner(", ");

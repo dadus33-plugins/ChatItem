@@ -6,8 +6,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
+import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.ItemSlot;
 import me.dadus33.chatitem.Storage;
+import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.utils.PacketUtils;
@@ -37,14 +39,22 @@ public class PaperListener implements Listener {
 			return;
 
 		Player p = e.getPlayer();
-		ItemSlot slot = ItemSlot.getItemSlotFromMessage(PlainTextComponentSerializer.plainText().serialize(e.message()));
+	    Component message = e.message();
+		String rawMessage = PlainTextComponentSerializer.plainText().serialize(message);
+		if(ChatManager.containsSeparator(rawMessage)) { // fix for v1
+			Chat chat = Chat.getFrom(rawMessage);
+			if(chat != null) {
+		    	message = message.replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.SEPARATOR + "" + chat.getId() + ChatManager.SEPARATOR_END).replacement(Component.text(chat.getSlot().getPlaceholders().get(0))).build());
+				rawMessage = PlainTextComponentSerializer.plainText().serialize(message);
+			}
+		}
+		ItemSlot slot = ItemSlot.getItemSlotFromMessage(rawMessage);
+		ChatItem.debug("(v3) Raw message: " + rawMessage + ", slot: " + slot);
 		if (slot == null) // if not found
 			return;
 		ChatAction action = ChatManager.getChatAction(slot, p);
 		if(action.isItem() && !ChatManager.canShowItem(p, action.getItem(), slot, e))
 			return;
-		e.setCancelled(true);
-	    Component message = e.message();
 	    ItemStack item = action.getItem();
 	    ComponentLike like = Component.text(ChatManager.getNameOfItem(p, item, getStorage())).hoverEvent(HoverEvent.showItem(Key.key(item.getType().getKey().getKey()), item.getAmount(), BinaryTagHolder.of(PacketUtils.getNbtTag(item))));
 	    for(String s : slot.getPlaceholders())

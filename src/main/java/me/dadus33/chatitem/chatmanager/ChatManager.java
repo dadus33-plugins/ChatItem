@@ -196,9 +196,9 @@ public abstract class ChatManager {
 	/**
 	 * Get the name of item according to player & config
 	 * 
-	 * @param p    the player that is owner of item
+	 * @param p the player that is owner of item
 	 * @param item the item
-	 * @param c    the config
+	 * @param c the config
 	 * @return the name of item or hand
 	 */
 	public static String getNameOfItem(Player p, ItemStack item, Storage c) {
@@ -206,7 +206,7 @@ public abstract class ChatManager {
 			if (c.handDisabled)
 				return ItemSlot.HAND.getPlaceholders().get(0);
 			else
-				return c.handName;
+				return c.handName.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName());
 		}
 		return styleItem(p, item, c);
 	}
@@ -218,7 +218,7 @@ public abstract class ChatManager {
 				if (c.handDisabled)
 					return ItemSlot.HAND.getPlaceholders().get(0);
 				else
-					return c.handName;
+					return c.handName.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName());
 			}
 			return styleItem(p, item, c);
 		}
