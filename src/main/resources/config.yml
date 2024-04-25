@@ -17,7 +17,7 @@ config-version: 13
 #        amount of possible issues.
 # You can replace 'both' by another mode that should correspond to what you want.
 # If you don't know which one use, come on discord (link at begin of config or in spigotmc)
-manager: "both"
+manager: "all"
 
 #General configuration
 general:

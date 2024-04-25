@@ -62,12 +62,7 @@ public enum Version {
 	}
 
 	public static Version getVersion(int protocolVersion) {
-		for (Version ver : Version.values()) {
-			if (protocolVersion >= ver.MIN_VER && protocolVersion <= ver.MAX_VER) {
-				return ver;
-			}
-		}
-		return HIGHER;
+		return getVersion(protocolVersion, HIGHER);
 	}
 
 	public static Version getVersion(int protocolVersion, Version def) {

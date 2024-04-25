@@ -23,6 +23,7 @@ import me.dadus33.chatitem.chatmanager.ChatEventListener;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v2.ChatListenerChatManager;
+import me.dadus33.chatitem.chatmanager.v3.PaperChatManager;
 import me.dadus33.chatitem.commands.CIReloadCommand;
 import me.dadus33.chatitem.commands.ChatItemCommand;
 import me.dadus33.chatitem.hook.ChatControlSupport;
@@ -34,6 +35,7 @@ import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.listeners.JoinListener;
 import me.dadus33.chatitem.listeners.TranslationInventoryListener;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
+import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.SemVer;
 import me.dadus33.chatitem.utils.Utils;
@@ -86,16 +88,25 @@ public class ChatItem extends JavaPlugin {
 
 		switch (managerName.toLowerCase(Locale.ROOT)) {
 		case "both":
+		case "all":
 			this.chatManager.add(new PacketEditingChatManager(this));
 			this.chatManager.add(new ChatListenerChatManager(this));
+			if(PacketUtils.IS_PAPER)
+				this.chatManager.add(new PaperChatManager(this));
 			getLogger().info("Manager automatically chosen: " + getVisualChatManagers());
 			break;
 		case "auto":
-			if (getPluginThatRequirePacket().stream().map(pm::getPlugin).anyMatch(Objects::nonNull) && Version.getVersion().isNewerThan(Version.V1_7))
+			if(PacketUtils.IS_PAPER)
+				this.chatManager.add(new PaperChatManager(this));
+			else if (getPluginThatRequirePacket().stream().map(pm::getPlugin).anyMatch(Objects::nonNull) && Version.getVersion().isNewerThan(Version.V1_7))
 				this.chatManager.add(new PacketEditingChatManager(this));
 			else
 				this.chatManager.add(new ChatListenerChatManager(this));
 			getLogger().info("Manager automatically chosen: " + getVisualChatManagers());
+			break;
+		case "paper":
+			this.chatManager.add(new PaperChatManager(this));
+			getLogger().info("Manager chosen: " + getVisualChatManagers());
 			break;
 		case "packet":
 			this.chatManager.add(new PacketEditingChatManager(this));
