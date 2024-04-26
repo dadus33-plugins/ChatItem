@@ -77,7 +77,12 @@ public class AdventureComponentManager implements IComponentManager {
 		if (action.isItem()) {
 			String itemName = ChatManager.getNameOfItem(chat.getPlayer(), item, c);
 			ChatItem.debug("NBT tag: " + PacketUtils.getNbtTag(item));
-			return manage(p, chat, packet, itemName, HoverEvent.showItem(Key.key(item.getType().getKey().getKey()), item.getAmount(), BinaryTagHolder.of(PacketUtils.getNbtTag(item))), null);
+			HoverEvent<?> hover;
+			if(PacketUtils.IS_PAPER)
+				hover = item.asHoverEvent();
+			else
+				hover = HoverEvent.showItem(Key.key(item.getType().getKey().getKey()), item.getAmount(), BinaryTagHolder.of(PacketUtils.getNbtTag(item)));
+			return manage(p, chat, packet, itemName, hover, null);
 		}
 		return manage(p, chat, packet, Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", chat.getPlayer().getName()),
 				HoverEvent.showText(Component.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", chat.getPlayer().getName()))),

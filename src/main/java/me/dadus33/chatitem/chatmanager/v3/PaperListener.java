@@ -12,13 +12,9 @@ import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
-import me.dadus33.chatitem.utils.PacketUtils;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextReplacementConfig;
-import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class PaperListener implements Listener {
@@ -56,7 +52,7 @@ public class PaperListener implements Listener {
 		if(action.isItem() && !ChatManager.canShowItem(p, action.getItem(), slot, e))
 			return;
 	    ItemStack item = action.getItem();
-	    ComponentLike like = Component.text(ChatManager.getNameOfItem(p, item, getStorage())).hoverEvent(HoverEvent.showItem(Key.key(item.getType().getKey().getKey()), item.getAmount(), BinaryTagHolder.of(PacketUtils.getNbtTag(item))));
+	    ComponentLike like = Component.text(ChatManager.getNameOfItem(p, item, getStorage())).hoverEvent(item.asHoverEvent());
 	    for(String s : slot.getPlaceholders())
 	    	message = message.replaceText(TextReplacementConfig.builder().matchLiteral(s).replacement(like).build());
 	    e.message(message);
