@@ -14,6 +14,11 @@ public class Colors {
 	public static final String GREEN = ColorManager.COLOR_CHAR + "a";
 	public static final String RESET = ColorManager.COLOR_CHAR + "r";
 
+
+	public static String color(String s) {
+		return s == null || s.isEmpty() ? s : translateAlternateColorCodes('&', s);
+	}
+	
     public static String translateAlternateColorCodes(char altColorChar, @NotNull String textToTranslate) {
         Preconditions.checkArgument(textToTranslate != null, "Cannot translate null text");
 

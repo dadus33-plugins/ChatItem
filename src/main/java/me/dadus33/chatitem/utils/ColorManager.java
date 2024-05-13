@@ -9,7 +9,7 @@ import net.md_5.bungee.api.ChatColor;
 public class ColorManager {
 
 	public static final char COLOR_CHAR = '§';
-	public static final List<String> COLORS = Arrays.asList("4", "c", "6", "e", "2", "a", "b", "3", "1", "9", "d", "5", "f", "7", "8", "0");
+	public static final List<String> COLORS = Arrays.asList("4", "c", "6", "e", "2", "a", "b", "3", "1", "9", "d", "5", "f", "7", "8", "0", "k", "l", "m", "n", "o", "r");
 	
 	public static boolean isHexColor(ChatColor c) {
 		return Version.getVersion().isNewerOrEquals(Version.V1_16) && c.getName().startsWith("#");

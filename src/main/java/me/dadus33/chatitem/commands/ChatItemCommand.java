@@ -24,6 +24,7 @@ import me.dadus33.chatitem.invsee.InvShower;
 import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.utils.Colors;
 import me.dadus33.chatitem.utils.Messages;
+import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -31,7 +32,14 @@ import net.md_5.bungee.api.chat.TextComponent;
 @SuppressWarnings("deprecation")
 public class ChatItemCommand implements CommandExecutor, TabExecutor {
 
-	private static final List<String> orders = Arrays.asList("packet", "chat", "both");
+	private static final List<String> ORDERS;
+	
+	static {
+		if(PacketUtils.IS_PAPER)
+			ORDERS = Arrays.asList("packet", "chat", "paper", "all");
+		else
+			ORDERS = Arrays.asList("packet", "chat", "all");
+	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -85,10 +93,10 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 			if(args.length == 1) {
 				p.sendMessage(Colors.GRAY + "----------" + Colors.GOLD + " ChatItem - Setup " + Colors.GRAY + "----------");
 				p.sendMessage(Colors.AQUA + "Welcome in the help of setup." + Colors.YELLOW + " Please follow step by simply answer to test.");
-				sendCheckSelectMessage(p, orders.get(0));
+				sendCheckSelectMessage(p, ORDERS.get(0));
 			} else {
 				String tested = args[1];
-				if(!orders.contains(tested)) {
+				if(!ORDERS.contains(tested)) {
 					p.sendMessage(Colors.RED + "Unknow test for " + tested + ".");
 					return false;
 				}
@@ -102,13 +110,13 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 					p.sendMessage(Colors.GREEN + "Perfect ! Updating config ...");
 					ChatItem.reload(p);
 				} else if(args[2].equalsIgnoreCase("no")) {
-					int index = orders.indexOf(tested);
-					if(orders.size() == (index + 1)) {
+					int index = ORDERS.indexOf(tested);
+					if(ORDERS.size() == (index + 1)) {
 						p.sendMessage(Colors.RED + "Sad. Sorry but nothing is available. I suggest you to come on discord for more help. Do '/chatitem link' for all links.");
 						ChatManager.setTesting(null);
 					} else {
 						p.sendMessage(Colors.RED + "Sad. Checking for next manager ...");
-						sendCheckSelectMessage(p, orders.get(index + 1));
+						sendCheckSelectMessage(p, ORDERS.get(index + 1));
 					}
 				} else {
 					p.sendMessage(Colors.RED + "Can't find if it works");
