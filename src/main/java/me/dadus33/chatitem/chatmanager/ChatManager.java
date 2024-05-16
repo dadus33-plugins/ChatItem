@@ -101,14 +101,14 @@ public abstract class ChatManager {
 	 * @return the usable item
 	 */
 	public static ItemStack getUsableItem(Player p, ItemSlot slot) {
-		if(slot == null)
+		if (slot == null)
 			return null;
 		ItemStack betterItem = HandItem.getBetterItem(p, slot);
-		if(betterItem == null)
+		if (betterItem == null)
 			return null;
-		
+
 		ItemStack item = betterItem.clone();
-		if(slot.isDenyIfNoItem() && ItemUtils.isEmpty(item))
+		if (slot.isDenyIfNoItem() && ItemUtils.isEmpty(item))
 			return null;
 		if (EcoEnchantsSupport.hasSupport()) {
 			item = EcoEnchantsSupport.manageItem(item);
@@ -132,9 +132,9 @@ public abstract class ChatManager {
 		}
 		return item;
 	}
-	
+
 	public static ChatAction getChatAction(ItemSlot slot, Player p) {
-		if(slot.isCommand()) {
+		if (slot.isCommand()) {
 			UUID uuid = UUID.randomUUID();
 			InvShower.add(uuid.toString(), slot == ItemSlot.INVENTORY ? new PlayerInventoryShower(p) : new EnderChestShower(p));
 			return new ChatAction(slot, "/chatitem seeinv " + uuid.toString());
@@ -197,9 +197,9 @@ public abstract class ChatManager {
 	/**
 	 * Get the name of item according to player & config
 	 * 
-	 * @param p the player that is owner of item
+	 * @param p    the player that is owner of item
 	 * @param item the item
-	 * @param c the config
+	 * @param c    the config
 	 * @return the name of item or hand
 	 */
 	public static String getNameOfItem(Player p, ItemStack item, Storage c) {
@@ -211,9 +211,9 @@ public abstract class ChatManager {
 		}
 		return styleItem(p, item, c);
 	}
-	
+
 	public static String getNameForChatAction(Player p, ChatAction action, Storage c) {
-		if(action.isItem()) {
+		if (action.isItem()) {
 			ItemStack item = action.getItem();
 			if (ItemUtils.isEmpty(item)) {
 				if (c.handDisabled)
@@ -225,7 +225,7 @@ public abstract class ChatManager {
 		}
 		return "";
 	}
-	
+
 	public static String getHandName(Player p) {
 		return ChatItem.getInstance().getStorage().handName.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName());
 	}
@@ -259,9 +259,7 @@ public abstract class ChatManager {
 		return builder.toString();
 	}
 
-	public static boolean canShowItem(Player p, ItemStack item, ItemSlot slot, @Nullable Cancellable e) {
-		if(item == null)
-			return false;
+	public static boolean canUsePlaceholder(Player p, ItemStack item, ItemSlot slot, @Nullable Cancellable e) {
 		Storage c = ChatItem.getInstance().getStorage();
 		if (c.permissionEnabled && !p.hasPermission(c.permissionName)) {
 			if (!c.letMessageThrough) {
@@ -273,7 +271,7 @@ public abstract class ChatManager {
 			}
 			return false;
 		}
-		if (item.getType().equals(Material.AIR)) {
+		if (item != null && item.getType().equals(Material.AIR)) {
 			if (slot.isDenyIfNoItem()) {
 				if (e != null)
 					e.setCancelled(true);
@@ -306,9 +304,11 @@ public abstract class ChatManager {
 				}
 			}
 		}
-		for (String ignored : c.ignoredItems) {
-			if (item.getType().name().toLowerCase().contains(ignored.toLowerCase())) {
-				return false;
+		if (item != null) {
+			for (String ignored : c.ignoredItems) {
+				if (item.getType().name().toLowerCase().contains(ignored.toLowerCase())) {
+					return false;
+				}
 			}
 		}
 
@@ -335,15 +335,15 @@ public abstract class ChatManager {
 	public static void applyCooldown(Player p) {
 		COOLDOWNS.put(p.getUniqueId(), System.currentTimeMillis() / 1000);
 	}
-	
+
 	public static boolean isTestingEnabled() {
 		return inTest != null;
 	}
-	
+
 	public static boolean isTesting(String actual) {
 		return inTest != null && (inTest == "both" || inTest.equalsIgnoreCase(actual));
 	}
-	
+
 	public static void setTesting(String actual) {
 		inTest = actual;
 	}

@@ -49,7 +49,7 @@ public class PaperListener implements Listener {
 		if (slot == null) // if not found
 			return;
 		ChatAction action = ChatManager.getChatAction(slot, p);
-		if(action.isItem() && !ChatManager.canShowItem(p, action.getItem(), slot, e))
+		if(action.isItem() && !ChatManager.canUsePlaceholder(p, action.getItem(), slot, e))
 			return;
 	    ItemStack item = action.getItem();
 	    ComponentLike like = Component.text(ChatManager.getNameOfItem(p, item, getStorage())).hoverEvent(item.asHoverEvent());

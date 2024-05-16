@@ -112,7 +112,7 @@ public class ChatListener implements Listener {
 			return;
 		}
 		ChatAction action = ChatManager.getChatAction(slot, p);
-		if(action.isItem() && !ChatManager.canShowItem(p, action.getItem(), slot, e))
+		if(!ChatManager.canUsePlaceholder(p, action.getItem(), slot, e))
 			return;
 		e.setCancelled(true);
 		String format = e.getFormat();

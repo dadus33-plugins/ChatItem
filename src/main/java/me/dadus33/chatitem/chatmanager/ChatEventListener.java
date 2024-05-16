@@ -38,7 +38,7 @@ public class ChatEventListener implements Listener {
 			return;
 		}
 		ChatAction action = ChatManager.getChatAction(slot, p);
-		if(action.isItem() && !ChatManager.canShowItem(p, action.getItem(), slot, e))
+		if(!ChatManager.canUsePlaceholder(p, action.getItem(), slot, e))
 			return;
 		String s = slot.replacePlaceholdersToSeparator(e.getMessage());
 		if (Utils.countMatches(s, Character.toString(ChatManager.SEPARATOR)) > getStorage().limit) {
