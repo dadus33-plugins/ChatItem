@@ -285,3 +285,7 @@ messages:
 # If ChatItem send message using DiscordSRV
 # This option will be ignored if you don't have it
 discord-srv-send-our: true
+
+manager-config:
+  paper:
+    send-ourself: false

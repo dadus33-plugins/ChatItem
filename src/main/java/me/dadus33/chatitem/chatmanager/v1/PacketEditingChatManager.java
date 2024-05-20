@@ -1,6 +1,7 @@
 package me.dadus33.chatitem.chatmanager.v1;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 
 import org.bukkit.Bukkit;
 
@@ -9,6 +10,7 @@ import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.listeners.ChatPacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacketManager;
+import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketManager;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
@@ -73,19 +75,19 @@ public class PacketEditingChatManager extends ChatManager {
 		return packet;
 	}
 
-	public static Object createSystemChatPacket(String json) throws Exception {
+	public static Object createSystemChatPacket(String json, Object old) throws Exception {
 		json = checkPacketSize(json, 150000);
-		Object packet = internalCreateSystemChatPacket(json);
+		Object packet = internalCreateSystemChatPacket(json, old);
 		if(packet != null)
 			return packet;
-		packet = internalCreateSystemChatPacket(PacketUtils.ICB_FROM_JSON.invoke(null, json));
+		packet = internalCreateSystemChatPacket(PacketUtils.ICB_FROM_JSON.invoke(null, json), old);
 		if(packet != null)
 			return packet;
 		ChatItem.getInstance().getLogger().warning("Can't create a new packet for json " + json);
 		return null;
 	}
 	
-	private static Object internalCreateSystemChatPacket(Object obj) throws Exception {
+	private static Object internalCreateSystemChatPacket(Object obj, Object old) throws Exception {
 		Class<?> packetClass = PacketUtils.getNmsClass("ClientboundPlayerChatPacket", "network.protocol.game.", "ClientboundSystemChatPacket", "PacketPlayOutChat");
 		Class<?> chatMessageTypeClass = PacketUtils.isClassExist("net.minecraft.network.chat.ChatMessageType") ? PacketUtils.getNmsClass("ChatMessageType", "network.chat.") : null;
 		Constructor<?> betterOne = null;
@@ -112,15 +114,27 @@ public class PacketEditingChatManager extends ChatManager {
 			int nbPut = 0;
 			Object[] params = new Object[cons.getParameterCount()];
 			for(int i = 0; i < params.length; i++) {
-				if(cons.getParameterTypes()[i].isAssignableFrom(obj.getClass())) {
+				Class<?> type = cons.getParameterTypes()[i];
+				if(type.isAssignableFrom(obj.getClass())) {
 					params[i] = obj;
 					nbPut++;
-				} else if(chatMessageTypeClass != null && cons.getParameterTypes()[i].isAssignableFrom(chatMessageTypeClass)) {
+				} else if(chatMessageTypeClass != null && type.isAssignableFrom(chatMessageTypeClass)) {
 					params[i] = getChatMessageType();
-				} else if(cons.getParameterTypes()[i].isAssignableFrom(boolean.class)) // need to set primitives
+				} else if(type.isAssignableFrom(boolean.class)) // need to set primitives
 					params[i] = false;
-				else if(cons.getParameterTypes()[i].isAssignableFrom(int.class)) // need to set primitives
+				else if(type.isAssignableFrom(int.class)) // need to set primitives
 					params[i] = 0;
+				else {
+					boolean found = false;
+					for(Class<?> prim : Arrays.asList(float.class, long.class)) { // if not primitive
+						if(type.isAssignableFrom(prim)) {
+							found = true;
+						}
+					}
+					if(!found) {
+						params[i] = new PacketContent(old).getSpecificModifier(type).readSafely(0);
+					}
+				}
 			}
 			if(nbPut == 1) {
 				if((betterOne == null && betterParam == null) || betterParam.length > params.length) {

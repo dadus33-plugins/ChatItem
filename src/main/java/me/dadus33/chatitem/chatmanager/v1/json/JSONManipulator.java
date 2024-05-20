@@ -202,7 +202,6 @@ public class JSONManipulator {
 	}
 
 	private void addParsedStringToArray(String msg, JsonArray rep, JsonElement o, JsonElement tooltip) {
-		ChatItem.debug("Checking " + msg + " > " + rep + ", o: " + o);
 		if (!ChatManager.containsSeparator(msg)) {
 			rep.add(o);
 			return;
@@ -284,7 +283,6 @@ public class JSONManipulator {
 					sb.append(entry.getKey());
 				sb.append(":");
 			}
-			ChatItem.debug("Cleaning " + entry.getKey() + ": " + entry.getValue() + " > " + cleanStr(entry.getValue()));
 			sb.append(cleanStr(entry.getValue()));
 		}
 		sb.append("}}"); // End of tag and end of item

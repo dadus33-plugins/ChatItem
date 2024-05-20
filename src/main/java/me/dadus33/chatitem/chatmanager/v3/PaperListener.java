@@ -12,6 +12,7 @@ import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextReplacementConfig;
@@ -49,13 +50,19 @@ public class PaperListener implements Listener {
 		if (slot == null) // if not found
 			return;
 		ChatAction action = ChatManager.getChatAction(slot, p);
-		if(action.isItem() && !ChatManager.canUsePlaceholder(p, action.getItem(), slot, e))
+		if(!ChatManager.canUsePlaceholder(p, action.getItem(), slot, e))
 			return;
 	    ItemStack item = action.getItem();
 	    ComponentLike like = Component.text(ChatManager.getNameOfItem(p, item, getStorage())).hoverEvent(item.asHoverEvent());
 	    for(String s : slot.getPlaceholders())
 	    	message = message.replaceText(TextReplacementConfig.builder().matchLiteral(s).replacement(like).build());
-	    e.message(message);
+	    if(ChatItem.getInstance().getConfig().getBoolean("manager-config.paper.send-ourself", false)) {
+	    	for(Audience a : e.viewers())
+	    		e.renderer().render(p, p.displayName(), message, a);
+	    	e.setCancelled(true);
+	    } else
+	    	e.message(message);
+	    ChatItem.debug("Changed message to " + PlainTextComponentSerializer.plainText().serialize(message));
 		if (getStorage().cooldown > 0 && !p.hasPermission("chatitem.ignore-cooldown"))
 			ChatManager.applyCooldown(p);
 	}

@@ -57,7 +57,7 @@ public class StringComponentManager implements IComponentManager {
 	@Override
 	public void writeJson(ChatItemPacket packet, String json) {
 		try {
-			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(json));
+			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(json, packet.getPacket()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -127,7 +127,7 @@ public class StringComponentManager implements IComponentManager {
 		if(ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage())
 			DiscordSrvSupport.sendChatMessage(p, TextComponent.toLegacyText(components), null);
 		try {
-			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(ComponentSerializer.toString(components)));
+			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(ComponentSerializer.toString(components), packet.getPacket()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
