@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -326,11 +327,15 @@ public class ChatListener implements Listener {
 		ComponentBuilder littleBuilder = new ComponentBuilder(text);
 		if(color != null && color != ChatColor.RESET) // don't add reset thing
 			littleBuilder.color(color);
-		if (action.isItem())
-			littleBuilder.event(Utils.createItemHover(action.getItem(), to));
-		else {
+		if (action.isItem()) {
+			if(action.getItem().getType().equals(Material.AIR))
+				littleBuilder.event(Utils.createTextHover(String.join("\n", ChatItem.getInstance().getStorage().tooltipHand)));
+			else
+				littleBuilder.event(Utils.createItemHover(action.getItem(), to));
+		} else {
 			littleBuilder.event(Utils.createTextHover(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover")));
-			littleBuilder.event(Utils.createRunCommand(action.getCommand()));
+			if(action.getCommand() != "")
+				littleBuilder.event(Utils.createRunCommand(action.getCommand()));
 		}
 		return littleBuilder.create();
 	}
