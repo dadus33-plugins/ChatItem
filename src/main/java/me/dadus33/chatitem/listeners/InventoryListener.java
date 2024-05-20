@@ -20,7 +20,7 @@ import me.dadus33.chatitem.listeners.holder.ChatItemHolder;
 import me.dadus33.chatitem.listeners.holder.CustomInventoryHolder;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.Messages;
-import me.dadus33.chatitem.utils.PacketUtils;
+import me.dadus33.chatitem.utils.Utils;
 
 public class InventoryListener implements Listener {
 
@@ -115,7 +115,7 @@ public class InventoryListener implements Listener {
 
 		int slot = 0;
 		for (String manager : Arrays.asList("all", "auto", "packet", "chat", "paper")) {
-			if (manager == "paper" && !PacketUtils.IS_PAPER)
+			if (manager == "paper" && !Utils.IS_PAPER)
 				continue;
 			holder.keyBySlot.put(slot, manager);
 			inv.setItem(slot++, getManagerItem(manager));

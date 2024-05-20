@@ -2,8 +2,6 @@ package me.dadus33.chatitem.utils;
 
 import java.net.InetSocketAddress;
 
-import org.bukkit.Bukkit;
-
 import me.dadus33.chatitem.ChatItem;
 
 public enum Version {
@@ -22,7 +20,8 @@ public enum Version {
 	V1_17(755, 756, 17),
 	V1_18(757, 758, 18),
 	V1_19(759, 762, 19),
-	V1_20(763, 1000, 20),
+	V1_20(763, 765, 20),
+	V1_20_6(766, 1000, 20.6),
 	HIGHER(Integer.MAX_VALUE, -1, Integer.MAX_VALUE);
 
 	// Latest version should always have the upper limit set to Integer.MAX_VALUE so
@@ -30,17 +29,11 @@ public enum Version {
 
 	public final int MIN_VER;
 	public final int MAX_VER;
-	public final int index; // Represents how new the version is (0 - extremely old)
+	public final double index; // Represents how new the version is (0 - extremely old)
 
-	private static final Version SERVER_VERSION;
-	public static final String BUKKIT_VERSION;
+	private static final Version SERVER_VERSION = ChatItem.getPlatform().getMinecraftVersion();
 
-	static {
-		BUKKIT_VERSION = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-		SERVER_VERSION = getVersionByName(BUKKIT_VERSION);
-	}
-
-	Version(int min, int max, int index) {
+	Version(int min, int max, double index) {
 		this.MIN_VER = min;
 		this.MAX_VER = max;
 		this.index = index;
@@ -55,6 +48,9 @@ public enum Version {
 	}
 
 	public static Version getVersionByName(String name) {
+		try {
+			return Version.valueOf(name.toUpperCase());
+		} catch (Exception e) {}
 		for (Version v : Version.values())
 			if (name.toLowerCase().startsWith(v.name().toLowerCase()))
 				return v;

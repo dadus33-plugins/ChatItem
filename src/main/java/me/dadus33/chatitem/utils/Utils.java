@@ -39,6 +39,7 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class Utils {
 
+	public static final boolean IS_PAPER = isClassExist("io.papermc.paper.event.player.AsyncChatEvent");
 	private static final Pattern UUID_PATTERN = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$");
 	private static final TreeMap<Integer, String> ROMAN_KEYS = new TreeMap<>();
 	private static final HashMap<String, String> ENCHANTS_NAMES = new HashMap<>();
@@ -258,5 +259,14 @@ public class Utils {
 		for(Object o : a)
 			sj.add(o == null ? "null" : o.toString());
 		return sj.toString();
+	}
+
+	public static boolean isClassExist(String name) {
+		try {
+			Class.forName(name);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 }

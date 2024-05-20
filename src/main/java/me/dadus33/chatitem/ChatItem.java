@@ -38,7 +38,6 @@ import me.dadus33.chatitem.platform.hook.PaperPlatform;
 import me.dadus33.chatitem.platform.hook.SpigotPlatform;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.Colors;
-import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.SemVer;
 import me.dadus33.chatitem.utils.Utils;
@@ -46,7 +45,7 @@ import me.dadus33.chatitem.utils.Version;
 
 public class ChatItem extends JavaPlugin {
 
-	private static final IPlatform platform = PacketUtils.IS_PAPER ? new PaperPlatform() : new SpigotPlatform();
+	private static final IPlatform platform = Utils.IS_PAPER ? new PaperPlatform() : new SpigotPlatform();
 	public static IPlatform getPlatform() {
 		return platform;
 	}
@@ -98,12 +97,12 @@ public class ChatItem extends JavaPlugin {
 		case "all":
 			this.chatManager.add(new PacketEditingChatManager(this));
 			this.chatManager.add(new ChatListenerChatManager(this));
-			if(PacketUtils.IS_PAPER)
+			if(Utils.IS_PAPER)
 				this.chatManager.add(new PaperChatManager(this));
 			getLogger().info("Manager automatically chosen: " + getVisualChatManagers());
 			break;
 		case "auto":
-			if(PacketUtils.IS_PAPER)
+			if(Utils.IS_PAPER)
 				this.chatManager.add(new PaperChatManager(this));
 			else if (getPluginThatRequirePacket().stream().map(pm::getPlugin).anyMatch(Objects::nonNull) && Version.getVersion().isNewerThan(Version.V1_7))
 				this.chatManager.add(new PacketEditingChatManager(this));

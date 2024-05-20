@@ -33,7 +33,7 @@ public class PCMComponentManager implements IComponentManager {
 				Object chatBaseComp = ReflectionUtils.getMethod(pcmClass, PacketUtils.COMPONENT_CLASS).invoke(pcm);
 				if(chatBaseComp != null)
 					ChatItem.debug("[PCMManager] Founded " + chatBaseComp.getClass().getSimpleName());
-				return chatBaseComp == null ? null : PacketUtils.CHAT_SERIALIZER.getMethod("a", PacketUtils.COMPONENT_CLASS).invoke(null, chatBaseComp).toString();
+				return chatBaseComp == null ? null : ChatItem.getPlatform().baseComponentToJson(chatBaseComp);
 			} catch (Exception exc) {
 				exc.printStackTrace();
 			}
@@ -44,7 +44,7 @@ public class PCMComponentManager implements IComponentManager {
 	@Override
 	public void writeJson(ChatItemPacket packet, String json) {
 		try {
-			Object chatComp = PacketUtils.CHAT_SERIALIZER.getMethod("a", String.class).invoke(null, json);
+			Object chatComp = ChatItem.getPlatform().jsonToBaseComponent(json);
 			Class<?> pcmClass = PacketUtils.getNmsClass("PlayerChatMessage", "network.chat.");
 			ContentModifier<Object> pcmModifier = packet.getContent().getSpecificModifier((Class<Object>) pcmClass);
 			Object pcm = ReflectionUtils.getMethod(pcmClass, pcmClass, PacketUtils.COMPONENT_CLASS).invoke(pcmModifier.readSafely(0), chatComp);

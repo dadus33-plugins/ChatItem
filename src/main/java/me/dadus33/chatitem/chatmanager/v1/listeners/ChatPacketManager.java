@@ -1,6 +1,5 @@
 package me.dadus33.chatitem.chatmanager.v1.listeners;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,24 +37,11 @@ import me.dadus33.chatitem.utils.Version;
 public class ChatPacketManager extends PacketHandler {
 
 	private Object lastSentPacket = null;
-	private Method serializerGetJson;
 	private PacketEditingChatManager manager;
 	private final List<IComponentManager> componentManager = new ArrayList<>();
 
 	public ChatPacketManager(PacketEditingChatManager manager) {
 		this.manager = manager;
-		try {
-			for (Method m : PacketUtils.CHAT_SERIALIZER.getDeclaredMethods()) {
-				if (m.getParameterCount() == 1 && m.getParameterTypes()[0].equals(PacketUtils.COMPONENT_CLASS) && m.getReturnType().equals(String.class)) {
-					serializerGetJson = m;
-					break;
-				}
-			}
-			if (serializerGetJson == null)
-				ChatItem.getInstance().getLogger().warning("Failed to find JSON serializer in class: " + PacketUtils.CHAT_SERIALIZER.getCanonicalName());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
 		for (IComponentManager getter : Arrays.asList(new StringComponentManager(), new ComponentNMSManager(), new PCMComponentManager())) {
 			tryRegister(getter);

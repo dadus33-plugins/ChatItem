@@ -15,12 +15,10 @@ import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 
 public class PacketUtils {
 
-	public static final String VERSION = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
 	public static final String NMS_PREFIX;
 	public static final String OBC_PREFIX;
-	public static final boolean IS_THERMOS = isClassExist("thermos.Thermos"), IS_PAPER = isClassExist("io.papermc.paper.event.player.AsyncChatEvent");
-	public static final Class<?> CHAT_SERIALIZER, COMPONENT_CLASS;
-	public static final Method ICB_FROM_JSON;
+	public static final boolean IS_THERMOS = Utils.isClassExist("thermos.Thermos");
+	public static final Class<?> COMPONENT_CLASS;
 
 	/**
 	 * This Map is to reduce Reflection action which take more resources than just
@@ -29,11 +27,10 @@ public class PacketUtils {
 	private static final Map<String, Class<?>> ALL_CLASS = Collections.synchronizedMap(new HashMap<String, Class<?>>());
 
 	static {
-		NMS_PREFIX = Version.getVersion().isNewerOrEquals(Version.V1_17) || IS_THERMOS ? "net.minecraft." : "net.minecraft.server." + VERSION + ".";
-		OBC_PREFIX = "org.bukkit.craftbukkit." + VERSION + ".";
-		CHAT_SERIALIZER = getNmsClass("IChatBaseComponent$ChatSerializer", "network.chat.", "ChatSerializer");
+		String version = ChatItem.getPlatform().getNMSVersion();
+		NMS_PREFIX = Version.getVersion().isNewerOrEquals(Version.V1_17) || IS_THERMOS ? "net.minecraft." : "net.minecraft.server." + (version == "" ? "" : version + ".");
+		OBC_PREFIX = "org.bukkit.craftbukkit." + (version == "" ? "" : version + ".");
 		COMPONENT_CLASS = getNmsClass("IChatBaseComponent", "network.chat.");
-		ICB_FROM_JSON = getMethod("a", CHAT_SERIALIZER, String.class);
 	}
 
 	/**
@@ -117,15 +114,6 @@ public class PacketUtils {
 		}
 	}
 
-	public static boolean isClassExist(String name) {
-		try {
-			Class.forName(name);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
 	/**
 	 * Get NMS player connection of specified player
 	 * 
@@ -204,15 +192,6 @@ public class PacketUtils {
 			e.printStackTrace();
 		}
 		return "{}";
-	}
-
-	private static Method getMethod(String name, Class<?> clazz, Class<?>... params) {
-		try {
-			return clazz.getDeclaredMethod(name, params);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 	
 	public static void printPacketToDebug(Object packet) {

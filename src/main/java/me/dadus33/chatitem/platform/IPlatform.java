@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import me.dadus33.chatitem.utils.Messages;
+import me.dadus33.chatitem.utils.Version;
 
 public interface IPlatform {
 
@@ -28,4 +29,14 @@ public interface IPlatform {
 	ItemStack createItemStack(Material type, String name, List<String> lore);
 	
 	String getPluginVersion(Plugin plugin);
+	
+	Version getMinecraftVersion();
+	
+	String getNMSVersion();
+	
+	boolean hasBaseComponentSerializer();
+	
+	String baseComponentToJson(Object obj);
+	
+	Object jsonToBaseComponent(String json);
 }

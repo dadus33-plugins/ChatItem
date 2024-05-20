@@ -80,7 +80,9 @@ public class PacketEditingChatManager extends ChatManager {
 		Object packet = internalCreateSystemChatPacket(json, old);
 		if(packet != null)
 			return packet;
-		packet = internalCreateSystemChatPacket(PacketUtils.ICB_FROM_JSON.invoke(null, json), old);
+		Object icb = ChatItem.getPlatform().jsonToBaseComponent(json);
+		if(icb != null)
+			packet = internalCreateSystemChatPacket(icb, old);
 		if(packet != null)
 			return packet;
 		ChatItem.getInstance().getLogger().warning("Can't create a new packet for json " + json);
@@ -89,7 +91,7 @@ public class PacketEditingChatManager extends ChatManager {
 	
 	private static Object internalCreateSystemChatPacket(Object obj, Object old) throws Exception {
 		Class<?> packetClass = PacketUtils.getNmsClass("ClientboundPlayerChatPacket", "network.protocol.game.", "ClientboundSystemChatPacket", "PacketPlayOutChat");
-		Class<?> chatMessageTypeClass = PacketUtils.isClassExist("net.minecraft.network.chat.ChatMessageType") ? PacketUtils.getNmsClass("ChatMessageType", "network.chat.") : null;
+		Class<?> chatMessageTypeClass = Utils.isClassExist("net.minecraft.network.chat.ChatMessageType") ? PacketUtils.getNmsClass("ChatMessageType", "network.chat.") : null;
 		Constructor<?> betterOne = null;
 		Object[] betterParam = null;
 		for (Constructor<?> cons : packetClass.getDeclaredConstructors()) {

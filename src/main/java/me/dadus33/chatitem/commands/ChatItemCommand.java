@@ -24,7 +24,6 @@ import me.dadus33.chatitem.invsee.InvShower;
 import me.dadus33.chatitem.listeners.InventoryListener;
 import me.dadus33.chatitem.utils.Colors;
 import me.dadus33.chatitem.utils.Messages;
-import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -35,7 +34,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 	private static final List<String> ORDERS;
 	
 	static {
-		if(PacketUtils.IS_PAPER)
+		if(Utils.IS_PAPER)
 			ORDERS = Arrays.asList("packet", "chat", "paper", "all");
 		else
 			ORDERS = Arrays.asList("packet", "chat", "all");

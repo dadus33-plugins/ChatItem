@@ -22,6 +22,7 @@ import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent.ContentModifier;
 import me.dadus33.chatitem.hook.DiscordSrvSupport;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.PacketUtils;
+import me.dadus33.chatitem.utils.Utils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
@@ -78,7 +79,7 @@ public class AdventureComponentManager implements IComponentManager {
 			String itemName = ChatManager.getNameOfItem(chat.getPlayer(), item, c);
 			ChatItem.debug("NBT tag: " + PacketUtils.getNbtTag(item));
 			HoverEvent<?> hover;
-			if(PacketUtils.IS_PAPER)
+			if(Utils.IS_PAPER)
 				hover = item.asHoverEvent();
 			else
 				hover = HoverEvent.showItem(Key.key(item.getType().getKey().getKey()), item.getAmount(), BinaryTagHolder.of(PacketUtils.getNbtTag(item)));
