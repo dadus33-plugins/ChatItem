@@ -1,8 +1,12 @@
 package me.dadus33.chatitem.utils;
 
+import java.util.Arrays;
+
 import org.jetbrains.annotations.NotNull;
 
 import com.google.common.base.Preconditions;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class Colors {
 
@@ -30,5 +34,9 @@ public class Colors {
             }
         }
         return new String(b);
+    }
+    
+    public static boolean isFormatting(ChatColor c) {
+    	return Arrays.asList(ChatColor.RESET, ChatColor.BOLD, ChatColor.MAGIC, ChatColor.UNDERLINE, ChatColor.ITALIC, ChatColor.STRIKETHROUGH).contains(c);
     }
 }

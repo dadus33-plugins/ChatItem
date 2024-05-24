@@ -27,6 +27,7 @@ import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.hook.DiscordSrvSupport;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.ColorManager;
+import me.dadus33.chatitem.utils.Colors;
 import me.dadus33.chatitem.utils.ItemUtils;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.PacketUtils;
@@ -325,7 +326,7 @@ public class ChatListener implements Listener {
 	
 	private static BaseComponent[] createComponent(Player to, String text, ChatColor color, ChatAction action) {
 		ComponentBuilder littleBuilder = new ComponentBuilder(text);
-		if(color != null && color != ChatColor.RESET) // don't add reset thing
+		if(color != null && !Colors.isFormatting(color)) // don't add reset thing
 			littleBuilder.color(color);
 		if (action.isItem()) {
 			if(action.getItem().getType().equals(Material.AIR))
