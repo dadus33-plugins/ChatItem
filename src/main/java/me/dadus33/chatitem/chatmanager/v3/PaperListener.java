@@ -12,10 +12,13 @@ import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
+import me.dadus33.chatitem.utils.Messages;
+import me.dadus33.chatitem.utils.Utils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class PaperListener implements Listener {
@@ -53,7 +56,7 @@ public class PaperListener implements Listener {
 		if(!ChatManager.canUsePlaceholder(p, action.getItem(), slot, e))
 			return;
 	    ItemStack item = action.getItem();
-	    ComponentLike like = Component.text(ChatManager.getNameOfItem(p, item, getStorage())).hoverEvent(item.asHoverEvent());
+	    ComponentLike like = Component.text(ChatManager.getNameOfItem(p, item, getStorage())).hoverEvent(action.isItem() ? action.getItem().asHoverEvent() : HoverEvent.showText(Component.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", p.getName()))));
 	    for(String s : slot.getPlaceholders())
 	    	message = message.replaceText(TextReplacementConfig.builder().matchLiteral(s).replacement(like).build());
 	    if(ChatItem.getInstance().getConfig().getBoolean("manager-config.paper.send-ourself", false)) {
