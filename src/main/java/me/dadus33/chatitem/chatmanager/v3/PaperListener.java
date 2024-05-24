@@ -13,7 +13,6 @@ import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.utils.Messages;
-import me.dadus33.chatitem.utils.Utils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
