@@ -90,8 +90,8 @@ public class SpigotPlatform implements IPlatform {
 	}
 	
 	public static Method getBaseComponentToJsonMethod() {
-		Class<?> chatSerializerClass = PacketUtils.getNmsClass("IChatBaseComponent$ChatSerializer", "network.chat.", "ChatSerializer");
-		Class<?> chatBaseComponentClass = PacketUtils.getNmsClass("IChatBaseComponent", "network.chat.");
+		Class<?> chatSerializerClass = PacketUtils.getNmsClass("IChatBaseComponent$ChatSerializer", "network.chat.", "ChatSerializer", "Component$Serializer");
+		Class<?> chatBaseComponentClass = PacketUtils.getNmsClass("IChatBaseComponent", "network.chat.", "Component");
 		if(chatSerializerClass == null || chatBaseComponentClass == null)
 			return null;
 		try {
@@ -107,8 +107,8 @@ public class SpigotPlatform implements IPlatform {
 	}
 	
 	public static Method getJsonToBaseComponentMethod() {
-		Class<?> chatSerializerClass = PacketUtils.getNmsClass("IChatBaseComponent$ChatSerializer", "network.chat.", "ChatSerializer");
-		Class<?> chatBaseComponentClass = PacketUtils.getNmsClass("IChatBaseComponent", "network.chat.");
+		Class<?> chatSerializerClass = PacketUtils.getNmsClass("IChatBaseComponent$ChatSerializer", "network.chat.", "ChatSerializer", "Component$Serializer");
+		Class<?> chatBaseComponentClass = PacketUtils.getNmsClass("IChatBaseComponent", "network.chat.", "Component");
 		if(chatSerializerClass == null || chatBaseComponentClass == null)
 			return null;
 		try {
