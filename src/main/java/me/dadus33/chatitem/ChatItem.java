@@ -30,6 +30,7 @@ import me.dadus33.chatitem.hook.ChatControlSupport;
 import me.dadus33.chatitem.hook.ChatManagerSupport;
 import me.dadus33.chatitem.hook.ecoenchants.EcoEnchantsSupport;
 import me.dadus33.chatitem.hook.placeholders.IPlaceholders;
+import me.dadus33.chatitem.hook.placeholders.MVdWPlaceholderAPIHook;
 import me.dadus33.chatitem.hook.placeholders.PlaceholderAPIHook;
 import me.dadus33.chatitem.invsee.InvShower;
 import me.dadus33.chatitem.itemnamer.NamerManager;
@@ -205,6 +206,10 @@ public class ChatItem extends JavaPlugin {
 		if (pm.isPluginEnabled("PlaceholderAPI")) {
 			plugins.add("PlaceholderAPI");
 			PLACEHOLDERS.add(new PlaceholderAPIHook());
+		}
+		if (pm.isPluginEnabled("MVdWPlaceholderAPI")) {
+			plugins.add("MVdWPlaceholderAPI");
+			PLACEHOLDERS.add(new MVdWPlaceholderAPIHook());
 		}
 
 		if (plugins.length() > 0)

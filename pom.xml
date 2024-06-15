@@ -57,6 +57,10 @@
             <id>PaperMC</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
+        <repository>
+		    <id>mvdw-software</id>
+		    <url>http://repo.mvdw-software.be/content/groups/public/</url>
+		</repository>
     </repositories>
 
 
@@ -176,6 +180,12 @@
             <version>2.11.6</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+		    <groupId>be.maximvdw</groupId>
+		    <artifactId>MVdWPlaceholderAPI</artifactId>
+		    <version>3.1.1-SNAPSHOT</version>
+            <scope>provided</scope>
+		</dependency>
     </dependencies>
 
     <build>
