@@ -137,9 +137,9 @@ public abstract class ChatManager {
 		if (slot.isCommand()) {
 			UUID uuid = UUID.randomUUID();
 			InvShower.add(uuid.toString(), slot == ItemSlot.INVENTORY ? new PlayerInventoryShower(p) : new EnderChestShower(p));
-			return new ChatAction(slot, "/chatitem seeinv " + uuid.toString());
+			return new ChatAction(slot, p, "/chatitem seeinv " + uuid.toString());
 		}
-		return new ChatAction(slot, getUsableItem(p, slot));
+		return new ChatAction(slot, p, getUsableItem(p, slot));
 	}
 
 	/**

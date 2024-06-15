@@ -325,7 +325,7 @@ public class ChatListener implements Listener {
 	}
 	
 	private static BaseComponent[] createComponent(Player to, String text, ChatColor color, ChatAction action) {
-		ComponentBuilder littleBuilder = new ComponentBuilder(text);
+		ComponentBuilder littleBuilder = new ComponentBuilder(ChatItem.replace(action.getOrigin(), text));
 		if(color != null && !Colors.isFormatting(color)) // don't add reset thing
 			littleBuilder.color(color);
 		if (action.isItem()) {

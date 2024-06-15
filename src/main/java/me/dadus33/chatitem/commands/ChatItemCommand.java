@@ -61,7 +61,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 			}
 			Storage c = ChatItem.getInstance().getStorage();
 			ItemStack item = ChatManager.getUsableItem(cible, ItemSlot.HAND);
-			ChatListener.showItem(p, cible, new ChatAction(ItemSlot.HAND, item), c.commandFormat.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
+			ChatListener.showItem(p, cible, new ChatAction(ItemSlot.HAND, cible, item), c.commandFormat.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
 		} else if (args[0].equalsIgnoreCase("broadcast") && ChatItem.getInstance().getStorage().cmdBroadcast) {
 			Player cible = args.length == 1 ? p : Bukkit.getPlayer(args[1]);
 			if(cible == null) {
@@ -71,7 +71,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 			Storage c = ChatItem.getInstance().getStorage();
 			ItemStack item = ChatManager.getUsableItem(cible, ItemSlot.HAND);
 			for(Player all : Bukkit.getOnlinePlayers())
-				ChatListener.showItem(all, cible, new ChatAction(ItemSlot.HAND, item), c.commandFormat.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
+				ChatListener.showItem(all, cible, new ChatAction(ItemSlot.HAND, cible, item), c.commandFormat.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
 		} else if (args[0].equalsIgnoreCase("link") || args[0].equalsIgnoreCase("links")) {
 			ConfigurationSection config = ChatItem.getInstance().getConfig()
 					.getConfigurationSection("messages.chatitem-cmd.links");

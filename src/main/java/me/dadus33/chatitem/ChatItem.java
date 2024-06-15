@@ -13,6 +13,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,6 +29,8 @@ import me.dadus33.chatitem.commands.ChatItemCommand;
 import me.dadus33.chatitem.hook.ChatControlSupport;
 import me.dadus33.chatitem.hook.ChatManagerSupport;
 import me.dadus33.chatitem.hook.ecoenchants.EcoEnchantsSupport;
+import me.dadus33.chatitem.hook.placeholders.IPlaceholders;
+import me.dadus33.chatitem.hook.placeholders.PlaceholderAPIHook;
 import me.dadus33.chatitem.invsee.InvShower;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.listeners.InventoryListener;
@@ -45,6 +48,15 @@ import me.dadus33.chatitem.utils.Version;
 
 public class ChatItem extends JavaPlugin {
 
+	private static final List<IPlaceholders> PLACEHOLDERS = new ArrayList<>();
+	public static List<IPlaceholders> getPlaceholders() {
+		return PLACEHOLDERS;
+	}
+	public static String replace(Player p, String text) {
+		for(IPlaceholders ip : getPlaceholders())
+			text = ip.replace(p, text);
+		return text;
+	}
 	private static final IPlatform platform = Utils.IS_PAPER ? new PaperPlatform() : new SpigotPlatform();
 	public static IPlatform getPlatform() {
 		return platform;
@@ -189,6 +201,10 @@ public class ChatItem extends JavaPlugin {
 		}
 		if (pm.isPluginEnabled("EcoEnchants") && EcoEnchantsSupport.load()) {
 			plugins.add("EcoEnchants");
+		}
+		if (pm.isPluginEnabled("PlaceholderAPI")) {
+			plugins.add("PlaceholderAPI");
+			PLACEHOLDERS.add(new PlaceholderAPIHook());
 		}
 
 		if (plugins.length() > 0)
