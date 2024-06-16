@@ -1,7 +1,5 @@
 package me.dadus33.chatitem.chatmanager.v1.basecomp.hook;
 
-import java.lang.reflect.Field;
-
 import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.ChatItem;
@@ -40,13 +38,7 @@ public class ComponentNMSManager implements IComponentManager {
 			ChatItem.debug("(v1 ComponentNMS) Can't send message to discord");
 		//	DiscordSrvSupport.sendChatMessage(p, comp, null);
 		try {
-			Object obj = PacketEditingChatManager.createSystemChatPacket(json, packet.getPacket());
-			ChatItem.debug("Created packet: " + obj.getClass().getPackage().getName() + "." + obj.getClass().getSimpleName());
-			for(Field f : obj.getClass().getDeclaredFields()) {
-				f.setAccessible(true);
-				ChatItem.debug("  > " + f.getName() + " (" + f.getType().getSimpleName() + "): " + f.get(obj));
-			}
-			packet.setPacket(obj);
+			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(json, packet.getPacket()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

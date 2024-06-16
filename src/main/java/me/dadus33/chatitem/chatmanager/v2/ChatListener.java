@@ -150,7 +150,6 @@ public class ChatListener implements Listener {
 		for (char args : msg.toCharArray()) {
 			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
-					ChatItem.debug("Append '" + text.replace(ChatColor.COLOR_CHAR, '&') + "' (len: " + text.length() + ")");
 					if(text.length() > 2 && text.startsWith("§") && text.substring(2) == ChatColor.stripColor(text)
 							&& color != null && color != ChatColor.WHITE) {
 						text = text.substring(2); // remove some code which should not be here
@@ -180,7 +179,6 @@ public class ChatListener implements Listener {
 							color = ColorManager.getColor(colorCode);
 						else {
 							color = ColorManager.getColor(colorCode.substring(0, 7)); // only the hex code
-							ChatItem.debug("Adding color for " + colorCode.substring(7, colorCode.length()) + " (in " + colorCode + ")");
 							text += ColorManager.getColorString(colorCode.substring(7, colorCode.length()));
 						}
 					} else if (colorCode.length() == 1) // if only one color code
@@ -304,14 +302,12 @@ public class ChatListener implements Listener {
 							color = ColorManager.getColor(colorCode);
 						else {
 							color = ColorManager.getColor(colorCode.substring(0, 7)); // only the hex code
-							ChatItem.debug("Adding color for " + colorCode.substring(7, colorCode.length()) + " (in " + colorCode + ")");
 							text += ColorManager.getColorString(colorCode.substring(7, colorCode.length()));
 						}
 					} else if (colorCode.length() == 1) // if only one color code
 						color = ColorManager.getColor(colorCode);
 					else
 						text += ColorManager.getColorString(colorCode);
-					ChatItem.debug("Color: " + color + ", text: " + text + ", code: " + colorCode);
 					colorCode = "";
 				}
 				// basic text, not waiting for code after '§'

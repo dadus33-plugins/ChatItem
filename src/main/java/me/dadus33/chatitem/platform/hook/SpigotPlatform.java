@@ -55,12 +55,12 @@ public class SpigotPlatform implements IPlatform {
 
 	@Override
 	public Version getMinecraftVersion() {
-		return Version.getVersionByName(getNMSVersion());
+		return Version.getVersionByName(getNMSVersion().replace("_R4", "_6"));
 	}
 	
 	@Override
 	public String getNMSVersion() {
-		return Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3].replace("_R4", "_6");
+		return Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
 	}
 	
 	@Override

@@ -49,7 +49,8 @@ public class ChatPacketManager extends PacketHandler {
 		try {
 			Class.forName("net.kyori.adventure.text.Component");
 			tryRegister(new AdventureComponentManager());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		ChatItem.getInstance().getLogger().info("Loaded " + componentManager.size() + " getter for base components.");
 		ChatItem.debug("ComponentManager: " + String.join(", ", componentManager.stream().map(IComponentManager::getClass).map(Class::getSimpleName).collect(Collectors.toList())));
 	}
@@ -66,7 +67,7 @@ public class ChatPacketManager extends PacketHandler {
 	public void onSend(ChatItemPacket e) {
 		if (!e.hasPlayer() || !e.getPacketType().equals(PacketType.Server.CHAT))
 			return;
-		if(ChatManager.isTestingEnabled() && !ChatManager.isTesting("packet"))
+		if (ChatManager.isTestingEnabled() && !ChatManager.isTesting("packet"))
 			return;
 		if (lastSentPacket != null && lastSentPacket == e.getPacket())
 			return; // prevent infinite loop
@@ -76,10 +77,6 @@ public class ChatPacketManager extends PacketHandler {
 		String json = "{}";
 		IComponentManager choosedGetter = null;
 		if (version.isNewerOrEquals(Version.V1_19)) {
-			/*if (packet.getIntegers().readSafely(0, 0) > 1) { // not parsed chat message type
-				ChatItem.debug("Invalid int: " + packet.getIntegers().read(0));
-				return;
-			}*/
 			choosedGetter = new StringComponentManager();
 			json = choosedGetter.getBaseComponentAsJSON(e); // if null, will be re-checked so anyway
 		} else if (version.isNewerOrEquals(Version.V1_12)) {
@@ -88,12 +85,13 @@ public class ChatPacketManager extends PacketHandler {
 				return; // It's an actionbar message, ignoring
 		} else if (version.isNewerOrEquals(Version.V1_8) && packet.getBytes().readSafely(0) == (byte) 2)
 			return; // It's an actionbar message, ignoring
-		if (json == null || choosedGetter == null) {
+		if (json == null || choosedGetter == null || !ChatManager.containsSeparator(json)) {
 			for (IComponentManager getters : componentManager) {
 				String tmpJson = getters.getBaseComponentAsJSON(e);
 				if (tmpJson != null) {
 					json = ChatManager.fixSeparator(tmpJson);
 					choosedGetter = getters;
+					ChatItem.debug("Seems to have one nice manager with " + getters.getClass().getSimpleName() + " (json: " + json + ")");
 					if (ChatManager.containsSeparator(json))
 						break; // be sure it's valid one
 				} else
@@ -106,10 +104,8 @@ public class ChatPacketManager extends PacketHandler {
 			PacketUtils.printPacketToDebug(e.getPacket());
 			return; // can't find something
 		}
-		if (!ChatManager.containsSeparator(json)) {// if the message doesn't contain the BELL separator
-			ChatItem.debug("No seperator with " + json);
+		if (!ChatManager.containsSeparator(json)) // if the message doesn't contain the BELL separator
 			return;
-		}
 		ChatItem.debug("Found with " + choosedGetter.getClass().getName());
 		Chat chat = choosedGetter.getChat(json);
 		if (chat == null) { // something went really bad, so we run away and hide (AKA the player left or is
@@ -145,7 +141,7 @@ public class ChatPacketManager extends PacketHandler {
 						} else
 							tooltip = new ArrayList<>();
 						message = JSONManipulator.getInstance().parseEmpty(getter.getBaseComponentAsJSON(e), ChatManager.styleItem(p, copy, getStorage()), tooltip, chat.getPlayer());
-						if(message != null) {
+						if (message != null) {
 							getter.writeJson(e, message);
 						}
 						lastSentPacket = e.getPacket();
