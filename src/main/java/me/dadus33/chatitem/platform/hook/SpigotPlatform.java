@@ -60,7 +60,7 @@ public class SpigotPlatform implements IPlatform {
 	
 	@Override
 	public String getNMSVersion() {
-		return Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+		return Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3].replace("_R4", "_6");
 	}
 	
 	@Override
