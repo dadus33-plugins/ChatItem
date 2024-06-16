@@ -159,7 +159,7 @@ public class ChatItem extends JavaPlugin {
 	public void onEnable() {
 		// Save the instance (we're basically a singleton)
 		instance = this;
-		getLogger().info("Detected server version: " + Version.getVersion().name().toLowerCase());
+		getLogger().info("Detected server version: " + Version.getVersion().name().toLowerCase() + " (Platform: " + getPlatform().getName() + ")");
 
 		// Load config
 		if (!new File(getDataFolder(), "config.yml").exists()) {

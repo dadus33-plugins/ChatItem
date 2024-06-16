@@ -13,6 +13,8 @@ import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.Version;
 
 public interface IPlatform {
+	
+	String getName();
 
 	Inventory createInventory(InventoryHolder holder, int slot, String name);
 

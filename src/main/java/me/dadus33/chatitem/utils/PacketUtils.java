@@ -20,6 +20,8 @@ public class PacketUtils {
 	public static final boolean IS_THERMOS = Utils.isClassExist("thermos.Thermos");
 	public static final Class<?> COMPONENT_CLASS;
 
+	private static Method getNbtMethod, sendPacketMethod;
+
 	/**
 	 * This Map is to reduce Reflection action which take more resources than just
 	 * RAM action
@@ -46,21 +48,14 @@ public class PacketUtils {
 				Class<?> clazz = Class.forName(fullPrefix + name);
 				if (clazz != null)
 					return clazz;
-			} catch (ClassNotFoundException e) {
-				if (alias.length == 0)
-					e.printStackTrace(); // no alias, print error
-				// else ignore and go check for alias
-			}
+			} catch (ClassNotFoundException e) {}
 
 			for (String className : alias) {
 				try {
 					Class<?> clazz = Class.forName(fullPrefix + className);
 					if (clazz != null)
 						return clazz;
-				} catch (ClassNotFoundException e) {
-					if (className == alias[alias.length - 1]) // if it's last alias, print error
-						e.printStackTrace();
-				}
+				} catch (ClassNotFoundException e) {}
 			}
 			return null;
 		});
@@ -154,14 +149,21 @@ public class PacketUtils {
 	public static void sendPacket(Player p, Object packet) {
 		try {
 			Object playerConnection = getPlayerConnection(p);
-			playerConnection.getClass().getMethod(Version.getVersion().isNewerOrEquals(Version.V1_18) ? "a" : "sendPacket", getNmsClass("Packet", "network.protocol."))
-					.invoke(playerConnection, packet);
+			if(sendPacketMethod == null) {
+				Version v = Version.getVersion();
+				if(v.isNewerOrEquals(Version.V1_20)) {
+					Class<?> packetSrvClass = getNmsClass("ServerCommonPacketListenerImpl", "server.network.");
+					if(packetSrvClass != null)
+						sendPacketMethod = packetSrvClass.getDeclaredMethod("b", getNmsClass("Packet", "network.protocol."));
+				}
+				if(sendPacketMethod == null)
+					sendPacketMethod = playerConnection.getClass().getMethod(Version.getVersion().isNewerOrEquals(Version.V1_18) ? "a" : "sendPacket", getNmsClass("Packet", "network.protocol."));
+			}
+			sendPacketMethod.invoke(playerConnection, packet);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
-	private static Method getNbtMethod;
 
 	/**
 	 * Converts an {@link org.bukkit.inventory.ItemStack} to a Json string for

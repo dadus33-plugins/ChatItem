@@ -20,6 +20,11 @@ import me.dadus33.chatitem.utils.Version;
 public class SpigotPlatform implements IPlatform {
 
 	@Override
+	public String getName() {
+		return "Spigot";
+	}
+
+	@Override
 	public Inventory createInventory(InventoryHolder holder, int slot, String name) {
 		return Bukkit.createInventory(holder, slot, name);
 	}
@@ -109,11 +114,15 @@ public class SpigotPlatform implements IPlatform {
 	public static Method getJsonToBaseComponentMethod() {
 		Class<?> chatSerializerClass = PacketUtils.getNmsClass("IChatBaseComponent$ChatSerializer", "network.chat.", "ChatSerializer", "Component$Serializer");
 		Class<?> chatBaseComponentClass = PacketUtils.getNmsClass("IChatBaseComponent", "network.chat.", "Component");
+		Class<?> chatMutableComponentClass = PacketUtils.getNmsClass("IChatMutableComponent", "network.chat.");
 		if(chatSerializerClass == null || chatBaseComponentClass == null)
 			return null;
 		try {
 			for (Method m : chatSerializerClass.getDeclaredMethods()) {
-				if(m.getParameterTypes()[0].equals(String.class) && m.getReturnType().equals(chatBaseComponentClass)) {
+				if(m.getParameterCount() == 0)
+					continue;
+				if(m.getParameterTypes()[0].equals(String.class) && (m.getReturnType().isAssignableFrom(chatBaseComponentClass) || (chatMutableComponentClass != null && m.getReturnType().equals(chatMutableComponentClass)))) {
+					m.setAccessible(true);
 					return m;
 				}
 			}

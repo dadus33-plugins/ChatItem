@@ -106,8 +106,10 @@ public class ChatPacketManager extends PacketHandler {
 			PacketUtils.printPacketToDebug(e.getPacket());
 			return; // can't find something
 		}
-		if (!ChatManager.containsSeparator(json)) // if the message doesn't contain the BELL separator
+		if (!ChatManager.containsSeparator(json)) {// if the message doesn't contain the BELL separator
+			ChatItem.debug("No seperator with " + json);
 			return;
+		}
 		ChatItem.debug("Found with " + choosedGetter.getClass().getName());
 		Chat chat = choosedGetter.getChat(json);
 		if (chat == null) { // something went really bad, so we run away and hide (AKA the player left or is

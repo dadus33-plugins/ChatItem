@@ -20,6 +20,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class PaperPlatform implements IPlatform {
 
 	@Override
+	public String getName() {
+		return "PaperMC";
+	}
+	
+	@Override
 	public Inventory createInventory(InventoryHolder holder, int slot, String name) {
 		return Bukkit.createInventory(holder, slot, Component.text(name));
 	}
@@ -61,14 +66,14 @@ public class PaperPlatform implements IPlatform {
 	
 	@Override
 	public boolean hasBaseComponentSerializer() {
-		return Version.getVersion().isNewerOrEquals(Version.V1_20_6) ? false : SpigotPlatform.getBaseComponentToJsonMethod() != null;
+		return SpigotPlatform.getBaseComponentToJsonMethod() != null;
 	}
 
 	@Override
 	public String baseComponentToJson(Object obj) {
-		if(Version.getVersion().isNewerOrEquals(Version.V1_20_6))
-			return null;
 		Method m = SpigotPlatform.getBaseComponentToJsonMethod();
+		if(m == null)
+			return null;
 		try {
 			return (String) m.invoke(null, obj);
 		} catch (Exception e) {
@@ -79,9 +84,9 @@ public class PaperPlatform implements IPlatform {
 
 	@Override
 	public Object jsonToBaseComponent(String json) {
-		if(Version.getVersion().isNewerOrEquals(Version.V1_20_6))
-			return null;
 		Method m = SpigotPlatform.getJsonToBaseComponentMethod();
+		if(m == null)
+			return null;
 		try {
 			return m.invoke(null, json);
 		} catch (Exception e) {
