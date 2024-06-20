@@ -177,7 +177,9 @@ public class PacketUtils {
 			if (getNbtMethod == null) {
 				Class<?> itemClass = getNmsClass("ItemStack", "world.item.");
 				Version v = Version.getVersion();
-				if (v.isNewerOrEquals(Version.V1_20))
+				if(v.isNewerOrEquals(Version.V1_20_6))
+					getNbtMethod = itemClass.getDeclaredMethod("d"); // return DataComponentPatch's object
+				else if (v.equals(Version.V1_20))
 					getNbtMethod = itemClass.getDeclaredMethod("w");
 				else if (v.equals(Version.V1_19))
 					getNbtMethod = itemClass.getDeclaredMethod("u");
