@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.Version;
 
@@ -41,4 +43,6 @@ public interface IPlatform {
 	String baseComponentToJson(Object obj);
 	
 	Object jsonToBaseComponent(String json);
+	
+	void sendMessage(Player to, Player origin, ChatAction action, String msg);
 }
