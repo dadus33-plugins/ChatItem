@@ -186,6 +186,12 @@
 		    <version>3.1.1-SNAPSHOT</version>
             <scope>provided</scope>
 		</dependency>
+	    <dependency>
+	        <groupId>com.github.MilkBowl</groupId>
+	        <artifactId>VaultAPI</artifactId>
+	        <version>1.7</version>
+	        <scope>provided</scope>
+	    </dependency>
     </dependencies>
 
     <build>

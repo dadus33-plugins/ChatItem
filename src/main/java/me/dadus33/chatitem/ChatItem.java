@@ -31,7 +31,9 @@ import me.dadus33.chatitem.hook.ChatManagerSupport;
 import me.dadus33.chatitem.hook.ecoenchants.EcoEnchantsSupport;
 import me.dadus33.chatitem.hook.placeholders.IPlaceholders;
 import me.dadus33.chatitem.hook.placeholders.MVdWPlaceholderAPIHook;
+import me.dadus33.chatitem.hook.placeholders.OwnPlaceholder;
 import me.dadus33.chatitem.hook.placeholders.PlaceholderAPIHook;
+import me.dadus33.chatitem.hook.placeholders.VaultPlaceholderHook;
 import me.dadus33.chatitem.invsee.InvShower;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.listeners.InventoryListener;
@@ -211,10 +213,15 @@ public class ChatItem extends JavaPlugin {
 			plugins.add("MVdWPlaceholderAPI");
 			PLACEHOLDERS.add(new MVdWPlaceholderAPIHook());
 		}
+		if (pm.isPluginEnabled("Vault")) {
+			plugins.add("Vault");
+			PLACEHOLDERS.add(new VaultPlaceholderHook());
+		}
 
 		if (plugins.length() > 0)
 			getLogger().info("Load " + plugins.toString() + " support.");
 
+		PLACEHOLDERS.add(new OwnPlaceholder());
 		Translation.load(this);
 
 		getServer().getMessenger().registerIncomingPluginChannel(this, brandChannelName, (chan, p, msg) -> ItemPlayer.getPlayer(p).setClientName(new String(msg).substring(1)));

@@ -1,5 +1,6 @@
 package me.dadus33.chatitem.chatmanager.v3;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,8 +16,9 @@ import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.utils.Messages;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
@@ -55,15 +57,17 @@ public class PaperListener implements Listener {
 		if(!ChatManager.canUsePlaceholder(p, action.getItem(), slot, e))
 			return;
 	    ItemStack item = action.getItem();
-	    ComponentLike like = Component.text(ChatManager.getNameOfItem(p, item, getStorage())).hoverEvent(action.isItem() ? action.getItem().asHoverEvent() : HoverEvent.showText(Component.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", p.getName()))));
+	    TextComponent like = Component.text(ChatManager.getNameOfItem(p, item, getStorage())).hoverEvent(action.isItem() ? action.getItem().asHoverEvent() : HoverEvent.showText(Component.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", p.getName()))));
+	    if(action.hasCommand())
+	    	like.clickEvent(ClickEvent.runCommand(action.getCommand()));
 	    for(String s : slot.getPlaceholders())
 	    	message = message.replaceText(TextReplacementConfig.builder().matchLiteral(s).replacement(like).build());
 	    if(ChatItem.getInstance().getConfig().getBoolean("manager-config.paper.send-ourself", false)) {
-	    	for(Audience a : e.viewers())
-	    		e.renderer().render(p, p.displayName(), message, a);
+	    	for(Audience a : e.viewers().isEmpty() ? Bukkit.getOnlinePlayers() : e.viewers())
+	    		a.sendMessage(e.renderer().render(p, p.displayName(), message, a));
 	    	e.setCancelled(true);
 	    } else
-	    	e.message(message);
+	    	e.message(e.renderer().render(p, p.displayName(), message, p));
 	    ChatItem.debug("Changed message to " + PlainTextComponentSerializer.plainText().serialize(message));
 		if (getStorage().cooldown > 0 && !p.hasPermission("chatitem.ignore-cooldown"))
 			ChatManager.applyCooldown(p);

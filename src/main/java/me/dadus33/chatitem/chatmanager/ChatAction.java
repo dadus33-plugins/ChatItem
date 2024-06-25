@@ -43,6 +43,10 @@ public class ChatAction {
 		return command;
 	}
 	
+	public boolean hasCommand() {
+		return command != null && command != "";
+	}
+	
 	public ItemStack getItem() {
 		return item;
 	}

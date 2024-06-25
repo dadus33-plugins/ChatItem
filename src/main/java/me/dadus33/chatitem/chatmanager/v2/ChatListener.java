@@ -88,7 +88,7 @@ public class ChatListener implements Listener {
 		if (ChatItem.discordSrvSupport)
 			DiscordSrvSupport.sendChatMessage(p, defMsg.replace(ChatManager.SEPARATOR + "", itemName), e);
 		Set<Player> recipients = e.getRecipients().isEmpty() ? new HashSet<>(Bukkit.getOnlinePlayers()) : e.getRecipients();
-		ChatItem.debug("Msg: " + msg.replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format + " to " + recipients.size() + " players");
+		ChatItem.debug("Msg: " + ChatItem.replace(p, msg).replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format + " to " + recipients.size() + " players");
 		recipients.forEach((pl) -> ChatItem.getPlatform().sendMessage(pl, p, action, ChatItem.replace(p, msg)));
 		if (c.cooldown > 0 && !p.hasPermission("chatitem.ignore-cooldown"))
 			ChatManager.applyCooldown(p);
