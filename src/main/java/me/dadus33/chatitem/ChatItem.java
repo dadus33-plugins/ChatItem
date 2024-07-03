@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 
@@ -104,37 +103,23 @@ public class ChatItem extends JavaPlugin {
 	private void chooseManagers() {
 		this.chatManager.forEach((cm) -> cm.unload(this));
 		this.chatManager.clear();
-		PluginManager pm = getServer().getPluginManager();
+		
+		this.chatManager.add(new PacketEditingChatManager(this));
+		this.chatManager.add(new ChatListenerChatManager(this));
+		if(Utils.IS_PAPER)
+			this.chatManager.add(new PaperChatManager(this));
+		
 		String managerName = getStorage().manager;
 
 		switch (managerName.toLowerCase(Locale.ROOT)) {
 		case "both":
 		case "all":
-			this.chatManager.add(new PacketEditingChatManager(this));
-			this.chatManager.add(new ChatListenerChatManager(this));
-			if(Utils.IS_PAPER)
-				this.chatManager.add(new PaperChatManager(this));
-			getLogger().info("Manager automatically chosen: " + getVisualChatManagers());
-			break;
 		case "auto":
-			if(Utils.IS_PAPER)
-				this.chatManager.add(new PaperChatManager(this));
-			else if (getPluginThatRequirePacket().stream().map(pm::getPlugin).anyMatch(Objects::nonNull) && Version.getVersion().isNewerThan(Version.V1_7))
-				this.chatManager.add(new PacketEditingChatManager(this));
-			else
-				this.chatManager.add(new ChatListenerChatManager(this));
 			getLogger().info("Manager automatically chosen: " + getVisualChatManagers());
 			break;
 		case "paper":
-			this.chatManager.add(new PaperChatManager(this));
-			getLogger().info("Manager chosen: " + getVisualChatManagers());
-			break;
 		case "packet":
-			this.chatManager.add(new PacketEditingChatManager(this));
-			getLogger().info("Manager chosen: " + getVisualChatManagers());
-			break;
 		case "chat":
-			this.chatManager.add(new ChatListenerChatManager(this));
 			getLogger().info("Manager chosen: " + getVisualChatManagers());
 			break;
 		default:
@@ -143,7 +128,6 @@ public class ChatItem extends JavaPlugin {
 			getLogger().severe("Please reset your config and/or check wiki for more information");
 			getLogger().severe("Using default manager: chat.");
 			getLogger().severe("----- WARN -----");
-			this.chatManager.add(new ChatListenerChatManager(this));
 			break;
 		}
 
@@ -153,7 +137,7 @@ public class ChatItem extends JavaPlugin {
 		PlayerNamerManager.load(this);
 	}
 
-	private List<String> getPluginThatRequirePacket() {
+	public static List<String> getPluginThatRequirePacket() {
 		return Arrays.asList("DeluxeChat", "HexNicks", "VentureChat", "ItemsAdder");
 	}
 

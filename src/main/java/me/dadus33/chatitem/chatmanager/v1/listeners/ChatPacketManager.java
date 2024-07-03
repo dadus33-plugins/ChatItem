@@ -69,6 +69,8 @@ public class ChatPacketManager extends PacketHandler {
 			return;
 		if (ChatManager.isTestingEnabled() && !ChatManager.isTesting("packet"))
 			return;
+		if(!ChatManager.isSelected("packet"))
+			return;
 		if (lastSentPacket != null && lastSentPacket == e.getPacket())
 			return; // prevent infinite loop
 		ChatItem.debug("Checking: " + e.getPacket().getClass().getSimpleName() + " to " + e.getPlayername());

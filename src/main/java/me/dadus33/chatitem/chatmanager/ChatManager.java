@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
@@ -341,10 +343,28 @@ public abstract class ChatManager {
 	}
 
 	public static boolean isTesting(String actual) {
-		return inTest != null && (inTest == "both" || inTest.equalsIgnoreCase(actual));
+		return inTest != null && (inTest == "both" || inTest == "all" || inTest.equalsIgnoreCase(actual));
 	}
 
 	public static void setTesting(String actual) {
 		inTest = actual;
+	}
+
+	public static boolean isSelected(String actual) {
+		if(isTestingEnabled())
+			return true;
+		String selected = ChatItem.getInstance().getStorage().manager;
+		if (selected == "both" || selected == "all")
+			return true;
+		if (selected == "auto") {
+			if (Utils.IS_PAPER && actual == "paper")
+				return true;
+			else if (actual == "packet" && ChatItem.getPluginThatRequirePacket().stream().map(Bukkit.getPluginManager()::getPlugin).anyMatch(Objects::nonNull)
+					&& Version.getVersion().isNewerThan(Version.V1_7))
+				return true;
+			else if (actual == "chat")
+				return true;
+		}
+		return selected.equalsIgnoreCase(actual);
 	}
 }

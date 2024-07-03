@@ -39,6 +39,8 @@ public class PaperListener implements Listener {
 	public void onChat(AsyncChatEvent e) {
 		if(ChatManager.isTestingEnabled() && !ChatManager.isTesting("paper"))
 			return;
+		if(!ChatManager.isSelected("paper"))
+			return;
 
 		Player p = e.getPlayer();
 	    Component message = e.message();
@@ -68,7 +70,7 @@ public class PaperListener implements Listener {
 	    		a.sendMessage(e.renderer().render(p, p.displayName(), message, a));
 	    	e.setCancelled(true);
 	    } else
-	    	e.message(e.renderer().render(p, p.displayName(), message, p));
+	    	e.message(message);
 	    ChatItem.debug("Changed message to " + PlainTextComponentSerializer.plainText().serialize(message));
 		if (getStorage().cooldown > 0 && !p.hasPermission("chatitem.ignore-cooldown"))
 			ChatManager.applyCooldown(p);
