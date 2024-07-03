@@ -1,8 +1,6 @@
 package me.dadus33.chatitem.chatmanager.v1.basecomp.hook;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -23,15 +21,12 @@ import me.dadus33.chatitem.hook.DiscordSrvSupport;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.PacketUtils;
 import me.dadus33.chatitem.utils.Utils;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 public class AdventureComponentManager implements IComponentManager {
@@ -68,6 +63,7 @@ public class AdventureComponentManager implements IComponentManager {
 			}
 			return json;
 		} catch (JsonParseException e) { // ignore this and just let skip this
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -110,42 +106,10 @@ public class AdventureComponentManager implements IComponentManager {
 			ChatItem.debug("The component is null.");
 			return null;
 		}
-		comp = checkComponent(comp, hover, click, replacement, chat);
+		comp = comp.replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.SEPARATOR + "" + chat.getId() + ChatManager.SEPARATOR_END).replacement(Component.text(replacement).hoverEvent(hover).clickEvent(click)).build());
 		if(ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage())
 			DiscordSrvSupport.sendChatMessage(p, comp, null);
-		try {
-			((Audience) Audience.class.getDeclaredMethod("audience", Audience.class).invoke(null, p)).sendMessage(comp);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		modifier.write(0, comp);
 		return null; // send by manager
-	}
-
-	private Component checkComponent(Component comp, HoverEvent<?> hover, ClickEvent click, String itemName, Chat chat) {
-		if (comp instanceof TextComponent) {
-			TextComponent tc = (TextComponent) comp;
-			if (ChatManager.containsSeparator(tc.content())) {
-				ChatItem.debug("Changing text " + tc.content() + " to " + itemName);
-				TextColor color = tc.color();
-				comp = tc.content(ChatManager.replaceSeparator(chat, tc.content(), itemName)).hoverEvent(hover);
-				if (click != null)
-					comp.clickEvent(click);
-				comp.append(Component.text("").color(color)); // reset color
-			} else
-				ChatItem.debug("No insert of text without separator: " + tc.content());
-		} else if (comp instanceof TranslatableComponent) {
-			TranslatableComponent tc = (TranslatableComponent) comp;
-			List<Component> next = new ArrayList<>();
-			for (Component extra : tc.args()) {
-				next.add(checkComponent(extra, hover, click, itemName, chat));
-			}
-			comp = tc.args(next);
-		} else
-			ChatItem.debug("Not valid comp class " + comp.getClass().getSimpleName() + " : " + comp);
-		List<Component> next = new ArrayList<>();
-		for (Component extra : comp.children()) {
-			next.add(checkComponent(extra, hover, click, itemName, chat));
-		}
-		return comp.children(next);
 	}
 }

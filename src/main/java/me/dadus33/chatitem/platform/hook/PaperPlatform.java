@@ -3,6 +3,7 @@ package me.dadus33.chatitem.platform.hook;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -18,6 +19,7 @@ import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.platform.IPlatform;
 import me.dadus33.chatitem.utils.Messages;
+import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.Version;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
@@ -84,20 +86,34 @@ public class PaperPlatform implements IPlatform {
 		if (m == null)
 			return null;
 		try {
-			return (String) m.invoke(null, obj);
+			Object[] args = new Object[m.getParameterCount()];
+			args[0] = obj;
+			if(args.length > 1 && ReflectionUtils.isClassExist("net.minecraft.core.HolderLookup$Provider")) {
+				Class<?> c = Class.forName("net.minecraft.core.HolderLookup$Provider");
+				if(m.getParameterTypes()[1].isAssignableFrom(c)) {
+					args[1] = c.getDeclaredMethod("create", Stream.class).invoke(null, Stream.of());
+				}
+			}
+			return (String) m.invoke(null, args);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-
+	
 	@Override
 	public Object jsonToBaseComponent(String json) {
 		Method m = SpigotPlatform.getJsonToBaseComponentMethod();
-		if (m == null)
-			return null;
 		try {
-			return m.invoke(null, json);
+			Object[] args = new Object[m.getParameterCount()];
+			args[0] = json;
+			if(args.length > 1 && ReflectionUtils.isClassExist("net.minecraft.core.HolderLookup$Provider")) {
+				Class<?> c = Class.forName("net.minecraft.core.HolderLookup$Provider");
+				if(m.getParameterTypes()[1].isAssignableFrom(c)) {
+					args[1] = c.getDeclaredMethod("create", Stream.class).invoke(null, Stream.of());
+				}
+			}
+			return m.invoke(null, args);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
