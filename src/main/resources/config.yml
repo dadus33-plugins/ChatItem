@@ -174,9 +174,9 @@ messages:
   chatitem-cmd:
     help:
     - "&6/chatitem admin : &7Manage some options"
-    - "&6/chatitem links : &7See all links which are usefull"
+    - "&6/chatitem links : &7See all links which are useful"
     links:
-      begin: "&aAll usefull links: "
+      begin: "&aAll useful links: "
       list:
         1:
           message: "\n&7- &eSpigotmc updates"
@@ -248,7 +248,7 @@ messages:
       chat:
         name: "&6Change basic message"
         lore:
-        - "&aVery quick and usefull for server without plugin message !"
+        - "&aVery quick and useful for server without plugin message !"
         - "&aIt enable to use ChatItem without packet reading."
         - "&eIt's more optimized than others manager"
         - ""
