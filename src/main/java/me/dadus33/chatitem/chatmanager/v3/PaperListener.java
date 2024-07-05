@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import me.dadus33.chatitem.ChatItem;
@@ -59,8 +58,7 @@ public class PaperListener implements Listener {
 		ChatAction action = ChatManager.getChatAction(slot, p);
 		if(!ChatManager.canUsePlaceholder(p, action.getItem(), slot, e))
 			return;
-	    ItemStack item = action.getItem();
-	    TextComponent like = Component.text(ChatManager.getNameOfItem(p, item, getStorage())).hoverEvent(action.isItem() ? action.getItem().asHoverEvent() : HoverEvent.showText(Component.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", p.getName()))));
+	    TextComponent like = Component.text(ChatManager.getNameForChatAction(p, action, getStorage())).hoverEvent(action.isItem() ? action.getItem().asHoverEvent() : HoverEvent.showText(Component.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", p.getName()))));
 	    if(action.hasCommand())
 	    	like.clickEvent(ClickEvent.runCommand(action.getCommand()));
 	    for(String s : slot.getPlaceholders())

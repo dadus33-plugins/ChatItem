@@ -1,9 +1,10 @@
 package me.dadus33.chatitem.chatmanager.v1.basecomp;
 
+import java.util.ArrayList;
+
 import javax.annotation.Nullable;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -44,12 +45,12 @@ public interface IComponentManager {
 		return null;
 	}
 
-	default Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, String json, Storage c) throws Exception {
+	default Object manageContent(Player p, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
 		String message;
 		if (Utils.isBeforeChatJson(p))
-			message = JSONManipulator.getInstance().parseEmpty(json, ChatManager.styleItem(chat.getPlayer(), item, c), ChatManager.getMaxLinesFromItem(p, item), chat.getPlayer());
+			message = JSONManipulator.getInstance().parseEmpty(chat, json, chat.getAction().isItem() ? ChatManager.getMaxLinesFromItem(p, chat.getAction().getItem()) : new ArrayList<>(), chat.getPlayer());
 		else
-			message = JSONManipulator.getInstance().parse(chat, json, chat.getAction(), ChatManager.styleItem(chat.getPlayer(), item, c));
+			message = JSONManipulator.getInstance().parse(chat, json, chat.getAction(), ChatManager.getNameForChatAction(p, chat.getAction(), c));
 		if (message != null) {
 			ChatItem.debug("(v1) Writing message: " + message);
 			writeJson(packet, message);
@@ -58,7 +59,7 @@ public interface IComponentManager {
 	}
 
 	default Object manageEmpty(Player p, Chat chat, ChatItemPacket packet, String json, Storage c) {
-		String message = JSONManipulator.getInstance().parseEmpty(json, ChatManager.getHandName(p), c.tooltipHand, chat.getPlayer());
+		String message = JSONManipulator.getInstance().parseEmpty(chat, json, c.tooltipHand, chat.getPlayer());
 		if (message != null) {
 			ChatItem.debug("(v1) Writing empty message: " + message);
 			writeJson(packet, message);

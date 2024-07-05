@@ -67,7 +67,9 @@ public class JSONManipulator {
 
 			// Get the JSON representation of the item (well, not really JSON, but rather a
 			// string representation of NBT data)
-			hover.addProperty("value", parseEmpty(json, replacement, Arrays.asList(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", chat.getItemPlayer().getPlayer().getName())), chat.getPlayer()));
+			JsonArray hoverArray = new JsonArray();
+			hoverArray.add(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", chat.getItemPlayer().getPlayer().getName()));
+			hover.add("value", hoverArray);
 
 			JsonObject click = new JsonObject();
 			click.addProperty("action", "run_command");
@@ -103,10 +105,10 @@ public class JSONManipulator {
 	}
 
 	@SuppressWarnings("deprecation")
-	public String parseEmpty(String json, String repl, List<String> tooltip, Player sender) {
+	public String parseEmpty(Chat chat, String json, List<String> tooltip, Player sender) {
 		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
 		JsonArray array = obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray();
-		JsonArray use = Translator.toJson(repl.replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
+		JsonArray use = Translator.toJson(ChatManager.getNameForChatAction(chat.getPlayer(), chat.getAction(), ChatItem.getInstance().getStorage()).replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
 		JsonObject hover = JsonParser.parseString("{\"action\":\"show_text\", \"value\": \"\"}").getAsJsonObject();
 
 		StringBuilder oneLineTooltip = new StringBuilder("");

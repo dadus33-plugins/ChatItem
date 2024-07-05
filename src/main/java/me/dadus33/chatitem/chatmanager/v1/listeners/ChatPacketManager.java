@@ -126,52 +126,55 @@ public class ChatPacketManager extends PacketHandler {
 			Player p = e.getPlayer();
 			String message = null;
 			try {
-				ItemStack item = ChatManager.getUsableItem(itemPlayer, chat.getSlot());
-				if (!ItemUtils.isEmpty(item)) {
-					ItemStack copy = item.clone();
-
-					if (ItemPlayer.getPlayer(p).isBuggedClient()) { // if the guy that will receive it is bugged
-						String act = getStorage().buggedClientAction;
-						List<String> tooltip;
-						if (act.equalsIgnoreCase("tooltip"))
-							tooltip = getStorage().tooltipBuggedClient;
-						else if (act.equalsIgnoreCase("item"))
-							tooltip = ChatManager.getMaxLinesFromItem(p, copy);
-						else if (act.equalsIgnoreCase("show_both")) {
-							tooltip = ChatManager.getMaxLinesFromItem(p, copy);
-							tooltip.addAll(getStorage().tooltipBuggedClient);
-						} else
-							tooltip = new ArrayList<>();
-						message = JSONManipulator.getInstance().parseEmpty(getter.getBaseComponentAsJSON(e), ChatManager.styleItem(p, copy, getStorage()), tooltip, chat.getPlayer());
-						if (message != null) {
-							getter.writeJson(e, message);
-						}
-						lastSentPacket = e.getPacket();
-					}
-					if (copy.hasItemMeta()) {
-						ItemMeta meta = copy.getItemMeta();
-						if (meta instanceof BookMeta) { // filtering written books
-							BookMeta bm = (BookMeta) copy.getItemMeta();
-							bm.setPages(Collections.emptyList());
-							copy.setItemMeta(bm);
-						} else if (meta instanceof BlockStateMeta && Version.getVersion().isNewerOrEquals(Version.V1_9)) { // if it's a block
-							BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
-							if (bsm.hasBlockState() && bsm.getBlockState() instanceof ShulkerBox) {
-								ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
-								for (ItemStack itemInv : sb.getInventory()) {
-									ItemUtils.stripData(itemInv);
-								}
-								bsm.setBlockState(sb);
+				if(chat.getAction().isItem()) {
+					ItemStack item = ChatManager.getUsableItem(itemPlayer, chat.getSlot());
+					if (!ItemUtils.isEmpty(item)) {
+						ItemStack copy = item.clone();
+	
+						if (ItemPlayer.getPlayer(p).isBuggedClient()) { // if the guy that will receive it is bugged
+							String act = getStorage().buggedClientAction;
+							List<String> tooltip;
+							if (act.equalsIgnoreCase("tooltip"))
+								tooltip = getStorage().tooltipBuggedClient;
+							else if (act.equalsIgnoreCase("item"))
+								tooltip = ChatManager.getMaxLinesFromItem(p, copy);
+							else if (act.equalsIgnoreCase("show_both")) {
+								tooltip = ChatManager.getMaxLinesFromItem(p, copy);
+								tooltip.addAll(getStorage().tooltipBuggedClient);
+							} else
+								tooltip = new ArrayList<>();
+							message = JSONManipulator.getInstance().parseEmpty(chat, getter.getBaseComponentAsJSON(e), tooltip, chat.getPlayer());
+							if (message != null) {
+								getter.writeJson(e, message);
 							}
-							copy.setItemMeta(bsm);
+							lastSentPacket = e.getPacket();
+						}
+						if (copy.hasItemMeta()) {
+							ItemMeta meta = copy.getItemMeta();
+							if (meta instanceof BookMeta) { // filtering written books
+								BookMeta bm = (BookMeta) copy.getItemMeta();
+								bm.setPages(Collections.emptyList());
+								copy.setItemMeta(bm);
+							} else if (meta instanceof BlockStateMeta && Version.getVersion().isNewerOrEquals(Version.V1_9)) { // if it's a block
+								BlockStateMeta bsm = (BlockStateMeta) copy.getItemMeta();
+								if (bsm.hasBlockState() && bsm.getBlockState() instanceof ShulkerBox) {
+									ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
+									for (ItemStack itemInv : sb.getInventory()) {
+										ItemUtils.stripData(itemInv);
+									}
+									bsm.setBlockState(sb);
+								}
+								copy.setItemMeta(bsm);
+							}
+						}
+						lastSentPacket = getter.manageContent(p, chat, e, fjson, getStorage());
+					} else {
+						if (!getStorage().handDisabled) {
+							lastSentPacket = getter.manageEmpty(p, chat, e, fjson, getStorage());
 						}
 					}
-					lastSentPacket = getter.manageItem(p, chat, e, item, fjson, getStorage());
-				} else {
-					if (!getStorage().handDisabled) {
-						lastSentPacket = getter.manageEmpty(p, chat, e, fjson, getStorage());
-					}
-				}
+				} else
+					lastSentPacket = getter.manageContent(p, chat, e, fjson, getStorage());
 				if (lastSentPacket == null) // maybe sent by the manager directly
 					ChatItem.debug("(v1) No packet to sent with manager " + getter.getClass().getName());
 				else

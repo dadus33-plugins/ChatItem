@@ -69,9 +69,10 @@ public class AdventureComponentManager implements IComponentManager {
 	}
 
 	@Override
-	public Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, String json, Storage c) throws Exception {
+	public Object manageContent(Player p, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
 		ChatAction action = chat.getAction();
 		if (action.isItem()) {
+			ItemStack item = action.getItem();
 			String itemName = ChatManager.getNameOfItem(chat.getPlayer(), item, c);
 			ChatItem.debug("NBT tag: " + PacketUtils.getNbtTag(item));
 			HoverEvent<?> hover;

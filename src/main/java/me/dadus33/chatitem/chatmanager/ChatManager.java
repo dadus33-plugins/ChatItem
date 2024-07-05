@@ -29,6 +29,7 @@ import me.dadus33.chatitem.invsee.hook.PlayerInventoryShower;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.utils.Colors;
 import me.dadus33.chatitem.utils.ItemUtils;
+import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.Utils;
 import me.dadus33.chatitem.utils.Version;
 
@@ -225,7 +226,7 @@ public abstract class ChatManager {
 			}
 			return styleItem(p, item, c);
 		}
-		return "";
+		return Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", p.getName());
 	}
 
 	public static String getHandName(Player p) {

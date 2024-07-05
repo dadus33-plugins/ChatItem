@@ -3,7 +3,6 @@ package me.dadus33.chatitem.chatmanager.v1.basecomp.hook;
 import java.util.Arrays;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -64,14 +63,13 @@ public class StringComponentManager implements IComponentManager {
 	}
 
 	@Override
-	public Object manageItem(Player p, Chat chat, ChatItemPacket packet, ItemStack item, String json, Storage c) throws Exception {
+	public Object manageContent(Player p, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
 		ChatAction action = chat.getAction();
 		if (action.isItem())
-			return manage(p, chat, packet, ChatManager.getNameOfItem(chat.getPlayer(), item, c), Utils.createItemHover(item, p), null);
+			return manage(p, chat, packet, ChatManager.getNameOfItem(chat.getPlayer(), action.getItem(), c), Utils.createItemHover(action.getItem(), p), null);
 		else
-			return manage(p, chat, packet, ChatManager.getNameOfItem(chat.getPlayer(), item, c),
-					Utils.createTextHover(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", chat.getPlayer().getName())),
-					Utils.createRunCommand(action.getCommand()));
+			return manage(p, chat, packet, ChatManager.getNameForChatAction(chat.getPlayer(), action, c),
+					Utils.createTextHover(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", chat.getPlayer().getName())), Utils.createRunCommand(action.getCommand()));
 	}
 
 	@Override
@@ -124,7 +122,7 @@ public class StringComponentManager implements IComponentManager {
 		ChatItem.debug("Checking for " + components.length + " components");
 		Arrays.asList(components).forEach(comp -> checkComponent(comp, hover, click, replacement, chat));
 
-		if(ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage())
+		if (ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage())
 			DiscordSrvSupport.sendChatMessage(p, TextComponent.toLegacyText(components), null);
 		try {
 			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(ComponentSerializer.toString(components), packet.getPacket()));
