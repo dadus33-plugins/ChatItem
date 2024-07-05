@@ -137,6 +137,7 @@ public class JSONManipulator {
 		boolean isComplex = false;
 		for (int i = 0; i < arr.size(); ++i) {
 			JsonElement element = arr.get(i);
+			ChatItem.debug("[JsonManipulator] Element: " + element.toString());
 			if (element.isJsonNull()) {
 				continue;
 			} else if (element.isJsonObject()) {
@@ -211,7 +212,9 @@ public class JSONManipulator {
 		for (String parts : msg.split("")) {
 			if (ChatManager.equalsSeparator(parts)) {
 				if (!current.isEmpty()) {
-					rep.add(current);
+					JsonObject jsonObj = o.getAsJsonObject().deepCopy();
+					jsonObj.addProperty("text", current); // edit text
+					rep.add(jsonObj); // add with all basic coloring things
 					current = "";
 				}
 				rep.add(tooltip);
@@ -223,8 +226,11 @@ public class JSONManipulator {
 				current += parts;
 			}
 		}
-		if (!current.isEmpty())
-			rep.add(current);
+		if (!current.isEmpty()) {
+			JsonObject jsonObj = o.getAsJsonObject().deepCopy();
+			jsonObj.addProperty("text", current); // edit text
+			rep.add(jsonObj); // add with all basic coloring things
+		}
 	}
 
 	public static String stringifyItem(ItemStack is) {

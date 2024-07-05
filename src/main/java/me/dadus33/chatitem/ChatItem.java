@@ -42,7 +42,6 @@ import me.dadus33.chatitem.platform.IPlatform;
 import me.dadus33.chatitem.platform.hook.PaperPlatform;
 import me.dadus33.chatitem.platform.hook.SpigotPlatform;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
-import me.dadus33.chatitem.utils.Colors;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.SemVer;
 import me.dadus33.chatitem.utils.Utils;
@@ -75,7 +74,6 @@ public class ChatItem extends JavaPlugin {
 		if (pl.getConfig().getKeys(false).isEmpty())
 			pl.saveDefaultConfig();
 		pl.reloadConfig();
-		String oldChatManager = pl.storage.manager;
 		pl.storage = new Storage(pl.getConfig());
 		pl.chooseManagers();
 		Translation.load(pl);
@@ -83,8 +81,6 @@ public class ChatItem extends JavaPlugin {
 		if(sender != null) {
 			if (!pl.storage.messageReload.isEmpty())
 				sender.sendMessage(pl.storage.messageReload);
-			if (!oldChatManager.equalsIgnoreCase(pl.storage.manager))
-				sender.sendMessage(Colors.GOLD + "Changing the manager with command reloading CAN produce issue. It's mostly suggested to restart after finding the better manager for you.");
 		}
 	}
 

@@ -10,9 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
 import me.dadus33.chatitem.chatmanager.v1.packets.PacketManager;
-import me.dadus33.chatitem.chatmanager.v1.packets.PacketType;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.channel.ChannelAbstract;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.channel.INC2Channel;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.channel.INCChannel;
@@ -79,14 +77,5 @@ public class CustomPacketManager extends PacketManager implements Listener {
 			channel.getAddChannelExecutor().shutdownNow();
 		if(channel.getRemoveChannelExecutor() != null)
 			channel.getRemoveChannelExecutor().shutdownNow();
-	}
-
-	public ChatItemPacket onPacketSent(PacketType type, Player sender, Object packet) {
-		if(type == null) {
-			return null;
-		}
-		ChatItemPacket customPacket = new ChatItemPacket(type, packet, sender);
-		notifyHandlersSent(customPacket);
-		return customPacket;
 	}
 }

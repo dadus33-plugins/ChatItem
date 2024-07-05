@@ -22,4 +22,13 @@ public abstract class PacketManager {
 	public void notifyHandlersSent(ChatItemPacket packet) {
 		handlers.forEach((handler) -> handler.onSend(packet));
 	}
+
+	public ChatItemPacket onPacketSent(PacketType type, Player sender, Object packet) {
+		if(type == null) {
+			return null;
+		}
+		ChatItemPacket customPacket = new ChatItemPacket(type, packet, sender);
+		notifyHandlersSent(customPacket);
+		return customPacket;
+	}
 }

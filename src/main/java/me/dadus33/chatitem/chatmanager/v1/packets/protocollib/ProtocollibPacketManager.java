@@ -51,12 +51,4 @@ public class ProtocollibPacketManager extends PacketManager {
 	public void stop() {
 		protocolManager.removePacketListeners(ChatItem.getInstance());
 	}
-
-	public ChatItemPacket onPacketSent(PacketType type, Player sender, Object packet) {
-		if(type == null)
-			return null;
-		ChatItemPacket customPacket = new ChatItemPacket(type, packet, sender);
-		notifyHandlersSent(customPacket);
-		return customPacket;
-	}
 }
