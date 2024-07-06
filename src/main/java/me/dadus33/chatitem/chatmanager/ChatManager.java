@@ -226,7 +226,7 @@ public abstract class ChatManager {
 			}
 			return styleItem(p, item, c);
 		}
-		return Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", p.getName());
+		return Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", p.getName());
 	}
 
 	public static String getHandName(Player p) {

@@ -123,9 +123,8 @@ public class PaperPlatform implements IPlatform {
 	@Override
 	public void sendMessage(Player to, Player origin, ChatAction action, String msg) {
 		Component comp = PlainTextComponentSerializer.plainText().deserialize(msg);
-		ItemStack item = action.getItem();
-		ComponentLike like = Component.text(ChatManager.getNameOfItem(origin, item, ChatItem.getInstance().getStorage())).hoverEvent(action.isItem() ? action.getItem().asHoverEvent()
-				: HoverEvent.showText(Component.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", origin.getName()))));
+		ComponentLike like = Component.text(ChatManager.getNameForChatAction(origin, action, ChatItem.getInstance().getStorage())).hoverEvent(action.isItem() ? action.getItem().asHoverEvent()
+				: HoverEvent.showText(Component.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", origin.getName()))));
 
 		to.sendMessage(comp.replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.SEPARATOR + "").replacement(like).build()));
 	}
