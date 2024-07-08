@@ -63,17 +63,17 @@ public class StringComponentManager implements IComponentManager {
 	}
 
 	@Override
-	public Object manageContent(Player p, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
+	public Object manageContent(Player viewer, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
 		ChatAction action = chat.getAction();
 		if (action.isItem())
-			return manage(p, chat, packet, ChatManager.getNameOfItem(chat.getPlayer(), action.getItem(), c), Utils.createItemHover(action.getItem(), p), null);
+			return manage(viewer, chat, packet, ChatManager.getNameOfItem(chat.getPlayer(), action.getItem(), viewer, c), Utils.createItemHover(action.getItem(), viewer), null);
 		else
-			return manage(p, chat, packet, ChatManager.getNameForChatAction(chat.getPlayer(), action, c),
+			return manage(viewer, chat, packet, ChatManager.getNameForChatAction(viewer, action, c),
 					Utils.createTextHover(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", chat.getPlayer().getName())), Utils.createRunCommand(action.getCommand()));
 	}
 
 	@Override
-	public Object manageEmpty(Player p, Chat chat, ChatItemPacket packet, String json, Storage c) {
+	public Object manageEmpty(Player viewer, Chat chat, ChatItemPacket packet, String json, Storage c) {
 		ComponentBuilder builder = new ComponentBuilder("");
 		c.tooltipHand.forEach(s -> builder.append(s));
 		HoverEvent hover;
@@ -82,17 +82,17 @@ public class StringComponentManager implements IComponentManager {
 		ChatAction action = chat.getAction();
 		if (action.isItem()) {
 			hover = Utils.createTextHover(builder.create());
-			rep = ChatManager.getHandName(p);
+			rep = ChatManager.getHandName(chat);
 			click = null;
 		} else {
 			hover = Utils.createTextHover(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", chat.getPlayer().getName()));
 			rep = Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", chat.getPlayer().getName());
 			click = Utils.createRunCommand(action.getCommand());
 		}
-		return manage(p, chat, packet, rep, hover, click);
+		return manage(viewer, chat, packet, rep, hover, click);
 	}
 
-	private Object manage(Player p, Chat chat, ChatItemPacket packet, String replacement, HoverEvent hover, ClickEvent click) {
+	private Object manage(Player viewer, Chat chat, ChatItemPacket packet, String replacement, HoverEvent hover, ClickEvent click) {
 		BaseComponent[] components = packet.getContent().getSpecificModifier(BaseComponent[].class).readSafely(0);
 		if (components == null) {
 			String json = packet.getContent().getStrings().readSafely(0);
@@ -122,8 +122,8 @@ public class StringComponentManager implements IComponentManager {
 		ChatItem.debug("Checking for " + components.length + " components");
 		Arrays.asList(components).forEach(comp -> checkComponent(comp, hover, click, replacement, chat));
 
-		if (ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage())
-			DiscordSrvSupport.sendChatMessage(p, TextComponent.toLegacyText(components), null);
+		if (ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage() && viewer == chat.getPlayer())
+			DiscordSrvSupport.sendChatMessage(viewer, TextComponent.toLegacyText(components), null);
 		try {
 			packet.setPacket(PacketEditingChatManager.createSystemChatPacket(ComponentSerializer.toString(components), packet.getPacket()));
 		} catch (Exception e) {

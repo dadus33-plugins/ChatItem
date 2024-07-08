@@ -255,7 +255,7 @@ public class SpigotPlatform implements IPlatform {
 		Storage c = ChatItem.getInstance().getStorage();
 		if (!ItemUtils.isEmpty(item)) {
 			ComponentBuilder itemComponent = new ComponentBuilder("");
-			appendToComponentBuilder(itemComponent, fixColorComponent(to, ChatManager.getNameOfItem(to, item, c), ChatColor.WHITE, action));
+			appendToComponentBuilder(itemComponent, fixColorComponent(to, ChatManager.getNameOfItem(origin, item, to, c), ChatColor.WHITE, action));
 			ChatItem.debug("Item for " + to.getName() + " (ver: " + ItemPlayer.getPlayer(to).getVersion().name() + ") : " + PacketUtils.getNbtTag(item));
 			// itemComponent.event(new HoverEvent(Action.SHOW_ITEM, itemBaseComponent));
 			appendToComponentBuilder(builder, itemComponent.create());

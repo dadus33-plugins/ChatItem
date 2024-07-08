@@ -152,11 +152,11 @@ public abstract class ChatManager {
 	 * @param item the item to get lines from
 	 * @return all lores
 	 */
-	public static List<String> getMaxLinesFromItem(Player p, ItemStack item) {
+	public static List<String> getMaxLinesFromItem(Player viewer, ItemStack item) {
 		List<String> lines = new ArrayList<>();
 		if (item.hasItemMeta()) {
 			ItemMeta meta = item.getItemMeta();
-			lines.add(meta.hasDisplayName() ? meta.getDisplayName() : NamerManager.getName(p, item, ChatItem.getInstance().getStorage()));
+			lines.add(meta.hasDisplayName() ? meta.getDisplayName() : NamerManager.getName(viewer, item, ChatItem.getInstance().getStorage()));
 			if (meta.hasEnchants()) {
 				meta.getEnchants().forEach((enchant, lvl) -> {
 					lines.add(Colors.RESET + Utils.getEnchantName(enchant) + " " + Utils.toRoman(lvl));
@@ -165,7 +165,7 @@ public abstract class ChatManager {
 			if (meta.hasLore())
 				lines.addAll(meta.getLore());
 		} else {
-			lines.add(NamerManager.getName(p, item, ChatItem.getInstance().getStorage()));
+			lines.add(NamerManager.getName(viewer, item, ChatItem.getInstance().getStorage()));
 		}
 		return lines;
 	}
@@ -175,12 +175,12 @@ public abstract class ChatManager {
 	 * Prefer use {@link #getNameOfItem(Player, ItemStack, Storage)} if you want
 	 * take in count the empty item
 	 * 
-	 * @param p    the player
-	 * @param item the item
-	 * @param c    the config
-	 * @return the name of item
+	 * @param viewer the player
+	 * @param item   the item
+	 * @param c      the config
+	 * @return the   name of item
 	 */
-	public static String styleItem(Player p, ItemStack item, Storage c) {
+	public static String styleItem(Player viewer, ItemStack item, Storage c) {
 		String replacer = c.nameFormat;
 		String amount = c.amountFormat;
 		if (item.getAmount() == 1) {
@@ -194,7 +194,7 @@ public abstract class ChatManager {
 			amount = amount.replace(TIMES, String.valueOf(item.getAmount()));
 			replacer = replacer.replace(AMOUNT, amount);
 		}
-		return replacer.replace(NAME, NamerManager.getName(p, item, c));
+		return replacer.replace(NAME, NamerManager.getName(viewer, item, c));
 	}
 
 	/**
@@ -205,31 +205,37 @@ public abstract class ChatManager {
 	 * @param c    the config
 	 * @return the name of item or hand
 	 */
-	public static String getNameOfItem(Player p, ItemStack item, Storage c) {
+	public static String getNameOfItem(Player p, ItemStack item, Player viewer, Storage c) {
 		if (ItemUtils.isEmpty(item)) {
 			if (c.handDisabled)
 				return ItemSlot.HAND.getPlaceholders().get(0);
 			else
 				return getHandName(p);
 		}
-		return styleItem(p, item, c);
+		return styleItem(viewer, item, c);
 	}
 
-	public static String getNameForChatAction(Player p, ChatAction action, Storage c) {
+	public static String getNameForChatAction(Player viewer, ChatAction action, Storage c) {
 		if (action.isItem()) {
 			ItemStack item = action.getItem();
 			if (ItemUtils.isEmpty(item)) {
 				if (c.handDisabled)
 					return ItemSlot.HAND.getPlaceholders().get(0);
 				else
-					return getHandName(p);
+					return getHandName(action.getOrigin());
 			}
-			return styleItem(p, item, c);
+			return styleItem(viewer, item, c);
 		}
-		return Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", p.getName());
+		return Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", action.getOrigin().getName());
 	}
 
+	@Deprecated
 	public static String getHandName(Player p) {
+		return ChatItem.getInstance().getStorage().handName.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName());
+	}
+
+	public static String getHandName(Chat c) {
+		Player p = c.getPlayer();
 		return ChatItem.getInstance().getStorage().handName.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName());
 	}
 

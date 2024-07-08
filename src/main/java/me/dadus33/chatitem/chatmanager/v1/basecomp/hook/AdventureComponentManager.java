@@ -69,33 +69,33 @@ public class AdventureComponentManager implements IComponentManager {
 	}
 
 	@Override
-	public Object manageContent(Player p, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
+	public Object manageContent(Player viewer, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
 		ChatAction action = chat.getAction();
 		if (action.isItem()) {
 			ItemStack item = action.getItem();
-			String itemName = ChatManager.getNameOfItem(chat.getPlayer(), item, c);
+			String itemName = ChatManager.getNameOfItem(chat.getPlayer(), item, viewer, c);
 			ChatItem.debug("NBT tag: " + PacketUtils.getNbtTag(item));
 			HoverEvent<?> hover;
 			if(Utils.IS_PAPER)
 				hover = item.asHoverEvent();
 			else
 				hover = HoverEvent.showItem(Key.key(item.getType().getKey().getKey()), item.getAmount(), BinaryTagHolder.of(PacketUtils.getNbtTag(item)));
-			return manage(p, chat, packet, itemName, hover, null);
+			return manage(viewer, chat, packet, itemName, hover, null);
 		}
-		return manage(p, chat, packet, Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", chat.getPlayer().getName()),
+		return manage(viewer, chat, packet, Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", chat.getPlayer().getName()),
 				HoverEvent.showText(Component.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", chat.getPlayer().getName()))),
 				ClickEvent.runCommand(action.getCommand()));
 	}
 
 	@Override
-	public Object manageEmpty(Player p, Chat chat, ChatItemPacket packet, String json, Storage c) {
+	public Object manageEmpty(Player viewer, Chat chat, ChatItemPacket packet, String json, Storage c) {
 		Component builder = Component.text("");
 		c.tooltipHand.forEach(s -> builder.append(Component.text(s)));
 		ChatAction action = chat.getAction();
 		if (action.isItem()) {
-			return manage(p, chat, packet, ChatManager.getHandName(p), HoverEvent.showText(builder), null);
+			return manage(viewer, chat, packet, ChatManager.getHandName(chat), HoverEvent.showText(builder), null);
 		}
-		return manage(p, chat, packet, Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", chat.getPlayer().getName()),
+		return manage(viewer, chat, packet, Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", chat.getPlayer().getName()),
 				HoverEvent.showText(Component.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", chat.getPlayer().getName()))),
 				ClickEvent.runCommand(action.getCommand()));
 	}
@@ -108,8 +108,8 @@ public class AdventureComponentManager implements IComponentManager {
 			return null;
 		}
 		comp = comp.replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.SEPARATOR + "" + chat.getId() + ChatManager.SEPARATOR_END).replacement(Component.text(replacement).hoverEvent(hover).clickEvent(click)).build());
-		if(ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage())
-			DiscordSrvSupport.sendChatMessage(p, comp, null);
+		if(ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage() && p == chat.getPlayer())
+			DiscordSrvSupport.sendChatMessage(chat.getPlayer(), comp, null);
 		modifier.write(0, comp);
 		return null; // send by manager
 	}

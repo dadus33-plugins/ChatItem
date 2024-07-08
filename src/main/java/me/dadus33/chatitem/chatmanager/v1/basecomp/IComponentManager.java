@@ -45,12 +45,12 @@ public interface IComponentManager {
 		return null;
 	}
 
-	default Object manageContent(Player p, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
+	default Object manageContent(Player viewer, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
 		String message;
-		if (Utils.isBeforeChatJson(p))
-			message = JSONManipulator.getInstance().parseEmpty(chat, json, chat.getAction().isItem() ? ChatManager.getMaxLinesFromItem(p, chat.getAction().getItem()) : new ArrayList<>(), chat.getPlayer());
+		if (Utils.isBeforeChatJson(viewer))
+			message = JSONManipulator.getInstance().parseEmpty(chat, json, chat.getAction().isItem() ? ChatManager.getMaxLinesFromItem(viewer, chat.getAction().getItem()) : new ArrayList<>(), chat.getPlayer());
 		else
-			message = JSONManipulator.getInstance().parse(chat, json, chat.getAction(), ChatManager.getNameForChatAction(p, chat.getAction(), c));
+			message = JSONManipulator.getInstance().parse(chat, json, chat.getAction(), ChatManager.getNameForChatAction(viewer, chat.getAction(), c));
 		if (message != null) {
 			ChatItem.debug("(v1) Writing message: " + message);
 			writeJson(packet, message);
