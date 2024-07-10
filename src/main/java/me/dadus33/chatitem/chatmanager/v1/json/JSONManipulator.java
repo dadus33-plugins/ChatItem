@@ -45,9 +45,19 @@ public class JSONManipulator {
 	public static final Field MAP = ReflectionUtils.getField(NBT_TAG_COMPOUND, "map", "x");
 
 	private JsonArray classicTooltip;
+	
+	private JsonObject parseOrGet(String json) {
+		try {
+			return JsonParser.parseString(json).getAsJsonObject();
+		} catch (Exception e) {
+			JsonObject obj = new JsonObject();
+			obj.addProperty("text", json);
+			return obj;
+		}
+	}
 
 	public String parse(Chat chat, String json, ChatAction action, String replacement) throws Exception {
-		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
+		JsonObject obj = parseOrGet(json);
 
 		JsonObject wrapper = new JsonObject(); // Create a wrapper object for the whole array
 		JsonArray use = Translator.toJson(replacement); // We get the json representation of the old color
@@ -106,7 +116,7 @@ public class JSONManipulator {
 
 	@SuppressWarnings("deprecation")
 	public String parseEmpty(Chat chat, String json, List<String> tooltip, Player sender) {
-		JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
+		JsonObject obj = parseOrGet(json);
 		JsonArray array = obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray();
 		JsonArray use = Translator.toJson(ChatManager.getNameForChatAction(chat.getPlayer(), chat.getAction(), ChatItem.getInstance().getStorage()).replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
 		JsonObject hover = JsonParser.parseString("{\"action\":\"show_text\", \"value\": \"\"}").getAsJsonObject();
