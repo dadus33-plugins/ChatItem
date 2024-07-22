@@ -229,14 +229,6 @@ messages:
         - "&eShould works with all types of plugins. (Previously named 'both' instead of 'all')"
         - ""
         - "&7Since ChatItem v2.1"
-      auto:
-        name: "&6Choose automatically"
-        lore:
-        - "&aChoose automatically between managers available"
-        - "&aaccording to actuals plugins."
-        - "&eThis is better when you are not using own plugin."
-        - ""
-        - "&7Since ChatItem v2.1"
       packet:
         name: "&6Intercept packets"
         lore:
