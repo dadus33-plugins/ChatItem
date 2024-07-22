@@ -26,6 +26,7 @@ import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class PaperPlatform implements IPlatform {
@@ -122,7 +123,7 @@ public class PaperPlatform implements IPlatform {
 
 	@Override
 	public void sendMessage(Player to, Player origin, ChatAction action, String msg) {
-		Component comp = PlainTextComponentSerializer.plainText().deserialize(msg);
+		Component comp = LegacyComponentSerializer.legacySection().deserialize(msg);
 		ComponentLike like = Component.text(ChatManager.getNameForChatAction(origin, action, ChatItem.getInstance().getStorage())).hoverEvent(action.isItem() ? action.getItem().asHoverEvent()
 				: HoverEvent.showText(Component.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", origin.getName()))));
 
