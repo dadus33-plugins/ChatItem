@@ -46,7 +46,10 @@ public class JSONManipulator {
 
 	private JsonArray classicTooltip;
 	
-	private JsonObject parseOrGet(String json) {
+	public static JsonObject parseOrGet(String json) {
+		if(json.startsWith("\"") && json.endsWith("\"")) {// seems to be simple line
+			return JsonParser.parseString("{\"text\":" + json + "}").getAsJsonObject();
+		}
 		try {
 			return JsonParser.parseString(json).getAsJsonObject();
 		} catch (Exception e) {
@@ -118,7 +121,7 @@ public class JSONManipulator {
 	public String parseEmpty(Chat chat, String json, List<String> tooltip, Player sender) {
 		JsonObject obj = parseOrGet(json);
 		JsonArray array = obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray();
-		JsonArray use = Translator.toJson(ChatManager.getNameForChatAction(chat.getPlayer(), chat.getAction(), ChatItem.getInstance().getStorage()).replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
+		JsonArray use = Translator.toJson(ChatManager.getNameForChatAction(chat.getPlayer(), chat, ChatItem.getInstance().getStorage()).replace("{name}", sender.getName()).replace("{display-name}", sender.getDisplayName()));
 		JsonObject hover = JsonParser.parseString("{\"action\":\"show_text\", \"value\": \"\"}").getAsJsonObject();
 
 		StringBuilder oneLineTooltip = new StringBuilder("");

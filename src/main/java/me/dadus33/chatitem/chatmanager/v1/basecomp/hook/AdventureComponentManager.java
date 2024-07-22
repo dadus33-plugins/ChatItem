@@ -7,7 +7,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.Storage;
@@ -15,11 +14,12 @@ import me.dadus33.chatitem.chatmanager.Chat;
 import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.basecomp.IComponentManager;
+import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.chatmanager.v1.packets.ChatItemPacket;
-import me.dadus33.chatitem.chatmanager.v1.packets.PacketContent.ContentModifier;
 import me.dadus33.chatitem.hook.DiscordSrvSupport;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.PacketUtils;
+import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.Utils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.api.BinaryTagHolder;
@@ -47,15 +47,31 @@ public class AdventureComponentManager implements IComponentManager {
 	public void writeJson(ChatItemPacket packet, String json) {
 	}
 
+	public void writeComponentToPacket(ChatItemPacket packet, Component next) {
+		if(packet.getContent().getSpecificModifier(Component.class).readSafely(0) == null) { // hard way
+			ReflectionUtils.setField(ReflectionUtils.getObject(packet.getPacket(), "unsignedContent"), "adventure", next);
+		} else { // easy way
+			packet.getContent().getSpecificModifier(Component.class).write(0, next);
+		}
+	}
+
+	public Component getComponentFromPacket(ChatItemPacket packet) {
+		Component comp = packet.getContent().getSpecificModifier(Component.class).readSafely(0);
+		if (comp == null && packet.getPacketName().equalsIgnoreCase("ClientboundPlayerChatPacket")) { // if can get one more
+			comp = (Component) ReflectionUtils.getObject(ReflectionUtils.getObject(packet.getPacket(), "unsignedContent"), "adventure");
+		}
+		return comp;
+	}
+	
 	@Override
 	public String getBaseComponentAsJSON(ChatItemPacket packet) {
-		Component comp = packet.getContent().getSpecificModifier(Component.class).readSafely(0);
-		if (comp == null)
+		Component comp = getComponentFromPacket(packet);
+		if(comp == null) // if comp stay null
 			return null;
 		try {
 			String json = GsonComponentSerializer.gson().serialize(comp);
-			JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
 			ChatItem.debug("AdventureJSON : " + json);
+			JsonObject jsonObj = JSONManipulator.parseOrGet(json);
 			if (jsonObj.has("with")) {
 				JsonObject next = new JsonObject();
 				next.add("extra", jsonObj.get("with"));
@@ -73,7 +89,7 @@ public class AdventureComponentManager implements IComponentManager {
 		ChatAction action = chat.getAction();
 		if (action.isItem()) {
 			ItemStack item = action.getItem();
-			String itemName = ChatManager.getNameOfItem(chat.getPlayer(), item, viewer, c);
+			String itemName = ChatManager.getNameForChatAction(viewer, chat, c);
 			ChatItem.debug("NBT tag: " + PacketUtils.getNbtTag(item));
 			HoverEvent<?> hover;
 			if(Utils.IS_PAPER)
@@ -93,24 +109,23 @@ public class AdventureComponentManager implements IComponentManager {
 		c.tooltipHand.forEach(s -> builder.append(Component.text(s)));
 		ChatAction action = chat.getAction();
 		if (action.isItem()) {
-			return manage(viewer, chat, packet, ChatManager.getHandName(chat), HoverEvent.showText(builder), null);
+			return manage(viewer, chat, packet, ChatManager.getNameForChatAction(viewer, chat, c), HoverEvent.showText(builder), null);
 		}
 		return manage(viewer, chat, packet, Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", chat.getPlayer().getName()),
 				HoverEvent.showText(Component.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", chat.getPlayer().getName()))),
 				ClickEvent.runCommand(action.getCommand()));
 	}
 
-	private Object manage(Player p, Chat chat, ChatItemPacket packet, String replacement, HoverEvent<?> hover, ClickEvent click) {
-		ContentModifier<Component> modifier = packet.getContent().getSpecificModifier(Component.class);
-		Component comp = modifier.readSafely(0);
+	private Object manage(Player viewer, Chat chat, ChatItemPacket packet, String replacement, HoverEvent<?> hover, ClickEvent click) {
+		Component comp = getComponentFromPacket(packet);
 		if (comp == null) {
 			ChatItem.debug("The component is null.");
 			return null;
 		}
 		comp = comp.replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.SEPARATOR + "" + chat.getId() + ChatManager.SEPARATOR_END).replacement(Component.text(replacement).hoverEvent(hover).clickEvent(click)).build());
-		if(ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage() && p == chat.getPlayer())
+		if(ChatItem.discordSrvSupport && DiscordSrvSupport.isSendingMessage() && viewer == chat.getPlayer())
 			DiscordSrvSupport.sendChatMessage(chat.getPlayer(), comp, null);
-		modifier.write(0, comp);
-		return null; // send by manager
+		viewer.sendMessage(comp);
+		return null;
 	}
 }

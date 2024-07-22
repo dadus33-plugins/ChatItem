@@ -82,6 +82,7 @@ public class ChatItem extends JavaPlugin {
 			if (!pl.storage.messageReload.isEmpty())
 				sender.sendMessage(pl.storage.messageReload);
 		}
+		ChatManager.setTesting(null);
 	}
 
 	public static ChatItem getInstance() {

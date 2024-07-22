@@ -66,9 +66,9 @@ public class StringComponentManager implements IComponentManager {
 	public Object manageContent(Player viewer, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
 		ChatAction action = chat.getAction();
 		if (action.isItem())
-			return manage(viewer, chat, packet, ChatManager.getNameOfItem(chat.getPlayer(), action.getItem(), viewer, c), Utils.createItemHover(action.getItem(), viewer), null);
+			return manage(viewer, chat, packet, ChatManager.getNameForChatAction(viewer, chat, c), Utils.createItemHover(action.getItem(), viewer), null);
 		else
-			return manage(viewer, chat, packet, ChatManager.getNameForChatAction(viewer, action, c),
+			return manage(viewer, chat, packet, ChatManager.getNameForChatAction(viewer, chat, c),
 					Utils.createTextHover(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", chat.getPlayer().getName())), Utils.createRunCommand(action.getCommand()));
 	}
 

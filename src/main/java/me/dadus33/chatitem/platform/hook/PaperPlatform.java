@@ -27,7 +27,6 @@ import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class PaperPlatform implements IPlatform {
 

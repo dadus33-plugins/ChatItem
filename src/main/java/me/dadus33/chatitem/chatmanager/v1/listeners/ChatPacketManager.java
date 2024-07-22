@@ -143,7 +143,7 @@ public class ChatPacketManager extends PacketHandler {
 								tooltip.addAll(getStorage().tooltipBuggedClient);
 							} else
 								tooltip = new ArrayList<>();
-							message = JSONManipulator.getInstance().parseEmpty(chat, getter.getBaseComponentAsJSON(e), tooltip, chat.getPlayer());
+							message = JSONManipulator.getInstance().parseEmpty(chat, fjson, tooltip, chat.getPlayer());
 							if (message != null) {
 								getter.writeJson(e, message);
 							}

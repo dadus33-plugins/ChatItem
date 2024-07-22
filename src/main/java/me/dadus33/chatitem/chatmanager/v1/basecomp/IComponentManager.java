@@ -50,7 +50,7 @@ public interface IComponentManager {
 		if (Utils.isBeforeChatJson(viewer))
 			message = JSONManipulator.getInstance().parseEmpty(chat, json, chat.getAction().isItem() ? ChatManager.getMaxLinesFromItem(viewer, chat.getAction().getItem()) : new ArrayList<>(), chat.getPlayer());
 		else
-			message = JSONManipulator.getInstance().parse(chat, json, chat.getAction(), ChatManager.getNameForChatAction(viewer, chat.getAction(), c));
+			message = JSONManipulator.getInstance().parse(chat, json, chat.getAction(), ChatManager.getNameForChatAction(viewer, chat, c));
 		if (message != null) {
 			ChatItem.debug("(v1) Writing message: " + message);
 			writeJson(packet, message);
@@ -77,7 +77,14 @@ public interface IComponentManager {
 		}
 
 		private Chat search() {
-			JsonObject jsonObj = JsonParser.parseString(json).getAsJsonObject();
+			JsonObject jsonObj;
+			try {
+				jsonObj = JsonParser.parseString(json).getAsJsonObject();
+			} catch (Exception e) {
+				if(searchInString(json))
+					return getWithId();
+				return null;
+			}
 			if (jsonObj.has("extra")) {
 				if (searchInExtra(jsonObj.getAsJsonArray("extra"))) {
 					return getWithId();

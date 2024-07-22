@@ -215,6 +215,21 @@ public abstract class ChatManager {
 		return styleItem(viewer, item, c);
 	}
 
+	public static String getNameForChatAction(Player viewer, Chat chat, Storage c) {
+		ChatAction action = chat.getAction();
+		if (action.isItem()) {
+			ItemStack item = action.getItem();
+			if (ItemUtils.isEmpty(item)) {
+				if (c.handDisabled)
+					return ItemSlot.HAND.getPlaceholders().get(0);
+				else
+					return getHandName(chat);
+			}
+			return styleItem(viewer, item, c);
+		}
+		return Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", action.getOrigin().getName());
+	}
+
 	public static String getNameForChatAction(Player viewer, ChatAction action, Storage c) {
 		if (action.isItem()) {
 			ItemStack item = action.getItem();
