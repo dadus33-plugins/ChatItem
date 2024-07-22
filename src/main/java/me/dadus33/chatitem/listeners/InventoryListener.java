@@ -39,8 +39,7 @@ public class InventoryListener implements Listener {
 			return;
 		InventoryHolder holder = e.getClickedInventory().getHolder();
 		if (holder == null || !(holder instanceof ChatItemHolder)) {
-			if (e.getClick().equals(ClickType.DOUBLE_CLICK) && p.getOpenInventory() != null
-					&& p.getOpenInventory().getTopInventory() != null) {
+			if (e.getClick().equals(ClickType.DOUBLE_CLICK) && p.getOpenInventory() != null && p.getOpenInventory().getTopInventory() != null) {
 				Inventory top = p.getOpenInventory().getTopInventory();
 				if (top.getHolder() != null && top.getHolder() instanceof ChatItemHolder) {
 					e.setCancelled(true);
@@ -120,8 +119,7 @@ public class InventoryListener implements Listener {
 			holder.keyBySlot.put(slot, manager);
 			inv.setItem(slot++, getManagerItem(manager));
 		}
-		inv.setItem(slot + 1,
-				getManagerItem("actual", "%manager%", Messages.getMessage("admin-inv.manager." + c.manager + ".name")));
+		inv.setItem(slot + 1, getManagerItem("actual", "%manager%", Messages.getMessage("admin-inv.manager." + c.manager + ".name")));
 
 		inv.setItem(8, getBoolChangeItem(ItemUtils.FIREWORK_CHARGE, "debug", c.debug));
 
@@ -130,27 +128,22 @@ public class InventoryListener implements Listener {
 		inv.setItem(21, getAmountChangeItem(Material.IRON_DOOR, "limit-per-message", c.limit));
 		inv.setItem(22, getAmountChangeItem(Material.APPLE, "cooldown", c.cooldown));
 		inv.setItem(23, getBoolChangeItem(Material.BLAZE_ROD, "check-update", c.checkUpdate));
-		inv.setItem(24, ChatItem.getPlatform().createTranslatedItemStack(Material.BOOK, "admin-inv.language", "%name%",
-				Translation.getMessage("language.name")));
+		inv.setItem(24, ChatItem.getPlatform().createTranslatedItemStack(Material.BOOK, "admin-inv.language", "%name%", Translation.getMessage("language.name")));
 
-		inv.setItem(26, ChatItem.getPlatform().createItemStack(ItemUtils.MATERIAL_CLOSE,
-				Messages.getMessage("admin-inv.close")));
+		inv.setItem(26, ChatItem.getPlatform().createItemStack(ItemUtils.MATERIAL_CLOSE, Messages.getMessage("admin-inv.close")));
 		p.openInventory(inv);
 	}
 
 	private static ItemStack getBoolChangeItem(Material type, String key, boolean b) {
-		return ChatItem.getPlatform().createItemStack(type,
-				Messages.getMessage("admin-inv." + key, "%state%", Messages.getMessage(b ? "enabled" : "disabled")),
+		return ChatItem.getPlatform().createItemStack(type, Messages.getMessage("admin-inv." + key, "%state%", Messages.getMessage(b ? "enabled" : "disabled")),
 				Messages.getMessageList("admin-inv.bool-lore"));
 	}
 
 	private static ItemStack getAmountChangeItem(Material type, String key, int amount) {
-		return ChatItem.getPlatform().createItemStack(type, Messages.getMessage("admin-inv." + key, "%state%", amount),
-				Messages.getMessageList("admin-inv.amount-lore"));
+		return ChatItem.getPlatform().createItemStack(type, Messages.getMessage("admin-inv." + key, "%state%", amount), Messages.getMessageList("admin-inv.amount-lore"));
 	}
 
 	private static ItemStack getManagerItem(String manager, Object... placeholders) {
-		return ChatItem.getPlatform().createTranslatedItemStack(Material.PAPER, "admin-inv.manager." + manager,
-				placeholders);
+		return ChatItem.getPlatform().createTranslatedItemStack(Material.PAPER, "admin-inv.manager." + manager, placeholders);
 	}
 }

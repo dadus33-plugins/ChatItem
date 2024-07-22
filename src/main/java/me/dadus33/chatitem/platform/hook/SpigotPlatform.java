@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -38,35 +37,20 @@ import net.md_5.bungee.api.chat.TextComponent;
 @SuppressWarnings("deprecation")
 public class SpigotPlatform implements IPlatform {
 
-	private static Method saveMethod;
 	private static boolean shouldUseAppendMethod = false;
 
 	static {
 		try {
-			Class<?> nbtTag = PacketUtils.getNmsClass("NBTTagCompound", "nbt.");
-			Class<?> itemClass = PacketUtils.getNmsClass("ItemStack", "world.item.");
-			for (Method m : itemClass.getDeclaredMethods()) {
-				if (m.getParameterTypes().length == 1) {
-					if (m.getParameterTypes()[0].equals(nbtTag) && m.getReturnType().equals(nbtTag)) {
-						saveMethod = m;
-					}
-				}
-			}
 			try {
 				ComponentBuilder.class.getDeclaredMethod("append", BaseComponent[].class);
 				shouldUseAppendMethod = true;
 			} catch (Exception e) {
 				shouldUseAppendMethod = false;
 			}
+			ChatItem.getInstance().getLogger().info(shouldUseAppendMethod ? "Use ComponentBuilder's method." : "Use own ComponentBuilder append method.");
 		} catch (Exception e) {
 
 		}
-		Logger log = ChatItem.getInstance().getLogger();
-		String appendMethodMsg = shouldUseAppendMethod ? "Use ComponentBuilder's method." : "Use own ComponentBuilder append method.";
-		if (saveMethod == null)
-			log.info("Failed to find save method. Using default system. " + appendMethodMsg);
-		else
-			log.info("Save method founded: " + saveMethod.getName() + ". " + appendMethodMsg);
 	}
 
 	@Override
