@@ -78,7 +78,7 @@ public class ChannelInboundHandler extends ChannelInboundHandlerAdapter {
 					int possibleProtocol = ints.readSafely(0, 0);
 					if(possibleProtocol == Bukkit.getPort())
 						possibleProtocol = ints.readSafely(1, 0);
-					if(possibleProtocol == -1 || possibleProtocol == 255)
+					if(possibleProtocol == -1 || possibleProtocol == 255 || possibleProtocol == Bukkit.getPort())
 						possibleProtocol = ints.readSafely(2, 0);
 					packetManager.protocolVersionPerChannel.put(channel, possibleProtocol);
 				}

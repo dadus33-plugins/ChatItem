@@ -79,6 +79,8 @@ public class ReflectionUtils {
 	 * @return the requested object of the field
 	 */
 	public static Object getObject(Object source, String... field) {
+		if(source == null)
+			return null;
 		try {
 			for(String fieldName : field) {
 				try {
@@ -104,6 +106,8 @@ public class ReflectionUtils {
 	 * @return the requested field
 	 */
 	public static Field getField(Object source, String field) {
+		if(source == null)
+			return null;
 		try {
 			Field f = source.getClass().getDeclaredField(field);
 			f.setAccessible(true);

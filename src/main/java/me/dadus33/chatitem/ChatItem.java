@@ -75,7 +75,7 @@ public class ChatItem extends JavaPlugin {
 			pl.saveDefaultConfig();
 		pl.reloadConfig();
 		pl.storage = new Storage(pl.getConfig());
-		pl.chooseManagers();
+		//pl.chooseManagers();
 		Translation.load(pl);
 		InvShower.getInvShower().clear();
 		if(sender != null) {
