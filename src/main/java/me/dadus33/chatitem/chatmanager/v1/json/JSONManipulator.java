@@ -102,6 +102,7 @@ public class JSONManipulator {
 			wrapper.add("extra", use); // add it only if
 		if (!wrapper.has("text"))
 			wrapper.addProperty("text", ""); // The text field is compulsory, even if it's empty
+		ChatItem.debug("Wrapper " + wrapper + " > " + use);
 		wrapper.add("hoverEvent", hover);
 
 		if (obj.size() == 1 && obj.has("text")) {
@@ -149,32 +150,37 @@ public class JSONManipulator {
 
 	private JsonArray parseArray(JsonArray arr, JsonElement tooltip) {
 		JsonArray replacer = new JsonArray();
-		boolean isComplex = false;
+		boolean separator = false;
 		for (int i = 0; i < arr.size(); ++i) {
 			JsonElement element = arr.get(i);
-			ChatItem.debug("[JsonManipulator] Element: " + element.toString());
-			if (element.isJsonNull()) {
+			if(element.isJsonNull())
 				continue;
-			} else if (element.isJsonObject()) {
-				isComplex = true;
+			if(separator) {
+				if(ChatManager.containsSeparatorEnd(element.toString()))
+					separator = false;
+				continue;
+			}
+			if (element.isJsonObject()) {
+				JsonElement text = element.getAsJsonObject().get("text");
+				if(text != null && ChatManager.containsSeparator(text.getAsString())) {
+					if(!ChatManager.containsSeparatorEnd(text.getAsString())) // if the separator doesn't end in the same string as it's begin
+						separator = true;
+				}
+				ChatItem.debug("Parsing object " + element.toString());
 				addParsedJsonObjectToArray(element.getAsJsonObject(), replacer, tooltip);
 			} else if (element.isJsonArray()) {
-				isComplex = true;
 				JsonArray jar = element.getAsJsonArray();
 				if (jar.size() != 0) {
 					jar = parseArray(element.getAsJsonArray(), tooltip);
 					replacer.set(i, jar);
 				}
-			} else if (element.isJsonPrimitive() && isComplex) {
+			} else if(element.isJsonPrimitive()) {
 				if(ChatManager.containsSeparator(element.getAsString())) {
+					if(!ChatManager.containsSeparatorEnd(element.getAsString())) // if the separator doesn't end in the same string as it's begin
+						separator = true;
 					addParsedStringToArray(element.getAsString(), replacer, element, tooltip);
-				} else
-					ChatItem.debug("[JSONManipulator] Put " + element + " to trash as it's primitive with complex things");
-				// ignore
-			} else {
-				addParsedStringToArray(element.getAsString(), replacer, element, tooltip);
+				}
 			}
-
 		}
 		return replacer;
 	}
@@ -222,6 +228,7 @@ public class JSONManipulator {
 			rep.add(o);
 			return;
 		}
+		ChatItem.debug("[JSONManipulator] Parsed string " + msg + ", rep: " + rep);
 		String current = "";
 		boolean wasSep = false;
 		for (String parts : msg.split("")) {
