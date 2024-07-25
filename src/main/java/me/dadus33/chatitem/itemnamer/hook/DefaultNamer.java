@@ -12,7 +12,7 @@ public class DefaultNamer implements INamer {
 
 	@Override
 	public Priority getPriority() {
-		return Priority.MINOR;
+		return Priority.SMALL;
 	}
 
 	@Override

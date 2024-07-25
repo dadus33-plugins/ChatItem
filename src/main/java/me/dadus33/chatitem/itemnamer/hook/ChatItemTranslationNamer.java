@@ -11,12 +11,12 @@ public class ChatItemTranslationNamer implements INamer {
 
 	@Override
 	public Priority getPriority() {
-		return Priority.SMALL;
+		return Priority.MINOR;
 	}
 
 	@Override
 	public String getName(Player p, ItemStack item, Storage storage) {
-		return Translation.get(item);
+		return Translation.getOr(item, null);
 	}
 
 }

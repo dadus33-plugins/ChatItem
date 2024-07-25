@@ -20,6 +20,7 @@ import com.google.gson.JsonParser;
 
 import me.dadus33.chatitem.utils.Utils;
 
+@SuppressWarnings("deprecation")
 public class Translation {
 
 	private static File folder;
@@ -81,7 +82,6 @@ public class Translation {
 		pl.getLogger().info("Loaded translation for " + lang + ".");
 	}
 
-	@SuppressWarnings("deprecation")
 	public static String get(ItemStack item) {
 		String key = (item.getType().isBlock() ? "block" : "item") + ".minecraft." + item.getType().name().toLowerCase();
 		if (messages != null && messages.has(key)) {
@@ -89,6 +89,15 @@ public class Translation {
 		} else
 			ChatItem.debug("Failed to find translation for " + key);
 		return legacy.getString(item.getType().name() + "." + item.getDurability(), item.getType().name().toLowerCase().replace("_", " "));
+	}
+	
+	public static String getOr(ItemStack item, String def) {
+		String key = (item.getType().isBlock() ? "block" : "item") + ".minecraft." + item.getType().name().toLowerCase();
+		if (messages != null && messages.has(key)) {
+			return messages.get(key).getAsString();
+		} else
+			ChatItem.debug("Failed to find translation for " + key);
+		return legacy.getString(item.getType().name() + "." + item.getDurability(), def);
 	}
 
 	protected void thisMethodShouldNotBeUsed_InsteadToUpdateLangFileFromLocalInstall() throws Exception {

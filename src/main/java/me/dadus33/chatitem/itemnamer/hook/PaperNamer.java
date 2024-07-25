@@ -5,7 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.itemnamer.INamer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class PaperNamer implements INamer {
 
@@ -16,7 +16,6 @@ public class PaperNamer implements INamer {
 
 	@Override
 	public String getName(Player p, ItemStack item, Storage storage) {
-		return PlainTextComponentSerializer.plainText().serialize(item.displayName());
+		return item.getItemMeta().hasDisplayName() ? LegacyComponentSerializer.legacySection().serialize(item.displayName()) : null;
 	}
-
 }
