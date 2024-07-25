@@ -34,9 +34,9 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 	
 	static {
 		if(Utils.IS_PAPER)
-			ORDERS = Arrays.asList("packet", "chat", "paper", "all");
+			ORDERS = Arrays.asList("chat", "paper", "packet", "all");
 		else
-			ORDERS = Arrays.asList("packet", "chat", "all");
+			ORDERS = Arrays.asList("chat", "packet", "all");
 	}
 	
 	@Override
@@ -150,6 +150,8 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 			decline.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatitem select " + testing + " no"));
 			decline.setHoverEvent(Utils.createTextHover(Colors.GRAY + "Click to say it's not working as expected"));
 			text.addExtra(decline);
+			if(testing.equalsIgnoreCase("packet"))
+				text.addExtra(" (This manager can have different result between 'chatitem select' and default chat for technical reasons. If nothing works, it's recommended to select it and try again)");
 			p.spigot().sendMessage(text);
 		}, 2);
 	}
