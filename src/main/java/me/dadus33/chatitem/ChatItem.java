@@ -28,6 +28,7 @@ import me.dadus33.chatitem.commands.ChatItemCommand;
 import me.dadus33.chatitem.hook.ChatControlSupport;
 import me.dadus33.chatitem.hook.ChatManagerSupport;
 import me.dadus33.chatitem.hook.ecoenchants.EcoEnchantsSupport;
+import me.dadus33.chatitem.hook.placeholders.EssentialsPlaceholdersHook;
 import me.dadus33.chatitem.hook.placeholders.IPlaceholders;
 import me.dadus33.chatitem.hook.placeholders.MVdWPlaceholderAPIHook;
 import me.dadus33.chatitem.hook.placeholders.OwnPlaceholder;
@@ -189,6 +190,10 @@ public class ChatItem extends JavaPlugin {
 		if (pm.isPluginEnabled("PlaceholderAPI")) {
 			plugins.add("PlaceholderAPI");
 			PLACEHOLDERS.add(new PlaceholderAPIHook());
+		}
+		if (pm.isPluginEnabled("Essentials")) {
+			plugins.add("Essentials");
+			PLACEHOLDERS.add(new EssentialsPlaceholdersHook());
 		}
 		if (pm.isPluginEnabled("MVdWPlaceholderAPI")) {
 			plugins.add("MVdWPlaceholderAPI");

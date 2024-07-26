@@ -34,7 +34,7 @@ public class ChatEventListener implements Listener {
 		String oldMsg = e.getMessage();
 		ItemSlot slot = ItemSlot.getItemSlotFromMessage(e.getMessage());
 		if (slot == null) {
-			ChatItem.debug("(v1) not found placeholders in: " + e.getMessage());
+			ChatItem.debug("(general) not found placeholders in: " + e.getMessage());
 			return;
 		}
 		ChatAction action = ChatManager.getChatAction(slot, p);
@@ -49,7 +49,7 @@ public class ChatEventListener implements Listener {
 		}
 
 		Chat c = Chat.create(p, oldMsg, action);
-		ChatItem.debug("(v1) Set placeholder to message " + c);
+		ChatItem.debug("(general) Set placeholder to message " + c);
 		e.setMessage(s.replace(Character.toString(ChatManager.SEPARATOR), SEPARATOR + Integer.toString(c.getId()) + SEPARATOR_END));
 		e.setFormat(e.getFormat().replace(oldMsg, e.getMessage())); // set own message for plugin that already put the message into the format
 	}

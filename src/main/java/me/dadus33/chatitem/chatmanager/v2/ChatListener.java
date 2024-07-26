@@ -73,9 +73,9 @@ public class ChatListener implements Listener {
 		e.setCancelled(true);
 		String format = e.getFormat();
 		String defMsg = slot.replacePlaceholdersToSeparator(e.getMessage());
-		if (Utils.countMatches(defMsg, Character.toString(ChatManager.SEPARATOR)) > getStorage().limit) {
-			if (!getStorage().messageLimit.isEmpty())
-				p.sendMessage(getStorage().messageLimit);
+		if (Utils.countMatches(defMsg, Character.toString(ChatManager.SEPARATOR)) > c.limit) {
+			if (!c.messageLimit.isEmpty())
+				p.sendMessage(c.messageLimit);
 			return;
 		}
 		String msg;

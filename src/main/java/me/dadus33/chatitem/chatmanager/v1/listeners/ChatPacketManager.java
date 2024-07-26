@@ -51,7 +51,6 @@ public class ChatPacketManager extends PacketHandler {
 			tryRegister(new AdventureComponentManager());
 		} catch (Exception e) {
 		}
-		ChatItem.getInstance().getLogger().info("Loaded " + componentManager.size() + " getter for base components.");
 		ChatItem.debug("ComponentManager: " + String.join(", ", componentManager.stream().map(IComponentManager::getClass).map(Class::getSimpleName).collect(Collectors.toList())));
 	}
 
