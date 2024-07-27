@@ -81,6 +81,11 @@ public class SpigotPlatform implements IPlatform {
 		item.setItemMeta(meta);
 		return item;
 	}
+	
+	@Override
+	public String getItemDisplayName(ItemStack item) {
+		return item.hasItemMeta() && item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : null;
+	}
 
 	@Override
 	public String getPluginVersion(Plugin plugin) {

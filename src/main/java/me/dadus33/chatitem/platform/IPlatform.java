@@ -32,6 +32,8 @@ public interface IPlatform {
 	
 	ItemStack createItemStack(Material type, String name, List<String> lore);
 	
+	String getItemDisplayName(ItemStack item);
+	
 	String getPluginVersion(Plugin plugin);
 	
 	Version getMinecraftVersion();

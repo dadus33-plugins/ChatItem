@@ -58,6 +58,11 @@ public class PaperPlatform implements IPlatform {
 		item.setItemMeta(meta);
 		return item;
 	}
+	
+	@Override
+	public String getItemDisplayName(ItemStack item) {
+		return LegacyComponentSerializer.legacySection().serialize(item.displayName());
+	}
 
 	@Override
 	public String getPluginVersion(Plugin plugin) {
