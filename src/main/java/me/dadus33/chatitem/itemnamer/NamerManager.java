@@ -17,8 +17,6 @@ import me.dadus33.chatitem.itemnamer.hook.ChatItemTranslationNamer;
 import me.dadus33.chatitem.itemnamer.hook.DefaultNamer;
 import me.dadus33.chatitem.itemnamer.hook.ItemDisplayNamer;
 import me.dadus33.chatitem.itemnamer.hook.LangUtilsNamer;
-import me.dadus33.chatitem.itemnamer.hook.PaperNamer;
-import me.dadus33.chatitem.utils.Utils;
 
 public class NamerManager {
 
@@ -39,8 +37,6 @@ public class NamerManager {
 		addNamer(new ChatItemTranslationNamer());
 		addNamer(new ItemDisplayNamer());
 		addNamer(new DefaultNamer());
-		if(Utils.IS_PAPER)
-			addNamer(new PaperNamer());
 	}
 	
 	/**

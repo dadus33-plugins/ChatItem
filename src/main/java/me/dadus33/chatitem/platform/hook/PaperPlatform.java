@@ -59,9 +59,12 @@ public class PaperPlatform implements IPlatform {
 		return item;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public String getItemDisplayName(ItemStack item) {
-		return LegacyComponentSerializer.legacySection().serialize(item.displayName());
+		// actually the get Displayname for better ... See: https://github.com/KyoriPowered/adventure-platform/issues/185
+		// return LegacyComponentSerializer.legacySection().serialize(item.displayName());
+		return item.hasItemMeta() && item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : null;
 	}
 
 	@Override
@@ -128,8 +131,8 @@ public class PaperPlatform implements IPlatform {
 	@Override
 	public void sendMessage(Player to, Player origin, ChatAction action, String msg) {
 		Component comp = LegacyComponentSerializer.legacySection().deserialize(msg);
-		ComponentLike like = Component.text(ChatManager.getNameForChatAction(origin, action, ChatItem.getInstance().getStorage())).hoverEvent(action.isItem() ? action.getItem().asHoverEvent()
-				: HoverEvent.showText(Component.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", origin.getName()))));
+		ComponentLike like = LegacyComponentSerializer.legacySection().deserialize(ChatManager.getNameForChatAction(origin, action, ChatItem.getInstance().getStorage())).hoverEvent(action.isItem() ? action.getItem().asHoverEvent()
+				: HoverEvent.showText(LegacyComponentSerializer.legacySection().deserialize(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", origin.getName()))));
 
 		to.sendMessage(comp.replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.SEPARATOR + "").replacement(like).build()));
 	}

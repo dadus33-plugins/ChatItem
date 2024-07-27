@@ -57,10 +57,13 @@ public class ChatListener implements Listener {
 			return;
 		}
 		Player p = e.getPlayer();
+		String targetReplace = ChatManager.SEPARATOR + "";
 		if(ChatManager.containsSeparator(e.getMessage())) { // fix for v1
 			Chat chat = Chat.getFrom(e.getMessage());
-			if(chat != null)
+			if(chat != null) {
+				targetReplace = ChatManager.SEPARATOR + "" + chat.getId() + ChatManager.SEPARATOR_END;
 				e.setMessage(ChatManager.replaceSeparator(chat, e.getMessage(), chat.getSlot().getPlaceholders().get(0)));
+			}
 		}
 		ItemSlot slot = ItemSlot.getItemSlotFromMessage(e.getMessage());
 		if (slot == null) { // if not found
@@ -71,7 +74,8 @@ public class ChatListener implements Listener {
 		if(!ChatManager.canUsePlaceholder(p, action.getItem(), slot, e))
 			return;
 		e.setCancelled(true);
-		String format = e.getFormat();
+		String format = e.getFormat().replace(targetReplace, slot.getPlaceholders().get(0));
+		ChatItem.debug("(v2) Using format: " + format + " and message: " + e.getMessage());
 		String defMsg = slot.replacePlaceholdersToSeparator(e.getMessage());
 		if (Utils.countMatches(defMsg, Character.toString(ChatManager.SEPARATOR)) > c.limit) {
 			if (!c.messageLimit.isEmpty())
@@ -90,7 +94,7 @@ public class ChatListener implements Listener {
 		if (ChatItem.discordSrvSupport)
 			DiscordSrvSupport.sendChatMessage(p, defMsg.replace(ChatManager.SEPARATOR + "", itemName), e);
 		Set<Player> recipients = e.getRecipients().isEmpty() ? new HashSet<>(Bukkit.getOnlinePlayers()) : e.getRecipients();
-		ChatItem.debug("Msg: " + ChatItem.replace(p, msg).replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format + " to " + recipients.size() + " players");
+		ChatItem.debug("(v2) Msg: " + ChatItem.replace(p, msg).replace(ChatColor.COLOR_CHAR, '&') + ", format: " + format + " to " + recipients.size() + " players");
 		recipients.forEach((pl) -> ChatItem.getPlatform().sendMessage(pl, p, action, ChatItem.replace(p, msg)));
 		if (c.cooldown > 0 && !p.hasPermission("chatitem.ignore-cooldown"))
 			ChatManager.applyCooldown(p);

@@ -156,7 +156,7 @@ public abstract class ChatManager {
 		List<String> lines = new ArrayList<>();
 		if (item.hasItemMeta()) {
 			ItemMeta meta = item.getItemMeta();
-			lines.add(meta.hasDisplayName() ? meta.getDisplayName() : NamerManager.getName(viewer, item, ChatItem.getInstance().getStorage()));
+			lines.add(NamerManager.getName(viewer, item, ChatItem.getInstance().getStorage()));
 			if (meta.hasEnchants()) {
 				meta.getEnchants().forEach((enchant, lvl) -> {
 					lines.add(Colors.RESET + Utils.getEnchantName(enchant) + " " + Utils.toRoman(lvl));
