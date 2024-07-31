@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.utils.ColorManager;
+import me.dadus33.chatitem.utils.Colors;
 import net.md_5.bungee.api.ChatColor;
 
 //Based on DarkSeraphim's system, but using Gson and supporting some more edge cases
@@ -46,10 +47,12 @@ public class Translator {
 					if(!text.isEmpty()) // ignore this if no text before
 						text += ColorManager.getColorString(colorCode);
 					colorCode = "x";
+				} else if(!colorCode.isEmpty() && !colorCode.startsWith("x")) { // already color and not hex
+					text += ColorManager.COLOR_CHAR + colorCode; // add the color to text
+					colorCode = args + "";
 				} else
 					colorCode += args; // a color by itself
 			} else {
-				waiting = false;
 				if(!colorCode.isEmpty()) { // manage color
 					if(colorCode.startsWith("x") && colorCode.length() == 7) { // hex color code
 						next.addProperty("color", ColorManager.getColor(colorCode).getName());
@@ -58,20 +61,21 @@ public class Translator {
 							text += ColorManager.getColor(colorCode);
 						else
 							next.addProperty("color", ColorManager.getColor(colorCode).getName());
-					} else if(!text.isEmpty())// no text before -> color will be used as "color"
+					} else if(!text.isEmpty()) // no text before -> color will be used as "color"
 						text += ColorManager.getColorString(colorCode);
 					
-					ChatItem.debug("Add " + colorCode + " to " + text + ", msg: " + message);
+					ChatItem.debug("[Translator] Add color code " + colorCode + " to " + text + args + ", msg: " + message);
 					colorCode = "";
 				}
 				// basic text, not waiting for code after '§'
 				text += args;
 			}
 		}
-		if(!text.isEmpty() || message.isEmpty()) {
+		if(!next.has("color") || colorCode.length() == 1) // if no color or a color that can override it
+			next.addProperty("color", (colorCode.length() == 1 ? ColorManager.getColor(colorCode).getName() : "white"));
+		if(!text.isEmpty() || message.isEmpty() || next.size() > 0) {
 	        next.addProperty("text", text);
-			if(!next.has("color"))
-				next.addProperty("color", "white");
+			ChatItem.debug("[Translator] Added content " + next + " to message" + message);
 			message.add(next);
 		}
         return message;

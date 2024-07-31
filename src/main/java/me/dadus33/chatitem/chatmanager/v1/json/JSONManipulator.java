@@ -234,9 +234,13 @@ public class JSONManipulator {
 		for (String parts : msg.split("")) {
 			if (ChatManager.equalsSeparator(parts)) {
 				if (!current.isEmpty()) {
-					JsonObject jsonObj = o.getAsJsonObject().deepCopy();
-					jsonObj.addProperty("text", current); // edit text
-					rep.add(jsonObj); // add with all basic coloring things
+					if(o.isJsonObject()) {
+						JsonObject jsonObj = o.getAsJsonObject().deepCopy();
+						jsonObj.addProperty("text", current); // edit text
+						rep.add(jsonObj); // add with all basic coloring things
+					} else {
+						rep.add(current);
+					}
 					current = "";
 				}
 				rep.add(tooltip);
@@ -249,9 +253,13 @@ public class JSONManipulator {
 			}
 		}
 		if (!current.isEmpty()) {
-			JsonObject jsonObj = o.getAsJsonObject().deepCopy();
-			jsonObj.addProperty("text", current); // edit text
-			rep.add(jsonObj); // add with all basic coloring things
+			if(o.isJsonObject()) {
+				JsonObject jsonObj = o.getAsJsonObject().deepCopy();
+				jsonObj.addProperty("text", current); // edit text
+				rep.add(jsonObj); // add with all basic coloring things
+			} else {
+				rep.add(current);
+			}
 		}
 	}
 
