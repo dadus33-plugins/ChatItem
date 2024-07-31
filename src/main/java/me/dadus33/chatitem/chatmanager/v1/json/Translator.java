@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.utils.ColorManager;
-import me.dadus33.chatitem.utils.Colors;
 import net.md_5.bungee.api.ChatColor;
 
 //Based on DarkSeraphim's system, but using Gson and supporting some more edge cases
