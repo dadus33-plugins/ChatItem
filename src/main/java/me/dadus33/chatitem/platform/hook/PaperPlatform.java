@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
+import me.dadus33.chatitem.C;
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
@@ -21,12 +22,10 @@ import me.dadus33.chatitem.platform.IPlatform;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.Version;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class PaperPlatform implements IPlatform {
 
@@ -37,14 +36,14 @@ public class PaperPlatform implements IPlatform {
 
 	@Override
 	public Inventory createInventory(InventoryHolder holder, int slot, String name) {
-		return Bukkit.createInventory(holder, slot, Component.text(name));
+		return Bukkit.createInventory(holder, slot, C.text(name));
 	}
 
 	@Override
 	public ItemStack createItemStack(Material type, String name) {
 		ItemStack item = new ItemStack(type);
 		ItemMeta meta = (ItemMeta) item.getItemMeta();
-		meta.displayName(Component.text(name).color(NamedTextColor.WHITE));
+		meta.displayName(C.text(name).color(NamedTextColor.WHITE));
 		item.setItemMeta(meta);
 		return item;
 	}
@@ -53,8 +52,8 @@ public class PaperPlatform implements IPlatform {
 	public ItemStack createItemStack(Material type, String name, List<String> lore) {
 		ItemStack item = new ItemStack(type);
 		ItemMeta meta = (ItemMeta) item.getItemMeta();
-		meta.displayName(Component.text(name).color(NamedTextColor.WHITE));
-		meta.lore(lore.stream().map(Component::text).collect(Collectors.toList()));
+		meta.displayName(C.text(name).color(NamedTextColor.WHITE));
+		meta.lore(lore.stream().map(C::text).collect(Collectors.toList()));
 		item.setItemMeta(meta);
 		return item;
 	}
@@ -130,10 +129,9 @@ public class PaperPlatform implements IPlatform {
 
 	@Override
 	public void sendMessage(Player to, Player origin, ChatAction action, String msg) {
-		Component comp = LegacyComponentSerializer.legacySection().deserialize(msg);
-		ComponentLike like = LegacyComponentSerializer.legacySection().deserialize(ChatManager.getNameForChatAction(origin, action, ChatItem.getInstance().getStorage())).hoverEvent(action.isItem() ? action.getItem().asHoverEvent()
-				: HoverEvent.showText(LegacyComponentSerializer.legacySection().deserialize(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", origin.getName()))));
+		ComponentLike like = C.text(ChatManager.getNameForChatAction(origin, action, ChatItem.getInstance().getStorage())).hoverEvent(action.isItem() ? action.getItem().asHoverEvent()
+				: HoverEvent.showText(C.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", origin.getName()))));
 
-		to.sendMessage(comp.replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.SEPARATOR + "").replacement(like).build()));
+		to.sendMessage(C.text(msg).replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.SEPARATOR + "").replacement(like).build()));
 	}
 }
