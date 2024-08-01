@@ -22,9 +22,12 @@ import me.dadus33.chatitem.platform.IPlatform;
 import me.dadus33.chatitem.utils.Messages;
 import me.dadus33.chatitem.utils.ReflectionUtils;
 import me.dadus33.chatitem.utils.Version;
-import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TextReplacementConfig;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.event.HoverEventSource;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class PaperPlatform implements IPlatform {
@@ -129,8 +132,26 @@ public class PaperPlatform implements IPlatform {
 
 	@Override
 	public void sendMessage(Player to, Player origin, ChatAction action, String msg) {
-		ComponentLike like = C.text(ChatManager.getNameForChatAction(origin, action, ChatItem.getInstance().getStorage())).hoverEvent(action.isItem() ? action.getItem().asHoverEvent()
-				: HoverEvent.showText(C.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", origin.getName()))));
+		HoverEventSource<?> hoverEvent = null;
+		if(action.isItem()) {
+			if(action.getItem().getType().equals(Material.AIR))
+				hoverEvent = action.getItem().asHoverEvent();
+			else {
+				Component t = null;
+				for(String line : Messages.getMessageList("general.hand.tooltip", "%cible%", origin.getName())) {
+					if(t == null) {
+						t = Component.text("");
+					} else
+						t.append(Component.newline());
+					t.append(C.text(line));
+				}
+				hoverEvent = HoverEvent.showText(t);
+			}
+		} else
+			hoverEvent = HoverEvent.showText(C.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", origin.getName())));
+		TextComponent like = Component.text(ChatManager.getNameForChatAction(origin, action, ChatItem.getInstance().getStorage())).hoverEvent(hoverEvent);
+		if (action.hasCommand())
+			like.clickEvent(ClickEvent.runCommand(action.getCommand()));
 
 		to.sendMessage(C.text(msg).replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.SEPARATOR + "").replacement(like).build()));
 	}
