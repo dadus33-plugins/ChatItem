@@ -54,7 +54,7 @@ general:
       - "{legs}"
     # Show what is their feets
     boots:
-      enabled: false
+      enabled: true
       deny-if-no-item: true
       keys:
       - "[feet]"
