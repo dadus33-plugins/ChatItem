@@ -361,7 +361,7 @@ public class SpigotPlatform implements IPlatform {
 				littleBuilder.event(Utils.createItemHover(action.getItem(), to));
 		} else {
 			littleBuilder.event(Utils.createTextHover(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover")));
-			if(action.getCommand() != "")
+			if(action.hasCommand())
 				littleBuilder.event(Utils.createRunCommand(action.getCommand()));
 		}
 		return littleBuilder.create();

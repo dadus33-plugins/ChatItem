@@ -151,7 +151,7 @@ public class PaperPlatform implements IPlatform {
 			hoverEvent = HoverEvent.showText(C.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", origin.getName())));
 		TextComponent like = Component.text(ChatManager.getNameForChatAction(origin, action, ChatItem.getInstance().getStorage())).hoverEvent(hoverEvent);
 		if (action.hasCommand())
-			like.clickEvent(ClickEvent.runCommand(action.getCommand()));
+			like = like.clickEvent(ClickEvent.runCommand(action.getCommand()));
 
 		to.sendMessage(C.text(msg).replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.SEPARATOR + "").replacement(like).build()));
 	}
