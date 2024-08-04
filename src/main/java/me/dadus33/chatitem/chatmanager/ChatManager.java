@@ -295,7 +295,7 @@ public abstract class ChatManager {
 			}
 			return false;
 		}
-		if (item != null && item.getType().equals(Material.AIR)) {
+		if (item != null && item.getType().equals(Material.AIR) && slot.isBasic()) {
 			if (slot.isDenyIfNoItem()) {
 				if (e != null)
 					e.setCancelled(true);

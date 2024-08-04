@@ -64,7 +64,7 @@ public class PaperListener implements Listener {
 			return;
 		HoverEventSource<?> hoverEvent = null;
 		if(action.isItem()) {
-			if(action.getItem().getType().equals(Material.AIR))
+			if(!action.getItem().getType().equals(Material.AIR))
 				hoverEvent = action.getItem().asHoverEvent();
 			else {
 				Component t = null;
