@@ -74,17 +74,13 @@ public class ReflectionUtils {
 	public static boolean hasObject(Object source, String... field) {
 		if(source == null)
 			return false;
-		try {
-			for(String fieldName : field) {
-				try {
-					source.getClass().getDeclaredField(fieldName);
-					return true;
-				} catch (NoSuchFieldException e) {
-					// ignore because going to next item
-				}
+		for(String fieldName : field) {
+			try {
+				source.getClass().getDeclaredField(fieldName);
+				return true;
+			} catch (NoSuchFieldException e) {
+				// ignore because going to next item
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		return false;
 	}

@@ -40,7 +40,7 @@ public class JSONManipulator {
 	public static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
 	public static final Class<?> NMS_ITEM_STACK_CLASS = getNmsClass("ItemStack", "world.item.");
 	public static final Method AS_NMS_COPY = ReflectionUtils.getMethod(CRAFT_ITEM_STACK_CLASS, "asNMSCopy", ItemStack.class);
-	public static final Class<?> NBT_TAG_COMPOUND = getNmsClass("NBTTagCompound", "nbt.");
+	public static final Class<?> NBT_TAG_COMPOUND = getNmsClass("NBTTagCompound", "nbt.", "CompoundTag");
 	public static final Method SAVE_NMS_ITEM_STACK_METHOD = ReflectionUtils.getMethod(NMS_ITEM_STACK_CLASS, NBT_TAG_COMPOUND, NBT_TAG_COMPOUND);
 	public static final Field MAP = ReflectionUtils.getField(NBT_TAG_COMPOUND, "map", "x");
 
@@ -274,6 +274,7 @@ public class JSONManipulator {
 
 	@SuppressWarnings({ "deprecation" })
 	public static String stringifyItemInternal(ItemStack is) throws Exception {
+		ChatItem.debug("[JSONManipulator] stringifying item");
 		Object nmsStack = JSONManipulator.AS_NMS_COPY.invoke(null, is);
 		Object nmsTag = JSONManipulator.NBT_TAG_COMPOUND.newInstance();
 		JSONManipulator.SAVE_NMS_ITEM_STACK_METHOD.invoke(nmsStack, nmsTag);
