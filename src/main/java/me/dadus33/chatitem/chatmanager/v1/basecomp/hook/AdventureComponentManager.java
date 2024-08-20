@@ -48,7 +48,7 @@ public class AdventureComponentManager implements IComponentManager {
 	}
 
 	public void writeComponentToPacket(ChatItemPacket packet, Component next) {
-		if(packet.getContent().getSpecificModifier(Component.class).readSafely(0) == null) { // hard way
+		if(packet.getContent().getSpecificModifier(Component.class).readSafely(0) == null && ReflectionUtils.hasObject(packet.getPacket(), "unsignedContent")) { // hard way
 			ReflectionUtils.setField(ReflectionUtils.getObject(packet.getPacket(), "unsignedContent"), "adventure", next);
 		} else { // easy way
 			packet.getContent().getSpecificModifier(Component.class).write(0, next);
@@ -57,7 +57,7 @@ public class AdventureComponentManager implements IComponentManager {
 
 	public Component getComponentFromPacket(ChatItemPacket packet) {
 		Component comp = packet.getContent().getSpecificModifier(Component.class).readSafely(0);
-		if (comp == null && packet.getPacketName().equalsIgnoreCase("ClientboundPlayerChatPacket")) { // if can get one more
+		if (comp == null && packet.getPacketName().equalsIgnoreCase("ClientboundPlayerChatPacket") && ReflectionUtils.hasObject(packet.getPacket(), "unsignedContent")) { // if can get one more
 			comp = (Component) ReflectionUtils.getObject(ReflectionUtils.getObject(packet.getPacket(), "unsignedContent"), "adventure");
 		}
 		return comp;
