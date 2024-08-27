@@ -13,11 +13,11 @@ jobs:
     - uses: actions/checkout@v4
       name: Checkout repo
 
-    - name: Set up JDK 18
+    - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
-        java-version: '18'
-        distribution: 'adopt'
+        java-version: '21'
+        distribution: 'temurin'
         cache: maven
 
     - name: Build with Maven
