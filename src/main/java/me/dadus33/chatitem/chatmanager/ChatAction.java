@@ -1,5 +1,6 @@
 package me.dadus33.chatitem.chatmanager;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -48,6 +49,6 @@ public class ChatAction {
 	}
 	
 	public ItemStack getItem() {
-		return item;
+		return item == null ? new ItemStack(Material.AIR) : item;
 	}
 }
