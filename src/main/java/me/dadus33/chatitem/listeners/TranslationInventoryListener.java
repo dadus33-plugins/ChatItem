@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -79,7 +78,7 @@ public class TranslationInventoryListener implements Listener {
 			holder.langBySlot.put(slot, lang);
 			ItemStack item = ChatItem.getPlatform().createItemStack(Material.PAPER, Colors.GOLD + Translation.getAllLangs().get(lang), Colors.GRAY + "Clic to select this language");
 			if(lang.equalsIgnoreCase(ChatItem.getInstance().getStorage().language)) {
-				item.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+				item.addUnsafeEnchantment(ItemUtils.getEnchant("DURABILITY", "UNBREAKING"), 1);
 				ItemMeta meta = item.getItemMeta();
 				meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 				item.setItemMeta(meta);

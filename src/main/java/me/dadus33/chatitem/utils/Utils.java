@@ -27,7 +27,6 @@ import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
 import me.dadus33.chatitem.chatmanager.ChatManager;
-import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.playerversion.PlayerVersionManager;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -178,7 +177,7 @@ public class Utils {
 		if(Version.getVersion().isNewerOrEquals(Version.V1_13)) {
 			return new HoverEvent(HoverEvent.Action.SHOW_ITEM, new Item(item.getType().getKey().getKey(), item.getAmount(), ItemTag.ofNbt(PacketUtils.getNbtTag(item))));
 		} else {
-			return new HoverEvent(HoverEvent.Action.SHOW_ITEM, new ComponentBuilder(JSONManipulator.stringifyItem(item)).create());
+			return new HoverEvent(HoverEvent.Action.SHOW_ITEM, new ComponentBuilder(ChatItem.getPlatform().stringifyItem(item)).create());
 		}
 	}
 
@@ -268,5 +267,9 @@ public class Utils {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	public static String cleanStr(String s) {
+		return s.startsWith("'") && s.endsWith("'") ? s.substring(1, s.length() - 1) : s;
 	}
 }

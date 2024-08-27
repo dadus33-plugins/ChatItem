@@ -2,6 +2,7 @@ package me.dadus33.chatitem.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -77,5 +78,15 @@ public class ItemUtils {
 			im.setDisplayName(original.getDisplayName());
 		}
 		i.setItemMeta(im);
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static Enchantment getEnchant(String... names) {
+		for(String name : names) {
+			Enchantment possible = Enchantment.getByName(name);
+			if(possible != null)
+				return possible;
+		}
+		return null;
 	}
 }

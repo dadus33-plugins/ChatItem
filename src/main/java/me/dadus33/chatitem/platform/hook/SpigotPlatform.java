@@ -3,7 +3,10 @@ package me.dadus33.chatitem.platform.hook;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -19,6 +22,7 @@ import me.dadus33.chatitem.ItemPlayer;
 import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.chatmanager.ChatAction;
 import me.dadus33.chatitem.chatmanager.ChatManager;
+import me.dadus33.chatitem.chatmanager.v1.json.JSONManipulator;
 import me.dadus33.chatitem.platform.IPlatform;
 import me.dadus33.chatitem.playernamer.PlayerNamerManager;
 import me.dadus33.chatitem.utils.ColorManager;
@@ -81,7 +85,7 @@ public class SpigotPlatform implements IPlatform {
 		item.setItemMeta(meta);
 		return item;
 	}
-	
+
 	@Override
 	public String getItemDisplayName(ItemStack item) {
 		return item.hasItemMeta() && item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : null;
@@ -96,17 +100,17 @@ public class SpigotPlatform implements IPlatform {
 	public Version getMinecraftVersion() {
 		return Version.getVersionByName(getNMSVersion().replace("_R4", "_6"));
 	}
-	
+
 	@Override
 	public String getNMSVersion() {
 		return Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
 	}
-	
+
 	@Override
 	public boolean hasBaseComponentSerializer() {
 		return getBaseComponentToJsonMethod() != null;
 	}
-	
+
 	@Override
 	public String baseComponentToJson(Object obj) {
 		Method m = getBaseComponentToJsonMethod();
@@ -119,7 +123,7 @@ public class SpigotPlatform implements IPlatform {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Object jsonToBaseComponent(String json) {
 		Method m = getJsonToBaseComponentMethod();
@@ -132,15 +136,15 @@ public class SpigotPlatform implements IPlatform {
 		}
 		return null;
 	}
-	
+
 	public static Method getBaseComponentToJsonMethod() {
 		Class<?> chatSerializerClass = PacketUtils.getNmsClass("IChatBaseComponent$ChatSerializer", "network.chat.", "ChatSerializer", "Component$Serializer");
 		Class<?> chatBaseComponentClass = PacketUtils.getNmsClass("IChatBaseComponent", "network.chat.", "Component");
-		if(chatSerializerClass == null || chatBaseComponentClass == null)
+		if (chatSerializerClass == null || chatBaseComponentClass == null)
 			return null;
 		try {
 			for (Method m : chatSerializerClass.getDeclaredMethods()) {
-				if(m.getParameterTypes()[0].equals(chatBaseComponentClass) && m.getReturnType().equals(String.class)) {
+				if (m.getParameterTypes()[0].equals(chatBaseComponentClass) && m.getReturnType().equals(String.class)) {
 					return m;
 				}
 			}
@@ -149,18 +153,19 @@ public class SpigotPlatform implements IPlatform {
 		}
 		return null;
 	}
-	
+
 	public static Method getJsonToBaseComponentMethod() {
 		Class<?> chatSerializerClass = PacketUtils.getNmsClass("IChatBaseComponent$ChatSerializer", "network.chat.", "ChatSerializer", "Component$Serializer");
 		Class<?> chatBaseComponentClass = PacketUtils.getNmsClass("IChatBaseComponent", "network.chat.", "Component");
 		Class<?> chatMutableComponentClass = PacketUtils.getNmsClass("IChatMutableComponent", "network.chat.");
-		if(chatSerializerClass == null || chatBaseComponentClass == null)
+		if (chatSerializerClass == null || chatBaseComponentClass == null)
 			return null;
 		try {
 			for (Method m : chatSerializerClass.getDeclaredMethods()) {
-				if(m.getParameterCount() == 0)
+				if (m.getParameterCount() == 0)
 					continue;
-				if(m.getParameterTypes()[0].equals(String.class) && (m.getReturnType().isAssignableFrom(chatBaseComponentClass) || (chatMutableComponentClass != null && m.getReturnType().equals(chatMutableComponentClass)))) {
+				if (m.getParameterTypes()[0].equals(String.class)
+						&& (m.getReturnType().isAssignableFrom(chatBaseComponentClass) || (chatMutableComponentClass != null && m.getReturnType().equals(chatMutableComponentClass)))) {
 					m.setAccessible(true);
 					return m;
 				}
@@ -180,8 +185,7 @@ public class SpigotPlatform implements IPlatform {
 		for (char args : msg.toCharArray()) {
 			if (args == '§') { // begin of color
 				if (colorCode.isEmpty() && !text.isEmpty()) { // text before this char
-					if(text.length() > 2 && text.startsWith("§") && text.substring(2) == ChatColor.stripColor(text)
-							&& color != null && color != ChatColor.WHITE) {
+					if (text.length() > 2 && text.startsWith("§") && text.substring(2) == ChatColor.stripColor(text) && color != null && color != ChatColor.WHITE) {
 						text = text.substring(2); // remove some code which should not be here
 					}
 					appendToComponentBuilder(builder, createComponent(to, text, color, action));
@@ -194,8 +198,8 @@ public class SpigotPlatform implements IPlatform {
 				if (args == 'r' && colorCode.isEmpty()) {
 					color = ChatColor.RESET;
 					continue;
-				} else if(args == 'x') {
-					if(!colorCode.isEmpty()) {
+				} else if (args == 'x') {
+					if (!colorCode.isEmpty()) {
 						color = ColorManager.getColor(colorCode);
 						colorCode = ""; // clean for previous things
 					}
@@ -220,16 +224,16 @@ public class SpigotPlatform implements IPlatform {
 				if (args == ChatManager.SEPARATOR) {
 					// here put the item
 					appendToComponentBuilder(builder, fixColorComponent(to, text, color, action));
-					if(action.isItem())
+					if (action.isItem())
 						addItem(builder, to, origin, action.getItem(), action);
 					else
 						addCommand(builder, to, origin, action.getCommand(), action);
 					text = "";
-					if(ChatManager.containsSeparatorEnd(msg))
+					if (ChatManager.containsSeparatorEnd(msg))
 						removing = true;
-				} else if(args == ChatManager.SEPARATOR_END) {
+				} else if (args == ChatManager.SEPARATOR_END) {
 					removing = false;
-				} else if(!removing) { // not removing content
+				} else if (!removing) { // not removing content
 					// basic text, not waiting for code after '§'
 					text += args;
 				}
@@ -349,21 +353,81 @@ public class SpigotPlatform implements IPlatform {
 		}
 		return builder.create();
 	}
-	
+
 	private static BaseComponent[] createComponent(Player to, String text, ChatColor color, ChatAction action) {
 		ComponentBuilder littleBuilder = new ComponentBuilder(ChatItem.replace(action.getOrigin(), text));
-		if(color != null && !Colors.isFormatting(color)) // don't add reset thing
+		if (color != null && !Colors.isFormatting(color)) // don't add reset thing
 			littleBuilder.color(color);
 		if (action.isItem()) {
-			if(action.getItem().getType().equals(Material.AIR))
+			if (action.getItem().getType().equals(Material.AIR))
 				littleBuilder.event(Utils.createTextHover(String.join("\n", ChatItem.getInstance().getStorage().tooltipHand)));
 			else
 				littleBuilder.event(Utils.createItemHover(action.getItem(), to));
 		} else {
 			littleBuilder.event(Utils.createTextHover(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover")));
-			if(action.hasCommand())
+			if (action.hasCommand())
 				littleBuilder.event(Utils.createRunCommand(action.getCommand()));
 		}
 		return littleBuilder.create();
+	}
+
+	private static final List<String> SKIPPED = Arrays.asList("HSTRY_ENCHANTS");
+
+	@Override
+	public String stringifyItem(ItemStack item) {
+		try {
+			ChatItem.debug("[JSONManipulator] stringifying item");
+			Object nmsStack = JSONManipulator.AS_NMS_COPY.invoke(null, item);
+			Object nmsTag = JSONManipulator.NBT_TAG_COMPOUND.newInstance();
+			JSONManipulator.SAVE_NMS_ITEM_STACK_METHOD.invoke(nmsStack, nmsTag);
+			HashMap<String, String> tagMap = new HashMap<>();
+			Map<String, Object> nmsMap = (Map<String, Object>) JSONManipulator.MAP.get(nmsTag);
+			String id = nmsMap.get("id").toString().replace("\"", "");
+			Object realTag = nmsMap.get("tag");
+			if (JSONManipulator.NBT_TAG_COMPOUND.isInstance(realTag)) { // We need to make sure this is indeed an
+																		// NBTTagCompound
+				Map<String, Object> realMap = (Map<String, Object>) JSONManipulator.MAP.get(realTag);
+				Set<Map.Entry<String, Object>> entrySet = realMap.entrySet();
+				for (Map.Entry<String, Object> entry : entrySet) {
+					tagMap.put(entry.getKey(), entry.getValue().toString());
+				}
+			}
+			// TODO check for ID remapping
+			// ItemRewriter.remapIds(Version.getVersion().MAX_VER, protocolVersion.MAX_VER,
+			// is);
+			StringBuilder sb = new StringBuilder("{id:");
+			sb.append("\"").append(id).append("\"").append(","); // Append the id
+			sb.append("Count:").append(item.getAmount()).append("b"); // Append the amount
+
+			if (!tagMap.containsKey("Damage")) { // for new versions
+				sb.append(",Damage:").append(item.getDurability()).append("s"); // Append the durability data
+			}
+			if (tagMap.isEmpty()) {
+				sb.append("}");
+				return sb.toString();
+			}
+			Set<Map.Entry<String, String>> entrySet = tagMap.entrySet();
+			boolean first = true;
+			sb.append(",tag:{"); // Start of the tag
+			for (Map.Entry<String, String> entry : entrySet) {
+				if (SKIPPED.contains(entry.getKey()))
+					continue;
+				if (!first)
+					sb.append(",");
+				first = false;
+				if (!entry.getKey().isEmpty()) {
+					if (entry.getKey().contains(";"))
+						sb.append("\"" + entry.getKey() + "\"");
+					else
+						sb.append(entry.getKey());
+					sb.append(":");
+				}
+				sb.append(Utils.cleanStr(entry.getValue()));
+			}
+			sb.append("}}"); // End of tag and end of item
+			return sb.toString();
+		} catch (Exception e) {
+			return "{}";
+		}
 	}
 }

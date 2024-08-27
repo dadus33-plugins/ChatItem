@@ -1,5 +1,6 @@
 package me.dadus33.chatitem.utils;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -16,6 +17,17 @@ public class ReflectionUtils {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static Method getMethodByName(Class<?> clazz, String methodName) {
+        try {
+        	for(Method m : clazz.getDeclaredMethods())
+        		if(m.getName().equals(methodName))
+        			return m;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
     
     public static Method getMethod(Class<?> clazz, Class<?> returned, Class<?>... params) {
@@ -208,5 +220,12 @@ public class ReflectionUtils {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+	
+	public static Constructor<?> getConstructor(Class<?> clazz, Class<?>... params) {
+		try {
+			return clazz.getConstructor(params);
+		} catch (Exception e) {}
+		return null;
 	}
 }

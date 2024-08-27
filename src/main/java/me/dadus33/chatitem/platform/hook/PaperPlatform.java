@@ -3,7 +3,6 @@ package me.dadus33.chatitem.platform.hook;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -27,6 +26,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.event.HoverEvent.ShowItem;
 import net.kyori.adventure.text.event.HoverEventSource;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -60,12 +60,14 @@ public class PaperPlatform implements IPlatform {
 		item.setItemMeta(meta);
 		return item;
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public String getItemDisplayName(ItemStack item) {
-		// actually the get Displayname for better ... See: https://github.com/KyoriPowered/adventure-platform/issues/185
-		// return LegacyComponentSerializer.legacySection().serialize(item.displayName());
+		// actually the get Displayname for better ... See:
+		// https://github.com/KyoriPowered/adventure-platform/issues/185
+		// return
+		// LegacyComponentSerializer.legacySection().serialize(item.displayName());
 		return item.hasItemMeta() && item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : null;
 	}
 
@@ -90,6 +92,11 @@ public class PaperPlatform implements IPlatform {
 		return SpigotPlatform.getBaseComponentToJsonMethod() != null;
 	}
 
+	private Object getRegistry() throws Exception {
+		Class<?> serverClass = Class.forName("net.minecraft.server.MinecraftServer");
+		return serverClass.getDeclaredMethod("registryAccess").invoke(serverClass.getDeclaredMethod("getServer").invoke(null));
+	}
+	
 	@Override
 	public String baseComponentToJson(Object obj) {
 		Method m = SpigotPlatform.getBaseComponentToJsonMethod();
@@ -98,10 +105,10 @@ public class PaperPlatform implements IPlatform {
 		try {
 			Object[] args = new Object[m.getParameterCount()];
 			args[0] = obj;
-			if(args.length > 1 && ReflectionUtils.isClassExist("net.minecraft.core.HolderLookup$Provider")) {
+			if (args.length > 1 && ReflectionUtils.isClassExist("net.minecraft.core.HolderLookup$Provider")) {
 				Class<?> c = Class.forName("net.minecraft.core.HolderLookup$Provider");
-				if(m.getParameterTypes()[1].isAssignableFrom(c)) {
-					args[1] = c.getDeclaredMethod("create", Stream.class).invoke(null, Stream.of());
+				if (m.getParameterTypes()[1].isAssignableFrom(c)) {
+					args[1] = getRegistry();
 				}
 			}
 			return (String) m.invoke(null, args);
@@ -110,17 +117,17 @@ public class PaperPlatform implements IPlatform {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Object jsonToBaseComponent(String json) {
 		Method m = SpigotPlatform.getJsonToBaseComponentMethod();
 		try {
 			Object[] args = new Object[m.getParameterCount()];
 			args[0] = json;
-			if(args.length > 1 && ReflectionUtils.isClassExist("net.minecraft.core.HolderLookup$Provider")) {
+			if (args.length > 1 && ReflectionUtils.isClassExist("net.minecraft.core.HolderLookup$Provider")) {
 				Class<?> c = Class.forName("net.minecraft.core.HolderLookup$Provider");
-				if(m.getParameterTypes()[1].isAssignableFrom(c)) {
-					args[1] = c.getDeclaredMethod("create", Stream.class).invoke(null, Stream.of());
+				if (m.getParameterTypes()[1].isAssignableFrom(c)) {
+					args[1] = getRegistry();
 				}
 			}
 			return m.invoke(null, args);
@@ -133,13 +140,13 @@ public class PaperPlatform implements IPlatform {
 	@Override
 	public void sendMessage(Player to, Player origin, ChatAction action, String msg) {
 		HoverEventSource<?> hoverEvent = null;
-		if(action.isItem()) {
-			if(!action.getItem().getType().equals(Material.AIR))
+		if (action.isItem()) {
+			if (!action.getItem().getType().equals(Material.AIR))
 				hoverEvent = action.getItem().asHoverEvent();
 			else {
 				Component t = null;
-				for(String line : Messages.getMessageList("general.hand.tooltip", "%cible%", origin.getName())) {
-					if(t == null) {
+				for (String line : Messages.getMessageList("general.hand.tooltip", "%cible%", origin.getName())) {
+					if (t == null) {
 						t = Component.text("");
 					} else
 						t.append(Component.newline());
@@ -154,5 +161,20 @@ public class PaperPlatform implements IPlatform {
 			like = like.clickEvent(ClickEvent.runCommand(action.getCommand()));
 
 		to.sendMessage(C.text(msg).replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.SEPARATOR + "").replacement(like).build()));
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public String stringifyItem(ItemStack item) {
+		ShowItem si = item.asHoverEvent().value();
+		String json = "{id:\"" + si.item().asString() + "\",count:" + item.getAmount();
+		if(si.nbt() != null) {
+			json += ",tag:{" + si.nbt().string() + "}";
+		} else if(Version.getVersion().isNewerOrEquals(Version.V1_20_6)) { // since MC 1.20.5 in fact
+			json += ",components:" + (item.hasItemMeta() ? item.getItemMeta().getAsString() : "{}");
+		}
+		json += "}";
+		ChatItem.debug("Item stringified: " + json);
+		return json;
 	}
 }

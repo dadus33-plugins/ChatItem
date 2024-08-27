@@ -4,11 +4,7 @@ import static me.dadus33.chatitem.utils.PacketUtils.getNmsClass;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -34,8 +30,6 @@ public class JSONManipulator {
 	public static JSONManipulator getInstance() {
 		return instance;
 	}
-
-	private static final List<String> SKIPPED = Arrays.asList("HSTRY_ENCHANTS");
 
 	public static final Class<?> CRAFT_ITEM_STACK_CLASS = PacketUtils.getObcClass("inventory.CraftItemStack");
 	public static final Class<?> NMS_ITEM_STACK_CLASS = getNmsClass("ItemStack", "world.item.");
@@ -74,7 +68,7 @@ public class JSONManipulator {
 
 			// Get the JSON representation of the item (well, not really JSON, but rather a
 			// string representation of NBT data)
-			hover.addProperty("value", stringifyItem(action.getItem()));
+			hover.addProperty("value", ChatItem.getPlatform().stringifyItem(action.getItem()));
 		} else {
 			hover.addProperty("action", "show_text");
 
@@ -114,7 +108,6 @@ public class JSONManipulator {
 		if (!obj.has("text")) {
 			obj.addProperty("text", "");
 		}
-		ChatItem.debug("Parsed array for item: " + obj.toString() + ", wrapper: " + wrapper);
 		return obj.toString();
 	}
 
@@ -261,72 +254,5 @@ public class JSONManipulator {
 				rep.add(current);
 			}
 		}
-	}
-
-	public static String stringifyItem(ItemStack is) {
-		try {
-			return stringifyItemInternal(is);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "{}";
-		}
-	}
-
-	@SuppressWarnings({ "deprecation" })
-	public static String stringifyItemInternal(ItemStack is) throws Exception {
-		ChatItem.debug("[JSONManipulator] stringifying item");
-		Object nmsStack = JSONManipulator.AS_NMS_COPY.invoke(null, is);
-		Object nmsTag = JSONManipulator.NBT_TAG_COMPOUND.newInstance();
-		JSONManipulator.SAVE_NMS_ITEM_STACK_METHOD.invoke(nmsStack, nmsTag);
-		HashMap<String, String> tagMap = new HashMap<>();
-		Map<String, Object> nmsMap = (Map<String, Object>) JSONManipulator.MAP.get(nmsTag);
-		String id = nmsMap.get("id").toString().replace("\"", "");
-		Object realTag = nmsMap.get("tag");
-		if (JSONManipulator.NBT_TAG_COMPOUND.isInstance(realTag)) { // We need to make sure this is indeed an
-																	// NBTTagCompound
-			Map<String, Object> realMap = (Map<String, Object>) JSONManipulator.MAP.get(realTag);
-			Set<Map.Entry<String, Object>> entrySet = realMap.entrySet();
-			for (Map.Entry<String, Object> entry : entrySet) {
-				tagMap.put(entry.getKey(), entry.getValue().toString());
-			}
-		}
-		// TODO check for ID remapping
-		// ItemRewriter.remapIds(Version.getVersion().MAX_VER, protocolVersion.MAX_VER,
-		// is);
-		StringBuilder sb = new StringBuilder("{id:");
-		sb.append("\"").append(id).append("\"").append(","); // Append the id
-		sb.append("Count:").append(is.getAmount()).append("b"); // Append the amount
-
-		if (!tagMap.containsKey("Damage")) { // for new versions
-			sb.append(",Damage:").append(is.getDurability()).append("s"); // Append the durability data
-		}
-		if (tagMap.isEmpty()) {
-			sb.append("}");
-			return sb.toString();
-		}
-		Set<Map.Entry<String, String>> entrySet = tagMap.entrySet();
-		boolean first = true;
-		sb.append(",tag:{"); // Start of the tag
-		for (Map.Entry<String, String> entry : entrySet) {
-			if (SKIPPED.contains(entry.getKey()))
-				continue;
-			if (!first)
-				sb.append(",");
-			first = false;
-			if (!entry.getKey().isEmpty()) {
-				if (entry.getKey().contains(";"))
-					sb.append("\"" + entry.getKey() + "\"");
-				else
-					sb.append(entry.getKey());
-				sb.append(":");
-			}
-			sb.append(cleanStr(entry.getValue()));
-		}
-		sb.append("}}"); // End of tag and end of item
-		return sb.toString();
-	}
-
-	private static String cleanStr(String s) {
-		return s.startsWith("'") && s.endsWith("'") ? s.substring(1, s.length() - 1) : s;
 	}
 }

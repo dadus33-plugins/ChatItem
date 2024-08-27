@@ -84,6 +84,7 @@ public class AdventureComponentManager implements IComponentManager {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public Object manageContent(Player viewer, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
 		ChatAction action = chat.getAction();

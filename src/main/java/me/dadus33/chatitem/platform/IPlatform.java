@@ -47,4 +47,6 @@ public interface IPlatform {
 	Object jsonToBaseComponent(String json);
 	
 	void sendMessage(Player to, Player origin, ChatAction action, String msg);
+	
+	String stringifyItem(ItemStack item);
 }
