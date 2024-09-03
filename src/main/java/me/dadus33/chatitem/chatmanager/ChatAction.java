@@ -16,7 +16,7 @@ public class ChatAction {
 	
 	public ChatAction(ItemSlot slot, Player origin, ItemStack item) {
 		this.slot = slot;
-		this.item = item;
+		this.item = item == null ? new ItemStack(Material.AIR) : item;
 		this.origin = origin;
 		this.isItem = true;
 	}

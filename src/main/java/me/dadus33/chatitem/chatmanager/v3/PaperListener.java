@@ -60,7 +60,7 @@ public class PaperListener implements Listener {
 		if (slot == null) // if not found
 			return;
 		ChatAction action = ChatManager.getChatAction(slot, p);
-		if (!ChatManager.canUsePlaceholder(p, action.getItem(), slot, e))
+		if (!ChatManager.canUsePlaceholder(p, action, slot, e))
 			return;
 		HoverEventSource<?> hoverEvent = null;
 		if(action.isItem()) {

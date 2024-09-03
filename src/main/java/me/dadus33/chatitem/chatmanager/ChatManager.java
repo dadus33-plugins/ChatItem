@@ -283,7 +283,7 @@ public abstract class ChatManager {
 		return builder.toString();
 	}
 
-	public static boolean canUsePlaceholder(Player p, ItemStack item, ItemSlot slot, @Nullable Cancellable e) {
+	public static boolean canUsePlaceholder(Player p, ChatAction action, ItemSlot slot, @Nullable Cancellable e) {
 		Storage c = ChatItem.getInstance().getStorage();
 		if (c.permissionEnabled && !p.hasPermission(c.permissionName)) {
 			if (!c.letMessageThrough) {
@@ -295,7 +295,7 @@ public abstract class ChatManager {
 			}
 			return false;
 		}
-		if (item != null && item.getType().equals(Material.AIR) && slot.isBasic()) {
+		if (action.isItem() && action.getItem().getType().equals(Material.AIR) && slot.isBasic()) {
 			if (slot.isDenyIfNoItem()) {
 				if (e != null)
 					e.setCancelled(true);
@@ -328,9 +328,9 @@ public abstract class ChatManager {
 				}
 			}
 		}
-		if (item != null) {
+		if (action.isItem()) {
 			for (String ignored : c.ignoredItems) {
-				if (item.getType().name().toLowerCase().contains(ignored.toLowerCase())) {
+				if (action.getItem().getType().name().toLowerCase().contains(ignored.toLowerCase())) {
 					return false;
 				}
 			}
