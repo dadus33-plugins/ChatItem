@@ -33,7 +33,7 @@ public class InventoryListener implements Listener {
 		InventoryHolder openInventoryHolder = null;
 		try {
 			openInventoryHolder = p.getOpenInventory().getTopInventory().getHolder();
-		} catch(java.lang.IncompatibleClassChangeError e) {} // ignore this
+		} catch(java.lang.IncompatibleClassChangeError exc) {} // ignore this
 
 		if (openInventoryHolder != null && openInventoryHolder instanceof CustomInventoryHolder) {
 			e.setCancelled(true);
