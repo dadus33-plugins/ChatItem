@@ -26,17 +26,22 @@ public class InventoryListener implements Listener {
 
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
+		if (!(e.getWhoClicked() instanceof Player))
+			return;
 		Player p = (Player) e.getWhoClicked();
 
-		InventoryHolder openInventoryHolder = p.getOpenInventory().getTopInventory().getHolder();
+		InventoryHolder openInventoryHolder = null;
+		try {
+			openInventoryHolder = p.getOpenInventory().getTopInventory().getHolder();
+		} catch(java.lang.IncompatibleClassChangeError e) {} // ignore this
 
-		if (openInventoryHolder instanceof CustomInventoryHolder) {
+		if (openInventoryHolder != null && openInventoryHolder instanceof CustomInventoryHolder) {
 			e.setCancelled(true);
 			return;
 		}
-
-		if (e.getClickedInventory() == null || !(e.getWhoClicked() instanceof Player))
+		if (e.getClickedInventory() == null)
 			return;
+
 		InventoryHolder holder = e.getClickedInventory().getHolder();
 		if (holder == null || !(holder instanceof ChatItemHolder)) {
 			if (e.getClick().equals(ClickType.DOUBLE_CLICK) && p.getOpenInventory() != null && p.getOpenInventory().getTopInventory() != null) {
