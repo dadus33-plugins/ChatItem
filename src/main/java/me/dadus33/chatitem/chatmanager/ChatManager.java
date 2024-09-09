@@ -209,10 +209,9 @@ public abstract class ChatManager {
 		if (ItemUtils.isEmpty(item)) {
 			if (c.handDisabled)
 				return ItemSlot.HAND.getPlaceholders().get(0);
-			else
-				return getHandName(p);
+			return getHandName(p);
 		}
-		return styleItem(viewer, item, c);
+		return ChatItem.replace(p, styleItem(viewer, item, c));
 	}
 
 	public static String getNameForChatAction(Player viewer, Chat chat, Storage c) {
@@ -221,13 +220,12 @@ public abstract class ChatManager {
 			ItemStack item = action.getItem();
 			if (ItemUtils.isEmpty(item)) {
 				if (c.handDisabled)
-					return ItemSlot.HAND.getPlaceholders().get(0);
-				else
-					return getHandName(chat);
+					return chat.getSlot().getPlaceholders().get(0);
+				return getHandName(chat);
 			}
-			return styleItem(viewer, item, c);
+			return ChatItem.replace(chat.getPlayer(), styleItem(viewer, item, c));
 		}
-		return Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", action.getOrigin().getName());
+		return ChatItem.replace(chat.getPlayer(), Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", action.getOrigin().getName()));
 	}
 
 	public static String getNameForChatAction(Player viewer, ChatAction action, Storage c) {
@@ -235,23 +233,23 @@ public abstract class ChatManager {
 			ItemStack item = action.getItem();
 			if (ItemUtils.isEmpty(item)) {
 				if (c.handDisabled)
-					return ItemSlot.HAND.getPlaceholders().get(0);
+					return action.getSlot().getPlaceholders().get(0);
 				else
 					return getHandName(action.getOrigin());
 			}
-			return styleItem(viewer, item, c);
+			return ChatItem.replace(action.getOrigin(), styleItem(viewer, item, c));
 		}
-		return Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", action.getOrigin().getName());
+		return ChatItem.replace(action.getOrigin(), Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", action.getOrigin().getName()));
 	}
 
 	@Deprecated
 	public static String getHandName(Player p) {
-		return ChatItem.getInstance().getStorage().handName.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName());
+		return ChatItem.replace(p, ChatItem.getInstance().getStorage().handName.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName()));
 	}
 
 	public static String getHandName(Chat c) {
 		Player p = c.getPlayer();
-		return ChatItem.getInstance().getStorage().handName.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName());
+		return ChatItem.replace(p, ChatItem.getInstance().getStorage().handName.replace("{name}", p.getName()).replace("{display-name}", p.getDisplayName()));
 	}
 
 	public static String calculateTime(long seconds) {
