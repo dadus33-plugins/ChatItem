@@ -23,7 +23,6 @@ import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.event.HoverEventSource;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class PaperListener implements Listener {
 
@@ -46,13 +45,13 @@ public class PaperListener implements Listener {
 
 		Player p = e.getPlayer();
 		Component message = e.message();
-		String rawMessage = PlainTextComponentSerializer.plainText().serialize(message);
+		String rawMessage = C.string(message);
 		if (ChatManager.containsSeparator(rawMessage)) { // fix for v1
 			Chat chat = Chat.getFrom(rawMessage);
 			if (chat != null) {
 				message = message.replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.SEPARATOR + "" + chat.getId() + ChatManager.SEPARATOR_END)
-						.replacement(Component.text(chat.getSlot().getPlaceholders().get(0))).build());
-				rawMessage = PlainTextComponentSerializer.plainText().serialize(message);
+						.replacement(C.text(chat.getSlot().getPlaceholders().get(0))).build());
+				rawMessage = C.string(message);
 			}
 		}
 		ItemSlot slot = ItemSlot.getItemSlotFromMessage(rawMessage);
@@ -79,7 +78,7 @@ public class PaperListener implements Listener {
 			}
 		} else
 			hoverEvent = HoverEvent.showText(C.text(Messages.getMessage(action.getSlot().name().toLowerCase() + ".hover", "%cible%", p.getName())));
-		TextComponent like = Component.text(ChatManager.getNameForChatAction(p, action, getStorage())).hoverEvent(hoverEvent);
+		TextComponent like = C.text(ChatManager.getNameForChatAction(p, action, getStorage())).hoverEvent(hoverEvent);
 		if (action.hasCommand())
 			like.clickEvent(ClickEvent.runCommand(action.getCommand()));
 		for (String s : slot.getPlaceholders())
@@ -90,7 +89,7 @@ public class PaperListener implements Listener {
 			e.setCancelled(true);
 		} else
 			e.message(message);
-		ChatItem.debug("Changed message to " + PlainTextComponentSerializer.plainText().serialize(message));
+		ChatItem.debug("Changed message to " + C.string(message));
 		if (getStorage().cooldown > 0 && !p.hasPermission("chatitem.ignore-cooldown"))
 			ChatManager.applyCooldown(p);
 	}

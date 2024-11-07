@@ -23,6 +23,7 @@ import me.dadus33.chatitem.chatmanager.ChatManager;
 import me.dadus33.chatitem.chatmanager.v1.PacketEditingChatManager;
 import me.dadus33.chatitem.chatmanager.v2.ChatListenerChatManager;
 import me.dadus33.chatitem.chatmanager.v3.PaperChatManager;
+import me.dadus33.chatitem.chatmanager.v4.OwnManager;
 import me.dadus33.chatitem.commands.CIReloadCommand;
 import me.dadus33.chatitem.commands.ChatItemCommand;
 import me.dadus33.chatitem.hook.ChatControlSupport;
@@ -104,8 +105,10 @@ public class ChatItem extends JavaPlugin {
 		
 		this.chatManager.add(new PacketEditingChatManager(this));
 		this.chatManager.add(new ChatListenerChatManager(this));
-		if(Utils.IS_PAPER)
+		if(Utils.IS_PAPER) {
 			this.chatManager.add(new PaperChatManager(this));
+			this.chatManager.add(new OwnManager());
+		}
 		
 		String managerName = getStorage().manager;
 

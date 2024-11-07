@@ -118,8 +118,8 @@ public class InventoryListener implements Listener {
 			inv.setItem(i, ChatItem.getPlatform().createItemStack(ItemUtils.WHITE_STAINED_GLASS, "-"));
 
 		int slot = 0;
-		for (String manager : Arrays.asList("all", "packet", "chat", "paper")) {
-			if (manager == "paper" && !Utils.IS_PAPER)
+		for (String manager : Arrays.asList("all", "packet", "chat", "paper")) { //, "ownformatter")) {
+			if ((manager == "paper" || manager == "ownformatter") && !Utils.IS_PAPER)
 				continue;
 			holder.keyBySlot.put(slot, manager);
 			inv.setItem(slot++, getManagerItem(manager));

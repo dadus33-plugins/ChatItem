@@ -145,6 +145,9 @@ general:
   sub-commands:
     broadcast: true
     show: true
+  ownformatter:
+    format: "%name%: %message%"
+    
  
  
 #  Messages section. You can disable any of them by simply leaving them empty, like this: ""
@@ -253,6 +256,13 @@ messages:
         - "&eAdapted for paper user, and could be used with more plugin that others"
         - ""
         - "&7Since ChatItem v2.6"
+      ownformatter:
+        name: "&6ChatItem formatter"
+        lore:
+        - "&aChatItem format the chat for you."
+        - "&aNo longer needs another chat plugin."
+        - ""
+        - "&7Since ChatItem v2.7"
       # The item that show the actual manager
       actual:
         name: '&6Actual manager: %manager%'
