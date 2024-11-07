@@ -23,10 +23,6 @@ public class ChatEventListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onChat(AsyncPlayerChatEvent e) {
-		if (ChatManager.isTestingEnabled() && !ChatManager.isTesting("packet"))
-			return;
-		if(!ChatItem.getInstance().isManagerEnabled("packet"))
-			return;
 		if (ChatManager.containsSeparator(e.getMessage())) { // If the BELL character is found, we have to remove it
 			e.setMessage(ChatManager.removeSeparator(e.getMessage()));
 		}

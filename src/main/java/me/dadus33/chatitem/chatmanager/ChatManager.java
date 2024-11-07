@@ -374,7 +374,7 @@ public abstract class ChatManager {
 		if(isTestingEnabled())
 			return true;
 		String selected = ChatItem.getInstance().getStorage().manager;
-		if (selected == "both" || selected == "all")
+		if (selected.equalsIgnoreCase("both") || selected.equalsIgnoreCase("all"))
 			return true;
 		if (selected == "auto") {
 			if (Utils.IS_PAPER && actual == "paper")
