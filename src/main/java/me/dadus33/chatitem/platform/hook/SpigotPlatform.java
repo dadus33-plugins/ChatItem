@@ -117,6 +117,12 @@ public class SpigotPlatform implements IPlatform {
 		try {
 			Object[] args = new Object[m.getParameterCount()];
 			args[0] = obj;
+			if (args.length > 1 && ReflectionUtils.isClassExist("net.minecraft.core.HolderLookup$a")) {
+				Class<?> c = Class.forName("net.minecraft.core.HolderLookup$a");
+				if (m.getParameterTypes()[1].isAssignableFrom(c)) {
+					args[1] = getRegistry();
+				}
+			}
 			return (String) m.invoke(null, args);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -130,11 +136,22 @@ public class SpigotPlatform implements IPlatform {
 		try {
 			Object[] args = new Object[m.getParameterCount()];
 			args[0] = json;
+			if (args.length > 1 && ReflectionUtils.isClassExist("net.minecraft.core.HolderLookup$a")) {
+				Class<?> c = Class.forName("net.minecraft.core.HolderLookup$a");
+				if (m.getParameterTypes()[1].isAssignableFrom(c)) {
+					args[1] = getRegistry();
+				}
+			}
 			return m.invoke(null, args);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private Object getRegistry() throws Exception {
+		Class<?> serverClass = Class.forName("net.minecraft.server.MinecraftServer");
+		return serverClass.getDeclaredMethod("ba").invoke(serverClass.getDeclaredMethod("getServer").invoke(null));
 	}
 
 	public static Method getBaseComponentToJsonMethod() {
