@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -23,6 +25,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
@@ -271,5 +275,27 @@ public class Utils {
 
 	public static String cleanStr(String s) {
 		return s.startsWith("'") && s.endsWith("'") ? s.substring(1, s.length() - 1) : s;
+	}
+	
+	/**
+	* In API versions 1.20.6 and earlier, InventoryView is a class.
+	* In versions 1.21 and later, it is an interface.
+	* This method uses reflection to get the top Inventory object from the
+	* InventoryView associated with an InventoryEvent, to avoid runtime errors.
+	* @param event The generic InventoryEvent with an InventoryView to inspect.
+	* @return The top Inventory object from the event's InventoryView.
+	*/
+	public static Inventory getTopInventory(InventoryEvent event) {
+	    try {
+	        Object view = event.getView();
+	        if(view == null)
+	        	return null;
+	        Method getTopInventory = view.getClass().getMethod("getTopInventory");
+	        getTopInventory.setAccessible(true);
+	        return (Inventory) getTopInventory.invoke(view);
+	    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+	    	e.printStackTrace();
+	    }
+	    return null;
 	}
 }

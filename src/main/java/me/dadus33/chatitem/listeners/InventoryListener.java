@@ -10,7 +10,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
@@ -31,8 +30,7 @@ public class InventoryListener implements Listener {
 			return;
 		Player p = (Player) e.getWhoClicked();
 
-		InventoryView openInvView = p.getOpenInventory();
-		Inventory topInventory = openInvView == null ? null : openInvView.getTopInventory();
+		Inventory topInventory = Utils.getTopInventory(e);
 		InventoryHolder openInventoryHolder = topInventory == null ? null : topInventory.getHolder();
 
 		if (openInventoryHolder != null && openInventoryHolder instanceof CustomInventoryHolder) {
