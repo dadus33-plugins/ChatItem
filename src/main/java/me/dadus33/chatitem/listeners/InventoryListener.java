@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import me.dadus33.chatitem.ChatItem;
@@ -30,10 +31,9 @@ public class InventoryListener implements Listener {
 			return;
 		Player p = (Player) e.getWhoClicked();
 
-		InventoryHolder openInventoryHolder = null;
-		try {
-			openInventoryHolder = p.getOpenInventory().getTopInventory().getHolder();
-		} catch(java.lang.IncompatibleClassChangeError exc) {} // ignore this
+		InventoryView openInvView = p.getOpenInventory();
+		Inventory topInventory = openInvView == null ? null : openInvView.getTopInventory();
+		InventoryHolder openInventoryHolder = topInventory == null ? null : topInventory.getHolder();
 
 		if (openInventoryHolder != null && openInventoryHolder instanceof CustomInventoryHolder) {
 			e.setCancelled(true);
@@ -44,9 +44,8 @@ public class InventoryListener implements Listener {
 
 		InventoryHolder holder = e.getClickedInventory().getHolder();
 		if (holder == null || !(holder instanceof ChatItemHolder)) {
-			if (e.getClick().equals(ClickType.DOUBLE_CLICK) && p.getOpenInventory() != null && p.getOpenInventory().getTopInventory() != null) {
-				Inventory top = p.getOpenInventory().getTopInventory();
-				if (top.getHolder() != null && top.getHolder() instanceof ChatItemHolder) {
+			if (e.getClick().equals(ClickType.DOUBLE_CLICK) && topInventory != null) {
+				if (openInventoryHolder != null && openInventoryHolder instanceof ChatItemHolder) {
 					e.setCancelled(true);
 				}
 			}
