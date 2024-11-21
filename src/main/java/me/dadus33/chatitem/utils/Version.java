@@ -7,7 +7,7 @@ import me.dadus33.chatitem.ChatItem;
 public enum Version {
 	
 	// http://wiki.vg/Protocol_version_numbers
-	V1_7(0, 5, 7),
+	UNSUPPORTED(0, 5, 7),
 	V1_8(6, 47, 8),
 	V1_9(49, 110, 9), // 1.9.X - Starts with 49 as 48 was an april fools update
 	V1_10(201, 210, 10), // 1.10.X - Starts with 201 because why not.

@@ -379,8 +379,7 @@ public abstract class ChatManager {
 		if (selected == "auto") {
 			if (Utils.IS_PAPER && actual == "paper")
 				return true;
-			else if (actual == "packet" && ChatItem.getPluginThatRequirePacket().stream().map(Bukkit.getPluginManager()::getPlugin).anyMatch(Objects::nonNull)
-					&& Version.getVersion().isNewerThan(Version.V1_7))
+			else if (actual == "packet" && ChatItem.getPluginThatRequirePacket().stream().map(Bukkit.getPluginManager()::getPlugin).anyMatch(Objects::nonNull))
 				return true;
 			else if (actual == "chat")
 				return true;

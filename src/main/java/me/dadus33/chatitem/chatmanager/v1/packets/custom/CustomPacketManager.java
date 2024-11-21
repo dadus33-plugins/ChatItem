@@ -14,7 +14,6 @@ import me.dadus33.chatitem.chatmanager.v1.packets.PacketManager;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.channel.ChannelAbstract;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.channel.INC2Channel;
 import me.dadus33.chatitem.chatmanager.v1.packets.custom.channel.INCChannel;
-import me.dadus33.chatitem.chatmanager.v1.packets.custom.channel.NMUChannel;
 import me.dadus33.chatitem.utils.Utils;
 import me.dadus33.chatitem.utils.Version;
 
@@ -30,8 +29,6 @@ public class CustomPacketManager extends PacketManager implements Listener {
 		Version version = Version.getVersion();
 		if (version.isNewerOrEquals(Version.V1_17))
 			channel = new INC2Channel(this);
-		else if (version.equals(Version.V1_7))
-			channel = new NMUChannel(this);
 		else
 			channel = new INCChannel(this);
 		pl.getServer().getPluginManager().registerEvents(this, pl);

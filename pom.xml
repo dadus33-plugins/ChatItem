@@ -75,13 +75,6 @@
             <version>1.21-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-	    <dependency>
-	        <groupId>org.bukkit</groupId>
-	        <artifactId>minecraft-server</artifactId>
-	        <version>1.7.10</version>
-	        <type>jar</type>
-	        <scope>provided</scope>
-	    </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>

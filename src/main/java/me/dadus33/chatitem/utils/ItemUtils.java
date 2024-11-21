@@ -44,12 +44,10 @@ public class ItemUtils {
 	}
 	
 	public static ItemStack hideAttributes(ItemStack stack) {
-		if (Version.getVersion().isNewerThan(Version.V1_7)) {
-			ItemMeta meta = stack.getItemMeta();
-			// All ItemFlags are used to hide attributes, their javadoc says so too.
-			meta.addItemFlags(ItemFlag.values());
-			stack.setItemMeta(meta);
-		}
+		ItemMeta meta = stack.getItemMeta();
+		// All ItemFlags are used to hide attributes, their javadoc says so too.
+		meta.addItemFlags(ItemFlag.values());
+		stack.setItemMeta(meta);
 		return stack;
 	}
 	
