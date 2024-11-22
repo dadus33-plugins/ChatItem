@@ -2,6 +2,7 @@ package me.dadus33.chatitem.commands;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -52,25 +53,14 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 			InventoryListener.open(p);
 		} else if (args[0].equalsIgnoreCase("reload") && p.hasPermission("chatitem.reload")) {
 			ChatItem.reload(sender);
+		} else if (args[0].equalsIgnoreCase("ec") && ChatItem.getInstance().getStorage().cmdShow) {
+			sendCommandFormatFrom(p, ItemSlot.ENDERCHEST, Bukkit.getOnlinePlayers());
+		} else if (args[0].equalsIgnoreCase("inv") && ChatItem.getInstance().getStorage().cmdShow) {
+			sendCommandFormatFrom(p, ItemSlot.INVENTORY, Bukkit.getOnlinePlayers());
 		} else if (args[0].equalsIgnoreCase("show") && ChatItem.getInstance().getStorage().cmdShow) {
-			Player cible = args.length == 1 ? p : Bukkit.getPlayer(args[1]);
-			if(cible == null) {
-				Messages.sendMessage(p, "player-not-found", "%arg%", args[1]);
-				return false;
-			}
-			Storage c = ChatItem.getInstance().getStorage();
-			ItemStack item = ChatManager.getUsableItem(cible, ItemSlot.HAND);
-			ChatItem.getPlatform().sendMessage(p, cible, new ChatAction(ItemSlot.HAND, cible, item), c.commandFormat.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
+			sendCommandFormatFrom(p, ItemSlot.getItemSlotByKey(args.length == 0 ? "" : args[1]), Arrays.asList(p));
 		} else if (args[0].equalsIgnoreCase("broadcast") && ChatItem.getInstance().getStorage().cmdBroadcast) {
-			Player cible = args.length == 1 ? p : Bukkit.getPlayer(args[1]);
-			if(cible == null) {
-				Messages.sendMessage(p, "player-not-found", "%arg%", args[1]);
-				return false;
-			}
-			Storage c = ChatItem.getInstance().getStorage();
-			ItemStack item = ChatManager.getUsableItem(cible, ItemSlot.HAND);
-			for(Player all : Bukkit.getOnlinePlayers())
-				ChatItem.getPlatform().sendMessage(all, cible, new ChatAction(ItemSlot.HAND, cible, item), c.commandFormat.replace("%name%", cible.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
+			sendCommandFormatFrom(p, ItemSlot.getItemSlotByKey(args.length == 0 ? "" : args[1]), Bukkit.getOnlinePlayers());
 		} else if (args[0].equalsIgnoreCase("link") || args[0].equalsIgnoreCase("links")) {
 			ConfigurationSection config = ChatItem.getInstance().getConfig()
 					.getConfigurationSection("messages.chatitem-cmd.links");
@@ -135,6 +125,12 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 		return false;
 	}
 	
+	private void sendCommandFormatFrom(Player p, ItemSlot slot, Collection<? extends Player> receivers) {
+		ItemStack item = ChatManager.getUsableItem(p, slot);
+		for(Player all : receivers)
+			ChatItem.getPlatform().sendMessage(all, p, new ChatAction(slot, p, item), ChatItem.getInstance().getStorage().commandFormat.replace("%name%", p.getName()).replace("%item%", ChatManager.SEPARATOR + ""));
+	}
+	
 	private void sendCheckSelectMessage(Player p, String testing) {
 		ChatManager.setTesting(testing);
 		p.chat("Checking for " + testing + ": [i]");
@@ -145,7 +141,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 			agree.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatitem select " + testing + " yes"));
 			agree.setHoverEvent(Utils.createTextHover(Colors.GRAY + "Click to say it worked fine"));
 			text.addExtra(agree);
-			text.addExtra(" ");
+			text.addExtra(", ");
 			TextComponent decline = new TextComponent(Colors.RED + "No");
 			decline.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chatitem select " + testing + " no"));
 			decline.setHoverEvent(Utils.createTextHover(Colors.GRAY + "Click to say it's not working as expected"));
@@ -166,13 +162,20 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 					if (prefix.isEmpty() || s.startsWith(prefix))
 						list.add(s);
 			}
-			if (ChatItem.getInstance().getStorage().cmdShow && (prefix.isEmpty() || "show".startsWith(prefix)))
-				list.add("show");
+			if(ChatItem.getInstance().getStorage().cmdShow) {
+				for (String s : Arrays.asList("show", "ec", "inv"))
+					if (prefix.isEmpty() || s.startsWith(prefix))
+						list.add(s);
+			}
 			if (ChatItem.getInstance().getStorage().cmdBroadcast && (prefix.isEmpty() || "broadcast".startsWith(prefix)))
 				list.add("broadcast");
 			for (String s : Arrays.asList("help", "link"))
 				if (prefix.isEmpty() || s.startsWith(prefix))
 					list.add(s);
+		} else if(arg[1].equalsIgnoreCase("show") || arg[1].equalsIgnoreCase("broadcast")) {
+			for (ItemSlot slot : ItemSlot.values())
+				if (prefix.isEmpty() || slot.getKey().startsWith(prefix))
+					list.add(slot.getKey());
 		}
 		return list;
 	}

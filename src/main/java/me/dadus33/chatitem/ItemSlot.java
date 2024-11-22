@@ -23,6 +23,10 @@ public enum ItemSlot {
 		this.key = key;
 	}
 	
+	public String getKey() {
+		return key;
+	}
+	
 	public boolean isBasic() {
 		return basic;
 	}
@@ -61,6 +65,15 @@ public enum ItemSlot {
 	public static ItemSlot getItemSlotFromMessage(String message) {
 		for(ItemSlot slot : ItemSlot.values()) {
 			if(slot.isEnabled() && slot.hasPlaceholders(message)) {
+				return slot;
+			}
+		}
+		return null;
+	}
+	
+	public static ItemSlot getItemSlotByKey(String key) {
+		for(ItemSlot slot : ItemSlot.values()) {
+			if(slot.isEnabled() && slot.getKey().equalsIgnoreCase(key)) {
 				return slot;
 			}
 		}
