@@ -38,6 +38,7 @@ general:
       keys:
       - "[head]"
       - "{head}"
+      show: "&6%name%'s helmet is %item%"
     # Show the CHESTPLATE not the enderchest or whatever
     chestplate:
       enabled: true
@@ -45,6 +46,7 @@ general:
       keys:
       - "[chest]"
       - "{chest}"
+      show: "&6%name%'s chestplate is %item%"
     # Show leggings
     leggings:
       enabled: true
@@ -52,6 +54,7 @@ general:
       keys:
       - "[legs]"
       - "{legs}"
+      show: "&6%name%'s leggings are %item%"
     # Show what is their feets
     boots:
       enabled: true
@@ -59,6 +62,7 @@ general:
       keys:
       - "[feet]"
       - "{feet}"
+      show: "&6%name%'s boots are %item%"
     inventory:
       enabled: true
       deny-if-no-item: true
@@ -67,6 +71,7 @@ general:
       keys:
       - "[inv]"
       - "{inv}"
+      show: "&6%name%'s inventory is %item%"
     enderchest:
       enabled: true
       deny-if-no-item: true
@@ -75,6 +80,7 @@ general:
       keys:
       - "[ec]"
       - "{ec}"
+      show: "&6%name%'s enderchest is %item%"
 
   # The format of the item placeholders.
   name-format: "&b&l&o{name}{amount}&r"
@@ -118,7 +124,7 @@ general:
       - "&7Failed to parse item for your client"
   
   # Format used with using /chatitem show
-  command-format: "&6%name%'s item is %item%"
+  show: "&6%name%'s item is %item%"
 
   #  Here you can set when the players should see the no-permission message (defined in the 'Messages' section bellow).
   # 'normal' dictates whether the user should see the message when using the placeholder in normal chat, and 'command'
@@ -145,8 +151,10 @@ general:
   sub-commands:
     broadcast: true
     show: true
+  # This part of config is in WIP. Please ignore it.
   ownformatter:
     format: "%name%: %message%"
+  # End of WIP config section.
     
  
  
@@ -155,6 +163,8 @@ messages:
   # The message sent if showing off hands is disabled and the user isn't holding an item.
   # Only works if 'General.deny-if-no-item' is set to true!
   deny-message: "&c&lYou have no item in hand!"
+  # Send for some command to prevent wrong messages
+  empty-item: "&cCan't show empty item"
   # The message sent after the configuration file is successfully reloaded.
   reload-success: "&b&lSuccessful reload!"
   # The message sent if the player is on cooldown from sending a placeholder.

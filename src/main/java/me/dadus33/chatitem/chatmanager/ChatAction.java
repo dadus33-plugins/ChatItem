@@ -51,4 +51,9 @@ public class ChatAction {
 	public ItemStack getItem() {
 		return item == null ? new ItemStack(Material.AIR) : item;
 	}
+	
+	@Override
+	public String toString() {
+		return "ChatAction[slot=" + slot + ",command=" + command + ",item=" + item + ",origin=" + origin + "]";
+	}
 }

@@ -3,22 +3,22 @@ package me.dadus33.chatitem;
 import java.util.List;
 
 import me.dadus33.chatitem.chatmanager.ChatManager;
+import me.dadus33.chatitem.utils.Colors;
 
 public enum ItemSlot {
 
-	HAND(true, "", false),
-	HELMET(false, "helmet", false),
-	CHESTPLATE(false, "chestplate", false),
-	LEGGINGS(false, "leggings", false),
-	BOOTS(false, "boots", false),
-	INVENTORY(false, "inventory", true),
-	ENDERCHEST(false, "enderchest", true);
+	HAND("", false),
+	HELMET("helmet", false),
+	CHESTPLATE("chestplate", false),
+	LEGGINGS("leggings", false),
+	BOOTS("boots", false),
+	INVENTORY("inventory", true),
+	ENDERCHEST("enderchest", true);
 	
-	private final boolean basic, command;
+	private final boolean command;
 	private final String key;
 	
-	private ItemSlot(boolean basic, String key, boolean command) {
-		this.basic = basic;
+	private ItemSlot(String key, boolean command) {
 		this.command = command;
 		this.key = key;
 	}
@@ -28,7 +28,7 @@ public enum ItemSlot {
 	}
 	
 	public boolean isBasic() {
-		return basic;
+		return key.equalsIgnoreCase("");
 	}
 	
 	public boolean isCommand() {
@@ -36,15 +36,19 @@ public enum ItemSlot {
 	}
 	
 	public List<String> getPlaceholders() {
-		return ChatItem.getInstance().getConfig().getStringList(basic ? "general.placeholders" : "general.other-placeholders." + key + ".keys");
+		return ChatItem.getInstance().getConfig().getStringList(isBasic() ? "general.placeholders" : "general.other-placeholders." + key + ".keys");
 	}
 	
 	public boolean isEnabled() {
-		return basic || ChatItem.getInstance().getConfig().getBoolean("general.other-placeholders." + key + ".enabled", true);
+		return isBasic() || ChatItem.getInstance().getConfig().getBoolean("general.other-placeholders." + key + ".enabled", true);
 	}
 	
 	public boolean isDenyIfNoItem() {
-		return ChatItem.getInstance().getConfig().getBoolean("general" + (basic ? "" : ".other-placeholders." + key) + ".deny-if-no-item", true);
+		return ChatItem.getInstance().getConfig().getBoolean("general" + (isBasic() ? "" : ".other-placeholders." + key) + ".deny-if-no-item", true);
+	}
+	 
+	public String getShowMessage() {
+		return Colors.color(ChatItem.getInstance().getConfig().getString("general" + (isBasic() ? "" : ".other-placeholders." + key) + ".show", ""));
 	}
 	
 	public boolean hasPlaceholders(String message) {
