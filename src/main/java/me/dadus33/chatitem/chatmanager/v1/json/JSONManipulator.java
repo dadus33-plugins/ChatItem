@@ -68,7 +68,9 @@ public class JSONManipulator {
 
 			// Get the JSON representation of the item (well, not really JSON, but rather a
 			// string representation of NBT data)
-			hover.addProperty("value", ChatItem.getPlatform().stringifyItem(action.getItem()));
+			String item = ChatItem.getPlatform().stringifyItem(action.getItem());
+			hover.addProperty("value", item);
+			hover.add("contents", parseOrGet(item));
 		} else {
 			hover.addProperty("action", "show_text");
 

@@ -67,7 +67,7 @@ public class NamerManager {
 				continue;
 			for(INamer namer : allNamers) {
 				String tmpName = namer.getName(p, item, storage);
-				if(tmpName != null) {
+				if(tmpName != null && tmpName != "") {
 					ChatItem.debug("Using namer " + namer.getClass().getSimpleName() + ", value: " + tmpName);
 					return tmpName;
 				}
