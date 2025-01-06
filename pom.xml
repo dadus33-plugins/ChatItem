@@ -96,7 +96,7 @@
         <dependency>
             <groupId>com.viaversion</groupId>
             <artifactId>viaversion-api</artifactId>
-            <version>5.0.3</version>
+            <version>5.2.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
