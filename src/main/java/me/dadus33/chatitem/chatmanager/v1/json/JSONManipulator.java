@@ -42,6 +42,8 @@ public class JSONManipulator {
 	
 	public static JsonObject parseOrGet(String json) {
 		if(json.startsWith("\"") && json.endsWith("\"")) {// seems to be simple line
+			if(json.startsWith("\"{") && json.endsWith("}\"")) // json in string
+				return JsonParser.parseString(json.substring(1, json.length() - 1).replace("\\\"", "\"")).getAsJsonObject();
 			return JsonParser.parseString("{\"text\":" + json + "}").getAsJsonObject();
 		}
 		try {
