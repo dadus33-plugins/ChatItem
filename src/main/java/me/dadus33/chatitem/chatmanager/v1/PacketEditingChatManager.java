@@ -2,6 +2,7 @@ package me.dadus33.chatitem.chatmanager.v1;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 
@@ -77,6 +78,20 @@ public class PacketEditingChatManager extends ChatManager {
 
 	public static Object createSystemChatPacket(String json, Object old) throws Exception {
 		json = checkPacketSize(json, 150000);
+		if(json.contains("tag:{{")) { // this is to fix for MC 1.20.4 (at least on purpur)
+			ChatItem.debug("Found strange JSON formatting. Cleaning...");
+			boolean replaced = false;
+			String next = "";
+			for(String part : json.split("tag:\\{\\{")) {
+				if(replaced) {
+					next += "tag:{";
+					next += part.replaceFirst("\\}\\}", "}");
+				} else
+					next += part;
+				replaced = true;
+			}
+			json = next;
+		}
 		Object packet = internalCreateSystemChatPacket(json, old);
 		if(packet != null)
 			return packet;
@@ -90,6 +105,7 @@ public class PacketEditingChatManager extends ChatManager {
 	}
 	
 	private static Object internalCreateSystemChatPacket(Object obj, Object old) throws Exception {
+		ChatItem.debug("Creating internal chat system packet from " + old + " to " + obj);
 		Class<?> packetClass = PacketUtils.getNmsClass("ClientboundSystemChatPacket", "network.protocol.game.", "ClientboundPlayerChatPacket", "PacketPlayOutChat");
 		Class<?> chatMessageTypeClass = Utils.isClassExist("net.minecraft.network.chat.ChatMessageType") ? PacketUtils.getNmsClass("ChatMessageType", "network.chat.") : null;
 		Constructor<?> betterOne = null;
