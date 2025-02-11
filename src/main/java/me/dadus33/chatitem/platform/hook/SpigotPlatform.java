@@ -161,7 +161,7 @@ public class SpigotPlatform implements IPlatform {
 			return null;
 		try {
 			for (Method m : chatSerializerClass.getDeclaredMethods()) {
-				if (m.getParameterTypes()[0].equals(chatBaseComponentClass) && m.getReturnType().equals(String.class)) {
+				if (m.getParameterTypes().length > 0 && m.getParameterTypes()[0].equals(chatBaseComponentClass) && m.getReturnType().equals(String.class)) {
 					return m;
 				}
 			}

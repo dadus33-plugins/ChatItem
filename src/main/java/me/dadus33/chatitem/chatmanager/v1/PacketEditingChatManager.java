@@ -2,7 +2,6 @@ package me.dadus33.chatitem.chatmanager.v1;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
-import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 
