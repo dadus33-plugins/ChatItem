@@ -57,10 +57,6 @@
             <id>PaperMC</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
-        <repository>
-		    <id>mvdw-software</id>
-		    <url>http://repo.mvdw-software.be/content/groups/public/</url>
-		</repository>
 	    <repository>
 	        <id>essentials-snapshots</id>
 	        <url>https://repo.essentialsx.net/snapshots/</url>

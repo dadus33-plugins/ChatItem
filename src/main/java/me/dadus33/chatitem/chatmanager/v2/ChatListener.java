@@ -90,7 +90,7 @@ public class ChatListener implements Listener {
 		}
 		String itemName = ChatManager.getNameForChatAction(p, action, c);
 		String loggedMessage = msg.replace(ChatManager.SEPARATOR + "", itemName);
-		Bukkit.getConsoleSender().sendMessage(loggedMessage); // show in log
+		Bukkit.getConsoleSender().sendMessage(c.replaceInConsole ? loggedMessage : msg); // show in log
 		if (ChatItem.discordSrvSupport)
 			DiscordSrvSupport.sendChatMessage(p, defMsg.replace(ChatManager.SEPARATOR + "", itemName), e);
 		Set<Player> recipients = e.getRecipients().isEmpty() ? new HashSet<>(Bukkit.getOnlinePlayers()) : e.getRecipients();

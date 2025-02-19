@@ -14,7 +14,7 @@ public class Storage {
 	public final String SECONDS, minutes, hours;
 	public final String updateMessage, updateHover;
 	public final List<String> tooltipHand, tooltipBuggedClient, ignoredItems;
-	public boolean colorIfColored, addAmountForced, letMessageThrough, debug, handDisabled, showNoPermissionMessage, checkUpdate, permissionEnabled, cmdBroadcast, cmdShow, discordSrvSendMsg;
+	public boolean colorIfColored, addAmountForced, letMessageThrough, debug, handDisabled, showNoPermissionMessage, checkUpdate, permissionEnabled, cmdBroadcast, cmdShow, discordSrvSendMsg, replaceInConsole;
 	public int configVersion, limit, cooldown;
 	private FileConfiguration conf;
 
@@ -47,6 +47,7 @@ public class Storage {
 		checkUpdate = conf.getBoolean("general.check-update", true);
 		cmdShow = conf.getBoolean("general.sub-commands.broadcast", true);
 		cmdBroadcast = conf.getBoolean("general.sub-commands.show", true);
+		replaceInConsole = conf.getBoolean("general.replace-in-console", true);
 		messageDeny = color(conf.getString("messages.deny-message", "&c&lYou have no item in hand!"));
 		messageReload = color(conf.getString("messages.reload-success", "&b&lSuccessful reload!"));
 		messageNoPermission = color(conf.getString("messages.no-permission", "&c&lI'm sorry, but you are not allowed to use the placeholder in chat!"));

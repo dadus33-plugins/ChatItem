@@ -96,6 +96,10 @@ general:
   let-message-through: true
   # Should we allow users to show their hands off
   deny-if-no-item: false
+  # Define if the console should see the real message or with the placeholder.
+  # By default on true to show the replaced placeholder.
+  # Warn: this cannot works with some manager.
+  replace-in-console: true
   #  If the above (deny-if-no-item) is set to false, what should the placeholder be replaced with?
   # Bellow you can configure that behaviour.
   hand:
