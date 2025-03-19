@@ -304,4 +304,4 @@ discord-srv-send-our: true
 
 manager-config:
   paper:
-    send-ourself: false
+    send-ourself: true

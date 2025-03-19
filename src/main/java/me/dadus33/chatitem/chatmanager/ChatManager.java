@@ -48,6 +48,10 @@ public abstract class ChatManager {
 	public final static char SEPARATOR_END = ((char) 0x0003);
 	public final static String SEPARATOR_END_STR = "\\u0003";
 
+	public static String addSeparator(int id) {
+		return SEPARATOR + Integer.toString(id) + SEPARATOR_END;
+	}
+	
 	public static String removeSeparator(String message) {
 		return fixSeparator(message).replace(Character.toString(SEPARATOR), "").replace(Character.toString(SEPARATOR_END), "");
 	}

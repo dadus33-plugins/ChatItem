@@ -49,7 +49,7 @@ public class PaperListener implements Listener {
 		if (ChatManager.containsSeparator(rawMessage)) { // fix for v1
 			Chat chat = Chat.getFrom(rawMessage);
 			if (chat != null) {
-				message = message.replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.SEPARATOR + "" + chat.getId() + ChatManager.SEPARATOR_END)
+				message = message.replaceText(TextReplacementConfig.builder().matchLiteral(ChatManager.addSeparator(chat.getId()))
 						.replacement(C.text(chat.getSlot().getPlaceholders().get(0))).build());
 				rawMessage = C.string(message);
 			}
@@ -81,15 +81,18 @@ public class PaperListener implements Listener {
 		TextComponent like = C.text(ChatManager.getNameForChatAction(p, action, getStorage())).hoverEvent(hoverEvent);
 		if (action.hasCommand())
 			like.clickEvent(ClickEvent.runCommand(action.getCommand()));
-		for (String s : slot.getPlaceholders())
+		for (String s : slot.getPlaceholders()) {
 			message = message.replaceText(TextReplacementConfig.builder().matchLiteral(s).replacement(like).build());
-		if (ChatItem.getInstance().getConfig().getBoolean("manager-config.paper.send-ourself", false)) {
+		}
+		if (ChatItem.getInstance().getConfig().getBoolean("manager-config.paper.send-ourself", true) || Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
 			for (Audience a : e.viewers().isEmpty() ? Bukkit.getOnlinePlayers() : e.viewers())
 				a.sendMessage(e.renderer().render(p, p.displayName(), message, a));
 			e.setCancelled(true);
-		} else
+			ChatItem.debug("Sent message by ourself : " + C.string(message));
+		} else {
 			e.message(message);
-		ChatItem.debug("Changed message to " + C.string(message));
+			ChatItem.debug("Changed message to " + C.string(message));
+		}
 		if (getStorage().cooldown > 0 && !p.hasPermission("chatitem.ignore-cooldown"))
 			ChatManager.applyCooldown(p);
 	}
