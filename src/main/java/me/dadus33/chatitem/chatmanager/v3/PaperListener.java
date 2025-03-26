@@ -36,7 +36,7 @@ public class PaperListener implements Listener {
 		return manage.getStorage();
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onChat(AsyncChatEvent e) {
 		if (ChatManager.isTestingEnabled() && !ChatManager.isTesting("paper"))
 			return;
@@ -84,7 +84,7 @@ public class PaperListener implements Listener {
 		for (String s : slot.getPlaceholders()) {
 			message = message.replaceText(TextReplacementConfig.builder().matchLiteral(s).replacement(like).build());
 		}
-		if (ChatItem.getInstance().getConfig().getBoolean("manager-config.paper.send-ourself", true) || Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
+		if (ChatItem.getInstance().getConfig().getBoolean("manager-config.paper.send-ourself", true)) {
 			for (Audience a : e.viewers().isEmpty() ? Bukkit.getOnlinePlayers() : e.viewers())
 				a.sendMessage(e.renderer().render(p, p.displayName(), message, a));
 			e.setCancelled(true);

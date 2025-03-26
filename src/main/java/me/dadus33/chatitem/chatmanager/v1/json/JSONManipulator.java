@@ -158,71 +158,45 @@ public class JSONManipulator {
 				continue;
 			}
 			if (element.isJsonObject()) {
-				JsonElement text = element.getAsJsonObject().get("text");
-				if(text != null && ChatManager.containsSeparator(text.getAsString())) {
-					if(!ChatManager.containsSeparatorEnd(text.getAsString())) // if the separator doesn't end in the same string as it's begin
+				JsonObject o = element.getAsJsonObject();
+				JsonElement text = o.get("text");
+				if(text != null && !text.getAsString().isEmpty()) {
+					if (ChatManager.containsSeparator(text.getAsString()) && !ChatManager.containsSeparatorEnd(text.getAsString())) // if the separator doesn't end in the same string as it's begin
 						separator = true;
+					if(!ChatManager.containsSeparator(o.toString())) {
+						addParsedStringToArray(text.getAsString(), replacer, o, tooltip);
+					}
 				}
-				ChatItem.debug("Parsing object " + element.toString());
-				addParsedJsonObjectToArray(element.getAsJsonObject(), replacer, tooltip);
+				if (o.has("extra") && !o.get("extra").getAsJsonArray().isEmpty()) {
+					JsonArray jar = o.get("extra").getAsJsonArray();
+					JsonArray tmpArray = parseArray(jar, tooltip);
+					if (!tmpArray.isEmpty()) {
+						o.add("extra", tmpArray);
+						replacer.add(o);
+					}
+					ChatItem.debug("[addParsedJsonObjectToArray] " + jar + " parsed " + tmpArray + " into " + replacer);
+				}
+				
 			} else if (element.isJsonArray()) {
 				JsonArray jar = element.getAsJsonArray();
-				if (jar.size() != 0) {
-					jar = parseArray(element.getAsJsonArray(), tooltip);
-					replacer.set(i, jar);
+				if (!jar.isEmpty()) {
+					replacer.set(i, parseArray(element.getAsJsonArray(), tooltip));
 				}
 			} else if(element.isJsonPrimitive()) {
 				if(ChatManager.containsSeparator(element.getAsString())) {
 					if(!ChatManager.containsSeparatorEnd(element.getAsString())) // if the separator doesn't end in the same string as it's begin
 						separator = true;
 					addParsedStringToArray(element.getAsString(), replacer, element, tooltip);
-				}
+				} else
+					replacer.add(element); // add basic element
 			}
 		}
 		return replacer;
 	}
 
-	private void addParsedJsonObjectToArray(JsonObject o, JsonArray rep, JsonElement tooltip) {
-		JsonElement text = o.get("text");
-		if (text == null) {
-			JsonElement el = o.get("extra");
-			if (el != null) {
-				JsonArray jar = el.getAsJsonArray();
-				if (jar.size() != 0) {
-					JsonArray tmpArray = parseArray(jar, tooltip);
-					if (!tmpArray.isEmpty())
-						o.add("extra", tmpArray);
-					else
-						o.remove("extra");
-				} else {
-					o.remove("extra");
-				}
-			}
-			return;
-		} else {
-			if (text.getAsString().isEmpty()) {
-				JsonElement el = o.get("extra");
-				if (el != null) {
-					JsonArray jar = el.getAsJsonArray();
-					if (!jar.isEmpty()) {
-						JsonArray tmpArray = parseArray(jar, tooltip);
-						if (!tmpArray.isEmpty())
-							o.add("extra", tmpArray);
-						else
-							o.remove("extra");
-					} else {
-						o.remove("extra");
-					}
-				}
-			}
-		}
-
-		addParsedStringToArray(text.getAsString(), rep, o, tooltip);
-	}
-
 	private void addParsedStringToArray(String msg, JsonArray rep, JsonElement o, JsonElement tooltip) {
 		if (!ChatManager.containsSeparator(msg)) {
-			rep.add(o);
+			rep.add(o.deepCopy());
 			return;
 		}
 		ChatItem.debug("[JSONManipulator] Parsed string " + msg + ", rep: " + rep);
