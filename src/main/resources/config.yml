@@ -81,6 +81,9 @@ general:
       - "[ec]"
       - "{ec}"
       show: "&6%name%'s enderchest is %item%"
+    one_item:
+      # Time in seconds before the placeholder expire
+      time-expire: 1800
 
   # The format of the item placeholders.
   name-format: "&b&l&o{name}{amount}&r"

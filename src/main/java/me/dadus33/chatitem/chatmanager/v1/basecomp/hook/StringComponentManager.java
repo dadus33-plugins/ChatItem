@@ -65,7 +65,7 @@ public class StringComponentManager implements IComponentManager {
 	@Override
 	public Object manageContent(Player viewer, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
 		ChatAction action = chat.getAction();
-		if (action.isItem())
+		if (action.hasItem())
 			return manage(viewer, chat, packet, ChatManager.getNameForChatAction(viewer, chat, c), Utils.createItemHover(action.getItem(), viewer), null);
 		else
 			return manage(viewer, chat, packet, ChatManager.getNameForChatAction(viewer, chat, c),
@@ -80,7 +80,7 @@ public class StringComponentManager implements IComponentManager {
 		ClickEvent click;
 		String rep;
 		ChatAction action = chat.getAction();
-		if (action.isItem()) {
+		if (action.hasItem()) {
 			hover = Utils.createTextHover(builder.create());
 			rep = ChatManager.getHandName(chat);
 			click = null;

@@ -8,24 +8,25 @@ import me.dadus33.chatitem.ItemSlot;
 
 public class ChatAction {
 
-	private boolean isItem;
+	private boolean hasItem;
 	private ItemSlot slot;
 	private String command;
 	private ItemStack item;
 	private Player origin;
 	
-	public ChatAction(ItemSlot slot, Player origin, ItemStack item) {
+	public ChatAction(ItemSlot slot, Player origin, ItemStack item, String command) {
 		this.slot = slot;
 		this.item = item == null ? new ItemStack(Material.AIR) : item;
+		this.command = command;
 		this.origin = origin;
-		this.isItem = true;
+		this.hasItem = true;
 	}
 	
 	public ChatAction(ItemSlot slot, Player origin, String command) {
 		this.slot = slot;
 		this.command = command;
 		this.origin = origin;
-		this.isItem = false;
+		this.hasItem = false;
 	}
 	
 	public Player getOrigin() {
@@ -36,8 +37,8 @@ public class ChatAction {
 		return slot;
 	}
 	
-	public boolean isItem() {
-		return isItem;
+	public boolean hasItem() {
+		return hasItem;
 	}
 	
 	public String getCommand() {

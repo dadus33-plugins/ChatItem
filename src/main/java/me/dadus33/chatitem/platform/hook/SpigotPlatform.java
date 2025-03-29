@@ -241,7 +241,7 @@ public class SpigotPlatform implements IPlatform {
 				if (args == ChatManager.SEPARATOR) {
 					// here put the item
 					appendToComponentBuilder(builder, fixColorComponent(to, text, color, action));
-					if (action.isItem())
+					if (action.hasItem())
 						addItem(builder, to, origin, action.getItem(), action);
 					else
 						addCommand(builder, to, origin, action.getCommand(), action);
@@ -375,7 +375,7 @@ public class SpigotPlatform implements IPlatform {
 		ComponentBuilder littleBuilder = new ComponentBuilder(ChatItem.replace(action.getOrigin(), text));
 		if (color != null && !Colors.isFormatting(color)) // don't add reset thing
 			littleBuilder.color(color);
-		if (action.isItem()) {
+		if (action.hasItem()) {
 			if (action.getItem().getType().equals(Material.AIR))
 				littleBuilder.event(Utils.createTextHover(String.join("\n", ChatItem.getInstance().getStorage().tooltipHand)));
 			else

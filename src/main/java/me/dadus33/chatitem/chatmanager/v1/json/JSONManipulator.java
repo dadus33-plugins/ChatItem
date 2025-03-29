@@ -65,7 +65,7 @@ public class JSONManipulator {
 		// There's no public clone method for JSONObjects so we need to parse them every
 		// time
 		JsonObject hover = new JsonObject();
-		if (action.isItem()) {
+		if (action.hasItem()) {
 			hover.addProperty("action", "show_item");
 
 			// Get the JSON representation of the item (well, not really JSON, but rather a

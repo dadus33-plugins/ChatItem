@@ -132,7 +132,7 @@ public class ChatItemCommand implements CommandExecutor, TabExecutor {
 		}
 		ChatAction action = ChatManager.getChatAction(slot, p);
 		ChatItem.debug("Action: " + action);
-		if(action.isItem() && ItemUtils.isEmpty(action.getItem())) {
+		if(action.hasItem() && ItemUtils.isEmpty(action.getItem())) {
 			Messages.sendMessage(p, "empty-item");
 			return;
 		}

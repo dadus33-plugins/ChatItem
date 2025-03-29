@@ -48,7 +48,7 @@ public interface IComponentManager {
 	default Object manageContent(Player viewer, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
 		String message;
 		if (Utils.isBeforeChatJson(viewer))
-			message = JSONManipulator.getInstance().parseEmpty(chat, json, chat.getAction().isItem() ? ChatManager.getMaxLinesFromItem(viewer, chat.getAction().getItem()) : new ArrayList<>(), chat.getPlayer());
+			message = JSONManipulator.getInstance().parseEmpty(chat, json, chat.getAction().hasItem() ? ChatManager.getMaxLinesFromItem(viewer, chat.getAction().getItem()) : new ArrayList<>(), chat.getPlayer());
 		else
 			message = JSONManipulator.getInstance().parse(chat, json, chat.getAction(), ChatManager.getNameForChatAction(viewer, chat, c));
 		if (message != null) {

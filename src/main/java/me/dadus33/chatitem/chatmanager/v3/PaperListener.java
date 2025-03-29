@@ -62,7 +62,7 @@ public class PaperListener implements Listener {
 		if (!ChatManager.canUsePlaceholder(p, action, slot, e))
 			return;
 		HoverEventSource<?> hoverEvent = null;
-		if(action.isItem()) {
+		if(action.hasItem()) {
 			if(!action.getItem().getType().equals(Material.AIR))
 				hoverEvent = action.getItem().asHoverEvent();
 			else {

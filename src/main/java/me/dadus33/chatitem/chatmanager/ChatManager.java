@@ -25,6 +25,7 @@ import me.dadus33.chatitem.Storage;
 import me.dadus33.chatitem.hook.ecoenchants.EcoEnchantsSupport;
 import me.dadus33.chatitem.invsee.InvShower;
 import me.dadus33.chatitem.invsee.hook.EnderChestShower;
+import me.dadus33.chatitem.invsee.hook.OneItemShower;
 import me.dadus33.chatitem.invsee.hook.PlayerInventoryShower;
 import me.dadus33.chatitem.itemnamer.NamerManager;
 import me.dadus33.chatitem.utils.Colors;
@@ -146,7 +147,10 @@ public abstract class ChatManager {
 			InvShower.add(uuid.toString(), slot == ItemSlot.INVENTORY ? new PlayerInventoryShower(p) : new EnderChestShower(p));
 			return new ChatAction(slot, p, "/chatitem seeinv " + uuid.toString());
 		}
-		return new ChatAction(slot, p, getUsableItem(p, slot));
+		UUID uuid = UUID.randomUUID();
+		ItemStack item = getUsableItem(p, slot);
+		InvShower.add(uuid.toString(), new OneItemShower(p, item));
+		return new ChatAction(slot, p, item, "/chatitem seeinv " + uuid.toString());
 	}
 
 	/**
@@ -220,7 +224,7 @@ public abstract class ChatManager {
 
 	public static String getNameForChatAction(Player viewer, Chat chat, Storage c) {
 		ChatAction action = chat.getAction();
-		if (action.isItem()) {
+		if (action.hasItem()) {
 			ItemStack item = action.getItem();
 			if (ItemUtils.isEmpty(item)) {
 				if (c.handDisabled)
@@ -233,7 +237,7 @@ public abstract class ChatManager {
 	}
 
 	public static String getNameForChatAction(Player viewer, ChatAction action, Storage c) {
-		if (action.isItem()) {
+		if (action.hasItem()) {
 			ItemStack item = action.getItem();
 			if (ItemUtils.isEmpty(item)) {
 				if (c.handDisabled)
@@ -297,7 +301,7 @@ public abstract class ChatManager {
 			}
 			return false;
 		}
-		if (action.isItem() && action.getItem().getType().equals(Material.AIR) && slot.isBasic()) {
+		if (action.hasItem() && action.getItem().getType().equals(Material.AIR) && slot.isBasic()) {
 			if (slot.isDenyIfNoItem()) {
 				if (e != null)
 					e.setCancelled(true);
@@ -330,7 +334,7 @@ public abstract class ChatManager {
 				}
 			}
 		}
-		if (action.isItem()) {
+		if (action.hasItem()) {
 			for (String ignored : c.ignoredItems) {
 				if (action.getItem().getType().name().toLowerCase().contains(ignored.toLowerCase())) {
 					return false;

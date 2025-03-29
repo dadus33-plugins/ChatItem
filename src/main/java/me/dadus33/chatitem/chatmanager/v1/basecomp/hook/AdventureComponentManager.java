@@ -88,7 +88,7 @@ public class AdventureComponentManager implements IComponentManager {
 	@Override
 	public Object manageContent(Player viewer, Chat chat, ChatItemPacket packet, String json, Storage c) throws Exception {
 		ChatAction action = chat.getAction();
-		if (action.isItem()) {
+		if (action.hasItem()) {
 			ItemStack item = action.getItem();
 			String itemName = ChatManager.getNameForChatAction(viewer, chat, c);
 			ChatItem.debug("NBT tag: " + PacketUtils.getNbtTag(item));
@@ -109,7 +109,7 @@ public class AdventureComponentManager implements IComponentManager {
 		Component builder = Component.text("");
 		c.tooltipHand.forEach(s -> builder.append(Component.text(s)));
 		ChatAction action = chat.getAction();
-		if (action.isItem()) {
+		if (action.hasItem()) {
 			return manage(viewer, chat, packet, ChatManager.getNameForChatAction(viewer, chat, c), HoverEvent.showText(builder), null);
 		}
 		return manage(viewer, chat, packet, Messages.getMessage(action.getSlot().name().toLowerCase() + ".chat", "%cible%", chat.getPlayer().getName()),
