@@ -36,7 +36,7 @@ public class PaperListener implements Listener {
 		return manage.getStorage();
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onChat(AsyncChatEvent e) {
 		if (ChatManager.isTestingEnabled() && !ChatManager.isTesting("paper"))
 			return;

@@ -108,7 +108,10 @@ public class JSONManipulator {
 			ChatItem.debug("[JsonManipulator] Parsed quick: " + obj.toString() + ", wrapper: " + wrapper);
 			return ChatManager.replaceSeparator(chat, wrapper.toString(), replacement);
 		}
-		obj.add("extra", parseArray(obj.has("extra") ? obj.getAsJsonArray("extra") : new JsonArray(), wrapper));
+		if(!obj.has("extra"))
+			obj.add("extra", new JsonArray());
+		ChatItem.debug("Parsing array " + obj.getAsJsonArray("extra") + " FROM: " + obj + ". Result: " + parseArray(obj.getAsJsonArray("extra"), wrapper));
+		obj.add("extra", parseArray(obj.getAsJsonArray("extra"), wrapper));
 		if (!obj.has("text")) {
 			obj.addProperty("text", "");
 		}
@@ -147,25 +150,21 @@ public class JSONManipulator {
 
 	private JsonArray parseArray(JsonArray arr, JsonElement tooltip) {
 		JsonArray replacer = new JsonArray();
-		boolean separator = false;
 		for (int i = 0; i < arr.size(); ++i) {
 			JsonElement element = arr.get(i);
 			if(element.isJsonNull())
 				continue;
-			if(separator) {
+			/*if(separator) {
 				if(ChatManager.containsSeparatorEnd(element.toString()))
 					separator = false;
 				continue;
-			}
+			}*/
 			if (element.isJsonObject()) {
 				JsonObject o = element.getAsJsonObject();
 				JsonElement text = o.get("text");
+				ChatItem.debug("adding JsonObject " + o + " (text: " + text + ")");
 				if(text != null && !text.getAsString().isEmpty()) {
-					if (ChatManager.containsSeparator(text.getAsString()) && !ChatManager.containsSeparatorEnd(text.getAsString())) // if the separator doesn't end in the same string as it's begin
-						separator = true;
-					if(!ChatManager.containsSeparator(o.toString())) {
-						addParsedStringToArray(text.getAsString(), replacer, o, tooltip);
-					}
+					addParsedStringToArray(text.getAsString(), replacer, o, tooltip);
 				}
 				if (o.has("extra") && !o.get("extra").getAsJsonArray().isEmpty()) {
 					JsonArray jar = o.get("extra").getAsJsonArray();
@@ -184,8 +183,6 @@ public class JSONManipulator {
 				}
 			} else if(element.isJsonPrimitive()) {
 				if(ChatManager.containsSeparator(element.getAsString())) {
-					if(!ChatManager.containsSeparatorEnd(element.getAsString())) // if the separator doesn't end in the same string as it's begin
-						separator = true;
 					addParsedStringToArray(element.getAsString(), replacer, element, tooltip);
 				} else
 					replacer.add(element); // add basic element
