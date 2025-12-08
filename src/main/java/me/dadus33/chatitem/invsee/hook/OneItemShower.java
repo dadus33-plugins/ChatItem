@@ -1,5 +1,6 @@
 package me.dadus33.chatitem.invsee.hook;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +18,7 @@ public class OneItemShower extends InvShower {
 	public OneItemShower(Player cible, ItemStack item) {
 		super("one_item", cible);
 		
-		this.item = item.clone();
+		this.item = item == null ? new ItemStack(Material.AIR) : item.clone();
 	}
 	
 	@Override
