@@ -30,9 +30,10 @@ public class INC2Channel extends ChannelAbstract {
 		super(customPacketManager);
 		boundHandler = new ChannelInboundHandler(customPacketManager);
 		try {
-			Object mcServer = ReflectionUtils.callMethod(PacketUtils.getCraftServer(), Version.getVersion().equals(Version.V1_17) ? "getServer" : "b");
-			Object co = ReflectionUtils.getFirstWith(mcServer, PacketUtils.getNmsClass("MinecraftServer", "server."), PacketUtils.getNmsClass("ServerConnection", "server.network."));
-			((List<ChannelFuture>) ReflectionUtils.getObject(co, "f")).forEach((channelFuture) -> {
+			Object mcServer = ReflectionUtils.callMethod(PacketUtils.getCraftServer(), Version.getVersion().equals(Version.V1_17) || Version.getVersion().equals(Version.V1_21_11) ? "getServer" : "b");
+			Object co = ReflectionUtils.getFirstWith(mcServer, PacketUtils.getNmsClass("MinecraftServer", "server."), PacketUtils.getNmsClass(Version.getVersion().equals(Version.V1_21_11) ? "ServerConnectionListener" : "ServerConnection", "server.network."));
+			ChatItem.debug("co: " + co);
+			((List<ChannelFuture>) ReflectionUtils.getObject(co, Version.getVersion().equals(Version.V1_21_11) ? "channels" : "f")).forEach((channelFuture) -> {
 				pipeline = channelFuture.channel().pipeline();
 				pipeline.addFirst(boundHandler);
 			});
@@ -87,7 +88,7 @@ public class INC2Channel extends ChannelAbstract {
 	@Override
 	public Channel getChannel(Player p) throws Exception {
 		Object playerConnection = getPlayerConnection(p);
-		Object networkManager = ReflectionUtils.getFirstWith(playerConnection, PacketUtils.getNmsClass("NetworkManager", "network."));
+		Object networkManager = ReflectionUtils.getFirstWith(playerConnection, PacketUtils.getNmsClass(Version.getVersion().isNewerOrEquals(Version.V1_21_11) ? "Connection" : "NetworkManager", "network."));
 		return ReflectionUtils.getFirstWith(networkManager, Channel.class);
 	}
 
